@@ -1,0 +1,11 @@
+-Lade Höhenmap aus Bilddatei; sprich Abbildung Dateiname -> 2D-Array aus [0,1]
+-Erstelle Klasse, die die Höhenmap speichert, rendere die Map mit Wireframe
+-Erstelle Kamera, die mit der Maus bewegt werden kann. Ctrl, Space ud wasd bestimmen das Strafen
+-Versuche Textur für das Terrain zu generieren aus mehreren Schichten: Gras, Steine, Sand. Große Steigungen sollten extra eingefärbt werden.
+-Lege Textur und Detailtextur auf das Terrain
+-Erstelle Wasserschicht (einfaches Quad, vielleicht Shadereffekt für Wasser?)
+-Erstelle Skydome (mit mehreren Texturschichten, Panning etc.)
+-Versuche ROAM umzusetzen, indem das komplette Terrain in ein reguläres Gitter gelegt wird und dann Frustum Culling gemacht wird. Alternativ vielleicht echtes ROAM?
+-Sonne einbauen, Farbgradient
+-Lightmap für Terrain generieren?
+-Gegenstände wie Bäume auf das Terrain setzen?
