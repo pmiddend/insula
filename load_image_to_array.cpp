@@ -1,15 +1,9 @@
+#include "height_map.hpp"
+#include "image_to_height_map.hpp"
+#include "display_2d_array.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
-#include <sge/renderer/refresh_rate_dont_care.hpp>
-#include <sge/renderer/no_multi_sampling.hpp>
-#include <sge/renderer/device.hpp>
-#include <sge/renderer/system.hpp>
-#include <sge/renderer/scoped_block.hpp>
-#include <sge/renderer/state/list.hpp>
-#include <sge/renderer/state/var.hpp>
-#include <sge/renderer/state/trampoline.hpp>
-#include <sge/renderer/filter/linear.hpp>
 #include <sge/input/system.hpp>
 #include <sge/input/action.hpp>
 #include <sge/image/multi_loader.hpp>
@@ -31,6 +25,9 @@
 #include <fcppt/log/activate_levels.hpp>
 #include <fcppt/log/level.hpp>
 #include <fcppt/io/cerr.hpp>
+#include <fcppt/io/cout.hpp>
+#include <fcppt/from_std_string.hpp>
+#include <fcppt/filesystem/is_regular.hpp>
 #include <boost/mpl/vector/vector10.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
@@ -38,9 +35,19 @@
 #include <exception>
 #include <ostream>
 
-int main(int,char *[])
+int main(int argc,char *argv[])
 try
 {
+	if (argc != 2)
+	{
+		fcppt::io::cerr << FCPPT_TEXT("usage: ") << fcppt::from_std_string(argv[0]) << FCPPT_TEXT(" <image-file>\n");
+		return EXIT_FAILURE;
+	}
+
+	fcppt::filesystem::path const filename(
+		fcppt::from_std_string(
+			argv[1]));
+
 	fcppt::log::activate_levels(
 		sge::log::global(),
 		fcppt::log::level::debug
@@ -49,34 +56,30 @@ try
 	sge::systems::instance sys(
 		sge::systems::list()
 		(
-			sge::window::parameters(
-				FCPPT_TEXT("insula toolbox, load image")
-			)
-		)
-		(
-			sge::renderer::parameters(
-				sge::renderer::display_mode(
-					sge::renderer::screen_size(
-						1024,
-						768
-					),
-					sge::renderer::bit_depth::depth32,
-					sge::renderer::refresh_rate_dont_care
-				),
-				sge::renderer::depth_buffer::off,
-				sge::renderer::stencil_buffer::off,
-				sge::renderer::window_mode::windowed,
-				sge::renderer::vsync::on,
-				sge::renderer::no_multi_sampling
-			)
-		)
-		(
 			sge::systems::image_loader(
 				sge::image::capabilities_field::null(),
 				sge::all_extensions
 			)
 		)
 	);
+
+	insula::height_map const h = 
+		insula::image_to_height_map(
+			sys.image_loader().load(
+				filename));
+	
+	fcppt::io::cout.precision(
+		2);
+	
+	fcppt::io::cout.width(
+		5);
+
+	fcppt::io::cout.setf(
+		std::ios::fixed);
+	
+	insula::display_2d_array(
+		fcppt::io::cout,
+		h);
 }
 catch(sge::exception const &e)
 {
