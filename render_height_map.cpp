@@ -39,6 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <sge/renderer/state/draw_mode.hpp>
 #include <sge/input/system.hpp>
 #include <sge/input/action.hpp>
+#include <sge/time/timer.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/image/capabilities.hpp>
 #include <sge/image/colors.hpp>
@@ -133,7 +134,7 @@ try
 			sys.image_loader().load(
 				filename)),
 		static_cast<insula::height_map::scalar>(
-			100),
+			1000),
 		insula::height_map::vector2(
 			50,50));
 
@@ -198,7 +199,13 @@ try
 		static_cast<insula::graphics::scalar>(
 			1),
 		static_cast<insula::graphics::scalar>(
-			1000));
+			1000),
+		static_cast<insula::graphics::scalar>(
+			200));
+	
+	sge::time::timer frame_timer(
+		sge::time::second(
+			1));
 
 	while(running)
 	{
@@ -209,6 +216,9 @@ try
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
+
+		cam.update(
+			frame_timer.reset());
 
 		h.render();
 	}

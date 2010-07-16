@@ -1,4 +1,6 @@
 #include "camera.hpp"
+#include "scalar.hpp"
+#include "vec4.hpp"
 #include <sge/input/key_pair.hpp>
 #include <sge/input/system.hpp>
 #include <fcppt/tr1/functional.hpp>
@@ -9,6 +11,12 @@
 #include <fcppt/math/matrix/rotation_y.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/output.hpp>
+#include <fcppt/math/matrix/transpose.hpp>
+#include <fcppt/math/vector/narrow_cast.hpp>
+#include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/matrix/vector.hpp>
+#include <fcppt/math/pi.hpp>
 #include <fcppt/io/cout.hpp>
 
 insula::graphics::camera::camera(
@@ -16,7 +24,8 @@ insula::graphics::camera::camera(
 	scalar _aspect,
 	scalar _fov,
 	scalar _near,
-	scalar _far)
+	scalar _far,
+	scalar _speed)
 :
 	input_connection_(
 		_is->register_callback(
@@ -24,8 +33,6 @@ insula::graphics::camera::camera(
 				&camera::input_callback,
 				this,
 				std::tr1::placeholders::_1))),
-	time_delta_(
-		static_cast<scalar>(0)),
 	aspect_(
 		_aspect),
 	fov_(
@@ -34,42 +41,71 @@ insula::graphics::camera::camera(
 		_near),
 	far_(
 		_far),
+	speed_(
+		_speed),
 	rotate_x_(
-		static_cast<scalar>(
-			0)),
+		fcppt::math::pi<scalar>()),
 	rotate_y_(
 		static_cast<scalar>(
-			0))
+			0)),
+	dirs_(
+		vec3::null()),
+	position_(
+		vec3::null())
 {
 }
 
 void
-insula::graphics::camera::time_delta(
-	scalar const _time_delta)
+insula::graphics::camera::update(
+	scalar const t)
 {
-	time_delta_ = 
-		_time_delta;
+	mat4 const rotation = 
+		fcppt::math::matrix::rotation_x(
+			rotate_x_) *
+		fcppt::math::matrix::rotation_y(
+			rotate_y_);
+
+	vec4 const v = 
+		vec4(0,0,1,0);
+
+	position_ = 
+		position_ + 
+		speed_ * 
+		t * 
+		dirs_.z() * 
+		fcppt::math::vector::narrow_cast<vec3>(
+			rotation * v);
 }
 
 insula::graphics::mat4 const
 insula::graphics::camera::world() const
 {
+	mat4 const 
+		rotate = 
+			fcppt::math::matrix::rotation_x(
+				rotate_x_) *
+			fcppt::math::matrix::rotation_y(
+				rotate_y_),
+		translate =
+			fcppt::math::matrix::transpose(
+				fcppt::math::matrix::translation(
+					position_));
+
 	return 
-		fcppt::math::matrix::rotation_x(
-			rotate_x_) *
-		fcppt::math::matrix::rotation_y(
-			rotate_y_);
+		rotate * 
+		translate;
 	
 }
 
 insula::graphics::mat4 const
 insula::graphics::camera::perspective() const
 {
-	return fcppt::math::matrix::perspective(
-			aspect_,
-			fov_,
-			near_,
-			far_);
+	return 
+		fcppt::math::matrix::perspective(
+		aspect_,
+		fov_,
+		near_,
+		far_);
 }
 
 void
@@ -87,10 +123,21 @@ insula::graphics::camera::input_callback(
 				static_cast<scalar>(k.value())/mouse_inverse_speed;
 			break;
 		case sge::input::kc::mouse_y_axis:
-			rotate_x_ += 
+			rotate_x_ -= 
 				static_cast<scalar>(k.value())/mouse_inverse_speed;
 			break;
 		default:
+			if (k.key().char_code() == FCPPT_TEXT('w'))
+				dirs_.z() = !k.value() ? 0 : 1;
+
+			if (k.key().char_code() == FCPPT_TEXT('s'))
+				dirs_.z() = !k.value() ? 0 : -1;
+
+			if (k.key().char_code() == FCPPT_TEXT('a'))
+				dirs_.x() = !k.value() ? 0 : 1;
+
+			if (k.key().char_code() == FCPPT_TEXT('d'))
+				dirs_.x() = !k.value() ? 0 : -1;
 			break;
 	}
 }

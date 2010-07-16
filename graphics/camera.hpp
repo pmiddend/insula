@@ -24,10 +24,11 @@ public:
 		scalar aspect,
 		scalar fov,
 		scalar near,
-		scalar far);
+		scalar far,
+		scalar camera_speed);
 	
 	void
-	time_delta(
+	update(
 		scalar);
 	
 	mat4 const
@@ -37,9 +38,10 @@ public:
 	perspective() const;
 private:
 	fcppt::signal::scoped_connection input_connection_;
-	scalar time_delta_;
 	scalar aspect_,fov_,near_,far_;
+	scalar speed_;
 	scalar rotate_x_,rotate_y_;
+	vec3 dirs_;
 	vec3 position_;
 
 	void

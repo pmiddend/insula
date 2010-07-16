@@ -1,4 +1,3 @@
--Erstelle Klasse, die die Höhenmap speichert, rendere die Map mit Wireframe
 -Erstelle Kamera, die mit der Maus bewegt werden kann. Ctrl, Space ud wasd bestimmen das Strafen
 -Versuche Textur für das Terrain zu generieren aus mehreren Schichten: Gras, Steine, Sand. Große Steigungen sollten extra eingefärbt werden.
 -Lege Textur und Detailtextur auf das Terrain
