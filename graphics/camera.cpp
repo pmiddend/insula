@@ -65,16 +65,24 @@ insula::graphics::camera::update(
 		fcppt::math::matrix::rotation_y(
 			rotate_y_);
 
-	vec4 const v = 
-		vec4(0,0,1,0);
-
 	position_ = 
 		position_ + 
 		speed_ * 
 		t * 
-		dirs_.z() * 
-		fcppt::math::vector::narrow_cast<vec3>(
-			rotation * v);
+		(
+			dirs_.x() * 
+			fcppt::math::vector::narrow_cast<vec3>(
+				rotation * 
+				vec4(1,0,0,0)) + 
+			dirs_.y() * 
+			fcppt::math::vector::narrow_cast<vec3>(
+				rotation * 
+				vec4(0,1,0,0)) + 
+			dirs_.z() * 
+			fcppt::math::vector::narrow_cast<vec3>(
+				rotation * 
+				vec4(0,0,1,0))
+		);
 }
 
 insula::graphics::mat4 const
@@ -125,6 +133,12 @@ insula::graphics::camera::input_callback(
 		case sge::input::kc::mouse_y_axis:
 			rotate_x_ -= 
 				static_cast<scalar>(k.value())/mouse_inverse_speed;
+			break;
+		case sge::input::kc::key_space:
+			dirs_.y() = !k.value() ? 0 : -1;
+			break;
+		case sge::input::kc::key_lctrl:
+			dirs_.y() = !k.value() ? 0 : 1;
 			break;
 		default:
 			if (k.key().char_code() == FCPPT_TEXT('w'))
