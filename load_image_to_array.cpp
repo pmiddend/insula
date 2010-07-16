@@ -1,5 +1,5 @@
-#include "height_map.hpp"
-#include "image_to_height_map.hpp"
+#include "height_map/array.hpp"
+#include "height_map/image_to_array.hpp"
 #include "display_2d_array.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
@@ -27,7 +27,6 @@
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/from_std_string.hpp>
-#include <fcppt/filesystem/is_regular.hpp>
 #include <boost/mpl/vector/vector10.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
@@ -63,8 +62,8 @@ try
 		)
 	);
 
-	insula::height_map const h = 
-		insula::image_to_height_map(
+	insula::height_map::array const h = 
+		insula::height_map::image_to_array(
 			sys.image_loader().load(
 				filename));
 	

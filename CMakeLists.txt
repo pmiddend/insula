@@ -51,7 +51,8 @@ ADD_DEFINITIONS(${SGE_CFLAGS})
 
 SET(media_path ${CMAKE_SOURCE_DIR}/media)
 
-FILE (GLOB basefiles load_image_to_array.cpp media_path.cpp image_to_height_map.cpp)
+FILE(GLOB_RECURSE height_map_files height_map/*)
+FILE(GLOB_RECURSE graphics_files graphics/*)
 
 set_source_files_properties(
 	media_path.cpp
@@ -60,14 +61,19 @@ set_source_files_properties(
 	-DMEDIA_PATH="\\\"${media_path}\\\""
 )
 
-ADD_EXECUTABLE(load_image_to_array ${basefiles})
+ADD_EXECUTABLE(load_image_to_array load_image_to_array.cpp media_path.cpp
+	${height_map_files})
+ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp
+	${graphics_files} ${height_map_files})
 
 TARGET_LINK_LIBRARIES(load_image_to_array fcppt sgecore)
+TARGET_LINK_LIBRARIES(render_height_map fcppt sgecore)
 
 IF(NOT MSVC)
 	TARGET_LINK_LIBRARIES(load_image_to_array ${Boost_LIBRARIES})
+	TARGET_LINK_LIBRARIES(render_height_map ${Boost_LIBRARIES})
 ENDIF()
 
 ENABLE_TESTING()
 
-ADD_SUBDIRECTORY (test)
+ADD_SUBDIRECTORY(test)

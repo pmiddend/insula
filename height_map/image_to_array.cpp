@@ -1,4 +1,4 @@
-#include "image_to_height_map.hpp"
+#include "image_to_array.hpp"
 #include <sge/image/file.hpp>
 #include <sge/image/view/detail/view_types.hpp>
 #include <sge/image/color/gray8_format.hpp>
@@ -16,8 +16,8 @@
 #include <boost/spirit/home/phoenix/bind/bind_function.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 
-insula::height_map const
-insula::image_to_height_map(
+insula::height_map::array const
+insula::height_map::image_to_array(
 	sge::image::file_ptr const im)
 try
 {
@@ -36,7 +36,7 @@ try
 	target_view const v(
 		im->view().get<target_view>());
 
-	height_map h(
+	array h(
 		v.dim());
 
 	/*

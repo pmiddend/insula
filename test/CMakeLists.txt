@@ -42,3 +42,4 @@ MACRO(
 ENDMACRO()
 
 ADD_INSULA_TEST(display_2d_array)
+ADD_INSULA_TEST(calculate_index)
