@@ -16,12 +16,15 @@
 #include <sge/renderer/size_type.hpp>
 #include <sge/renderer/scoped_vertex_lock.hpp>
 #include <sge/renderer/scoped_index_lock.hpp>
+#include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/renderer/vertex_buffer.hpp>
 #include <sge/renderer/first_vertex.hpp>
 #include <sge/renderer/vertex_count.hpp>
 #include <sge/renderer/primitive_count.hpp>
 #include <sge/renderer/index_buffer.hpp>
+#include <sge/image/color/any/convert.hpp>
+#include <sge/image/colors.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/io/cout.hpp>
@@ -131,7 +134,7 @@ insula::height_map::object::object(
 		for (array::size_type x = 0; x < a.shape()[1]; ++x)
 		{
 			// Just to be safe, we put the 0 here
-			(*vb_it++).set<vf::position,0>(
+			(*vb_it++).set<vf::position>(
 				vf::packed_position(
 					static_cast<graphics::scalar>(
 						static_cast<scalar>(
@@ -160,6 +163,10 @@ insula::height_map::object::object(
 void
 insula::height_map::object::render()
 {
+	sge::renderer::scoped_vertex_buffer const vb_context(
+		renderer_,
+		vb_);
+	
 	renderer_->render(
 		ib_,
 		sge::renderer::first_vertex(

@@ -52,30 +52,24 @@ insula::graphics::camera::time_delta(
 }
 
 insula::graphics::mat4 const
-insula::graphics::camera::matrix() const
+insula::graphics::camera::world() const
 {
-	/*
-	fcppt::io::cout << 
-		fcppt::math::matrix::perspective(
-			aspect_,
-			fov_,
-			near_,
-			far_) * 
-		fcppt::math::matrix::rotation_x(
-			rotate_x_) *
-		fcppt::math::matrix::rotation_y(
-			rotate_y_) << "\n";*/
 	return 
-		fcppt::math::matrix::perspective(
-			aspect_,
-			fov_,
-			near_,
-			far_) * 
 		fcppt::math::matrix::rotation_x(
 			rotate_x_) *
 		fcppt::math::matrix::rotation_y(
 			rotate_y_);
 	
+}
+
+insula::graphics::mat4 const
+insula::graphics::camera::perspective() const
+{
+	return fcppt::math::matrix::perspective(
+			aspect_,
+			fov_,
+			near_,
+			far_);
 }
 
 void

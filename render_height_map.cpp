@@ -61,9 +61,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <fcppt/log/activate_levels.hpp>
 #include <fcppt/log/level.hpp>
 #include <fcppt/io/cerr.hpp>
+#include <fcppt/io/cout.hpp>
 #include <fcppt/from_std_string.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/matrix/output.hpp>
 #include <boost/mpl/vector/vector10.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
@@ -173,7 +176,10 @@ try
 	sys.renderer()->state(
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::clear_backbuffer = true)
-		 //	(sge::renderer::state::draw_mode::line)
+		 	(sge::renderer::state::bool_::enable_lighting = false)
+		 	(sge::renderer::state::cull_mode::off)
+		 	(sge::renderer::state::depth_func::off)
+		 	(sge::renderer::state::draw_mode::line)
 			(sge::renderer::state::color::clear_color = sge::image::colors::black()));
 	
 	insula::graphics::shaders shads(
@@ -199,7 +205,7 @@ try
 		sge::mainloop::dispatch();
 	
 		shads.mvp(
-			cam.matrix());
+			cam.perspective() * cam.world());
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());

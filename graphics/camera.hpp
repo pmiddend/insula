@@ -31,7 +31,10 @@ public:
 		scalar);
 	
 	mat4 const
-	matrix() const;
+	world() const;
+
+	mat4 const
+	perspective() const;
 private:
 	fcppt::signal::scoped_connection input_connection_;
 	scalar time_delta_;
