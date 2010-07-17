@@ -39,7 +39,9 @@ IF (${CMAKE_COMPILER_IS_GNUCXX})
 	"-Wextra -Wconversion -Wfloat-equal -Wredundant-decls"
 	"-Wstrict-null-sentinel -Winit-self -Woverloaded-virtual"
 	"-Wold-style-cast -Wnon-virtual-dtor -Wctor-dtor-privacy -Wsign-promo"
-	"-Wstrict-aliasing=1 -Wmissing-declarations -Wno-long-long")
+	"-Wstrict-aliasing=1 -Wmissing-declarations -Wno-long-long"
+	)
+#"-std=c++0x")
 	# we don't use long long but boost does :(
 
 	ADD_DEFINITIONS(-D BOOST_FILESYSTEM_NO_DEPRECATED)
@@ -66,12 +68,17 @@ ADD_EXECUTABLE(load_image_to_array load_image_to_array.cpp media_path.cpp
 ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp
 	${graphics_files} ${height_map_files})
 
+ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
+	${height_map_files})
+
 TARGET_LINK_LIBRARIES(load_image_to_array fcppt sgecore)
 TARGET_LINK_LIBRARIES(render_height_map fcppt sgecore)
+TARGET_LINK_LIBRARIES(generate_height_texture fcppt sgecore)
 
 IF(NOT MSVC)
 	TARGET_LINK_LIBRARIES(load_image_to_array ${Boost_LIBRARIES})
 	TARGET_LINK_LIBRARIES(render_height_map ${Boost_LIBRARIES})
+	TARGET_LINK_LIBRARIES(generate_height_texture ${Boost_LIBRARIES})
 ENDIF()
 
 ENABLE_TESTING()

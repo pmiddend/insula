@@ -64,24 +64,20 @@ insula::graphics::camera::update(
 			rotate_x_) *
 		fcppt::math::matrix::rotation_y(
 			rotate_y_);
-
+	
 	position_ = 
 		position_ + 
 		speed_ * 
 		t * 
 		(
 			dirs_.x() * 
-			fcppt::math::vector::narrow_cast<vec3>(
-				rotation * 
-				vec4(1,0,0,0)) + 
+			vec3(rotation[0][0],rotation[0][1],rotation[0][2]) +
+
 			dirs_.y() * 
-			fcppt::math::vector::narrow_cast<vec3>(
-				rotation * 
-				vec4(0,1,0,0)) + 
+			vec3(rotation[1][0],rotation[1][1],rotation[1][2]) +
+
 			dirs_.z() * 
-			fcppt::math::vector::narrow_cast<vec3>(
-				rotation * 
-				vec4(0,0,1,0))
+			vec3(rotation[2][0],rotation[2][1],rotation[2][2])
 		);
 }
 

@@ -136,7 +136,7 @@ try
 		static_cast<insula::height_map::scalar>(
 			1000),
 		insula::height_map::vector2(
-			50,50));
+			5,5));
 
 #if 0
 	typedef 
@@ -224,6 +224,11 @@ try
 	}
 }
 catch(sge::exception const &e)
+{
+	fcppt::io::cerr << e.string() << FCPPT_TEXT('\n');
+	return EXIT_FAILURE;
+}
+catch (fcppt::exception const &e)
 {
 	fcppt::io::cerr << e.string() << FCPPT_TEXT('\n');
 	return EXIT_FAILURE;

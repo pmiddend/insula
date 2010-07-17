@@ -12,6 +12,7 @@
 #include <sge/renderer/index/dynamic/format.hpp>
 #include <sge/renderer/index/dynamic/view.hpp>
 #include <sge/renderer/index/i16.hpp>
+#include <sge/renderer/index/i32.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
 #include <sge/renderer/size_type.hpp>
 #include <sge/renderer/scoped_vertex_lock.hpp>
@@ -105,7 +106,7 @@ insula::height_map::object::object(
 			sge::renderer::resource_flags::none)),
 	ib_(
 		renderer_->create_index_buffer(
-			sge::renderer::index::dynamic::format::i16,
+			sge::renderer::index::dynamic::format::i32,
 			// q = (n-1)*(m-1) Quads
 			// 2*q Tris
 			// 3*2*q Indices
@@ -116,7 +117,7 @@ insula::height_map::object::object(
 	FCPPT_ASSERT_MESSAGE(
 		vb_->size() < 
 		static_cast<sge::renderer::size_type>(
-			std::numeric_limits<sge::renderer::index::i16>::max()),
+			std::numeric_limits<sge::renderer::index::i32>::max()),
 		FCPPT_TEXT("The heightmap is too big for a 16 bit index!"));
 	
 	sge::renderer::scoped_vertex_lock const vblock(
