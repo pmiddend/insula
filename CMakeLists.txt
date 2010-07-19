@@ -10,6 +10,8 @@ ENDIF()
 
 INCLUDE (FindPkgConfig)
 
+OPTION(ENABLE_OPTIMIZATIONS "Enable -O3" OFF)
+
 #SET (CMAKE_VERBOSE_MAKEFILE ON)
 
 SET (Boost_ADDITIONAL_VERSIONS "1.41" "1.41.0" "1.42" "1.42.0")
@@ -40,8 +42,11 @@ IF (${CMAKE_COMPILER_IS_GNUCXX})
 	"-Wstrict-null-sentinel -Winit-self -Woverloaded-virtual"
 	"-Wold-style-cast -Wnon-virtual-dtor -Wctor-dtor-privacy -Wsign-promo"
 	"-Wstrict-aliasing=1 -Wmissing-declarations -Wno-long-long"
-	#	)
-"-std=c++0x")
+	"-std=c++0x")
+
+	IF (ENABLE_OPTIMIZATIONS)
+		ADD_DEFINITIONS("-O2")
+	ENDIF()
 	# we don't use long long but boost does :(
 
 	ADD_DEFINITIONS(-D BOOST_FILESYSTEM_NO_DEPRECATED)

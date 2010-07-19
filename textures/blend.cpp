@@ -10,6 +10,7 @@
 #include <mizuiro/image/types/raw.hpp>
 #include <mizuiro/image/make_const_view.hpp>
 #include <mizuiro/color/operators/scalar_multiply.hpp>
+#include <mizuiro/color/operators/add.hpp>
 #include <mizuiro/nonconst_tag.hpp>
 #include <fcppt/variant/object.hpp>
 #include <fcppt/variant/invalid_get.hpp>
@@ -17,6 +18,7 @@
 #include <fcppt/math/dim/basic_impl.hpp>
 #include <fcppt/math/dim/comparison.hpp>
 #include <fcppt/text.hpp>
+#include <fcppt/io/cout.hpp>
 #include <fcppt/assert.hpp>
 #include <boost/foreach.hpp>
 #include <algorithm>
@@ -100,6 +102,14 @@ try
 					// the gradient
 					static_cast<weight>(
 						0)).sequence();
+
+			FCPPT_ASSERT(
+				w.size() == views.size());
+
+			//fcppt::io::cout << "weight sequence: ";
+			//BOOST_FOREACH(weights::weight_sequence::const_reference r,w)
+			//	fcppt::io::cout << r << ",";
+			//fcppt::io::cout << "\n";
 
 			// Current position
 			store_type::dim_type const cp(

@@ -22,7 +22,7 @@
 #include <sge/mainloop/dispatch.hpp>
 #include <sge/log/global.hpp>
 #include <sge/all_extensions.hpp>
-#include <sge/exception.hpp>
+#include <fcppt/exception.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/log/activate_levels.hpp>
@@ -99,6 +99,8 @@ try
 			images),
 		[&sys](fcppt::filesystem::path const &p) { return sys.image_loader().load(p); });
 	
+	fcppt::io::cout << FCPPT_TEXT("There are ") << images.size() << FCPPT_TEXT(" images\n");
+	
 	insula::textures::interpolators::bernstein_polynomial bp(
 		images.size());
 	
@@ -111,7 +113,7 @@ try
 	result->save(
 		FCPPT_TEXT("media/result.png"));
 }
-catch(sge::exception const &e)
+catch(fcppt::exception const &e)
 {
 	fcppt::io::cerr << e.string() << FCPPT_TEXT('\n');
 	return EXIT_FAILURE;

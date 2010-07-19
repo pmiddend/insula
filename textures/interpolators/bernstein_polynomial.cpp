@@ -36,8 +36,7 @@ insula::textures::interpolators::bernstein_polynomial::calculate_weights(
 	weight const p,
 	weight const gradient)
 {
-	weights::weight_sequence w(
-		count_);
+	weights::weight_sequence w;
 	for (weights::size_type i = 0; i < count_; ++i)
 		w.push_back(
 			at(
