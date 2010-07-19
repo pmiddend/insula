@@ -126,7 +126,7 @@ try
 				std::next(
 					views.begin());
 			for (weights::weight_sequence::const_iterator i = std::next(w.begin()); i != w.end(); ++i)
-				target.at(cp) = target.at(cp) + (*i) * view_it->at(cp);
+				target.at(cp) = target.at(cp) + (*i) * (view_it++)->at(cp);
 		}
 	}
 	
