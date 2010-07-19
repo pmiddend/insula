@@ -11,7 +11,8 @@ MACRO(
 
 	SET(INSULA_TEST_NAME insula${TESTNAME}test)
 
-	ADD_EXECUTABLE (${INSULA_TEST_NAME} ${PATHNAME}.cpp)
+	ADD_EXECUTABLE(${INSULA_TEST_NAME} ${PATHNAME}.cpp
+		${all_files})
 
 	IF(MSVC)
 		SET_PROPERTY(
@@ -31,6 +32,8 @@ MACRO(
 		${INSULA_TEST_NAME}
 		${INSULA_DEFAULT_LINK_TARGET}
 		${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+		fcppt
+		sgecore
 	)
 
 	ADD_TEST(
@@ -43,3 +46,4 @@ ENDMACRO()
 
 ADD_INSULA_TEST(display_2d_array)
 ADD_INSULA_TEST(calculate_index)
+ADD_INSULA_TEST(bernstein_polynomial)

@@ -3,7 +3,6 @@
 #include "vec4.hpp"
 #include <sge/input/key_pair.hpp>
 #include <sge/input/system.hpp>
-#include <fcppt/tr1/functional.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/matrix/perspective.hpp>
 #include <fcppt/math/matrix/translation.hpp>
@@ -19,6 +18,8 @@
 #include <fcppt/math/pi.hpp>
 #include <fcppt/io/cout.hpp>
 
+#include <functional>
+
 insula::graphics::camera::camera(
 	sge::input::system_ptr const _is,
 	scalar _aspect,
@@ -29,10 +30,10 @@ insula::graphics::camera::camera(
 :
 	input_connection_(
 		_is->register_callback(
-			std::tr1::bind(
+			std::bind(
 				&camera::input_callback,
 				this,
-				std::tr1::placeholders::_1))),
+				std::placeholders::_1))),
 	aspect_(
 		_aspect),
 	fov_(

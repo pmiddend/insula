@@ -1,21 +1,21 @@
 #ifndef INSULA_HEIGHT_MAP_CALCULATE_INDEX_CELL_HPP_INCLUDED
 #define INSULA_HEIGHT_MAP_CALCULATE_INDEX_CELL_HPP_INCLUDED
 
-#include <fcppt/tr1/array.hpp>
+#include <array>
 
 namespace insula
 {
 namespace height_map
 {
 template<typename T>
-std::tr1::array<T,6> const
+std::array<T,6> const
 calculate_index_cell(
 	T const x,
 	T const y,
 	T const w,
 	T const)
 {
-	std::tr1::array<T,6> a;
+	std::array<T,6> a;
 	T const 
 		base = 
 			static_cast<T>(

@@ -10,11 +10,12 @@
 #include <fcppt/variant/invalid_get.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
-#include <fcppt/tr1/functional.hpp>
 #include <fcppt/function/object.hpp>
 
 #include <boost/spirit/home/phoenix/bind/bind_function.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
+
+#include <functional>
 
 insula::height_map::array const
 insula::height_map::image_to_array(
@@ -64,14 +65,14 @@ try
 			*/
 
 	fcppt::function::object<float (target_view::iterator::reference const &)> fun = 
-		std::tr1::bind(
+		std::bind(
 			&mizuiro::color::normalize
 			<
 				mizuiro::color::channel::gray,
 				float,
 				target_view::iterator::reference
 			>,
-			std::tr1::placeholders::_1);
+			std::placeholders::_1);
 	
 	//float const f2 = fun(*v.begin());
 	/*

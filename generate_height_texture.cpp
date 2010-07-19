@@ -1,6 +1,8 @@
 #include "height_map/array.hpp"
 #include "height_map/image_to_array.hpp"
 #include "textures/interpolators/bernstein_polynomial.hpp"
+#include "textures/blend.hpp"
+#include "textures/image_sequence.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
@@ -8,6 +10,7 @@
 #include <sge/input/action.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/image/capabilities.hpp>
+#include <sge/image/file.hpp>
 #include <sge/texture/manager.hpp>
 #include <sge/texture/add_image.hpp>
 #include <sge/texture/no_fragmented.hpp>
@@ -35,6 +38,8 @@
 #include <exception>
 #include <vector>
 #include <ostream>
+#include <iterator>
+#include <algorithm>
 
 namespace
 {
@@ -49,8 +54,6 @@ filename_sequence;
 int main(int const argc,char *argv[])
 try
 {
-	insula::textures::interpolators::bernstein_polynomial<float,3> bp;
-
 	if (argc < 3)
 	{
 		fcppt::io::cerr << FCPPT_TEXT("usage: ") << fcppt::from_std_string(argv[0]) << FCPPT_TEXT(" <image-file>\n");
@@ -87,7 +90,26 @@ try
 			sys.image_loader().load(
 				heightmap_filename));
 	
+	insula::textures::image_sequence images;
 	
+	std::transform(
+		height_textures.begin(),
+		height_textures.end(),
+		std::back_inserter<insula::textures::image_sequence>(
+			images),
+		[&sys](fcppt::filesystem::path const &p) { return sys.image_loader().load(p); });
+	
+	insula::textures::interpolators::bernstein_polynomial bp(
+		images.size());
+	
+	sge::image::file_ptr const result = 
+		insula::textures::blend(
+			images,
+			h,
+			bp);
+	
+	result->save(
+		FCPPT_TEXT("media/result.png"));
 }
 catch(sge::exception const &e)
 {

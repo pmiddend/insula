@@ -40,11 +40,12 @@ IF (${CMAKE_COMPILER_IS_GNUCXX})
 	"-Wstrict-null-sentinel -Winit-self -Woverloaded-virtual"
 	"-Wold-style-cast -Wnon-virtual-dtor -Wctor-dtor-privacy -Wsign-promo"
 	"-Wstrict-aliasing=1 -Wmissing-declarations -Wno-long-long"
-	)
-#"-std=c++0x")
+	#	)
+"-std=c++0x")
 	# we don't use long long but boost does :(
 
 	ADD_DEFINITIONS(-D BOOST_FILESYSTEM_NO_DEPRECATED)
+	ADD_DEFINITIONS(-D BOOST_HAS_GCC_TR1)
 ELSEIF (MSVC)
 	ADD_DEFINITIONS ("/W3 /wd4512 /wd4355 /wd4800 /wd4996 /wd4714 /EHa /D_BIND_TO_CURRENT_VCLIBS_VERSION=1")
 ENDIF ()
@@ -55,6 +56,10 @@ SET(media_path ${CMAKE_SOURCE_DIR}/media)
 
 FILE(GLOB_RECURSE height_map_files height_map/*)
 FILE(GLOB_RECURSE graphics_files graphics/*)
+FILE(GLOB_RECURSE texture_files textures/*)
+FILE(GLOB base_files media_path.cpp)
+
+SET(all_files ${height_map_files} ${graphics_files} ${texture_files} ${base_files}) 
 
 set_source_files_properties(
 	media_path.cpp
@@ -67,9 +72,8 @@ ADD_EXECUTABLE(load_image_to_array load_image_to_array.cpp media_path.cpp
 	${height_map_files})
 ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp
 	${graphics_files} ${height_map_files})
-
 ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
-	${height_map_files})
+	${height_map_files} ${texture_files})
 
 TARGET_LINK_LIBRARIES(load_image_to_array fcppt sgecore)
 TARGET_LINK_LIBRARIES(render_height_map fcppt sgecore)
