@@ -101,12 +101,19 @@ try
 					static_cast<weight>(
 						0)).sequence();
 
-			store_type::dim_type const cp(x,y);
+			// Current position
+			store_type::dim_type const cp(
+				x,
+				y);
 
 			target.at(cp) = 
 				w.front() * views.front().at(cp);
-			//target.at(storage::dim_type(x,y)) = 
-			//	
+
+			view_sequence::const_iterator view_it = 
+				std::next(
+					views.begin());
+			for (weights::weight_sequence::const_iterator i = std::next(w.begin()); i != w.end(); ++i)
+				target.at(cp) = target.at(cp) + (*i) * view_it->at(cp);
 		}
 	}
 	
