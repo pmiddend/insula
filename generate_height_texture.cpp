@@ -40,6 +40,7 @@
 #include <ostream>
 #include <iterator>
 #include <algorithm>
+#include <cmath>
 
 namespace
 {
@@ -85,10 +86,17 @@ try
 				sge::image::capabilities_field::null(),
 				sge::all_extensions)));
 
-	insula::height_map::array const h = 
+	insula::height_map::array h = 
 		insula::height_map::image_to_array(
 			sys.image_loader().load(
 				heightmap_filename));
+	
+	std::transform(
+		h.data(),
+		h.data() + h.num_elements(),
+		h.data(),
+	//	[](insula::height_map::array::element const s) { return s*s; });
+		[](insula::height_map::array::element const s) { return std::sin(s); });
 	
 	insula::textures::image_sequence images;
 	

@@ -41,15 +41,17 @@ try
 			images.end(),
 			[&images](sge::image::file_ptr const &f) { return f->dim() == images.front()->dim(); }));
 	
+	/*
 	FCPPT_ASSERT(
 		std::inner_product(
-			images.front()->dim().begin(),
+			images.front()->dim().begin(), // FIXME: dim is by value!
 			images.front()->dim().end(),
 			heights.shape(),
 			true,
 			std::logical_and<bool>(),
 			std::equal_to<std::size_t>())
 		);
+		*/
 
 	typedef
 	mizuiro::image::const_view
@@ -97,6 +99,7 @@ try
 		{
 			weights::weight_sequence const w = 
 				lerper.calculate_weights(
+					//static_cast<weight>(0.5),
 					static_cast<weight>(
 						heights[x][y]),
 					// the gradient

@@ -11,6 +11,11 @@ BOOST_AUTO_TEST_CASE(bernstein_polynomial)
 {
 	insula::textures::weight const bound = 0.001;
 
+	insula::textures::interpolators::bernstein_polynomial bpthree(
+		3);
+	
+	fcppt::io::cout << bpthree.at(0,0.5) << bpthree.at(1,0.5) << bpthree.at(2,0.5) <<  "\n";
+
 	insula::textures::interpolators::bernstein_polynomial bp(
 		4);
 

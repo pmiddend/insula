@@ -45,7 +45,7 @@ IF (${CMAKE_COMPILER_IS_GNUCXX})
 	"-std=c++0x")
 
 	IF (ENABLE_OPTIMIZATIONS)
-		ADD_DEFINITIONS("-O2")
+		ADD_DEFINITIONS("-O3")
 	ENDIF()
 	# we don't use long long but boost does :(
 
