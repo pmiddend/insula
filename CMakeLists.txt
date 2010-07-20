@@ -76,6 +76,7 @@ set_source_files_properties(
 ADD_EXECUTABLE(load_image_to_array load_image_to_array.cpp media_path.cpp
 	${height_map_files})
 ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp
+	${texture_files}
 	${graphics_files} ${height_map_files})
 ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
 	${height_map_files} ${texture_files})

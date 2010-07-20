@@ -11,12 +11,8 @@
 #include <sge/input/action.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/image/capabilities.hpp>
+#include <sge/image/loader.hpp>
 #include <sge/image/file.hpp>
-#include <sge/texture/manager.hpp>
-#include <sge/texture/add_image.hpp>
-#include <sge/texture/no_fragmented.hpp>
-#include <sge/texture/default_creator.hpp>
-#include <sge/texture/default_creator_impl.hpp>
 #include <sge/time/millisecond.hpp>
 #include <sge/time/second.hpp>
 #include <sge/time/default_callback.hpp>
@@ -35,6 +31,7 @@
 #include <boost/mpl/vector/vector10.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
+#include <mizuiro/image/make_const_view.hpp>
 #include <cstdlib>
 #include <exception>
 #include <vector>
@@ -56,6 +53,10 @@ filename_sequence;
 int main(int const argc,char *argv[])
 try
 {
+	fcppt::log::activate_levels(
+		sge::log::global(),
+		fcppt::log::level::debug);
+
 	if (argc < 3)
 	{
 		fcppt::io::cerr << FCPPT_TEXT("usage: ") << fcppt::from_std_string(argv[0]) << FCPPT_TEXT(" <image-file>\n");
@@ -74,11 +75,6 @@ try
 	
 	FCPPT_ASSERT(
 		!height_textures.empty());
-
-	fcppt::log::activate_levels(
-		sge::log::global(),
-		fcppt::log::level::debug
-	);
 
 	sge::systems::instance sys(
 		sge::systems::list()
@@ -118,14 +114,19 @@ try
 	insula::textures::interpolators::bernstein_polynomial bp(
 		images.size());
 	
-	sge::image::file_ptr const result = 
+	insula::textures::rgb_store const result = 
 		insula::textures::blend(
 			images,
 			h,
 			bp);
+
+	sys.image_loader().loaders().at(0)->create(
+		mizuiro::image::make_const_view(
+			result.view()))->save(FCPPT_TEXT("media/result.png"));
 	
+	/*
 	result->save(
-		FCPPT_TEXT("media/result.png"));
+		FCPPT_TEXT("media/result.png"))*/;
 }
 catch(fcppt::exception const &e)
 {

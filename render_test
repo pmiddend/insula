@@ -1,0 +1,3 @@
+#!/bin/bash
+
+build/render_height_map --height-map media/smooth_heightfield_512.png --height-texture media/textures/* $*

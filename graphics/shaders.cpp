@@ -8,6 +8,8 @@
 #include <sge/renderer/glsl/uniform/single_value.hpp>
 #include <fcppt/optional.hpp>
 #include <fcppt/io/cifstream.hpp>
+#include <fcppt/io/cout.hpp>
+#include <fcppt/text.hpp>
 
 insula::graphics::shaders::shaders(
 	sge::renderer::device_ptr const renderer,
@@ -32,7 +34,14 @@ insula::graphics::shaders::shaders(
 	renderer->glsl_program(
 		p);
 	
+	fcppt::io::cout << FCPPT_TEXT("Error log: ") << p->info_log() << FCPPT_TEXT("\n");
+	
 	mvp_ = p->uniform("mvp");
+	texture0_ = p->uniform("main_texture");
+
+	sge::renderer::glsl::uniform::single_value(
+		texture0_,
+		0);
 }
 
 void

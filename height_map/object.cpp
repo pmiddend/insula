@@ -2,8 +2,10 @@
 #include "../graphics/scalar.hpp"
 #include "vf/format.hpp"
 #include "vf/position.hpp"
+#include "vf/texture_coordinate.hpp"
 #include "vf/vertex_view.hpp"
 #include "vf/packed_position.hpp"
+#include "vf/packed_texture_coordinate.hpp"
 #include "calculate_index_cell.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/vf/dynamic/make_format.hpp>
@@ -134,21 +136,27 @@ insula::height_map::object::object(
 	{
 		for (array::size_type x = 0; x < a.shape()[1]; ++x)
 		{
+			vf::packed_position p(
+				static_cast<graphics::scalar>(
+					static_cast<scalar>(
+						x) * 
+					cell_sizes.x()),
+				static_cast<graphics::scalar>(
+					static_cast<scalar>(
+						height_scaling) * 
+					a[y][x]),
+				static_cast<graphics::scalar>(
+					static_cast<scalar>(
+						y) * 
+					cell_sizes.y()));
 			// Just to be safe, we put the 0 here
-			(*vb_it++).set<vf::position>(
-				vf::packed_position(
-					static_cast<graphics::scalar>(
-						static_cast<scalar>(
-							x) * 
-						cell_sizes.x()),
-					static_cast<graphics::scalar>(
-						static_cast<scalar>(
-							height_scaling) * 
-						a[y][x]),
-					static_cast<graphics::scalar>(
-						static_cast<scalar>(
-							y) * 
-						cell_sizes.y())));
+			(*vb_it).set<vf::position>(
+				p);
+
+			(*vb_it++).set<vf::texture_coordinate>(
+				vf::packed_texture_coordinate(
+					p.x()/(cell_sizes.x() * static_cast<graphics::scalar>(a.shape()[0])),
+					p.z()/(cell_sizes.y() * static_cast<graphics::scalar>(a.shape()[1]))));
 		}
 	}
 	

@@ -1,8 +1,7 @@
 #include "blend.hpp"
+#include "rgb_view.hpp"
+#include "rgb_store.hpp"
 #include "../height_map/array.hpp"
-#include <sge/image/view/detail/view_types.hpp>
-#include <sge/image/color/rgb8_format.hpp>
-#include <sge/image/file.hpp>
 #include <mizuiro/image/const_view.hpp>
 #include <mizuiro/image/store.hpp>
 #include <mizuiro/image/types/pointer.hpp>
@@ -12,6 +11,7 @@
 #include <mizuiro/color/operators/scalar_multiply.hpp>
 #include <mizuiro/color/operators/add.hpp>
 #include <mizuiro/nonconst_tag.hpp>
+#include <sge/image/file.hpp>
 #include <fcppt/variant/object.hpp>
 #include <fcppt/variant/invalid_get.hpp>
 #include <fcppt/exception.hpp>
@@ -25,9 +25,9 @@
 #include <functional>
 #include <iterator>
 
-sge::image::file_ptr const
+insula::textures::rgb_store const
 insula::textures::blend(
-	image_sequence &images,
+	image_sequence const &images,
 	height_map::array const &heights,
 	interpolators::base &lerper)
 try
@@ -54,17 +54,7 @@ try
 		*/
 
 	typedef
-	mizuiro::image::const_view
-	<
-		sge::image::view::detail::view_types
-		<
-			sge::image::color::rgb8_format
-		>::type
-	>::type
-	target_view;
-
-	typedef
-	std::vector<target_view>
+	std::vector<rgb_view>
 	view_sequence;
 
 	view_sequence views;
@@ -76,26 +66,18 @@ try
 			views),
 		[](sge::image::file_ptr const f) 
 		{ 
-			return f->view().get<target_view>(); 
+			return f->view().get<rgb_view>(); 
 		});
 	
-	typedef
-	mizuiro::image::store
-	<
-		target_view::format,
-		target_view::access
-	>
-	store_type;
-	
-	store_type m(
+	rgb_store m(
 		views.front().dim());
 	
-	store_type::view_type target = 
+	rgb_store::view_type target = 
 		m.view();
 	
-	for (store_type::dim_type::value_type x = 0; x < target.dim()[0]; ++x)
+	for (rgb_store::dim_type::value_type x = 0; x < target.dim()[0]; ++x)
 	{
-		for (store_type::dim_type::value_type y = 0; y < target.dim()[1]; ++y)
+		for (rgb_store::dim_type::value_type y = 0; y < target.dim()[1]; ++y)
 		{
 			weights::weight_sequence const w = 
 				lerper.calculate_weights(
@@ -115,7 +97,7 @@ try
 			//fcppt::io::cout << "\n";
 
 			// Current position
-			store_type::dim_type const cp(
+			rgb_store::dim_type const cp(
 				x,
 				y);
 
@@ -130,11 +112,7 @@ try
 		}
 	}
 	
-	images.front()->data(
-		mizuiro::image::make_const_view(
-			target));
-	
-	return images.front();
+	return m;
 }
 catch (fcppt::variant::invalid_get const &)
 {

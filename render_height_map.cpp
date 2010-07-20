@@ -1,29 +1,14 @@
-/*
-spacegameengine is a portable easy to use game engine written in C++.
-Copyright (C) 2006-2009 Carl Philipp Reh (sefi@s-e-f-i.de)
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
 #include "height_map/array.hpp"
 #include "height_map/scalar.hpp"
 #include "height_map/vector2.hpp"
 #include "height_map/object.hpp"
 #include "height_map/image_to_array.hpp"
+#include "height_map/normalize_and_stretch.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/camera.hpp"
+#include "textures/interpolators/bernstein_polynomial.hpp"
+#include "textures/blend.hpp"
+#include "textures/image_sequence.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
@@ -35,21 +20,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/var.hpp>
 #include <sge/renderer/state/trampoline.hpp>
+#include <sge/renderer/filter/trilinear.hpp>
 #include <sge/renderer/filter/linear.hpp>
+#include <sge/renderer/resource_flags_none.hpp>
 #include <sge/renderer/state/draw_mode.hpp>
+#include <sge/renderer/texture.hpp>
 #include <sge/input/system.hpp>
 #include <sge/input/action.hpp>
 #include <sge/time/timer.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/image/capabilities.hpp>
 #include <sge/image/colors.hpp>
-#if 0
-#include <sge/texture/manager.hpp>
-#include <sge/texture/add_image.hpp>
-#include <sge/texture/no_fragmented.hpp>
-#include <sge/texture/default_creator.hpp>
-#include <sge/texture/default_creator_impl.hpp>
-#endif
+
 #include <sge/time/millisecond.hpp>
 #include <sge/time/second.hpp>
 #include <sge/time/default_callback.hpp>
@@ -57,6 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <sge/log/global.hpp>
 #include <sge/all_extensions.hpp>
 #include <sge/exception.hpp>
+#include <mizuiro/image/make_const_view.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/log/activate_levels.hpp>
@@ -71,35 +54,66 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <boost/mpl/vector/vector10.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
+#include <boost/program_options.hpp>
 #include <cstdlib>
 #include <exception>
+#include <algorithm>
+#include <iterator>
 #include <ostream>
+#include <vector>
 
 int main(int argc,char *argv[])
 try
 {
-	if (argc != 2)
+	typedef
+	std::vector<fcppt::string>
+	string_vector;
+
+	boost::program_options::options_description desc("Allowed options");
+	
+	string_vector height_textures;
+
+	desc.add_options()
+		("help","produce help message")
+		("fov",boost::program_options::value<insula::graphics::scalar>()->default_value(90),"Field of view (in degrees)")
+		("near",boost::program_options::value<insula::graphics::scalar>()->default_value(0.1),"Distance to the near plane")
+		("far",boost::program_options::value<insula::graphics::scalar>()->default_value(10),"Distance to the far plane")
+		("grid-x",boost::program_options::value<insula::height_map::scalar>()->default_value(5),"Size of a grid cell in x dimension")
+		("grid-y",boost::program_options::value<insula::height_map::scalar>()->default_value(5),"Size of a grid cell in y dimension")
+		("height-scale",boost::program_options::value<insula::height_map::scalar>()->default_value(1000),"Height scaling")
+		("camera-speed",boost::program_options::value<insula::graphics::scalar>()->default_value(200),"Speed of the camera")
+		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
+		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture");
+	
+	boost::program_options::variables_map vm;
+	boost::program_options::store(
+		boost::program_options::parse_command_line(
+			argc, 
+			argv, 
+			desc), 
+			vm);
+	boost::program_options::notify(
+		vm);    
+
+	if (vm.count("help")) 
 	{
-		fcppt::io::cerr << FCPPT_TEXT("usage: ") << fcppt::from_std_string(argv[0]) << FCPPT_TEXT(" <image-file>\n");
-		return EXIT_FAILURE;
+		fcppt::io::cout << desc << FCPPT_TEXT("\n");
+		return EXIT_SUCCESS;
 	}
-
-	fcppt::filesystem::path const filename(
-		fcppt::from_std_string(
-			argv[1]));
-
+	
 	fcppt::log::activate_levels(
 		sge::log::global(),
 		fcppt::log::level::debug
 	);
 
+	fcppt::filesystem::path const filename(
+		vm["height-map"].as<fcppt::string>());
+
 	sge::systems::instance sys(
-		sge::systems::list()
+		sge::systems::list() 
 		(
 			sge::window::parameters(
-				FCPPT_TEXT("render height map")
-			)
-		)
+				FCPPT_TEXT("render height map")))
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
@@ -114,59 +128,57 @@ try
 				sge::renderer::stencil_buffer::off,
 				sge::renderer::window_mode::windowed,
 				sge::renderer::vsync::on,
-				sge::renderer::no_multi_sampling
-			)
-		)
+				sge::renderer::no_multi_sampling))
 		(
-			sge::systems::parameterless::input
-		)
+			sge::systems::parameterless::input)
 		(
 			sge::systems::image_loader(
 				sge::image::capabilities_field::null(),
-				sge::all_extensions
-			)
-		)
-	);
+				sge::all_extensions)));
+	
+	insula::height_map::array height_map_array = 
+		insula::height_map::image_to_array(
+			sys.image_loader().load(
+				filename));
+
+	insula::height_map::normalize_and_stretch(
+		height_map_array);
 
 	insula::height_map::object h(
 		sys.renderer(),
-		insula::height_map::image_to_array(
-			sys.image_loader().load(
-				filename)),
-		static_cast<insula::height_map::scalar>(
-			1000),
+		height_map_array,
+		vm["height-scale"].as<insula::height_map::scalar>(),
 		insula::height_map::vector2(
-			5,5));
+			vm["grid-x"].as<insula::height_map::scalar>(),
+			vm["grid-y"].as<insula::height_map::scalar>()));
 
-#if 0
-	typedef 
-	sge::texture::default_creator<sge::texture::no_fragmented> 
-	texture_creator;
+	insula::textures::image_sequence images;
 	
-	texture_creator const creator(
-		rend,
-		sge::image::color::format::rgba8,
-		sge::renderer::filter::linear
-	);
+	std::transform(
+		height_textures.begin(),
+		height_textures.end(),
+		std::back_inserter<insula::textures::image_sequence>(
+			images),
+		[&sys](fcppt::filesystem::path const &p) { return sys.image_loader().load(p); });
 
-	sge::texture::manager tex_man(
-		rend,
-		creator
-	);
+	insula::textures::interpolators::bernstein_polynomial bp(
+		images.size());
+	
+	insula::textures::rgb_store const main_store = 
+		insula::textures::blend(
+			images,
+			height_map_array,
+			bp);
+	
+	sge::renderer::texture_ptr const main_texture = 
+		sys.renderer()->create_texture(
+			mizuiro::image::make_const_view(
+				main_store.view()),
+			sge::renderer::filter::linear,
+			sge::renderer::resource_flags::none);
 
-	sge::texture::const_part_ptr const
-		tex1(
-			sge::texture::add_image(
-				tex_man,
-				image_loader.load(
-					sge::config::media_path()
-					/ FCPPT_TEXT("cloudsquare.jpg")
-				)
-			)
-		);
-#endif
-
-	bool running = true;
+	bool running = 
+		true;
 
 	fcppt::signal::scoped_connection const cb(
 		sys.input_system()->register_callback(
@@ -178,10 +190,15 @@ try
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::clear_backbuffer = true)
 		 	(sge::renderer::state::bool_::enable_lighting = false)
-		 	(sge::renderer::state::cull_mode::off)
-		 	(sge::renderer::state::depth_func::off)
-		 	(sge::renderer::state::draw_mode::line)
+		 	(sge::renderer::state::cull_mode::front)
+		 	(sge::renderer::state::depth_func::less)
+		 	(sge::renderer::state::bool_::clear_zbuffer = true)
+		 	(sge::renderer::state::float_::zbuffer_clear_val = 0.f)
+//		 	(sge::renderer::state::draw_mode::line)
 			(sge::renderer::state::color::clear_color = sge::image::colors::black()));
+	
+	sys.renderer()->texture(
+		main_texture);
 	
 	insula::graphics::shaders shads(
 		sys.renderer(),
@@ -195,13 +212,10 @@ try
 		static_cast<insula::graphics::scalar>(
 			fcppt::math::deg_to_rad(
 				static_cast<insula::graphics::scalar>(
-					90))),
-		static_cast<insula::graphics::scalar>(
-			1),
-		static_cast<insula::graphics::scalar>(
-			1000),
-		static_cast<insula::graphics::scalar>(
-			200));
+					vm["fov"].as<insula::graphics::scalar>()))),
+		vm["near"].as<insula::graphics::scalar>(),
+		vm["far"].as<insula::graphics::scalar>(),
+		vm["camera-speed"].as<insula::graphics::scalar>());
 	
 	sge::time::timer frame_timer(
 		sge::time::second(

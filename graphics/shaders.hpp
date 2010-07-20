@@ -26,6 +26,7 @@ public:
 		mat4 const &);
 private:
 	sge::renderer::glsl::uniform::variable_ptr mvp_;
+	sge::renderer::glsl::uniform::variable_ptr texture0_;
 };
 }
 }
