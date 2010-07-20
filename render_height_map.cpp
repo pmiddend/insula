@@ -124,7 +124,7 @@ try
 					sge::renderer::bit_depth::depth32,
 					sge::renderer::refresh_rate_dont_care
 				),
-				sge::renderer::depth_buffer::off,
+				sge::renderer::depth_buffer::d24,
 				sge::renderer::stencil_buffer::off,
 				sge::renderer::window_mode::windowed,
 				sge::renderer::vsync::on,
@@ -193,7 +193,7 @@ try
 		 	(sge::renderer::state::cull_mode::front)
 		 	(sge::renderer::state::depth_func::less)
 		 	(sge::renderer::state::bool_::clear_zbuffer = true)
-		 	(sge::renderer::state::float_::zbuffer_clear_val = 0.f)
+		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
 //		 	(sge::renderer::state::draw_mode::line)
 			(sge::renderer::state::color::clear_color = sge::image::colors::black()));
 	

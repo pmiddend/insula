@@ -107,10 +107,10 @@ insula::graphics::camera::perspective() const
 {
 	return 
 		fcppt::math::matrix::perspective(
-		aspect_,
-		fov_,
-		near_,
-		far_);
+			aspect_,
+			fov_,
+			near_,
+			far_);
 }
 
 void
