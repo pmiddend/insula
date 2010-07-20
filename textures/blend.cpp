@@ -75,15 +75,15 @@ try
 	rgb_store::view_type target = 
 		m.view();
 	
-	for (rgb_store::dim_type::value_type x = 0; x < target.dim()[0]; ++x)
+	for (rgb_store::dim_type::value_type y = 0; y < target.dim()[0]; ++y)
 	{
-		for (rgb_store::dim_type::value_type y = 0; y < target.dim()[1]; ++y)
+		for (rgb_store::dim_type::value_type x = 0; x < target.dim()[1]; ++x)
 		{
 			weights::weight_sequence const w = 
 				lerper.calculate_weights(
 					//static_cast<weight>(0.5),
 					static_cast<weight>(
-						heights[x][y]),
+						heights[y][x]),
 					// the gradient
 					static_cast<weight>(
 						0)).sequence();

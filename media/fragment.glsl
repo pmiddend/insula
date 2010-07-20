@@ -2,7 +2,8 @@
 
 //out vec4 frag_color;
 uniform sampler2D main_texture;
-varying vec3 position;
+varying vec2 texcoord;
+//varying vec3 position;
 
 void main()
 {
@@ -11,7 +12,10 @@ void main()
 	gl_FragColor = 
 		texture2D(
 			main_texture,
+			texcoord
+			
+			/*
 			vec2(
 				position.x/2560.0,
-				position.z/2560.0));
+				position.z/2560.0)*/);
 }
