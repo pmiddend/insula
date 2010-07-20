@@ -1,5 +1,6 @@
 #include "height_map/array.hpp"
 #include "height_map/image_to_array.hpp"
+#include "height_map/normalize_and_stretch.hpp"
 #include "textures/interpolators/bernstein_polynomial.hpp"
 #include "textures/blend.hpp"
 #include "textures/image_sequence.hpp"
@@ -91,12 +92,17 @@ try
 			sys.image_loader().load(
 				heightmap_filename));
 	
+	/*
 	std::transform(
 		h.data(),
 		h.data() + h.num_elements(),
 		h.data(),
-	//	[](insula::height_map::array::element const s) { return s*s; });
+//		[](insula::height_map::array::element const s) { return s*s; });
 		[](insula::height_map::array::element const s) { return std::sin(s); });
+		*/
+
+	insula::height_map::normalize_and_stretch(
+		h);
 	
 	insula::textures::image_sequence images;
 	
