@@ -230,17 +230,17 @@ try
 		sand_texture = 
 			sys.renderer()->create_texture(
 				images[0]->view(),
-				sge::renderer::filter::linear,
+				sge::renderer::filter::trilinear,
 				sge::renderer::resource_flags::none),
 		rock_texture = 
 			sys.renderer()->create_texture(
 				gradient_image->view(),
-				sge::renderer::filter::linear,
+				sge::renderer::filter::trilinear,
 				sge::renderer::resource_flags::none),
 		grass_texture = 
 			sys.renderer()->create_texture(
 				images[1]->view(),
-				sge::renderer::filter::linear,
+				sge::renderer::filter::trilinear,
 				sge::renderer::resource_flags::none);
 
 	bool running = 
