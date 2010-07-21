@@ -26,7 +26,8 @@ insula::graphics::camera::camera(
 	scalar _fov,
 	scalar _near,
 	scalar _far,
-	scalar _speed)
+	scalar _speed,
+	vec3 const &_position)
 :
 	input_connection_(
 		_is->register_callback(
@@ -52,7 +53,7 @@ insula::graphics::camera::camera(
 	dirs_(
 		vec3::null()),
 	position_(
-		vec3::null())
+		_position)
 {
 }
 

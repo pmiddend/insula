@@ -25,7 +25,8 @@ public:
 		scalar fov,
 		scalar near,
 		scalar far,
-		scalar camera_speed);
+		scalar camera_speed,
+		vec3 const &position);
 	
 	void
 	update(

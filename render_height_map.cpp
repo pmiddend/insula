@@ -57,6 +57,7 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/from_std_string.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/output.hpp>
@@ -99,7 +100,11 @@ try
 		("camera-speed",boost::program_options::value<insula::graphics::scalar>()->default_value(200),"Speed of the camera")
 		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
 		("gradient-texture",boost::program_options::value<fcppt::string>()->required(),"Texture for the gradient")
-		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture");
+		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture")
+		("ambient-light",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(0.25)),"Ambient lighting (in [0,1])")
+		("sun-x",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun x position")
+		("sun-y",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(1000)),"Sun y position")
+		("sun-z",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun z position");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -285,6 +290,13 @@ try
 
 	sge::renderer::glsl::uniform::variable_ptr const sun_position_var = 
 		shads.program()->uniform("sun_position");
+
+	sge::renderer::glsl::uniform::variable_ptr const ambient_light_var = 
+		shads.program()->uniform("ambient_light");
+
+	sge::renderer::glsl::uniform::single_value(
+		ambient_light_var,
+		vm["ambient-light"].as<insula::graphics::scalar>());
 	
 	sge::renderer::glsl::uniform::single_value(
 		grid_size_var,
@@ -295,11 +307,15 @@ try
 			static_cast<insula::graphics::scalar>(
 				static_cast<insula::graphics::scalar>(images[0]->dim()[1]) * 
 				vm["grid-y"].as<insula::height_map::scalar>())));
+	
+	insula::graphics::vec3 const sun_position(
+		vm["sun-x"].as<insula::graphics::scalar>(),
+		vm["sun-y"].as<insula::graphics::scalar>(),
+		vm["sun-z"].as<insula::graphics::scalar>());
 
 	sge::renderer::glsl::uniform::single_value(
 		sun_position_var,
-		insula::graphics::vec3(
-			-10,100,-10));
+		sun_position);
 	
 	insula::graphics::camera cam(
 		sys.input_system(),
@@ -311,7 +327,8 @@ try
 					vm["fov"].as<insula::graphics::scalar>()))),
 		vm["near"].as<insula::graphics::scalar>(),
 		vm["far"].as<insula::graphics::scalar>(),
-		vm["camera-speed"].as<insula::graphics::scalar>());
+		vm["camera-speed"].as<insula::graphics::scalar>(),
+		sun_position);
 	
 	sge::time::timer frame_timer(
 		sge::time::second(
