@@ -20,7 +20,9 @@ public:
 	explicit
 	object(
 		sge::renderer::device_ptr,
-		array const &,
+		array const &heights,
+		array const &heights_stretched,
+		array const &gradient,
 		scalar height_scaling,
 		vector2 const &cell_sizes);
 	

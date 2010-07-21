@@ -31,7 +31,7 @@ public:
 private:
 	sge::renderer::glsl::program_ptr program_;
 	sge::renderer::glsl::uniform::variable_ptr mvp_;
-	sge::renderer::glsl::uniform::variable_ptr texture0_;
+	sge::renderer::glsl::uniform::variable_ptr sand_,rock_,grass_;
 };
 }
 }

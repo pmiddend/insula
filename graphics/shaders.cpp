@@ -37,11 +37,21 @@ insula::graphics::shaders::shaders(
 	fcppt::io::cout << FCPPT_TEXT("Error log: ") << program_->info_log() << FCPPT_TEXT("\n");
 	
 	mvp_ = program_->uniform("mvp");
-	texture0_ = program_->uniform("main_texture");
+	sand_ = program_->uniform("sand");
+	rock_ = program_->uniform("rock");
+	grass_ = program_->uniform("grass");
 
 	sge::renderer::glsl::uniform::single_value(
-		texture0_,
+		sand_,
 		0);
+
+	sge::renderer::glsl::uniform::single_value(
+		rock_,
+		1);
+
+	sge::renderer::glsl::uniform::single_value(
+		grass_,
+		2);
 }
 
 sge::renderer::glsl::program_ptr const

@@ -94,7 +94,9 @@ private:
 
 insula::height_map::object::object(
 	sge::renderer::device_ptr const _renderer,
-	array const &a,
+	array const &heights,
+	array const &heights_stretched,
+	array const &grad,
 	scalar const height_scaling,
 	vector2 const &cell_sizes)
 :
@@ -104,7 +106,7 @@ insula::height_map::object::object(
 		renderer_->create_vertex_buffer(
 			sge::renderer::vf::dynamic::make_format<vf::format>(),
 			static_cast<sge::renderer::size_type>(
-				a.num_elements()),
+				heights.num_elements()),
 			sge::renderer::resource_flags::none)),
 	ib_(
 		renderer_->create_index_buffer(
@@ -113,7 +115,7 @@ insula::height_map::object::object(
 			// 2*q Tris
 			// 3*2*q Indices
 			static_cast<sge::renderer::size_type>(
-				3*2*((a.shape()[0]-1)*(a.shape()[1]-1))),
+				3*2*((heights.shape()[0]-1)*(heights.shape()[1]-1))),
 			sge::renderer::resource_flags::none))
 {
 	FCPPT_ASSERT_MESSAGE(
@@ -132,9 +134,9 @@ insula::height_map::object::object(
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
 
-	for (array::size_type y = 0; y < a.shape()[0]; ++y)
+	for (array::size_type y = 0; y < heights.shape()[0]; ++y)
 	{
-		for (array::size_type x = 0; x < a.shape()[1]; ++x)
+		for (array::size_type x = 0; x < heights.shape()[1]; ++x)
 		{
 			vf::packed_position p(
 				static_cast<graphics::scalar>(
@@ -144,7 +146,7 @@ insula::height_map::object::object(
 				static_cast<graphics::scalar>(
 					static_cast<scalar>(
 						height_scaling) * 
-					a[y][x]),
+					heights[y][x]),
 				static_cast<graphics::scalar>(
 					static_cast<scalar>(
 						y) * 
@@ -153,20 +155,19 @@ insula::height_map::object::object(
 			(*vb_it).set<vf::position>(
 				p);
 
-			vb_it++;
-			/*
-			(*vb_it++).set<vf::texture_coordinate>(
+			(*vb_it).set<vf::texture_coordinate>(
 				vf::packed_texture_coordinate(
-					p.x()/(cell_sizes.x() * static_cast<graphics::scalar>(a.shape()[0])),
-					p.z()/(cell_sizes.y() * static_cast<graphics::scalar>(a.shape()[1]))));
-					*/
+					heights_stretched[y][x],
+					grad[y][x]));
+			
+			vb_it++;
 		}
 	}
 	
 	fcppt::variant::apply_unary(
 		index_visitor(
-			a.shape()[0],
-			a.shape()[1]),
+			heights.shape()[0],
+			heights.shape()[1]),
 		sge::renderer::scoped_index_lock(
 			ib_,
 			sge::renderer::lock_mode::writeonly).value().any());

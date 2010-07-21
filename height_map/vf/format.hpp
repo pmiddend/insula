@@ -2,7 +2,7 @@
 #define INSULA_HEIGHT_MAP_VF_FORMAT_HPP_INCLUDED
 
 #include "position.hpp"
-//#include "texture_coordinate.hpp"
+#include "texture_coordinate.hpp"
 #include <sge/renderer/vf/format.hpp>
 #include <boost/mpl/vector/vector10.hpp>
 
@@ -15,9 +15,10 @@ namespace vf
 typedef 
 sge::renderer::vf::format
 <
-	boost::mpl::vector1
+	boost::mpl::vector2
 	<
-		position
+		position,
+		texture_coordinate
 	>
 > 
 format;

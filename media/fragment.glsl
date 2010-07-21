@@ -1,21 +1,30 @@
 //#version 140
 
 //out vec4 frag_color;
-uniform sampler2D main_texture;
+uniform sampler2D sand,rock,grass;
 varying vec2 texcoord;
-//varying vec3 position;
+varying vec2 height_and_gradient_out;
 
 void main()
 {
 	//gl_FragColor = vec4(1.0,1.0,1.0,1.0);
 
+	float 
+		grad = height_and_gradient_out.y,
+		first = 1.0-height_and_gradient_out.x,
+		second = height_and_gradient_out.x;
+
 	gl_FragColor = 
+		(1.0-grad) * first * 
 		texture2D(
-			main_texture,
-			texcoord
-			
-			/*
-			vec2(
-				position.x/2560.0,
-				position.z/2560.0)*/);
+			sand,
+			texcoord) +
+		(1.0-grad) * second * 
+		texture2D(
+			grass,
+			texcoord) +
+		grad *
+		texture2D(
+			rock,
+			texcoord);
 }

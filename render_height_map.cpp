@@ -148,21 +148,39 @@ try
 				sge::image::capabilities_field::null(),
 				sge::all_extensions)));
 	
-	insula::height_map::array height_map_array = 
+	insula::height_map::array height_map_array_raw = 
 		insula::height_map::image_to_array(
 			sys.image_loader().load(
 				filename));
+	
+	insula::height_map::array height_map_array = 
+		height_map_array_raw;
+
+	insula::height_map::normalize_and_stretch(
+		height_map_array);
+
+	insula::height_map::array grad = 
+		insula::height_map::generate_gradient(
+			height_map_array);
+
+	insula::height_map::normalize_and_stretch(
+		grad);
+	
+	std::transform(
+		grad.data(),
+		grad.data() + height_map_array.num_elements(),
+		grad.data(),
+		[](insula::height_map::array::element const s) { return std::sin(s); });
 
 	insula::height_map::object h(
 		sys.renderer(),
+		height_map_array_raw,
 		height_map_array,
+		grad,
 		vm["height-scale"].as<insula::height_map::scalar>(),
 		insula::height_map::vector2(
 			vm["grid-x"].as<insula::height_map::scalar>(),
 			vm["grid-y"].as<insula::height_map::scalar>()));
-
-	insula::height_map::normalize_and_stretch(
-		height_map_array);
 
 	sge::image::file_ptr const gradient_image = 
 		sys.image_loader().load(
@@ -177,6 +195,7 @@ try
 			images),
 		[&sys](fcppt::filesystem::path const &p) { return sys.image_loader().load(p); });
 
+	/*
 	insula::textures::rgb_view const gradient_view = 
 		gradient_image->view().get<insula::textures::rgb_view>();
 
@@ -191,19 +210,6 @@ try
 
 	insula::textures::interpolators::bernstein_polynomial bp(
 		views.size());
-
-	insula::height_map::array grad = 
-		insula::height_map::generate_gradient(
-			height_map_array);
-	
-	insula::height_map::normalize_and_stretch(
-		grad);
-	
-	std::transform(
-		grad.data(),
-		grad.data() + height_map_array.num_elements(),
-		grad.data(),
-		[](insula::height_map::array::element const s) { return std::sin(s); });
 	
 	insula::textures::rgb_store const main_store = 
 		insula::textures::blend(
@@ -219,6 +225,23 @@ try
 				main_store.view()),
 			sge::renderer::filter::linear,
 			sge::renderer::resource_flags::none);
+	*/
+	sge::renderer::texture_ptr const 
+		sand_texture = 
+			sys.renderer()->create_texture(
+				images[0]->view(),
+				sge::renderer::filter::linear,
+				sge::renderer::resource_flags::none),
+		rock_texture = 
+			sys.renderer()->create_texture(
+				gradient_image->view(),
+				sge::renderer::filter::linear,
+				sge::renderer::resource_flags::none),
+		grass_texture = 
+			sys.renderer()->create_texture(
+				images[1]->view(),
+				sge::renderer::filter::linear,
+				sge::renderer::resource_flags::none);
 
 	bool running = 
 		true;
@@ -241,7 +264,16 @@ try
 			(sge::renderer::state::color::clear_color = sge::image::colors::black()));
 	
 	sys.renderer()->texture(
-		main_texture);
+		sand_texture,
+		0);
+
+	sys.renderer()->texture(
+		rock_texture,
+		1);
+
+	sys.renderer()->texture(
+		grass_texture,
+		2);
 	
 	insula::graphics::shaders shads(
 		sys.renderer(),
@@ -255,10 +287,10 @@ try
 		grid_size_var,
 		insula::graphics::vec2(
 			static_cast<insula::graphics::scalar>(
-				static_cast<insula::graphics::scalar>(gradient_view.dim()[0]) * 
+				static_cast<insula::graphics::scalar>(images[0]->dim()[0]) * 
 				vm["grid-x"].as<insula::height_map::scalar>()),
 			static_cast<insula::graphics::scalar>(
-				static_cast<insula::graphics::scalar>(gradient_view.dim()[1]) * 
+				static_cast<insula::graphics::scalar>(images[0]->dim()[1]) * 
 				vm["grid-y"].as<insula::height_map::scalar>())));
 	
 	insula::graphics::camera cam(
