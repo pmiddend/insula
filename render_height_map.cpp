@@ -282,6 +282,9 @@ try
 	
 	sge::renderer::glsl::uniform::variable_ptr const grid_size_var = 
 		shads.program()->uniform("grid_size");
+
+	sge::renderer::glsl::uniform::variable_ptr const sun_position_var = 
+		shads.program()->uniform("sun_position");
 	
 	sge::renderer::glsl::uniform::single_value(
 		grid_size_var,
@@ -292,6 +295,11 @@ try
 			static_cast<insula::graphics::scalar>(
 				static_cast<insula::graphics::scalar>(images[0]->dim()[1]) * 
 				vm["grid-y"].as<insula::height_map::scalar>())));
+
+	sge::renderer::glsl::uniform::single_value(
+		sun_position_var,
+		insula::graphics::vec3(
+			-10,100,-10));
 	
 	insula::graphics::camera cam(
 		sys.input_system(),

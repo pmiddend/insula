@@ -4,6 +4,7 @@
 uniform sampler2D sand,rock,grass;
 varying vec2 texcoord;
 varying vec2 height_and_gradient_out;
+varying float light_intensity;
 
 void main()
 {
@@ -15,16 +16,18 @@ void main()
 		second = height_and_gradient_out.x;
 
 	gl_FragColor = 
-		(1.0-grad) * first * 
-		texture2D(
-			sand,
-			texcoord) +
-		(1.0-grad) * second * 
-		texture2D(
-			grass,
-			texcoord) +
-		grad *
-		texture2D(
-			rock,
-			texcoord);
+		/*light_intensity * */
+		(
+			(1.0-grad) * first * 
+			texture2D(
+				sand,
+				texcoord) +
+			(1.0-grad) * second * 
+			texture2D(
+				grass,
+				texcoord) +
+			grad *
+			texture2D(
+				rock,
+				texcoord));
 }
