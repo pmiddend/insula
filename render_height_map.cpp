@@ -93,7 +93,7 @@ try
 		("help","produce help message")
 		("fov",boost::program_options::value<insula::graphics::scalar>()->default_value(90),"Field of view (in degrees)")
 		("near",boost::program_options::value<insula::graphics::scalar>()->default_value(1),"Distance to the near plane")
-		("far",boost::program_options::value<insula::graphics::scalar>()->default_value(1000),"Distance to the far plane")
+		("far",boost::program_options::value<insula::graphics::scalar>()->default_value(10000),"Distance to the far plane")
 		("grid-x",boost::program_options::value<insula::height_map::scalar>()->default_value(5),"Size of a grid cell in x dimension")
 		("grid-y",boost::program_options::value<insula::height_map::scalar>()->default_value(5),"Size of a grid cell in y dimension")
 		("height-scale",boost::program_options::value<insula::height_map::scalar>()->default_value(1000),"Height scaling")
