@@ -22,26 +22,32 @@ insula::graphics::shaders::shaders(
 		fragment_stream(
 			fragment);
 
-	sge::renderer::glsl::program_ptr const p(
+	program_ = 
 		renderer->create_glsl_program(
 			sge::renderer::glsl::optional_istream(
 				sge::renderer::glsl::istream_ref(
 					vertex_stream)),
 			sge::renderer::glsl::optional_istream(
 				sge::renderer::glsl::istream_ref(
-					fragment_stream))));
+					fragment_stream)));
 
 	renderer->glsl_program(
-		p);
+		program_);
 	
-	fcppt::io::cout << FCPPT_TEXT("Error log: ") << p->info_log() << FCPPT_TEXT("\n");
+	fcppt::io::cout << FCPPT_TEXT("Error log: ") << program_->info_log() << FCPPT_TEXT("\n");
 	
-	mvp_ = p->uniform("mvp");
-	texture0_ = p->uniform("main_texture");
+	mvp_ = program_->uniform("mvp");
+	texture0_ = program_->uniform("main_texture");
 
 	sge::renderer::glsl::uniform::single_value(
 		texture0_,
 		0);
+}
+
+sge::renderer::glsl::program_ptr const
+insula::graphics::shaders::program()
+{
+	return program_;
 }
 
 void

@@ -6,6 +6,7 @@
 #include <fcppt/filesystem/path.hpp>
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/glsl/uniform/variable_ptr.hpp>
+#include <sge/renderer/glsl/program_ptr.hpp>
 
 namespace insula
 {
@@ -21,10 +22,14 @@ public:
 		fcppt::filesystem::path const &vertex,
 		fcppt::filesystem::path const &fragment);
 	
+	sge::renderer::glsl::program_ptr const
+	program();
+	
 	void
 	mvp(
 		mat4 const &);
 private:
+	sge::renderer::glsl::program_ptr program_;
 	sge::renderer::glsl::uniform::variable_ptr mvp_;
 	sge::renderer::glsl::uniform::variable_ptr texture0_;
 };

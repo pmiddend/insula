@@ -7,6 +7,8 @@
 #include "height_map/normalize_and_stretch.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/vec2.hpp"
+#include "graphics/scalar.hpp"
 #include "textures/interpolators/bernstein_polynomial.hpp"
 #include "textures/blend.hpp"
 #include "textures/image_sequence.hpp"
@@ -29,6 +31,9 @@
 #include <sge/renderer/resource_flags_none.hpp>
 #include <sge/renderer/state/draw_mode.hpp>
 #include <sge/renderer/texture.hpp>
+#include <sge/renderer/glsl/uniform/variable_ptr.hpp>
+#include <sge/renderer/glsl/uniform/single_value.hpp>
+#include <sge/renderer/glsl/program.hpp>
 #include <sge/input/system.hpp>
 #include <sge/input/action.hpp>
 #include <sge/time/timer.hpp>
@@ -242,6 +247,19 @@ try
 		sys.renderer(),
 		FCPPT_TEXT("media/vertex.glsl"),
 		FCPPT_TEXT("media/fragment.glsl"));
+	
+	sge::renderer::glsl::uniform::variable_ptr const grid_size_var = 
+		shads.program()->uniform("grid_size");
+	
+	sge::renderer::glsl::uniform::single_value(
+		grid_size_var,
+		insula::graphics::vec2(
+			static_cast<insula::graphics::scalar>(
+				static_cast<insula::graphics::scalar>(gradient_view.dim()[0]) * 
+				vm["grid-x"].as<insula::height_map::scalar>()),
+			static_cast<insula::graphics::scalar>(
+				static_cast<insula::graphics::scalar>(gradient_view.dim()[1]) * 
+				vm["grid-y"].as<insula::height_map::scalar>())));
 	
 	insula::graphics::camera cam(
 		sys.input_system(),

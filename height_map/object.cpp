@@ -153,10 +153,13 @@ insula::height_map::object::object(
 			(*vb_it).set<vf::position>(
 				p);
 
+			vb_it++;
+			/*
 			(*vb_it++).set<vf::texture_coordinate>(
 				vf::packed_texture_coordinate(
 					p.x()/(cell_sizes.x() * static_cast<graphics::scalar>(a.shape()[0])),
 					p.z()/(cell_sizes.y() * static_cast<graphics::scalar>(a.shape()[1]))));
+					*/
 		}
 	}
 	
