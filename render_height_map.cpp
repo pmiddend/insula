@@ -3,15 +3,19 @@
 #include "height_map/vector2.hpp"
 #include "height_map/object.hpp"
 #include "height_map/image_to_array.hpp"
+#include "height_map/generate_gradient.hpp"
 #include "height_map/normalize_and_stretch.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/camera.hpp"
 #include "textures/interpolators/bernstein_polynomial.hpp"
 #include "textures/blend.hpp"
 #include "textures/image_sequence.hpp"
+#include "textures/rgb_view.hpp"
+#include "textures/rgb_view_sequence.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
+#include <sge/image/file.hpp>
 #include <sge/renderer/refresh_rate_dont_care.hpp>
 #include <sge/renderer/no_multi_sampling.hpp>
 #include <sge/renderer/device.hpp>
@@ -65,6 +69,12 @@
 int main(int argc,char *argv[])
 try
 {
+	fcppt::log::activate_levels(
+		sge::log::global(),
+		fcppt::log::level::debug
+	);
+
+	// We need this to read the filename vector for the height textures
 	typedef
 	std::vector<fcppt::string>
 	string_vector;
@@ -83,6 +93,7 @@ try
 		("height-scale",boost::program_options::value<insula::height_map::scalar>()->default_value(1000),"Height scaling")
 		("camera-speed",boost::program_options::value<insula::graphics::scalar>()->default_value(200),"Speed of the camera")
 		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
+		("gradient-texture",boost::program_options::value<fcppt::string>()->required(),"Texture for the gradient")
 		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture");
 	
 	boost::program_options::variables_map vm;
@@ -92,6 +103,7 @@ try
 			argv, 
 			desc), 
 			vm);
+
 	boost::program_options::notify(
 		vm);    
 
@@ -100,11 +112,6 @@ try
 		fcppt::io::cout << desc << FCPPT_TEXT("\n");
 		return EXIT_SUCCESS;
 	}
-	
-	fcppt::log::activate_levels(
-		sge::log::global(),
-		fcppt::log::level::debug
-	);
 
 	fcppt::filesystem::path const filename(
 		vm["height-map"].as<fcppt::string>());
@@ -141,9 +148,6 @@ try
 			sys.image_loader().load(
 				filename));
 
-	insula::height_map::normalize_and_stretch(
-		height_map_array);
-
 	insula::height_map::object h(
 		sys.renderer(),
 		height_map_array,
@@ -151,6 +155,13 @@ try
 		insula::height_map::vector2(
 			vm["grid-x"].as<insula::height_map::scalar>(),
 			vm["grid-y"].as<insula::height_map::scalar>()));
+
+	insula::height_map::normalize_and_stretch(
+		height_map_array);
+
+	sge::image::file_ptr const gradient_image = 
+		sys.image_loader().load(
+			vm["gradient-texture"].as<fcppt::string>());
 
 	insula::textures::image_sequence images;
 	
@@ -161,15 +172,42 @@ try
 			images),
 		[&sys](fcppt::filesystem::path const &p) { return sys.image_loader().load(p); });
 
+	insula::textures::rgb_view const gradient_view = 
+		gradient_image->view().get<insula::textures::rgb_view>();
+
+	insula::textures::rgb_view_sequence views;
+
+	std::transform(
+		images.begin(),
+		images.end(),
+		std::back_inserter<insula::textures::rgb_view_sequence>(
+			views),
+		[](sge::image::file_ptr const f) { return f->view().get<insula::textures::rgb_view>(); });
+
 	insula::textures::interpolators::bernstein_polynomial bp(
-		images.size());
+		views.size());
+
+	insula::height_map::array grad = 
+		insula::height_map::generate_gradient(
+			height_map_array);
+	
+	insula::height_map::normalize_and_stretch(
+		grad);
+	
+	std::transform(
+		grad.data(),
+		grad.data() + height_map_array.num_elements(),
+		grad.data(),
+		[](insula::height_map::array::element const s) { return std::sin(s); });
 	
 	insula::textures::rgb_store const main_store = 
 		insula::textures::blend(
-			images,
+			gradient_view,
+			views,
 			height_map_array,
+			grad,
 			bp);
-	
+
 	sge::renderer::texture_ptr const main_texture = 
 		sys.renderer()->create_texture(
 			mizuiro::image::make_const_view(

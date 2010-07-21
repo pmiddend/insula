@@ -1,6 +1,6 @@
 #include "image_to_array.hpp"
+#include "gray_view.hpp"
 #include <sge/image/file.hpp>
-#include <sge/image/view/detail/view_types.hpp>
 #include <sge/image/color/gray8_format.hpp>
 #include <mizuiro/image/const_view.hpp>
 #include <mizuiro/image/view_impl.hpp>
@@ -22,20 +22,8 @@ insula::height_map::image_to_array(
 	sge::image::file_ptr const im)
 try
 {
-	typedef
-	mizuiro::image::const_view
-	<
-		// NOTE: Damn, why do I have to grab to ::detail here?
-		sge::image::view::detail::view_types
-		<
-			sge::image::color::gray8_format
-		// NOTE: The double ::type here are both needed!
-		>::type
-	>::type
-	target_view;
-
-	target_view const v(
-		im->view().get<target_view>());
+	gray_view const v(
+		im->view().get<gray_view>());
 
 	array h(
 		v.dim());
@@ -47,7 +35,7 @@ try
 			<
 				mizuiro::color::channel::gray,
 				float,
-				target_view::iterator::reference
+				gray_view::iterator::reference
 			>,
 			boost::phoenix::arg_names::arg1)(
 				*v.begin());
@@ -59,18 +47,18 @@ try
 		<
 			mizuiro::color::channel::gray,
 			float,
-			target_view::iterator::reference
+			gray_view::iterator::reference
 		>(
 			*v.begin());
 			*/
 
-	fcppt::function::object<float (target_view::iterator::reference const &)> fun = 
+	fcppt::function::object<float (gray_view::iterator::reference const &)> fun = 
 		std::bind(
 			&mizuiro::color::normalize
 			<
 				mizuiro::color::channel::gray,
 				float,
-				target_view::iterator::reference
+				gray_view::iterator::reference
 			>,
 			std::placeholders::_1);
 	
@@ -84,7 +72,7 @@ try
 			<
 				mizuiro::color::channel::gray,
 				float,
-				target_view::iterator::reference
+				gray_view::iterator::reference
 			>,
 			std::tr1::placeholders::_1)(
 				*v.begin());

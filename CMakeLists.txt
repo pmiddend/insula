@@ -42,6 +42,7 @@ IF (${CMAKE_COMPILER_IS_GNUCXX})
 	"-Wstrict-null-sentinel -Winit-self -Woverloaded-virtual"
 	"-Wold-style-cast -Wnon-virtual-dtor -Wctor-dtor-privacy -Wsign-promo"
 	"-Wstrict-aliasing=1 -Wmissing-declarations -Wno-long-long"
+	"-ggdb"
 	"-std=c++0x")
 
 	IF (ENABLE_OPTIMIZATIONS)

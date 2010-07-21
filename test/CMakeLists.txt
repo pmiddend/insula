@@ -3,16 +3,15 @@ FIND_PACKAGE(
 	unit_test_framework
 )
 
-MACRO(
+FUNCTION(
 	ADD_INSULA_TEST
 	PATHNAME
 )
 	STRING(REGEX REPLACE "\\/" "_" TESTNAME ${PATHNAME})
 
-	SET(INSULA_TEST_NAME insula${TESTNAME}test)
+	SET(INSULA_TEST_NAME insula_${TESTNAME}_test)
 
-	ADD_EXECUTABLE(${INSULA_TEST_NAME} ${PATHNAME}.cpp
-		${all_files})
+	ADD_EXECUTABLE(${INSULA_TEST_NAME} ${PATHNAME}.cpp ${ARGN})
 
 	IF(MSVC)
 		SET_PROPERTY(
@@ -42,8 +41,9 @@ MACRO(
 		COMMAND
 		${INSULA_TEST_NAME}
 	)
-ENDMACRO()
+ENDFUNCTION()
 
 ADD_INSULA_TEST(display_2d_array)
 ADD_INSULA_TEST(calculate_index)
-ADD_INSULA_TEST(bernstein_polynomial)
+ADD_INSULA_TEST(gradient ../height_map/generate_gradient.cpp)
+ADD_INSULA_TEST(bernstein_polynomial ../textures/interpolators/bernstein_polynomial.cpp ../textures/weights.cpp)

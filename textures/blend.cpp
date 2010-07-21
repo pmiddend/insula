@@ -12,8 +12,6 @@
 #include <mizuiro/color/operators/add.hpp>
 #include <mizuiro/nonconst_tag.hpp>
 #include <sge/image/file.hpp>
-#include <fcppt/variant/object.hpp>
-#include <fcppt/variant/invalid_get.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/math/dim/basic_impl.hpp>
 #include <fcppt/math/dim/comparison.hpp>
@@ -27,10 +25,11 @@
 
 insula::textures::rgb_store const
 insula::textures::blend(
-	image_sequence const &images,
+	rgb_view const &gradient_image,
+	rgb_view_sequence const &images,
 	height_map::array const &heights,
+	height_map::array const &grad,
 	interpolators::base &lerper)
-try
 {
 	FCPPT_ASSERT(
 		!images.empty());
@@ -39,38 +38,11 @@ try
 		std::all_of(
 			images.begin(),
 			images.end(),
-			[&images](sge::image::file_ptr const &f) { return f->dim() == images.front()->dim(); }));
-	
-	/*
-	FCPPT_ASSERT(
-		std::inner_product(
-			images.front()->dim().begin(), // FIXME: dim is by value!
-			images.front()->dim().end(),
-			heights.shape(),
-			true,
-			std::logical_and<bool>(),
-			std::equal_to<std::size_t>())
-		);
-		*/
+			[&images](rgb_view const &f) { return f.dim() == images.front().dim(); }) &&
+		gradient_image.dim() == images.front().dim());
 
-	typedef
-	std::vector<rgb_view>
-	view_sequence;
-
-	view_sequence views;
-	
-	std::transform(
-		images.begin(),
-		images.end(),
-		std::back_inserter<view_sequence>(
-			views),
-		[](sge::image::file_ptr const f) 
-		{ 
-			return f->view().get<rgb_view>(); 
-		});
-	
 	rgb_store m(
-		views.front().dim());
+		images.front().dim());
 	
 	rgb_store::view_type target = 
 		m.view();
@@ -79,17 +51,16 @@ try
 	{
 		for (rgb_store::dim_type::value_type x = 0; x < target.dim()[1]; ++x)
 		{
-			weights::weight_sequence const w = 
+			weights const w = 
 				lerper.calculate_weights(
-					//static_cast<weight>(0.5),
 					static_cast<weight>(
 						heights[y][x]),
-					// the gradient
 					static_cast<weight>(
-						0)).sequence();
+						grad[y][x]));
 
 			FCPPT_ASSERT(
-				w.size() == views.size());
+				static_cast<weights::weight_sequence::size_type>(w.sequence().size()) == 
+				static_cast<weights::weight_sequence::size_type>(images.size()));
 
 			//fcppt::io::cout << "weight sequence: ";
 			//BOOST_FOREACH(weights::weight_sequence::const_reference r,w)
@@ -102,19 +73,16 @@ try
 				y);
 
 			target.at(cp) = 
-				w.front() * views.front().at(cp);
+				w.gradient() * gradient_image.at(cp);
 
-			view_sequence::const_iterator view_it = 
-				std::next(
-					views.begin());
-			for (weights::weight_sequence::const_iterator i = std::next(w.begin()); i != w.end(); ++i)
-				target.at(cp) = target.at(cp) + (*i) * (view_it++)->at(cp);
+			rgb_view_sequence::const_iterator view_it = 
+				images.begin();
+			for (weights::weight_sequence::const_iterator i = w.sequence().begin(); i != w.sequence().end(); ++i)
+				target.at(cp) = 
+					target.at(cp) + 
+					(*i) * (view_it++)->at(cp);
 		}
 	}
 	
 	return m;
-}
-catch (fcppt::variant::invalid_get const &)
-{
-	throw fcppt::exception(FCPPT_TEXT("Tried to use an image as height texture which is not rgb8"));
 }

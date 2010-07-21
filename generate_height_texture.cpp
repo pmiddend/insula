@@ -1,9 +1,14 @@
+#include "media_path.hpp"
 #include "height_map/array.hpp"
 #include "height_map/image_to_array.hpp"
 #include "height_map/normalize_and_stretch.hpp"
+#include "height_map/array_to_image.hpp"
+#include "height_map/generate_gradient.hpp"
 #include "textures/interpolators/bernstein_polynomial.hpp"
 #include "textures/blend.hpp"
 #include "textures/image_sequence.hpp"
+#include "textures/rgb_view.hpp"
+#include "textures/rgb_view_sequence.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
@@ -34,21 +39,10 @@
 #include <mizuiro/image/make_const_view.hpp>
 #include <cstdlib>
 #include <exception>
-#include <vector>
 #include <ostream>
 #include <iterator>
 #include <algorithm>
 #include <cmath>
-
-namespace
-{
-typedef
-std::vector
-<
-	fcppt::filesystem::path
->
-filename_sequence;
-}
 
 int main(int const argc,char *argv[])
 try
@@ -57,24 +51,22 @@ try
 		sge::log::global(),
 		fcppt::log::level::debug);
 
-	if (argc < 3)
+	if (argc < 4)
 	{
-		fcppt::io::cerr << FCPPT_TEXT("usage: ") << fcppt::from_std_string(argv[0]) << FCPPT_TEXT(" <image-file>\n");
+		fcppt::io::cerr 
+			<< FCPPT_TEXT("usage: ") 
+			<< fcppt::from_std_string(argv[0]) 
+			<< FCPPT_TEXT("<height-map-file> <gradient-image-file> <image-file>*\n");
 		return EXIT_FAILURE;
 	}
 
-	fcppt::filesystem::path const heightmap_filename(
-		fcppt::from_std_string(
-			argv[1]));
-	
-	filename_sequence height_textures;
-	
-	for (int i = 2; i < argc; ++i)
-		height_textures.push_back(
-			argv[i]);
-	
-	FCPPT_ASSERT(
-		!height_textures.empty());
+	fcppt::filesystem::path const 
+		heightmap_filename = 
+			fcppt::from_std_string(
+				argv[1]),
+		gradient_image_filename = 
+			fcppt::from_std_string(
+				argv[2]);
 
 	sge::systems::instance sys(
 		sge::systems::list()
@@ -88,6 +80,7 @@ try
 			sys.image_loader().load(
 				heightmap_filename));
 	
+	// Optional postprocessing
 	/*
 	std::transform(
 		h.data(),
@@ -100,33 +93,70 @@ try
 	insula::height_map::normalize_and_stretch(
 		h);
 	
+	insula::height_map::array grad = 
+		insula::height_map::generate_gradient(
+			h);
+	
+	insula::height_map::normalize_and_stretch(
+		grad);
+	
+	std::transform(
+		grad.data(),
+		grad.data() + h.num_elements(),
+		grad.data(),
+		[](insula::height_map::array::element const s) { return std::sin(s); });
+	
+	insula::height_map::array_to_image(
+		grad,
+		sys.image_loader(),
+		insula::media_path()/FCPPT_TEXT("result_gradient.png"));
+	
+	sge::image::file_ptr const gradient_image = 
+		sys.image_loader().load(
+			gradient_image_filename);
 	insula::textures::image_sequence images;
 	
 	std::transform(
-		height_textures.begin(),
-		height_textures.end(),
+		argv + 3,
+		argv + argc,
 		std::back_inserter<insula::textures::image_sequence>(
 			images),
-		[&sys](fcppt::filesystem::path const &p) { return sys.image_loader().load(p); });
+		[&sys](char const *c) { return sys.image_loader().load(fcppt::from_std_string(c)); });
+
+	insula::textures::rgb_view const gradient_view = 
+		gradient_image->view().get<insula::textures::rgb_view>();
 	
-	fcppt::io::cout << FCPPT_TEXT("There are ") << images.size() << FCPPT_TEXT(" images\n");
+	insula::textures::rgb_view_sequence views;
+
+	std::transform(
+		images.begin(),
+		images.end(),
+		std::back_inserter<insula::textures::rgb_view_sequence>(
+			views),
+		[](sge::image::file_ptr const f) { return f->view().get<insula::textures::rgb_view>(); });
 	
 	insula::textures::interpolators::bernstein_polynomial bp(
-		images.size());
+		views.size());
 	
 	insula::textures::rgb_store const result = 
 		insula::textures::blend(
-			images,
+			gradient_view,
+			views,
 			h,
+			grad,
 			bp);
 
 	sys.image_loader().loaders().at(0)->create(
 		mizuiro::image::make_const_view(
-			result.view()))->save(FCPPT_TEXT("media/result.png"));
+			result.view()))->save(insula::media_path()/FCPPT_TEXT("result.png"));
 	
 	/*
 	result->save(
 		FCPPT_TEXT("media/result.png"))*/;
+}
+catch (fcppt::variant::invalid_get const &)
+{
+	throw fcppt::exception(FCPPT_TEXT("Tried to use an image as height texture which is not rgb8"));
 }
 catch(fcppt::exception const &e)
 {

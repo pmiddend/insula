@@ -7,10 +7,5 @@
 -Lightmap für Terrain generieren?
 -Gegenstände wie Bäume auf das Terrain setzen?
 
-
----Notizen Texturen:
---Ansatz Bernsteinpolynome:
-Seien n Texturarten gegeben, diese sollen das Einheitsintervall [0,1] in n
-Teile zerlegen. Die Texturen müssen nach "Höhenlevel" sortiert sein. Sei ein
-Pixel mit Höhenwert h gegeben. Der Einfluss von Textur t ist gegeben durch das
-t-te Bernsteinpolynom an der Stelle h.
+--Notiz Shadowmap
+-Entscheidend für die Farbe ist weiterhin die Sonnenposition und die Position des Punktes (sagen wir einer der Punkte des Faces (Mittelpunkt müsste man interpolieren)). Es wird ein Strahl geschossen von der Sonne zum Zielpunkt. Zunächst wird bestimmt, welche Zellen von diesem Strahl geschnitten werden (die Reihenfolge ist hier wichtig). Dann wird für jede Zelle auf dem Weg bestimmt, ob ein Schnittpunkt vorliegt. Ist dem so, wird die Zielzelle mit der ambienten Beleuchtung versehen. Ist dem nicht so, wird sie mit der Zielbeleuchtung versehen.
