@@ -16,7 +16,7 @@ void main()
 		second = height_and_gradient_out.x;
 
 	gl_FragColor = 
-		/*light_intensity * */
+		light_intensity * 
 		(
 			(1.0-grad) * first * 
 			texture2D(
