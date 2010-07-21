@@ -101,7 +101,7 @@ try
 		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
 		("gradient-texture",boost::program_options::value<fcppt::string>()->required(),"Texture for the gradient")
 		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture")
-		("ambient-light",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(0.25)),"Ambient lighting (in [0,1])")
+		("ambient-light",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(0.4)),"Ambient lighting (in [0,1])")
 		("sun-x",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun x position")
 		("sun-y",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(1000)),"Sun y position")
 		("sun-z",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun z position");
