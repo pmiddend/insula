@@ -1,5 +1,5 @@
 #include "bernstein_polynomial.hpp"
-#include <boost/math/special_functions/binomial.hpp>
+//#include <boost/math/special_functions/binomial.hpp>
 #include <fcppt/io/cout.hpp>
 #include <algorithm>
 #include <cmath>
@@ -18,10 +18,11 @@ insula::textures::interpolators::bernstein_polynomial::at(
 	weight const t)
 {
 	return 
+		/*
 		boost::math::binomial_coefficient<weight>(
 			static_cast<unsigned>(
 				count_-1),
-			i) *
+			i) * */
 		std::pow(
 			t,
 			static_cast<weight>(
