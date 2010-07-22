@@ -28,7 +28,8 @@ void main()
 			ambient_light,
 			max(
 				0.0, 
-				dot(normalize(normal), normalize(sun_position - gl_Vertex.xyz))));
+				//dot(normalize(normal), normalize(sun_position - gl_Vertex.xyz))));
+				dot(normalize(normal), normalize(sun_position))));
 
 	height_and_gradient_out = height_and_gradient;
 

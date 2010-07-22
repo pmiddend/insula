@@ -45,6 +45,7 @@
 #include <sge/time/second.hpp>
 #include <sge/time/default_callback.hpp>
 #include <sge/mainloop/dispatch.hpp>
+#include <sge/console/object.hpp>
 #include <sge/log/global.hpp>
 #include <sge/all_extensions.hpp>
 #include <sge/exception.hpp>
@@ -84,6 +85,9 @@ try
 	typedef
 	std::vector<fcppt::string>
 	string_vector;
+
+	//insula::console::object console(
+	//	);
 
 	boost::program_options::options_description desc("Allowed options");
 	
@@ -202,37 +206,6 @@ try
 			images),
 		[&sys](fcppt::filesystem::path const &p) { return sys.image_loader().load(p); });
 
-	/*
-	insula::textures::rgb_view const gradient_view = 
-		gradient_image->view().get<insula::textures::rgb_view>();
-
-	insula::textures::rgb_view_sequence views;
-
-	std::transform(
-		images.begin(),
-		images.end(),
-		std::back_inserter<insula::textures::rgb_view_sequence>(
-			views),
-		[](sge::image::file_ptr const f) { return f->view().get<insula::textures::rgb_view>(); });
-
-	insula::textures::interpolators::bernstein_polynomial bp(
-		views.size());
-	
-	insula::textures::rgb_store const main_store = 
-		insula::textures::blend(
-			gradient_view,
-			views,
-			height_map_array,
-			grad,
-			bp);
-
-	sge::renderer::texture_ptr const main_texture = 
-		sys.renderer()->create_texture(
-			mizuiro::image::make_const_view(
-				main_store.view()),
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::none);
-	*/
 	sge::renderer::texture_ptr const 
 		sand_texture = 
 			sys.renderer()->create_texture(
