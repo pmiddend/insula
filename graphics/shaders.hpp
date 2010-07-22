@@ -32,7 +32,10 @@ public:
 	void
 	perspective(
 		mat4 const &);
+	
+	~shaders();
 private:
+	sge::renderer::device_ptr const renderer_;
 	sge::renderer::glsl::program_ptr program_;
 	sge::renderer::glsl::uniform::variable_ptr world_,perspective_;
 	sge::renderer::glsl::uniform::variable_ptr sand_,rock_,grass_;

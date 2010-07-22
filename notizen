@@ -9,3 +9,7 @@
 
 --Notiz Shadowmap
 -Entscheidend für die Farbe ist weiterhin die Sonnenposition und die Position des Punktes (sagen wir einer der Punkte des Faces (Mittelpunkt müsste man interpolieren)). Es wird ein Strahl geschossen von der Sonne zum Zielpunkt. Zunächst wird bestimmt, welche Zellen von diesem Strahl geschnitten werden (die Reihenfolge ist hier wichtig). Dann wird für jede Zelle auf dem Weg bestimmt, ob ein Schnittpunkt vorliegt. Ist dem so, wird die Zielzelle mit der ambienten Beleuchtung versehen. Ist dem nicht so, wird sie mit der Zielbeleuchtung versehen.
+
+--Notiz Himmel
+-Himmeltextur komplett im Shader machen? 3D-Noise?
+-

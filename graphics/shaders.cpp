@@ -81,3 +81,9 @@ insula::graphics::shaders::perspective(
 		fcppt::math::matrix::transpose(
 			m));
 }
+
+insula::graphics::shaders::~shaders()
+{
+	renderer_->glsl_program(
+		sge::renderer::glsl::program_ptr());
+}
