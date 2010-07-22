@@ -39,7 +39,7 @@ void main()
 
 	vec3 N = normalize(normal_out);
 	vec3 L = normalize(sun_position);
-	vec3 V = normalize(eye_space.xyz * vec3(1.0, 1.0, -1.0));
+	vec3 V = normalize(eye_space * vec3(1.0, 1.0, -1.0));
 
 	vec4 light_color =
 		light_intensity *
@@ -57,7 +57,8 @@ void main()
 				rock,
 				texcoord));
 
+	gl_FragColor = light_color;
 	//gl_FragColor = blinnPhongReflectance(N, L, V, light_color.xyz);
-	gl_FragColor = blinnPhongReflectance(N, L, V, light_color.xyz);
+	//gl_FragColor = blinnPhongReflectance(N, L, V, light_color.xyz);
 }
 

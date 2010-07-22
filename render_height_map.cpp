@@ -94,17 +94,19 @@ try
 		("fov",boost::program_options::value<insula::graphics::scalar>()->default_value(90),"Field of view (in degrees)")
 		("near",boost::program_options::value<insula::graphics::scalar>()->default_value(1),"Distance to the near plane")
 		("far",boost::program_options::value<insula::graphics::scalar>()->default_value(10000),"Distance to the far plane")
-		("grid-x",boost::program_options::value<insula::height_map::scalar>()->default_value(5),"Size of a grid cell in x dimension")
-		("grid-y",boost::program_options::value<insula::height_map::scalar>()->default_value(5),"Size of a grid cell in y dimension")
+		("grid-x",boost::program_options::value<insula::height_map::scalar>()->default_value(20),"Size of a grid cell in x dimension")
+		("grid-y",boost::program_options::value<insula::height_map::scalar>()->default_value(20),"Size of a grid cell in y dimension")
 		("height-scale",boost::program_options::value<insula::height_map::scalar>()->default_value(1000),"Height scaling")
-		("camera-speed",boost::program_options::value<insula::graphics::scalar>()->default_value(200),"Speed of the camera")
+		("camera-speed",boost::program_options::value<insula::graphics::scalar>()->default_value(500),"Speed of the camera")
 		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
 		("gradient-texture",boost::program_options::value<fcppt::string>()->required(),"Texture for the gradient")
 		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture")
 		("ambient-light",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(0.4)),"Ambient lighting (in [0,1])")
 		("sun-x",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun x position")
 		("sun-y",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(1000)),"Sun y position")
-		("sun-z",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun z position");
+		("sun-z",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun z position")
+		("texture-scaling",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
+		("wireframe",boost::program_options::value<bool>()->zero_tokens(),"Enable wireframe mode");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -256,6 +258,13 @@ try
 			sge::input::action(
 				sge::input::kc::key_escape,
 				boost::phoenix::ref(running) = false)));
+	
+	if (vm.count("wireframe"))
+	{
+		sys.renderer()->state(
+			sge::renderer::state::list
+				(sge::renderer::state::draw_mode::line));
+	}
 
 	sys.renderer()->state(
 		sge::renderer::state::list
@@ -265,7 +274,6 @@ try
 		 	(sge::renderer::state::depth_func::less)
 		 	(sge::renderer::state::bool_::clear_zbuffer = true)
 		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
-//		 	(sge::renderer::state::draw_mode::line)
 			(sge::renderer::state::color::clear_color = sge::image::colors::black()));
 	
 	sys.renderer()->texture(
@@ -294,9 +302,16 @@ try
 	sge::renderer::glsl::uniform::variable_ptr const ambient_light_var = 
 		shads.program()->uniform("ambient_light");
 
+	sge::renderer::glsl::uniform::variable_ptr const multiplicator_var = 
+		shads.program()->uniform("multiplicator");
+
 	sge::renderer::glsl::uniform::single_value(
 		ambient_light_var,
 		vm["ambient-light"].as<insula::graphics::scalar>());
+
+	sge::renderer::glsl::uniform::single_value(
+		multiplicator_var,
+		vm["texture-scaling"].as<insula::graphics::scalar>());
 	
 	sge::renderer::glsl::uniform::single_value(
 		grid_size_var,

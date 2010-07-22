@@ -1,3 +1,3 @@
 #!/bin/bash
 
-build/render_height_map --height-map media/smooth* --gradient-texture media/textures/rock_512.png --height-texture media/textures/sand_512.png media/textures/grass_512.png $*
+build/render_height_map --height-map media/real_insula.png --gradient-texture media/textures/rock_512.png --height-texture media/textures/grass_512.png media/textures/sand_512.png $*
