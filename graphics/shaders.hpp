@@ -26,11 +26,15 @@ public:
 	program();
 	
 	void
-	mvp(
+	world(
+		mat4 const &);
+
+	void
+	perspective(
 		mat4 const &);
 private:
 	sge::renderer::glsl::program_ptr program_;
-	sge::renderer::glsl::uniform::variable_ptr mvp_;
+	sge::renderer::glsl::uniform::variable_ptr world_,perspective_;
 	sge::renderer::glsl::uniform::variable_ptr sand_,rock_,grass_;
 };
 }

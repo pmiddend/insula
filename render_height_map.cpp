@@ -338,8 +338,11 @@ try
 	{
 		sge::mainloop::dispatch();
 	
-		shads.mvp(
-			cam.perspective() * cam.world());
+		shads.world(
+			cam.world());
+
+		shads.perspective(
+			cam.perspective());
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());

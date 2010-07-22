@@ -8,6 +8,7 @@
 #include <sge/renderer/glsl/uniform/single_value.hpp>
 #include <fcppt/optional.hpp>
 #include <fcppt/io/cifstream.hpp>
+#include <fcppt/math/matrix/transpose.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/text.hpp>
 
@@ -36,7 +37,8 @@ insula::graphics::shaders::shaders(
 	
 	fcppt::io::cout << FCPPT_TEXT("Error log: ") << program_->info_log() << FCPPT_TEXT("\n");
 	
-	mvp_ = program_->uniform("mvp");
+	world_ = program_->uniform("world");
+	perspective_ = program_->uniform("perspective");
 	sand_ = program_->uniform("sand");
 	rock_ = program_->uniform("rock");
 	grass_ = program_->uniform("grass");
@@ -61,10 +63,21 @@ insula::graphics::shaders::program()
 }
 
 void
-insula::graphics::shaders::mvp(
+insula::graphics::shaders::world(
 	mat4 const &m)
 {
 	sge::renderer::glsl::uniform::single_value(
-		mvp_,
-		m);
+		world_,
+		fcppt::math::matrix::transpose(
+			m));
+}
+
+void
+insula::graphics::shaders::perspective(
+	mat4 const &m)
+{
+	sge::renderer::glsl::uniform::single_value(
+		perspective_,
+		fcppt::math::matrix::transpose(
+			m));
 }

@@ -1,6 +1,7 @@
 //#version 140
 
-uniform mat4 mvp;
+uniform mat4 world;
+uniform mat4 perspective;
 uniform sampler2D sand,rock,grass;
 uniform vec2 grid_size;
 uniform vec3 sun_position;
@@ -29,5 +30,5 @@ void main()
 
 	height_and_gradient_out = height_and_gradient;
 
-	gl_Position = transpose(mvp) * gl_Vertex;
+	gl_Position = perspective * world * gl_Vertex;
 }
