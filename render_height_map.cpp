@@ -5,15 +5,12 @@
 #include "height_map/image_to_array.hpp"
 #include "height_map/generate_gradient.hpp"
 #include "height_map/normalize_and_stretch.hpp"
-#include "graphics/shaders.hpp"
+#include "graphics/shader.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/vec2.hpp"
 #include "graphics/scalar.hpp"
-#include "textures/interpolators/bernstein_polynomial.hpp"
-#include "textures/blend.hpp"
 #include "textures/image_sequence.hpp"
-#include "textures/rgb_view.hpp"
-#include "textures/rgb_view_sequence.hpp"
+#include "console/object.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
@@ -87,9 +84,6 @@ try
 	std::vector<fcppt::string>
 	string_vector;
 
-	//insula::console::object console(
-	//	);
-
 	boost::program_options::options_description desc("Allowed options");
 	
 	string_vector height_textures;
@@ -153,12 +147,18 @@ try
 				sge::renderer::window_mode::windowed,
 				sge::renderer::vsync::on,
 				sge::renderer::no_multi_sampling))
-		(
-			sge::systems::parameterless::input)
+		(sge::systems::parameterless::input)
+		(sge::systems::parameterless::font)
 		(
 			sge::systems::image_loader(
 				sge::image::capabilities_field::null(),
 				sge::all_extensions)));
+
+	insula::console::object console(
+		sys.input_system(),
+		sys.renderer(),
+		sys.font_system(),
+		sys.image_loader());
 	
 	insula::height_map::array height_map_array_raw = 
 		insula::height_map::image_to_array(
@@ -262,39 +262,41 @@ try
 		grass_texture,
 		2);
 	
-	insula::graphics::shaders shads(
+	insula::graphics::shader terrain_shader(
 		sys.renderer(),
 		FCPPT_TEXT("media/vertex.glsl"),
 		FCPPT_TEXT("media/fragment.glsl"));
 	
-	shads.set_uniform(
+	terrain_shader.activate();
+	
+	terrain_shader.set_uniform(
 		FCPPT_TEXT("sand"),
 		0);
 
-	shads.set_uniform(
+	terrain_shader.set_uniform(
 		FCPPT_TEXT("rock"),
 		1);
 
-	shads.set_uniform(
+	terrain_shader.set_uniform(
 		FCPPT_TEXT("grass"),
 		2);
 	
-	shads.set_uniform(
+	terrain_shader.set_uniform(
 		FCPPT_TEXT("sun_direction"),
 		insula::graphics::vec3(
 			vm["sun-x"].as<insula::graphics::scalar>(),
 			vm["sun-y"].as<insula::graphics::scalar>(),
 			vm["sun-z"].as<insula::graphics::scalar>()));
 
-	shads.set_uniform(
+	terrain_shader.set_uniform(
 		FCPPT_TEXT("ambient_light"),
 		vm["ambient-light"].as<insula::graphics::scalar>());
 
-	shads.set_uniform(
+	terrain_shader.set_uniform(
 		FCPPT_TEXT("multiplicator"),
 		vm["texture-scaling"].as<insula::graphics::scalar>());
 	
-	shads.set_uniform(
+	terrain_shader.set_uniform(
 		FCPPT_TEXT("grid_size"),
 		insula::graphics::vec2(
 			static_cast<insula::graphics::scalar>(
@@ -305,7 +307,7 @@ try
 				vm["grid-y"].as<insula::height_map::scalar>())));
 
 	insula::graphics::camera cam(
-		sys.input_system(),
+		console,
 		static_cast<insula::graphics::scalar>(
 			1024.0/768.0),
 		static_cast<insula::graphics::scalar>(
@@ -324,13 +326,18 @@ try
 	while(running)
 	{
 		sge::mainloop::dispatch();
+
+		cam.update(
+			frame_timer.reset());
+
+		terrain_shader.activate();
 	
-		shads.set_uniform(
+		terrain_shader.set_uniform(
 			FCPPT_TEXT("world"),
 			fcppt::math::matrix::transpose(
 				cam.world()));
 
-		shads.set_uniform(
+		terrain_shader.set_uniform(
 			FCPPT_TEXT("perspective"),
 			fcppt::math::matrix::transpose(
 				cam.perspective()));
@@ -338,10 +345,11 @@ try
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
 
-		cam.update(
-			frame_timer.reset());
-
 		h.render();
+
+		sys.renderer()->glsl_program(
+			sge::renderer::glsl::program_ptr());
+		console.render();
 	}
 }
 catch(sge::exception const &e)

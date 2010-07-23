@@ -4,6 +4,7 @@
 #include "scalar.hpp"
 #include "mat4.hpp"
 #include "vec3.hpp"
+#include "../console/object_fwd.hpp"
 #include <sge/input/system_ptr.hpp>
 #include <sge/input/key_pair_fwd.hpp>
 #include <fcppt/noncopyable.hpp>
@@ -20,7 +21,7 @@ FCPPT_NONCOPYABLE(camera)
 public:
 	explicit
 	camera(
-		sge::input::system_ptr,
+		console::object &,
 		scalar aspect,
 		scalar fov,
 		scalar near,

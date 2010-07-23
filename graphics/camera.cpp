@@ -1,6 +1,7 @@
 #include "camera.hpp"
 #include "scalar.hpp"
 #include "vec4.hpp"
+#include "../console/object.hpp"
 #include <sge/input/key_pair.hpp>
 #include <sge/input/system.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
@@ -21,7 +22,7 @@
 #include <functional>
 
 insula::graphics::camera::camera(
-	sge::input::system_ptr const _is,
+	console::object &_con,
 	scalar _aspect,
 	scalar _fov,
 	scalar _near,
@@ -30,7 +31,7 @@ insula::graphics::camera::camera(
 	vec3 const &_position)
 :
 	input_connection_(
-		_is->register_callback(
+		_con.register_callback(
 			std::bind(
 				&camera::input_callback,
 				this,

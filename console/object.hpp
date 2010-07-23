@@ -12,7 +12,6 @@
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/image/multi_loader_fwd.hpp>
 #include <sge/font/system_ptr.hpp>
-#include <fcppt/noncopyable.hpp>
 #include <fcppt/signal/auto_connection.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/signal/object.hpp>
@@ -23,8 +22,13 @@ namespace console
 {
 class object
 {
-FCPPT_NONCOPYABLE(object)
 public:
+	object &operator=(
+		object const &) = delete;
+	object(
+		object const &) = delete;
+
+	
 	explicit
 	object(
 		sge::input::system_ptr,

@@ -10,10 +10,6 @@
 #include <fcppt/variant/invalid_get.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
-#include <fcppt/function/object.hpp>
-
-#include <boost/spirit/home/phoenix/bind/bind_function.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
 
 #include <functional>
 
@@ -27,61 +23,12 @@ try
 
 	array h(
 		v.dim());
-
-	/*
-	float const f = 
-		boost::phoenix::bind(
-			&mizuiro::color::normalize
-			<
-				mizuiro::color::channel::gray,
-				float,
-				gray_view::iterator::reference
-			>,
-			boost::phoenix::arg_names::arg1)(
-				*v.begin());
-				*/
-
-	/*
-	float const f = 
-		mizuiro::color::normalize
-		<
-			mizuiro::color::channel::gray,
-			float,
-			gray_view::iterator::reference
-		>(
-			*v.begin());
-			*/
-
-	fcppt::function::object<float (gray_view::iterator::reference const &)> fun = 
-		std::bind(
-			&mizuiro::color::normalize
-			<
-				mizuiro::color::channel::gray,
-				float,
-				gray_view::iterator::reference
-			>,
-			std::placeholders::_1);
 	
-	//float const f2 = fun(*v.begin());
-	/*
-	*/
-	/*
-	float const f2 = 
-		std::tr1::bind(
-			&mizuiro::color::normalize
-			<
-				mizuiro::color::channel::gray,
-				float,
-				gray_view::iterator::reference
-			>,
-			std::tr1::placeholders::_1)(
-				*v.begin());
-	*/
 	std::transform(
 		v.begin(),
 		v.end(),
 		h.data(),
-		fun);
+		[](gray_view::iterator::reference const &f) { return mizuiro::color::normalize<mizuiro::color::channel::gray,float>(f); });
 
 	return h;
 }

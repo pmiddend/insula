@@ -1,14 +1,12 @@
-#ifndef INSULA_GRAPHICS_SHADERS_HPP_INCLUDED
-#define INSULA_GRAPHICS_SHADERS_HPP_INCLUDED
+#ifndef INSULA_GRAPHICS_SHADER_HPP_INCLUDED
+#define INSULA_GRAPHICS_SHADER_HPP_INCLUDED
 
-#include "mat4.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/glsl/uniform/variable_ptr.hpp>
 #include <sge/renderer/glsl/uniform/single_value.hpp>
 #include <sge/renderer/glsl/program.hpp>
 #include <sge/renderer/glsl/program_ptr.hpp>
 #include <fcppt/assert.hpp>
-#include <fcppt/noncopyable.hpp>
 #include <fcppt/filesystem/path.hpp>
 #include <fcppt/container/map.hpp>
 #include <map>
@@ -17,18 +15,21 @@ namespace insula
 {
 namespace graphics
 {
-class shaders
+class shader
 {
-FCPPT_NONCOPYABLE(shaders)
 public:
 	explicit
-	shaders(
+	shader(
 		sge::renderer::device_ptr,
 		fcppt::filesystem::path const &vertex,
 		fcppt::filesystem::path const &fragment);
 	
-	sge::renderer::glsl::program_ptr const
-	program();
+	shader &operator=(
+		shader const &) = delete;
+
+	shader(
+		shader const&) = delete;
+
 	
 	template<typename T>
 	void
@@ -45,6 +46,9 @@ public:
 			uniforms_[name],
 			t);
 	}
+
+	void
+	activate();
 private:
 	typedef
 	fcppt::container::map

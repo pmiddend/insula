@@ -94,7 +94,8 @@ insula::console::object::register_repeat_callback(
 void
 insula::console::object::render()
 {
-	gfx_.draw();
+	if (gfx_.active())
+		gfx_.draw();
 }
 
 void

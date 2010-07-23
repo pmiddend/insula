@@ -1,4 +1,4 @@
-#include "shaders.hpp"
+#include "shader.hpp"
 #include <sge/renderer/glsl/program_ptr.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/glsl/program.hpp>
@@ -12,10 +12,13 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/text.hpp>
 
-insula::graphics::shaders::shaders(
-	sge::renderer::device_ptr const renderer,
+insula::graphics::shader::shader(
+	sge::renderer::device_ptr const _renderer,
 	fcppt::filesystem::path const &vertex,
 	fcppt::filesystem::path const &fragment)
+:
+	renderer_(
+		_renderer)
 {
 	fcppt::io::cifstream 
 		vertex_stream(
@@ -24,22 +27,23 @@ insula::graphics::shaders::shaders(
 			fragment);
 
 	program_ = 
-		renderer->create_glsl_program(
+		renderer_->create_glsl_program(
 			sge::renderer::glsl::optional_istream(
 				sge::renderer::glsl::istream_ref(
 					vertex_stream)),
 			sge::renderer::glsl::optional_istream(
 				sge::renderer::glsl::istream_ref(
 					fragment_stream)));
-
-	renderer->glsl_program(
-		program_);
 	
-	fcppt::io::cout << FCPPT_TEXT("Error log: ") << program_->info_log() << FCPPT_TEXT("\n");
+	fcppt::io::cout 
+		<< FCPPT_TEXT("Error log: ") 
+		<< program_->info_log() 
+		<< FCPPT_TEXT("\n");
 }
 
-sge::renderer::glsl::program_ptr const
-insula::graphics::shaders::program()
+void
+insula::graphics::shader::activate()
 {
-	return program_;
+	renderer_->glsl_program(
+		program_);
 }
