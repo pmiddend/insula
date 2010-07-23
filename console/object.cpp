@@ -32,7 +32,7 @@ insula::console::object::object(
 	gfx_(
 		object_,
 		rend,
-		sge::image::colors::white(),
+		sge::image::colors::black(),
 		fs->create_font(
 			sge::config::media_path()
 			/ FCPPT_TEXT("fonts")

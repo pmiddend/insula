@@ -38,6 +38,7 @@
 #include <sge/time/second.hpp>
 #include <sge/time/default_callback.hpp>
 #include <sge/renderer/state/list.hpp>
+#include <sge/renderer/state/draw_mode.hpp>
 #include <sge/renderer/state/bool.hpp>
 #include <sge/renderer/state/color.hpp>
 #include <sge/renderer/state/trampoline.hpp>
@@ -106,7 +107,7 @@ try
 		("sun-y",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(1000)),"Sun y position")
 		("sun-z",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun z position")
 		("texture-scaling",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
-		("wireframe",boost::program_options::value<bool>()->zero_tokens(),"Enable wireframe mode (currently not functional)");
+		("wireframe",boost::program_options::value<bool>()->zero_tokens(),"Enable wireframe mode");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -234,26 +235,12 @@ try
 				sge::input::kc::key_escape,
 				boost::phoenix::ref(running) = false)));
 	
-	/*
 	if (vm.count("wireframe"))
 	{
 		sys.renderer()->state(
 			sge::renderer::state::list
 				(sge::renderer::state::draw_mode::line));
 	}
-	*/
-	
-	sys.renderer()->texture(
-		sand_texture,
-		0);
-
-	sys.renderer()->texture(
-		rock_texture,
-		1);
-
-	sys.renderer()->texture(
-		grass_texture,
-		2);
 	
 	insula::graphics::shader terrain_shader(
 		sys.renderer(),
@@ -344,11 +331,35 @@ try
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
+	
+		sys.renderer()->texture(
+			sand_texture,
+			0);
+
+		sys.renderer()->texture(
+			rock_texture,
+			1);
+
+		sys.renderer()->texture(
+			grass_texture,
+			2);
 
 		h.render();
 
 		sys.renderer()->glsl_program(
 			sge::renderer::glsl::program_ptr());
+
+		sys.renderer()->texture(
+			sge::renderer::device::no_texture,
+			0);
+
+		sys.renderer()->texture(
+			sge::renderer::device::no_texture,
+			1);
+
+		sys.renderer()->texture(
+			sge::renderer::device::no_texture,
+			2);
 		console.render();
 	}
 }
