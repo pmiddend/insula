@@ -8,6 +8,7 @@
 #include "graphics/shader.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/vec2.hpp"
+#include "graphics/vec3.hpp"
 #include "graphics/scalar.hpp"
 #include "textures/image_sequence.hpp"
 #include "console/object.hpp"
@@ -58,6 +59,9 @@
 #include <fcppt/from_std_string.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/input.hpp>
+#include <fcppt/math/vector/output.hpp>
+#include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/output.hpp>
@@ -76,6 +80,8 @@
 int main(int argc,char *argv[])
 try
 {
+	using namespace insula;
+
 	fcppt::log::activate_levels(
 		sge::log::global(),
 		fcppt::log::level::debug
@@ -92,21 +98,18 @@ try
 
 	desc.add_options()
 		("help","produce help message")
-		("fov",boost::program_options::value<insula::graphics::scalar>()->default_value(90),"Field of view (in degrees)")
-		("near",boost::program_options::value<insula::graphics::scalar>()->default_value(1),"Distance to the near plane")
-		("far",boost::program_options::value<insula::graphics::scalar>()->default_value(10000),"Distance to the far plane")
-		("grid-x",boost::program_options::value<insula::height_map::scalar>()->default_value(20),"Size of a grid cell in x dimension")
-		("grid-y",boost::program_options::value<insula::height_map::scalar>()->default_value(20),"Size of a grid cell in y dimension")
-		("height-scale",boost::program_options::value<insula::height_map::scalar>()->default_value(1000),"Height scaling")
-		("camera-speed",boost::program_options::value<insula::graphics::scalar>()->default_value(500),"Speed of the camera")
+		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
+		("near",boost::program_options::value<graphics::scalar>()->default_value(1),"Distance to the near plane")
+		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
+		("grid-sizes",boost::program_options::value<height_map::vector2>()->default_value(height_map::vector2(20,20)),"Size of a grid cell")
+		("height-scale",boost::program_options::value<height_map::scalar>()->default_value(1000),"Height scaling")
+		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
 		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
 		("gradient-texture",boost::program_options::value<fcppt::string>()->required(),"Texture for the gradient")
 		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture")
-		("ambient-light",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(0.4)),"Ambient lighting (in [0,1])")
-		("sun-x",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun x position")
-		("sun-y",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(1000)),"Sun y position")
-		("sun-z",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun z position")
-		("texture-scaling",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
+		("ambient-light",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.4)),"Ambient lighting (in [0,1])")
+		("sun-direction",boost::program_options::value<graphics::vec3>()->default_value(graphics::vec3(100,100,100)),"Sun direction")
+		("texture-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
 		("wireframe",boost::program_options::value<bool>()->zero_tokens(),"Enable wireframe mode");
 	
 	boost::program_options::variables_map vm;
@@ -156,56 +159,54 @@ try
 				sge::image::capabilities_field::null(),
 				sge::all_extensions)));
 
-	insula::console::object console(
+	console::object console(
 		sys.input_system(),
 		sys.renderer(),
 		sys.font_system(),
 		sys.image_loader());
 	
-	insula::height_map::array height_map_array_raw = 
-		insula::height_map::image_to_array(
+	height_map::array height_map_array_raw = 
+		height_map::image_to_array(
 			sys.image_loader().load(
 				filename));
 	
-	insula::height_map::array height_map_array = 
+	height_map::array height_map_array = 
 		height_map_array_raw;
 
-	insula::height_map::normalize_and_stretch(
+	height_map::normalize_and_stretch(
 		height_map_array);
 
-	insula::height_map::array grad = 
-		insula::height_map::generate_gradient(
+	height_map::array grad = 
+		height_map::generate_gradient(
 			height_map_array);
 
-	insula::height_map::normalize_and_stretch(
+	height_map::normalize_and_stretch(
 		grad);
 	
 	std::transform(
 		grad.data(),
 		grad.data() + height_map_array.num_elements(),
 		grad.data(),
-		[](insula::height_map::array::element const s) { return std::sin(s); });
+		[](height_map::array::element const s) { return std::sin(s); });
 
-	insula::height_map::object h(
+	height_map::object h(
 		sys.renderer(),
 		height_map_array_raw,
 		height_map_array,
 		grad,
-		vm["height-scale"].as<insula::height_map::scalar>(),
-		insula::height_map::vector2(
-			vm["grid-x"].as<insula::height_map::scalar>(),
-			vm["grid-y"].as<insula::height_map::scalar>()));
+		vm["height-scale"].as<height_map::scalar>(),
+		vm["grid-sizes"].as<height_map::vector2>());
 
 	sge::image::file_ptr const gradient_image = 
 		sys.image_loader().load(
 			vm["gradient-texture"].as<fcppt::string>());
 
-	insula::textures::image_sequence images;
+	textures::image_sequence images;
 	
 	std::transform(
 		height_textures.begin(),
 		height_textures.end(),
-		std::back_inserter<insula::textures::image_sequence>(
+		std::back_inserter<textures::image_sequence>(
 			images),
 		[&sys](fcppt::filesystem::path const &p) { return sys.image_loader().load(p); });
 
@@ -242,7 +243,7 @@ try
 				(sge::renderer::state::draw_mode::line));
 	}
 	
-	insula::graphics::shader terrain_shader(
+	graphics::shader terrain_shader(
 		sys.renderer(),
 		FCPPT_TEXT("media/vertex.glsl"),
 		FCPPT_TEXT("media/fragment.glsl"));
@@ -263,41 +264,38 @@ try
 	
 	terrain_shader.set_uniform(
 		FCPPT_TEXT("sun_direction"),
-		insula::graphics::vec3(
-			vm["sun-x"].as<insula::graphics::scalar>(),
-			vm["sun-y"].as<insula::graphics::scalar>(),
-			vm["sun-z"].as<insula::graphics::scalar>()));
+		vm["sun-direction"].as<graphics::vec3>());
 
 	terrain_shader.set_uniform(
 		FCPPT_TEXT("ambient_light"),
-		vm["ambient-light"].as<insula::graphics::scalar>());
+		vm["ambient-light"].as<graphics::scalar>());
 
 	terrain_shader.set_uniform(
 		FCPPT_TEXT("multiplicator"),
-		vm["texture-scaling"].as<insula::graphics::scalar>());
+		vm["texture-scaling"].as<graphics::scalar>());
 	
 	terrain_shader.set_uniform(
 		FCPPT_TEXT("grid_size"),
-		insula::graphics::vec2(
-			static_cast<insula::graphics::scalar>(
-				static_cast<insula::graphics::scalar>(images[0]->dim()[0]) * 
-				vm["grid-x"].as<insula::height_map::scalar>()),
-			static_cast<insula::graphics::scalar>(
-				static_cast<insula::graphics::scalar>(images[0]->dim()[1]) * 
-				vm["grid-y"].as<insula::height_map::scalar>())));
+		graphics::vec2(
+			static_cast<graphics::scalar>(
+				images[0]->dim()[0]),
+			static_cast<graphics::scalar>(
+				images[0]->dim()[1])) * 
+		fcppt::math::vector::structure_cast<graphics::vec2>(
+			vm["grid-sizes"].as<height_map::vector2>()));
 
-	insula::graphics::camera cam(
+	graphics::camera cam(
 		console,
-		static_cast<insula::graphics::scalar>(
+		static_cast<graphics::scalar>(
 			1024.0/768.0),
-		static_cast<insula::graphics::scalar>(
+		static_cast<graphics::scalar>(
 			fcppt::math::deg_to_rad(
-				static_cast<insula::graphics::scalar>(
-					vm["fov"].as<insula::graphics::scalar>()))),
-		vm["near"].as<insula::graphics::scalar>(),
-		vm["far"].as<insula::graphics::scalar>(),
-		vm["camera-speed"].as<insula::graphics::scalar>(),
-		insula::graphics::vec3::null());
+				static_cast<graphics::scalar>(
+					vm["fov"].as<graphics::scalar>()))),
+		vm["near"].as<graphics::scalar>(),
+		vm["far"].as<graphics::scalar>(),
+		vm["camera-speed"].as<graphics::scalar>(),
+		graphics::vec3::null());
 	
 	sge::time::timer frame_timer(
 		sge::time::second(
