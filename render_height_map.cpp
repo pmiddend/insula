@@ -20,13 +20,9 @@
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/system.hpp>
 #include <sge/renderer/scoped_block.hpp>
-#include <sge/renderer/state/list.hpp>
-#include <sge/renderer/state/var.hpp>
-#include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/filter/trilinear.hpp>
 #include <sge/renderer/filter/linear.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
-#include <sge/renderer/state/draw_mode.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/glsl/uniform/variable_ptr.hpp>
 #include <sge/renderer/glsl/uniform/single_value.hpp>
@@ -41,6 +37,11 @@
 #include <sge/time/millisecond.hpp>
 #include <sge/time/second.hpp>
 #include <sge/time/default_callback.hpp>
+#include <sge/renderer/state/list.hpp>
+#include <sge/renderer/state/bool.hpp>
+#include <sge/renderer/state/color.hpp>
+#include <sge/renderer/state/trampoline.hpp>
+#include <sge/image/colors.hpp>
 #include <sge/mainloop/dispatch.hpp>
 #include <sge/console/object.hpp>
 #include <sge/log/global.hpp>
@@ -105,7 +106,7 @@ try
 		("sun-y",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(1000)),"Sun y position")
 		("sun-z",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(100)),"Sun z position")
 		("texture-scaling",boost::program_options::value<insula::graphics::scalar>()->default_value(static_cast<insula::graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
-		("wireframe",boost::program_options::value<bool>()->zero_tokens(),"Enable wireframe mode");
+		("wireframe",boost::program_options::value<bool>()->zero_tokens(),"Enable wireframe mode (currently not functional)");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -233,22 +234,14 @@ try
 				sge::input::kc::key_escape,
 				boost::phoenix::ref(running) = false)));
 	
+	/*
 	if (vm.count("wireframe"))
 	{
 		sys.renderer()->state(
 			sge::renderer::state::list
 				(sge::renderer::state::draw_mode::line));
 	}
-
-	sys.renderer()->state(
-		sge::renderer::state::list
-		 	(sge::renderer::state::bool_::clear_backbuffer = true)
-		 	(sge::renderer::state::bool_::enable_lighting = false)
-		 	(sge::renderer::state::cull_mode::front)
-		 	(sge::renderer::state::depth_func::less)
-		 	(sge::renderer::state::bool_::clear_zbuffer = true)
-		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
-			(sge::renderer::state::color::clear_color = sge::image::colors::black()));
+	*/
 	
 	sys.renderer()->texture(
 		sand_texture,
@@ -322,6 +315,13 @@ try
 	sge::time::timer frame_timer(
 		sge::time::second(
 			1));
+	
+	sys.renderer()->state(
+		sge::renderer::state::list
+		 	(sge::renderer::state::bool_::clear_backbuffer = true)
+			(sge::renderer::state::color::clear_color = sge::image::colors::black())
+			(sge::renderer::state::bool_::clear_zbuffer = true)
+		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f));
 
 	while(running)
 	{

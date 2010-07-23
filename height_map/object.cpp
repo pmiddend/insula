@@ -22,6 +22,11 @@
 #include <sge/renderer/scoped_vertex_lock.hpp>
 #include <sge/renderer/scoped_index_lock.hpp>
 #include <sge/renderer/scoped_vertex_buffer.hpp>
+#include <sge/renderer/state/scoped.hpp>
+#include <sge/renderer/state/list.hpp>
+#include <sge/renderer/state/var.hpp>
+#include <sge/renderer/state/trampoline.hpp>
+#include <sge/renderer/state/draw_mode.hpp>
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/renderer/vertex_buffer.hpp>
 #include <sge/renderer/first_vertex.hpp>
@@ -267,6 +272,13 @@ insula::height_map::object::render()
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,
 		vb_);
+	
+	sge::renderer::state::scoped scoped_state(
+		renderer_,
+		sge::renderer::state::list
+		 	(sge::renderer::state::bool_::enable_lighting = false)
+		 	(sge::renderer::state::cull_mode::front)
+		 	(sge::renderer::state::depth_func::less));
 
 	renderer_->render(
 		ib_,
