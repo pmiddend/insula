@@ -196,7 +196,10 @@ insula::height_map::object::object(
 			// 3*2*q Indices
 			static_cast<sge::renderer::size_type>(
 				3*2*((heights.shape()[0]-1)*(heights.shape()[1]-1))),
-			sge::renderer::resource_flags::none))
+			sge::renderer::resource_flags::none)),
+	scoped_vb_(
+		renderer_,
+		vb_)
 {
 	FCPPT_ASSERT_MESSAGE(
 		vb_->size() < 
@@ -264,10 +267,6 @@ insula::height_map::object::object(
 void
 insula::height_map::object::render()
 {
-	sge::renderer::scoped_vertex_buffer const vb_context(
-		renderer_,
-		vb_);
-	
 	renderer_->render(
 		ib_,
 		sge::renderer::first_vertex(

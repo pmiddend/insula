@@ -63,9 +63,8 @@ SET(media_path ${CMAKE_SOURCE_DIR}/media)
 FILE(GLOB_RECURSE height_map_files height_map/*)
 FILE(GLOB_RECURSE graphics_files graphics/*)
 FILE(GLOB_RECURSE texture_files textures/*)
+FILE(GLOB_RECURSE console_files console/*)
 FILE(GLOB base_files media_path.cpp)
-
-SET(all_files ${height_map_files} ${graphics_files} ${texture_files} ${base_files}) 
 
 set_source_files_properties(
 	media_path.cpp
@@ -78,7 +77,9 @@ ADD_EXECUTABLE(load_image_to_array load_image_to_array.cpp media_path.cpp
 	${height_map_files})
 ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp
 	${texture_files}
-	${graphics_files} ${height_map_files})
+	${graphics_files} 
+	${height_map_files}
+	${console_files})
 ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
 	${height_map_files} ${texture_files})
 

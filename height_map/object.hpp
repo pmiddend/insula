@@ -7,6 +7,7 @@
 #include <sge/renderer/vertex_buffer_ptr.hpp>
 #include <sge/renderer/index_buffer_ptr.hpp>
 #include <sge/renderer/device_ptr.hpp>
+#include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <fcppt/noncopyable.hpp>
 
 namespace insula
@@ -32,6 +33,7 @@ private:
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::vertex_buffer_ptr const vb_;
 	sge::renderer::index_buffer_ptr const ib_;
+	sge::renderer::scoped_vertex_buffer const scoped_vb_;
 };
 }
 }
