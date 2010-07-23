@@ -47,3 +47,10 @@ insula::graphics::shader::activate()
 	renderer_->glsl_program(
 		program_);
 }
+
+void
+insula::graphics::shader::deactivate()
+{
+	renderer_->glsl_program(
+		sge::renderer::device::no_program);
+}

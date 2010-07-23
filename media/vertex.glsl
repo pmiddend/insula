@@ -5,7 +5,7 @@ uniform sampler2D sand,rock,grass;
 uniform vec2 grid_size;
 uniform vec3 sun_direction;
 uniform float ambient_light;
-uniform float multiplicator;
+uniform float texture_scaling;
 attribute vec3 normal;
 attribute vec2 height_and_gradient;
 varying vec2 texcoord;
@@ -18,8 +18,8 @@ void main()
 {
 	texcoord = 
 		vec2(
-			gl_Vertex.x / grid_size.x * multiplicator,
-			gl_Vertex.z / grid_size.y * multiplicator);
+			gl_Vertex.x / grid_size.x * texture_scaling,
+			gl_Vertex.z / grid_size.y * texture_scaling);
 	
 	//normal = gl_NormalMatrix * gl_Normal;
 	

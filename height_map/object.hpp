@@ -1,12 +1,17 @@
 #ifndef INSULA_HEIGHT_MAP_OBJECT_HPP_INCLUDED
 #define INSULA_HEIGHT_MAP_OBJECT_HPP_INCLUDED
 
+#include "../graphics/camera_fwd.hpp"
+#include "../graphics/vec2.hpp"
+#include "../graphics/vec3.hpp"
+#include "../graphics/scalar.hpp"
+#include "../graphics/shader.hpp"
 #include "array.hpp"
-#include "scalar.hpp"
-#include "vector2.hpp"
+#include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
 #include <sge/renderer/index_buffer_ptr.hpp>
-#include <sge/renderer/device_ptr.hpp>
+#include <sge/renderer/texture_ptr.hpp>
+#include <sge/image/file_ptr.hpp>
 
 namespace insula
 {
@@ -17,22 +22,46 @@ class object
 public:
 	explicit
 	object(
+		graphics::camera const &,
 		sge::renderer::device_ptr,
-		array const &heights,
-		array const &heights_stretched,
-		array const &gradient,
-		scalar height_scaling,
-		vector2 const &cell_sizes);
+		height_map::array const &,
+		graphics::vec2 const &cell_sizes,
+		graphics::scalar const height_scaling,
+		graphics::vec3 const &sun_direction,
+		graphics::scalar const ambient_light,
+		graphics::scalar const texture_scaling,
+		sge::image::file_ptr const &gradient_texture_image,
+		sge::image::file_ptr const &lower_texture_image,
+		sge::image::file_ptr const &upper_texture_image);
 	
-	object &operator=(object &) = delete;
-	object(object const &) = delete;
+	object &operator=(
+		object &) = delete;
+	object(
+		object const &) = delete;
 	
 	void
 	render();
 private:
+	graphics::camera const &camera_;
 	sge::renderer::device_ptr const renderer_;
-	sge::renderer::vertex_buffer_ptr const vb_;
-	sge::renderer::index_buffer_ptr const ib_;
+	sge::renderer::vertex_buffer_ptr vb_;
+	sge::renderer::index_buffer_ptr ib_;
+	graphics::shader shader_;
+	sge::renderer::texture_ptr lower_texture_,upper_texture_,gradient_texture_;
+
+	void
+	regenerate_from_raw_map(
+		graphics::vec2 const &cell_sizes,
+		graphics::scalar const height_scaling,
+		array const &raw);
+
+	void 
+	regenerate_buffers(
+		graphics::vec2 const &cell_sizes,
+		graphics::scalar const height_scaling,
+		array const &raw,
+		array const &stretched,
+		array const &gradient);
 };
 }
 }

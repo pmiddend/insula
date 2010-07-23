@@ -49,6 +49,9 @@ public:
 
 	void
 	activate();
+
+	void
+	deactivate();
 private:
 	typedef
 	fcppt::container::map

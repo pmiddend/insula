@@ -1,81 +1,64 @@
-#include "height_map/array.hpp"
-#include "height_map/scalar.hpp"
-#include "height_map/vector2.hpp"
-#include "height_map/object.hpp"
-#include "height_map/image_to_array.hpp"
-#include "height_map/generate_gradient.hpp"
-#include "height_map/normalize_and_stretch.hpp"
-#include "graphics/shader.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/scalar.hpp"
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
-#include "graphics/scalar.hpp"
-#include "textures/image_sequence.hpp"
+#include "graphics/camera.hpp"
+#include "height_map/image_to_array.hpp"
+#include "height_map/object.hpp"
 #include "console/object.hpp"
+#include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
-#include <sge/config/media_path.hpp>
-#include <sge/image/file.hpp>
-#include <sge/renderer/refresh_rate_dont_care.hpp>
-#include <sge/renderer/no_multi_sampling.hpp>
+#include <sge/systems/parameterless.hpp>
+#include <sge/systems/image_loader.hpp>
+#include <sge/image/capabilities_field.hpp>
+#include <sge/window/parameters.hpp>
 #include <sge/renderer/device.hpp>
-#include <sge/renderer/system.hpp>
-#include <sge/renderer/scoped_block.hpp>
-#include <sge/renderer/filter/trilinear.hpp>
-#include <sge/renderer/filter/linear.hpp>
-#include <sge/renderer/resource_flags_none.hpp>
-#include <sge/renderer/texture.hpp>
-#include <sge/renderer/glsl/uniform/variable_ptr.hpp>
-#include <sge/renderer/glsl/uniform/single_value.hpp>
-#include <sge/renderer/glsl/program.hpp>
-#include <sge/input/system.hpp>
-#include <sge/input/action.hpp>
-#include <sge/time/timer.hpp>
-#include <sge/image/multi_loader.hpp>
-#include <sge/image/capabilities.hpp>
-#include <sge/image/colors.hpp>
-
-#include <sge/time/millisecond.hpp>
-#include <sge/time/second.hpp>
-#include <sge/time/default_callback.hpp>
+#include <sge/renderer/parameters.hpp>
+#include <sge/renderer/screen_size.hpp>
+#include <sge/renderer/display_mode.hpp>
+#include <sge/renderer/bit_depth.hpp>
+#include <sge/renderer/refresh_rate_dont_care.hpp>
+#include <sge/renderer/depth_buffer.hpp>
+#include <sge/renderer/stencil_buffer.hpp>
+#include <sge/renderer/window_mode.hpp>
+#include <sge/renderer/vsync.hpp>
+#include <sge/renderer/no_multi_sampling.hpp>
 #include <sge/renderer/state/list.hpp>
+#include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/state/draw_mode.hpp>
 #include <sge/renderer/state/bool.hpp>
 #include <sge/renderer/state/color.hpp>
-#include <sge/renderer/state/trampoline.hpp>
-#include <sge/image/colors.hpp>
+#include <sge/renderer/state/float.hpp>
 #include <sge/mainloop/dispatch.hpp>
-#include <sge/console/object.hpp>
-#include <sge/log/global.hpp>
-#include <sge/all_extensions.hpp>
+#include <sge/renderer/scoped_block.hpp>
 #include <sge/exception.hpp>
-#include <mizuiro/image/make_const_view.hpp>
-#include <fcppt/signal/scoped_connection.hpp>
-#include <fcppt/assign/make_container.hpp>
+#include <sge/image/colors.hpp>
+#include <sge/time/timer.hpp>
+#include <sge/time/second.hpp>
+#include <sge/input/system.hpp>
+#include <sge/input/action.hpp>
+#include <sge/input/key_code.hpp>
+#include <sge/image/multi_loader.hpp>
+#include <sge/all_extensions.hpp>
 #include <fcppt/log/activate_levels.hpp>
 #include <fcppt/log/level.hpp>
-#include <fcppt/io/cerr.hpp>
-#include <fcppt/io/cout.hpp>
-#include <fcppt/from_std_string.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/input.hpp>
-#include <fcppt/math/vector/output.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
-#include <fcppt/math/matrix/output.hpp>
-#include <fcppt/math/matrix/transpose.hpp>
-#include <boost/mpl/vector/vector10.hpp>
+#include <fcppt/signal/scoped_connection.hpp>
+#include <fcppt/io/cout.hpp>
+#include <fcppt/math/vector/output.hpp>
+#include <fcppt/math/vector/input.hpp>
+#include <fcppt/io/cerr.hpp>
+#include <fcppt/string.hpp>
+#include <fcppt/exception.hpp>
+#include <fcppt/text.hpp>
+#include <boost/program_options.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
-#include <boost/program_options.hpp>
+#include <vector>
 #include <cstdlib>
 #include <exception>
-#include <algorithm>
-#include <iterator>
+#include <iostream>
 #include <ostream>
-#include <vector>
 
 int main(int argc,char *argv[])
 try
@@ -101,8 +84,8 @@ try
 		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
 		("near",boost::program_options::value<graphics::scalar>()->default_value(1),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
-		("grid-sizes",boost::program_options::value<height_map::vector2>()->default_value(height_map::vector2(20,20)),"Size of a grid cell")
-		("height-scale",boost::program_options::value<height_map::scalar>()->default_value(1000),"Height scaling")
+		("grid-sizes",boost::program_options::value<graphics::vec2>()->default_value(graphics::vec2(20,20)),"Size of a grid cell")
+		("height-scale",boost::program_options::value<graphics::scalar>()->default_value(1000),"Height scaling")
 		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
 		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
 		("gradient-texture",boost::program_options::value<fcppt::string>()->required(),"Texture for the gradient")
@@ -165,67 +148,36 @@ try
 		sys.font_system(),
 		sys.image_loader());
 	
-	height_map::array height_map_array_raw = 
-		height_map::image_to_array(
-			sys.image_loader().load(
-				filename));
-	
-	height_map::array height_map_array = 
-		height_map_array_raw;
-
-	height_map::normalize_and_stretch(
-		height_map_array);
-
-	height_map::array grad = 
-		height_map::generate_gradient(
-			height_map_array);
-
-	height_map::normalize_and_stretch(
-		grad);
-	
-	std::transform(
-		grad.data(),
-		grad.data() + height_map_array.num_elements(),
-		grad.data(),
-		[](height_map::array::element const s) { return std::sin(s); });
+	graphics::camera cam(
+		console,
+		static_cast<graphics::scalar>(
+			1024.0/768.0),
+		static_cast<graphics::scalar>(
+			fcppt::math::deg_to_rad(
+				static_cast<graphics::scalar>(
+					vm["fov"].as<graphics::scalar>()))),
+		vm["near"].as<graphics::scalar>(),
+		vm["far"].as<graphics::scalar>(),
+		vm["camera-speed"].as<graphics::scalar>(),
+		graphics::vec3::null());
 
 	height_map::object h(
+		cam,
 		sys.renderer(),
-		height_map_array_raw,
-		height_map_array,
-		grad,
-		vm["height-scale"].as<height_map::scalar>(),
-		vm["grid-sizes"].as<height_map::vector2>());
-
-	sge::image::file_ptr const gradient_image = 
+		height_map::image_to_array(
+			sys.image_loader().load(
+				filename)),
+		vm["grid-sizes"].as<graphics::vec2>(),
+		vm["height-scale"].as<graphics::scalar>(),
+		vm["sun-direction"].as<graphics::vec3>(),
+		vm["ambient-light"].as<graphics::scalar>(),
+		vm["texture-scaling"].as<graphics::scalar>(),
 		sys.image_loader().load(
-			vm["gradient-texture"].as<fcppt::string>());
-
-	textures::image_sequence images;
-	
-	std::transform(
-		height_textures.begin(),
-		height_textures.end(),
-		std::back_inserter<textures::image_sequence>(
-			images),
-		[&sys](fcppt::filesystem::path const &p) { return sys.image_loader().load(p); });
-
-	sge::renderer::texture_ptr const 
-		sand_texture = 
-			sys.renderer()->create_texture(
-				images[0]->view(),
-				sge::renderer::filter::trilinear,
-				sge::renderer::resource_flags::none),
-		rock_texture = 
-			sys.renderer()->create_texture(
-				gradient_image->view(),
-				sge::renderer::filter::trilinear,
-				sge::renderer::resource_flags::none),
-		grass_texture = 
-			sys.renderer()->create_texture(
-				images[1]->view(),
-				sge::renderer::filter::trilinear,
-				sge::renderer::resource_flags::none);
+			vm["gradient-texture"].as<fcppt::string>()),
+		sys.image_loader().load(
+			height_textures[0]),
+		sys.image_loader().load(
+			height_textures[1]));
 
 	bool running = 
 		true;
@@ -242,61 +194,7 @@ try
 			sge::renderer::state::list
 				(sge::renderer::state::draw_mode::line));
 	}
-	
-	graphics::shader terrain_shader(
-		sys.renderer(),
-		FCPPT_TEXT("media/vertex.glsl"),
-		FCPPT_TEXT("media/fragment.glsl"));
-	
-	terrain_shader.activate();
-	
-	terrain_shader.set_uniform(
-		FCPPT_TEXT("sand"),
-		0);
 
-	terrain_shader.set_uniform(
-		FCPPT_TEXT("rock"),
-		1);
-
-	terrain_shader.set_uniform(
-		FCPPT_TEXT("grass"),
-		2);
-	
-	terrain_shader.set_uniform(
-		FCPPT_TEXT("sun_direction"),
-		vm["sun-direction"].as<graphics::vec3>());
-
-	terrain_shader.set_uniform(
-		FCPPT_TEXT("ambient_light"),
-		vm["ambient-light"].as<graphics::scalar>());
-
-	terrain_shader.set_uniform(
-		FCPPT_TEXT("multiplicator"),
-		vm["texture-scaling"].as<graphics::scalar>());
-	
-	terrain_shader.set_uniform(
-		FCPPT_TEXT("grid_size"),
-		graphics::vec2(
-			static_cast<graphics::scalar>(
-				images[0]->dim()[0]),
-			static_cast<graphics::scalar>(
-				images[0]->dim()[1])) * 
-		fcppt::math::vector::structure_cast<graphics::vec2>(
-			vm["grid-sizes"].as<height_map::vector2>()));
-
-	graphics::camera cam(
-		console,
-		static_cast<graphics::scalar>(
-			1024.0/768.0),
-		static_cast<graphics::scalar>(
-			fcppt::math::deg_to_rad(
-				static_cast<graphics::scalar>(
-					vm["fov"].as<graphics::scalar>()))),
-		vm["near"].as<graphics::scalar>(),
-		vm["far"].as<graphics::scalar>(),
-		vm["camera-speed"].as<graphics::scalar>(),
-		graphics::vec3::null());
-	
 	sge::time::timer frame_timer(
 		sge::time::second(
 			1));
@@ -315,49 +213,10 @@ try
 		cam.update(
 			frame_timer.reset());
 
-		terrain_shader.activate();
-	
-		terrain_shader.set_uniform(
-			FCPPT_TEXT("world"),
-			fcppt::math::matrix::transpose(
-				cam.world()));
-
-		terrain_shader.set_uniform(
-			FCPPT_TEXT("perspective"),
-			fcppt::math::matrix::transpose(
-				cam.perspective()));
-
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
 	
-		sys.renderer()->texture(
-			sand_texture,
-			0);
-
-		sys.renderer()->texture(
-			rock_texture,
-			1);
-
-		sys.renderer()->texture(
-			grass_texture,
-			2);
-
 		h.render();
-
-		sys.renderer()->glsl_program(
-			sge::renderer::glsl::program_ptr());
-
-		sys.renderer()->texture(
-			sge::renderer::device::no_texture,
-			0);
-
-		sys.renderer()->texture(
-			sge::renderer::device::no_texture,
-			1);
-
-		sys.renderer()->texture(
-			sge::renderer::device::no_texture,
-			2);
 		console.render();
 	}
 }
@@ -373,6 +232,6 @@ catch (fcppt::exception const &e)
 }
 catch(std::exception const &e)
 {
-	fcppt::io::cerr << e.what() << FCPPT_TEXT('\n');
+	std::cerr << e.what() << FCPPT_TEXT('\n');
 	return EXIT_FAILURE;
 }
