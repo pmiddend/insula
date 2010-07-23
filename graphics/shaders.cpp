@@ -36,54 +36,10 @@ insula::graphics::shaders::shaders(
 		program_);
 	
 	fcppt::io::cout << FCPPT_TEXT("Error log: ") << program_->info_log() << FCPPT_TEXT("\n");
-	
-	world_ = program_->uniform("world");
-	perspective_ = program_->uniform("perspective");
-	sand_ = program_->uniform("sand");
-	rock_ = program_->uniform("rock");
-	grass_ = program_->uniform("grass");
-
-	sge::renderer::glsl::uniform::single_value(
-		sand_,
-		0);
-
-	sge::renderer::glsl::uniform::single_value(
-		rock_,
-		1);
-
-	sge::renderer::glsl::uniform::single_value(
-		grass_,
-		2);
 }
 
 sge::renderer::glsl::program_ptr const
 insula::graphics::shaders::program()
 {
 	return program_;
-}
-
-void
-insula::graphics::shaders::world(
-	mat4 const &m)
-{
-	sge::renderer::glsl::uniform::single_value(
-		world_,
-		fcppt::math::matrix::transpose(
-			m));
-}
-
-void
-insula::graphics::shaders::perspective(
-	mat4 const &m)
-{
-	sge::renderer::glsl::uniform::single_value(
-		perspective_,
-		fcppt::math::matrix::transpose(
-			m));
-}
-
-insula::graphics::shaders::~shaders()
-{
-	renderer_->glsl_program(
-		sge::renderer::glsl::program_ptr());
 }

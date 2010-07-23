@@ -62,6 +62,7 @@
 #include <fcppt/math/deg_to_rad.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/output.hpp>
+#include <fcppt/math/matrix/transpose.hpp>
 #include <boost/mpl/vector/vector10.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
@@ -266,28 +267,35 @@ try
 		FCPPT_TEXT("media/vertex.glsl"),
 		FCPPT_TEXT("media/fragment.glsl"));
 	
-	sge::renderer::glsl::uniform::variable_ptr const grid_size_var = 
-		shads.program()->uniform("grid_size");
+	shads.set_uniform(
+		FCPPT_TEXT("sand"),
+		0);
 
-	sge::renderer::glsl::uniform::variable_ptr const sun_position_var = 
-		shads.program()->uniform("sun_position");
+	shads.set_uniform(
+		FCPPT_TEXT("rock"),
+		1);
 
-	sge::renderer::glsl::uniform::variable_ptr const ambient_light_var = 
-		shads.program()->uniform("ambient_light");
+	shads.set_uniform(
+		FCPPT_TEXT("grass"),
+		2);
+	
+	shads.set_uniform(
+		FCPPT_TEXT("sun_direction"),
+		insula::graphics::vec3(
+			vm["sun-x"].as<insula::graphics::scalar>(),
+			vm["sun-y"].as<insula::graphics::scalar>(),
+			vm["sun-z"].as<insula::graphics::scalar>()));
 
-	sge::renderer::glsl::uniform::variable_ptr const multiplicator_var = 
-		shads.program()->uniform("multiplicator");
-
-	sge::renderer::glsl::uniform::single_value(
-		ambient_light_var,
+	shads.set_uniform(
+		FCPPT_TEXT("ambient_light"),
 		vm["ambient-light"].as<insula::graphics::scalar>());
 
-	sge::renderer::glsl::uniform::single_value(
-		multiplicator_var,
+	shads.set_uniform(
+		FCPPT_TEXT("multiplicator"),
 		vm["texture-scaling"].as<insula::graphics::scalar>());
 	
-	sge::renderer::glsl::uniform::single_value(
-		grid_size_var,
+	shads.set_uniform(
+		FCPPT_TEXT("grid_size"),
 		insula::graphics::vec2(
 			static_cast<insula::graphics::scalar>(
 				static_cast<insula::graphics::scalar>(images[0]->dim()[0]) * 
@@ -295,16 +303,7 @@ try
 			static_cast<insula::graphics::scalar>(
 				static_cast<insula::graphics::scalar>(images[0]->dim()[1]) * 
 				vm["grid-y"].as<insula::height_map::scalar>())));
-	
-	insula::graphics::vec3 const sun_position(
-		vm["sun-x"].as<insula::graphics::scalar>(),
-		vm["sun-y"].as<insula::graphics::scalar>(),
-		vm["sun-z"].as<insula::graphics::scalar>());
 
-	sge::renderer::glsl::uniform::single_value(
-		sun_position_var,
-		sun_position);
-	
 	insula::graphics::camera cam(
 		sys.input_system(),
 		static_cast<insula::graphics::scalar>(
@@ -316,7 +315,7 @@ try
 		vm["near"].as<insula::graphics::scalar>(),
 		vm["far"].as<insula::graphics::scalar>(),
 		vm["camera-speed"].as<insula::graphics::scalar>(),
-		sun_position);
+		insula::graphics::vec3::null());
 	
 	sge::time::timer frame_timer(
 		sge::time::second(
@@ -326,11 +325,15 @@ try
 	{
 		sge::mainloop::dispatch();
 	
-		shads.world(
-			cam.world());
+		shads.set_uniform(
+			FCPPT_TEXT("world"),
+			fcppt::math::matrix::transpose(
+				cam.world()));
 
-		shads.perspective(
-			cam.perspective());
+		shads.set_uniform(
+			FCPPT_TEXT("perspective"),
+			fcppt::math::matrix::transpose(
+				cam.perspective()));
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());

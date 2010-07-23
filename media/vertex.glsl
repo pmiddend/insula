@@ -3,7 +3,7 @@
 uniform mat4 world,perspective;
 uniform sampler2D sand,rock,grass;
 uniform vec2 grid_size;
-uniform vec3 sun_position;
+uniform vec3 sun_direction;
 uniform float ambient_light;
 uniform float multiplicator;
 attribute vec3 normal;
@@ -29,7 +29,7 @@ void main()
 			max(
 				0.0, 
 				//dot(normalize(normal), normalize(sun_position - gl_Vertex.xyz))));
-				dot(normalize(normal), normalize(sun_position))));
+				dot(normalize(normal), normalize(sun_direction))));
 
 	height_and_gradient_out = height_and_gradient;
 
