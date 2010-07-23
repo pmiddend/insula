@@ -12,6 +12,7 @@
 #include "normalize_and_stretch.hpp"
 #include "generate_gradient.hpp"
 #include "calculate_index_cell.hpp"
+#include "calculate_normal.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera.hpp"
 #include "../media_path.hpp"
@@ -57,81 +58,6 @@
 
 namespace
 {
-insula::height_map::vf::packed_normal const
-calculate_point(
-	insula::height_map::array const &heights,
-	insula::height_map::scalar const height_scaling,
-	insula::height_map::vector2 const &cell_sizes,
-	std::make_signed<insula::height_map::array::size_type>::type rx,
-	std::make_signed<insula::height_map::array::size_type>::type ry)
-{
-	insula::height_map::array::size_type const 
-		x = 
-			static_cast<insula::height_map::array::size_type>(
-				std::max(
-					static_cast<std::make_signed<insula::height_map::array::size_type>::type>(0),
-					std::min(
-						static_cast<std::make_signed<insula::height_map::array::size_type>::type>(
-							heights.shape()[0]-1),
-						rx))),
-		y = 
-			static_cast<insula::height_map::array::size_type>(
-				std::max(
-					static_cast<std::make_signed<insula::height_map::array::size_type>::type>(0),
-					std::min(
-						static_cast<std::make_signed<insula::height_map::array::size_type>::type>(
-							heights.shape()[1]-1),
-						ry)));
-	return 
-		insula::height_map::vf::packed_normal(
-			static_cast<insula::graphics::scalar>(
-					static_cast<insula::height_map::scalar>(
-						x) * 
-					cell_sizes.x()),
-				static_cast<insula::graphics::scalar>(
-					static_cast<insula::height_map::scalar>(
-						height_scaling) * 
-					heights[y][x]),
-				static_cast<insula::graphics::scalar>(
-					static_cast<insula::height_map::scalar>(
-						y) * 
-					cell_sizes.y()));
-}
-
-insula::height_map::vf::packed_normal const
-calculate_normal(
-	insula::height_map::array const &heights,
-	insula::height_map::scalar const height_scaling,
-	insula::height_map::vector2 const &cell_sizes,
-	insula::height_map::array::size_type const x,
-	insula::height_map::array::size_type const y)
-{
-	insula::height_map::vf::packed_normal const
-		point = calculate_point(heights,height_scaling,cell_sizes,x,y),
-		left = calculate_point(heights,height_scaling,cell_sizes,x-1,y),
-		right = calculate_point(heights,height_scaling,cell_sizes,x+1,y),
-		top = calculate_point(heights,height_scaling,cell_sizes,x,y-1),
-		bottom = calculate_point(heights,height_scaling,cell_sizes,x,y+1),
-		to_top = top - point,
-		to_right = right - point,
-		to_bottom = bottom - point,
-		to_left = left - point;
-
-	return 
-		(fcppt::math::vector::cross(
-			to_right,
-			to_top) + 
-		fcppt::math::vector::cross(
-			to_top,
-			to_left) + 
-		fcppt::math::vector::cross(
-			to_left,
-			to_bottom) + 
-		fcppt::math::vector::cross(
-			to_bottom,
-			to_right))/static_cast<insula::graphics::scalar>(4);
-}
-
 struct index_visitor
 {
 public:
