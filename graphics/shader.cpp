@@ -1,4 +1,5 @@
 #include "shader.hpp"
+#include "../stdlib/map.hpp"
 #include <sge/renderer/glsl/program_ptr.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/glsl/program.hpp>
@@ -39,6 +40,15 @@ insula::graphics::shader::shader(
 		<< FCPPT_TEXT("Error log: ") 
 		<< program_->info_log() 
 		<< FCPPT_TEXT("\n");
+}
+
+insula::graphics::shader::name_set const
+insula::graphics::shader::uniform_names() const
+{
+	return 
+		stdlib::map<name_set>(
+			uniforms_,
+			[](uniform_map::const_reference r) { return r.first; });
 }
 
 void

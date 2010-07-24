@@ -4,7 +4,7 @@
 #include "vf/packed_normal.hpp"
 #include "array.hpp"
 #include "scalar.hpp"
-#include "vector2.hpp"
+#include "vec2.hpp"
 
 namespace insula
 {
@@ -14,7 +14,7 @@ vf::packed_normal const
 calculate_normal(
 	array const &heights,
 	scalar const height_scaling,
-	vector2 const &cell_sizes,
+	vec2 const &cell_sizes,
 	array::size_type const x,
 	array::size_type const y);
 }

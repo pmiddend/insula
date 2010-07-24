@@ -1,5 +1,5 @@
-#ifndef INSULA_HEIGHT_MAP_VECTOR2_HPP_INCLUDED
-#define INSULA_HEIGHT_MAP_VECTOR2_HPP_INCLUDED
+#ifndef INSULA_HEIGHT_MAP_VEC2_HPP_INCLUDED
+#define INSULA_HEIGHT_MAP_VEC2_HPP_INCLUDED
 
 #include "scalar.hpp"
 #include <fcppt/math/vector/static.hpp>
@@ -14,7 +14,7 @@ fcppt::math::vector::static_
 	scalar,
 	2
 >::type
-vector2;
+vec2;
 }
 }
 

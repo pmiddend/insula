@@ -11,7 +11,7 @@ insula::height_map::vf::packed_normal const
 insula::height_map::calculate_normal(
 	array const &heights,
 	scalar const height_scaling,
-	vector2 const &cell_sizes,
+	vec2 const &cell_sizes,
 	array::size_type const x,
 	array::size_type const y)
 {

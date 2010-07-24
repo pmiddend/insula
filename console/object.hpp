@@ -7,9 +7,10 @@
 #include <sge/input/key_pair_function.hpp>
 #include <sge/input/key_type_function.hpp>
 #include <sge/console/object.hpp>
-#include <sge/font/system_ptr.hpp>
+#include <sge/console/stdlib.hpp>
 #include <sge/console/gfx.hpp>
 #include <sge/renderer/device_ptr.hpp>
+#include <sge/font/system_ptr.hpp>
 #include <sge/image/multi_loader_fwd.hpp>
 #include <sge/font/system_ptr.hpp>
 #include <fcppt/signal/auto_connection.hpp>
@@ -46,12 +47,19 @@ public:
 	
 	void
 	render();
+
+	sge::console::object &
+	model();
+
+	sge::console::object const &
+	model() const;
 private:
 	fcppt::signal::object<sge::input::key_pair_function> signal_;
 	fcppt::signal::object<sge::input::key_type_function> repeat_signal_;
 
 	sge::console::object object_;
 	sge::console::gfx gfx_;
+	sge::console::stdlib stdlib_;
 
 	fcppt::signal::scoped_connection c1,c2;
 

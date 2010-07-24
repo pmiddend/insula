@@ -8,7 +8,7 @@
 #include "vf/vertex_view.hpp"
 #include "scalar.hpp"
 #include "array.hpp"
-#include "vector2.hpp"
+#include "vec2.hpp"
 #include "normalize_and_stretch.hpp"
 #include "generate_gradient.hpp"
 #include "calculate_index_cell.hpp"
@@ -114,6 +114,7 @@ private:
 insula::height_map::object::object(
 	graphics::camera const &_camera,
 	sge::renderer::device_ptr const _renderer,
+	sge::console::object &_console,
 	height_map::array const &raw,
 	graphics::vec2 const &cell_sizes,
 	graphics::scalar const height_scaling,
@@ -131,7 +132,11 @@ insula::height_map::object::object(
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("vertex.glsl"),
-		media_path()/FCPPT_TEXT("fragment.glsl"))
+		media_path()/FCPPT_TEXT("fragment.glsl")),
+	shader_console_(
+		FCPPT_TEXT("terrain"),
+		shader_,
+		_console)
 {
 	regenerate_from_raw_map(
 		cell_sizes,

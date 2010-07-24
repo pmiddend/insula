@@ -62,6 +62,8 @@ insula::console::object::object(
       .elements()),
 		static_cast<sge::console::output_line_limit>(
 			1000)),
+	stdlib_(
+		object_),
 	c1(
 		is->register_callback(
 			std::bind(
@@ -96,6 +98,18 @@ insula::console::object::render()
 {
 	if (gfx_.active())
 		gfx_.draw();
+}
+
+sge::console::object &
+insula::console::object::model()
+{
+	return object_;
+}
+
+sge::console::object const &
+insula::console::object::model() const
+{
+	return object_;
 }
 
 void

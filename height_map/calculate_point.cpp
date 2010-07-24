@@ -7,7 +7,7 @@ insula::height_map::vf::packed_normal const
 insula::height_map::calculate_point(
 	array const &heights,
 	scalar const height_scaling,
-	vector2 const &cell_sizes,
+	vec2 const &cell_sizes,
 	std::make_signed<array::size_type>::type rx,
 	std::make_signed<array::size_type>::type ry)
 {

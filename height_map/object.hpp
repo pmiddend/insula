@@ -5,6 +5,7 @@
 #include "../graphics/vec2.hpp"
 #include "../graphics/vec3.hpp"
 #include "../graphics/scalar.hpp"
+#include "../graphics/shader_to_console.hpp"
 #include "../graphics/shader.hpp"
 #include "array.hpp"
 #include <sge/renderer/device_ptr.hpp>
@@ -12,6 +13,7 @@
 #include <sge/renderer/index_buffer_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
 #include <sge/image/file_ptr.hpp>
+#include <sge/console/object_fwd.hpp>
 
 namespace insula
 {
@@ -24,6 +26,7 @@ public:
 	object(
 		graphics::camera const &,
 		sge::renderer::device_ptr,
+		sge::console::object &,
 		height_map::array const &,
 		graphics::vec2 const &cell_sizes,
 		graphics::scalar const height_scaling,
@@ -47,6 +50,7 @@ private:
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;
 	graphics::shader shader_;
+	graphics::shader_to_console shader_console_;
 	sge::renderer::texture_ptr lower_texture_,upper_texture_,gradient_texture_;
 
 	void

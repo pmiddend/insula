@@ -164,6 +164,7 @@ try
 	height_map::object h(
 		cam,
 		sys.renderer(),
+		console.model(),
 		height_map::image_to_array(
 			sys.image_loader().load(
 				filename)),

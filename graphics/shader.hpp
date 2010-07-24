@@ -10,6 +10,7 @@
 #include <fcppt/filesystem/path.hpp>
 #include <fcppt/container/map.hpp>
 #include <map>
+#include <set>
 
 namespace insula
 {
@@ -18,6 +19,13 @@ namespace graphics
 class shader
 {
 public:
+	typedef
+	std::set
+	<
+		fcppt::string
+	>
+	name_set;
+
 	explicit
 	shader(
 		sge::renderer::device_ptr,
@@ -29,7 +37,6 @@ public:
 
 	shader(
 		shader const&) = delete;
-
 	
 	template<typename T>
 	void
@@ -46,6 +53,9 @@ public:
 			uniforms_[name],
 			t);
 	}
+
+	name_set const
+	uniform_names() const;
 
 	void
 	activate();
