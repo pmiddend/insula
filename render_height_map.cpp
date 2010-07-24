@@ -10,6 +10,8 @@
 #include <sge/systems/list.hpp>
 #include <sge/systems/parameterless.hpp>
 #include <sge/systems/image_loader.hpp>
+#include <sge/console/arg_list.hpp>
+#include <sge/console/object.hpp>
 #include <sge/image/capabilities_field.hpp>
 #include <sge/window/parameters.hpp>
 #include <sge/renderer/device.hpp>
@@ -51,6 +53,10 @@
 #include <fcppt/string.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
+#include <fcppt/lexical_cast.hpp>
+#include <fcppt/bad_lexical_cast.hpp>
+#include <fcppt/filesystem/is_regular.hpp>
+#include <fcppt/io/ifstream.hpp>
 #include <boost/program_options.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
@@ -179,6 +185,48 @@ try
 			height_textures[0]),
 		sys.image_loader().load(
 			height_textures[1]));
+	
+	fcppt::signal::scoped_connection regenerate_conn(
+		console.model().insert(
+			FCPPT_TEXT("regenerate"),
+			[&h,&sys](sge::console::arg_list const &args,sge::console::object &ob) 
+			{ 
+				if (args.size() <= 4)
+				{
+					ob.emit_error(
+						FCPPT_TEXT("usage: ")+args[0]+FCPPT_TEXT(" <filename> <cell-size-x> <cell-size-y> <height-scaling>"));
+					return;
+				}
+
+				if (!fcppt::filesystem::is_regular(args[1]))
+				{
+					ob.emit_error(
+						FCPPT_TEXT("File \"")+args[1]+FCPPT_TEXT("\" isn't regular"));
+					return;
+				}
+
+				try
+				{
+					h.regenerate(
+						graphics::vec2(
+							fcppt::lexical_cast<graphics::scalar>(
+							args[2]),
+							fcppt::lexical_cast<graphics::scalar>(
+								args[3])),
+						fcppt::lexical_cast<graphics::scalar>(
+							args[4]),
+						height_map::image_to_array(
+							sys.image_loader().load(
+								args[1])));
+				}
+				catch (fcppt::bad_lexical_cast const &)
+				{
+					ob.emit_error(
+						FCPPT_TEXT("Cell size/height scaling invalid"));
+					return;
+				}
+			},
+			FCPPT_TEXT("regenerate terrain from filename")));
 
 	bool running = 
 		true;

@@ -44,6 +44,12 @@ public:
 	
 	void
 	render();
+
+	void
+	regenerate(
+		graphics::vec2 const &cell_sizes,
+		graphics::scalar const height_scaling,
+		array const &raw);
 private:
 	graphics::camera const &camera_;
 	sge::renderer::device_ptr const renderer_;
@@ -52,12 +58,6 @@ private:
 	graphics::shader shader_;
 	graphics::shader_to_console shader_console_;
 	sge::renderer::texture_ptr lower_texture_,upper_texture_,gradient_texture_;
-
-	void
-	regenerate_from_raw_map(
-		graphics::vec2 const &cell_sizes,
-		graphics::scalar const height_scaling,
-		array const &raw);
 
 	void 
 	regenerate_buffers(

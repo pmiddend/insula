@@ -138,7 +138,7 @@ insula::height_map::object::object(
 		shader_,
 		_console)
 {
-	regenerate_from_raw_map(
+	regenerate(
 		cell_sizes,
 		height_scaling,
 		raw);
@@ -262,8 +262,10 @@ insula::height_map::object::render()
 	shader_.deactivate();
 }
 
+
+
 void
-insula::height_map::object::regenerate_from_raw_map(
+insula::height_map::object::regenerate(
 	graphics::vec2 const &cell_sizes,
 	graphics::scalar const height_scaling,
 	array const &raw)
