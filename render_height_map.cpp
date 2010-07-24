@@ -98,8 +98,7 @@ try
 		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture")
 		("ambient-light",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.4)),"Ambient lighting (in [0,1])")
 		("sun-direction",boost::program_options::value<graphics::vec3>()->default_value(graphics::vec3(100,100,100)),"Sun direction")
-		("texture-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
-		("wireframe",boost::program_options::value<bool>()->zero_tokens(),"Enable wireframe mode");
+		("texture-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -237,6 +236,30 @@ try
 				sge::input::kc::key_escape,
 				boost::phoenix::ref(running) = false)));
 	
+	fcppt::signal::scoped_connection wireframe_conn(
+		console.model().insert(
+			FCPPT_TEXT("wireframe"),
+			[&sys](
+				sge::console::arg_list const &args,
+				sge::console::object &o)
+			{
+				if (args.size() == 1)
+				{
+					o.emit_error(FCPPT_TEXT("usage: ")+args[0]+FCPPT_TEXT(" [0|1]"));
+					return;
+				}
+
+				if (args[1] == FCPPT_TEXT("1"))
+					sys.renderer()->state(
+						sge::renderer::state::list
+							(sge::renderer::state::draw_mode::line));
+				else
+					sys.renderer()->state(
+						sge::renderer::state::list
+							(sge::renderer::state::draw_mode::fill));
+			},
+			FCPPT_TEXT("Toggle wireframe mode")));
+
 	if (vm.count("wireframe"))
 	{
 		sys.renderer()->state(
