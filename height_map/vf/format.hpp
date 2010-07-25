@@ -3,7 +3,7 @@
 
 #include "position.hpp"
 #include "normal.hpp"
-#include "texcoord.hpp"
+#include "height_and_gradient.hpp"
 #include <sge/renderer/vf/format.hpp>
 #include <boost/mpl/vector/vector10.hpp>
 
@@ -20,7 +20,7 @@ sge::renderer::vf::format
 	<
 		position,
 		normal,
-		texcoord
+		height_and_gradient
 	>
 > 
 format;

@@ -2,8 +2,8 @@
 #include "vf/packed_normal.hpp"
 #include "vf/packed_position.hpp"
 #include "vf/format.hpp"
-#include "vf/texcoord.hpp"
-#include "vf/packed_texcoord.hpp"
+#include "vf/height_and_gradient.hpp"
+#include "vf/packed_height_and_gradient.hpp"
 #include "vf/normal.hpp"
 #include "vf/vertex_view.hpp"
 #include "scalar.hpp"
@@ -369,8 +369,8 @@ insula::height_map::object::regenerate_buffers(
 					x,
 					y));
 
-			(*vb_it).set<vf::texcoord>(
-				vf::packed_texcoord(
+			(*vb_it).set<vf::height_and_gradient>(
+				vf::packed_height_and_gradient(
 					stretched[y][x],
 					gradient[y][x]));
 			

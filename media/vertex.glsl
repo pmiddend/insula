@@ -8,15 +8,15 @@ uniform float ambient_light;
 uniform float texture_scaling;
 in vec3 position;
 in vec3 normal;
-in vec2 texcoord;
-out vec2 texcoord_out;
-out vec2 height_and_gradient;
+in vec2 height_and_gradient;
+out vec2 texcoord;
+out vec2 height_and_gradient_out;
 out float light_intensity;
 out vec3 eye_space;
 
 void main()
 {
-	texcoord_out = 
+	texcoord = 
 		vec2(
 			position.x / grid_size.x * texture_scaling,
 			position.z / grid_size.y * texture_scaling);
@@ -31,7 +31,7 @@ void main()
 				//dot(normalize(normal), normalize(sun_position - gl_Vertex.xyz))));
 				dot(normalize(normal), normalize(sun_direction))));
 
-	height_and_gradient = texcoord;
+	height_and_gradient_out = height_and_gradient;
 
 	gl_Position = perspective * world * vec4(position,1.0);
 	eye_space = vec3(world * vec4(position,1.0));
