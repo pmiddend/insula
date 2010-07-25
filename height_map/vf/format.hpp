@@ -3,7 +3,7 @@
 
 #include "position.hpp"
 #include "normal.hpp"
-#include "texture_coordinate.hpp"
+#include "texcoord.hpp"
 #include <sge/renderer/vf/format.hpp>
 #include <boost/mpl/vector/vector10.hpp>
 
@@ -20,7 +20,7 @@ sge::renderer::vf::format
 	<
 		position,
 		normal,
-		texture_coordinate
+		texcoord
 	>
 > 
 format;

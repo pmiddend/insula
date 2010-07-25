@@ -2,8 +2,8 @@
 #include "vf/packed_normal.hpp"
 #include "vf/packed_position.hpp"
 #include "vf/format.hpp"
-#include "vf/texture_coordinate.hpp"
-#include "vf/packed_texture_coordinate.hpp"
+#include "vf/texcoord.hpp"
+#include "vf/packed_texcoord.hpp"
 #include "vf/normal.hpp"
 #include "vf/vertex_view.hpp"
 #include "scalar.hpp"
@@ -305,6 +305,8 @@ insula::height_map::object::regenerate_buffers(
 	array const &stretched,
 	array const &gradient)
 {
+	shader_.activate();
+
 	vb_ = 
 		renderer_->create_vertex_buffer(
 			sge::renderer::vf::dynamic::make_format<vf::format>(),
@@ -367,8 +369,8 @@ insula::height_map::object::regenerate_buffers(
 					x,
 					y));
 
-			(*vb_it).set<vf::texture_coordinate>(
-				vf::packed_texture_coordinate(
+			(*vb_it).set<vf::texcoord>(
+				vf::packed_texcoord(
 					stretched[y][x],
 					gradient[y][x]));
 			

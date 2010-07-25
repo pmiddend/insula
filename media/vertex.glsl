@@ -1,4 +1,4 @@
-//#version 140
+#version 140
 
 uniform mat4 world,perspective;
 uniform sampler2D sand,rock,grass;
@@ -6,22 +6,22 @@ uniform vec2 grid_size;
 uniform vec3 sun_direction;
 uniform float ambient_light;
 uniform float texture_scaling;
-attribute vec3 normal;
-attribute vec2 height_and_gradient;
-varying vec2 texcoord;
-varying vec2 height_and_gradient_out;
-varying float light_intensity;
-
-varying vec3 eye_space;
+in vec3 position;
+in vec3 normal;
+in vec2 texcoord;
+out vec2 texcoord_out;
+out vec2 height_and_gradient;
+out float light_intensity;
+out vec3 eye_space;
 
 void main()
 {
-	texcoord = 
+	texcoord_out = 
 		vec2(
-			gl_Vertex.x / grid_size.x * texture_scaling,
-			gl_Vertex.z / grid_size.y * texture_scaling);
+			position.x / grid_size.x * texture_scaling,
+			position.z / grid_size.y * texture_scaling);
 	
-	//normal = gl_NormalMatrix * gl_Normal;
+	//normal_out = gl_NormalMatrix * gl_Normal;
 	
 	light_intensity = 
 		max(
@@ -31,9 +31,8 @@ void main()
 				//dot(normalize(normal), normalize(sun_position - gl_Vertex.xyz))));
 				dot(normalize(normal), normalize(sun_direction))));
 
-	height_and_gradient_out = height_and_gradient;
+	height_and_gradient = texcoord;
 
-	gl_Position = perspective * world * gl_Vertex;
-
-	eye_space = vec3(world * gl_Vertex);
+	gl_Position = perspective * world * vec4(position,1.0);
+	eye_space = vec3(world * vec4(position,1.0));
 }

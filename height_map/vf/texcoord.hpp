@@ -1,5 +1,5 @@
-#ifndef INSULA_HEIGHT_MAP_NORMAL_HPP_INCLUDED
-#define INSULA_HEIGHT_MAP_NORMAL_HPP_INCLUDED
+#ifndef INSULA_HEIGHT_MAP_VF_TEXCOORD_HPP_INCLUDED
+#define INSULA_HEIGHT_MAP_VF_TEXCOORD_HPP_INCLUDED
 
 #include "../../graphics/scalar.hpp"
 #include <sge/renderer/vf/make_unspecified_tag.hpp>
@@ -14,7 +14,7 @@ namespace vf
 {
 namespace tags
 {
-SGE_RENDERER_VF_MAKE_UNSPECIFIED_TAG(normal)
+SGE_RENDERER_VF_MAKE_UNSPECIFIED_TAG(texcoord)
 }
 
 typedef 
@@ -23,11 +23,11 @@ sge::renderer::vf::unspecified
 	sge::renderer::vf::vector
 	<
 		graphics::scalar,
-		3
+		2
 	>,
-	tags::normal
+	tags::texcoord
 > 
-normal;
+texcoord;
 }
 }
 }
