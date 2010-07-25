@@ -62,6 +62,9 @@ public:
 
 	void
 	deactivate();
+
+	sge::renderer::glsl::program_ptr const
+	program();
 private:
 	typedef
 	fcppt::container::map

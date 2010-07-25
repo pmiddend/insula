@@ -64,3 +64,9 @@ insula::graphics::shader::deactivate()
 	renderer_->glsl_program(
 		sge::renderer::device::no_program);
 }
+
+sge::renderer::glsl::program_ptr const
+insula::graphics::shader::program()
+{
+	return program_;
+}

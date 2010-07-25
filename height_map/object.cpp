@@ -33,6 +33,7 @@
 #include <sge/renderer/state/bool.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
 #include <sge/renderer/state/depth_func.hpp>
+#include <sge/renderer/glsl/scoped_program.hpp>
 #include <sge/renderer/first_vertex.hpp>
 #include <sge/renderer/vertex_count.hpp>
 #include <sge/renderer/indexed_primitive_type.hpp>
@@ -43,6 +44,7 @@
 #include <sge/renderer/scoped_vertex_lock.hpp>
 #include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/scoped_index_lock.hpp>
+#include <sge/renderer/scoped_texture.hpp>
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/image/file.hpp>
 #include <fcppt/math/vector/cross.hpp>
@@ -69,6 +71,7 @@ public:
 	insula::height_map::array::size_type
 	size_type;
 
+	explicit
 	index_visitor(
 		size_type const _w,
 		size_type const _h)
@@ -203,9 +206,11 @@ insula::height_map::object::render()
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,
 		vb_);
-	
-	shader_.activate();
 
+	sge::renderer::glsl::scoped_program scoped_shader_(
+		renderer_,
+		shader_.program());
+	
 	shader_.set_uniform(
 		FCPPT_TEXT("world"),
 		fcppt::math::matrix::transpose(
@@ -223,15 +228,18 @@ insula::height_map::object::render()
 		 	(sge::renderer::state::cull_mode::front)
 		 	(sge::renderer::state::depth_func::less));
 
-	renderer_->texture(
+	sge::renderer::scoped_texture scoped_tex0(
+		renderer_,
 		lower_texture_,
 		0);
 
-	renderer_->texture(
+	sge::renderer::scoped_texture scoped_tex1(
+		renderer_,
 		gradient_texture_,
 		1);
 
-	renderer_->texture(
+	sge::renderer::scoped_texture scoped_tex2(
+		renderer_,
 		upper_texture_,
 		2);
 
@@ -246,20 +254,6 @@ insula::height_map::object::render()
 			ib_->size() / 3),
 		sge::renderer::first_index(
 			0));
-
-	renderer_->texture(
-		sge::renderer::device::no_texture,
-		0);
-
-	renderer_->texture(
-		sge::renderer::device::no_texture,
-		1);
-
-	renderer_->texture(
-		sge::renderer::device::no_texture,
-		2);
-	
-	shader_.deactivate();
 }
 
 
@@ -318,7 +312,7 @@ insula::height_map::object::regenerate_buffers(
 		vb_->size() < 
 		static_cast<sge::renderer::size_type>(
 			std::numeric_limits<sge::renderer::index::i32>::max()),
-		FCPPT_TEXT("The heightmap is too big for a 16 bit index!"));
+		FCPPT_TEXT("The heightmap is too big for a 32 bit index!"));
 
 	ib_ = 
 		renderer_->create_index_buffer(
