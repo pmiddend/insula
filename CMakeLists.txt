@@ -64,6 +64,7 @@ FILE(GLOB_RECURSE height_map_files height_map/*)
 FILE(GLOB_RECURSE graphics_files graphics/*)
 FILE(GLOB_RECURSE texture_files textures/*)
 FILE(GLOB_RECURSE console_files console/*)
+FILE(GLOB_RECURSE skydome_files skydome/*)
 FILE(GLOB base_files media_path.cpp)
 
 set_source_files_properties(
@@ -82,15 +83,19 @@ ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp
 	${console_files})
 ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
 	${height_map_files} ${texture_files} ${graphics_files} ${console_files})
+ADD_EXECUTABLE(render_skydome media_path.cpp render_skydome.cpp 
+	${texture_files} ${graphics_files} ${console_files} ${skydome_files})
 
 TARGET_LINK_LIBRARIES(load_image_to_array fcppt sgecore)
 TARGET_LINK_LIBRARIES(render_height_map fcppt sgecore)
 TARGET_LINK_LIBRARIES(generate_height_texture fcppt sgecore)
+TARGET_LINK_LIBRARIES(render_skydome fcppt sgecore)
 
 IF(NOT MSVC)
 	TARGET_LINK_LIBRARIES(load_image_to_array ${Boost_LIBRARIES})
 	TARGET_LINK_LIBRARIES(render_height_map ${Boost_LIBRARIES})
 	TARGET_LINK_LIBRARIES(generate_height_texture ${Boost_LIBRARIES})
+	TARGET_LINK_LIBRARIES(render_skydome ${Boost_LIBRARIES})
 ENDIF()
 
 ENABLE_TESTING()

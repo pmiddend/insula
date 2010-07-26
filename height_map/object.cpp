@@ -146,7 +146,9 @@ insula::height_map::object::object(
 		height_scaling,
 		raw);
 
-	shader_.activate();
+	sge::renderer::glsl::scoped_program scoped_shader_(
+		renderer_,
+		shader_.program());
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("sand"),
@@ -299,7 +301,9 @@ insula::height_map::object::regenerate_buffers(
 	array const &stretched,
 	array const &gradient)
 {
-	shader_.activate();
+	sge::renderer::glsl::scoped_program scoped_shader_(
+		renderer_,
+		shader_.program());
 
 	vb_ = 
 		renderer_->create_vertex_buffer(

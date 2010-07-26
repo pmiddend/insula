@@ -62,8 +62,6 @@ insula::console::object::object(
       .elements()),
 		static_cast<sge::console::output_line_limit>(
 			1000)),
-	stdlib_(
-		object_),
 	c1(
 		is->register_callback(
 			std::bind(
