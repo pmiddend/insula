@@ -1,0 +1,65 @@
+* Aktivitäten
+** Perspektive
+*** Notizen
+Variationsmöglichkeiten:
+
+**** TODO Gesamtmatrix transponieren
+**** DONE Gesamtmatrix im Shader oder im Programm transponieren
+		 CLOSED: [2010-07-27 Tue 18:27]
+**** TODO Die einzelnen Matrizen transponieren
+**** TODO Perspektive und Rotation/Translation einzeln zum Shader übertragen und dort multiplizieren 
+**** TODO w-Koordinate nicht zurück auf 1 setzen.
+**** TODO Rotation um x und y vertauschen
+**** DONE Rotation und Translation vertauschen
+		 CLOSED: [2010-07-27 Tue 18:35]
+**** TODO World und Perspektive vertauschen
+**** DONE Code zum Verschieben der aktuellen Position nochmal angucken
+		 CLOSED: [2010-07-27 Tue 18:08]
+
+Ergebnisse:
+- w-Koordinate auf 1:
+	- Die Translation wird zu einer Zerrung oder einer Rotation, schwer zu sagen.
+  - translation transponieren: Es findet keine Translation mehr statt
+  - Transponiert man die Gesamtmatrix, hat die Translation keinen 
+    wirklichen Effekt mehr
+  - Transponiert man die Perspektive, funktioniert die Translation in x-Richtung
+		(zumindest scheinbar), aber die anderen Translationen sind kaputt, außerdem
+		scheint der Rotationspunkt falsch zu sein
+- 
+** Skydome
+*** Klassischer Ansatz
+**** TODO
+
+1. Erstelle Vertexbuffer für die _komplette_ Kugel
+
+2. Zeichne diesen Vertexbuffer als Punktprimitiv
+
+3. Schaue wie sich die Winkel auswirken, überlege wie man 
+   die Winkel wählen müsste um einen Dome zu bekommen
+
+4. Korrigiere eventuell den Fehler in der perspektivischen 
+   oder der Modelviewmatrix
+
+5. Erstelle korrekten Indexbuffer
+
+6. Erstelle Shader, der Anhand der y-Koordinate die Farbe als 
+   Gradient von hellblau zu blau wählt. Der Shader braucht 
+   dafür vermutlich die maximal y-Koordinate.
+
+*** Icosphere-Ansatz
+
+**** TODO Suche bei Google nach "icosphere triangle strip"
+
+** Wasser
+
+** Nebel
+
+** HDR-Faking für besseres Licht
+
+** Models (Bäume etc.)
+
+** Shadow Maps
+
+** Physik, Fahrzeuge
+
+** Sounds?

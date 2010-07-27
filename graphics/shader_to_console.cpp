@@ -37,7 +37,8 @@ insula::graphics::shader_to_console::shader_to_console(
 				this,
 				std::placeholders::_1,
 				std::placeholders::_2),
-			FCPPT_TEXT("Set a uniform variable for \"")+name+FCPPT_TEXT("\"")))
+			FCPPT_TEXT("Set a uniform variable for \"")+name+FCPPT_TEXT("\""),
+			FCPPT_TEXT("This function takes at least 1 and up to 4 arguments. One argument is treated as a scalar value, the other are vec2, vec3, vec4, respectively. You will get an error if:\n-you try to assign a non-numeric value\n-you try to assign a value to a non-defined variable\n-you try to assign a value of the wrong type.")))
 {
 }
 

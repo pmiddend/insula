@@ -9,6 +9,7 @@
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/rotation_x.hpp>
 #include <fcppt/math/matrix/rotation_y.hpp>
+#include <fcppt/math/matrix/rotation_z.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/output.hpp>
 #include <fcppt/math/matrix/transpose.hpp>
@@ -28,6 +29,7 @@ insula::graphics::camera::camera(
 	scalar _near,
 	scalar _far,
 	scalar _speed,
+	scalar _roll_speed,
 	vec3 const &_position)
 :
 	input_connection_(
@@ -46,8 +48,11 @@ insula::graphics::camera::camera(
 		_far),
 	speed_(
 		_speed),
+	roll_speed_(
+		_roll_speed),
 	rotate_x_(
-		fcppt::math::pi<scalar>()),
+		static_cast<scalar>(
+			0)),
 	rotate_y_(
 		static_cast<scalar>(
 			0)),
@@ -62,11 +67,9 @@ void
 insula::graphics::camera::update(
 	scalar const t)
 {
-	mat4 const rotation = 
-		fcppt::math::matrix::rotation_x(
-			rotate_x_) *
-		fcppt::math::matrix::rotation_y(
-			rotate_y_);
+	mat4 const r = 
+		fcppt::math::matrix::transpose(
+			rotation());
 	
 	position_ = 
 		position_ + 
@@ -74,32 +77,55 @@ insula::graphics::camera::update(
 		t * 
 		(
 			dirs_.x() * 
-			vec3(rotation[0][0],rotation[0][1],rotation[0][2]) +
+			vec3(r[0][0],r[0][1],r[0][2]) +
 
 			dirs_.y() * 
-			vec3(rotation[1][0],rotation[1][1],rotation[1][2]) +
+			vec3(r[1][0],r[1][1],r[1][2]) +
 
 			dirs_.z() * 
-			vec3(rotation[2][0],rotation[2][1],rotation[2][2])
+			vec3(r[2][0],r[2][1],r[2][2])
 		);
+
+	rotate_z_ += 
+		roll_speed_ * 
+		t *
+		do_rotate_z_;
 }
 
 insula::graphics::mat4 const
 insula::graphics::camera::world() const
+{
+	return 
+		rotation() * 
+		translation();
+	
+}
+
+insula::graphics::mat4 const
+insula::graphics::camera::rotation() const
 {
 	mat4 const 
 		rotate = 
 			fcppt::math::matrix::rotation_x(
 				rotate_x_) *
 			fcppt::math::matrix::rotation_y(
-				rotate_y_),
-		translate =
-			fcppt::math::matrix::transpose(
-				fcppt::math::matrix::translation(
-					position_));
+				rotate_y_) * 
+			fcppt::math::matrix::rotation_z(
+				rotate_z_);
 
 	return 
-		rotate * 
+		rotate;
+}
+
+insula::graphics::mat4 const
+insula::graphics::camera::translation() const
+{
+	mat4 const 
+		translate =
+				fcppt::math::matrix::translation(
+					position_);
+
+	return 
 		translate;
 	
 }
@@ -130,7 +156,7 @@ insula::graphics::camera::input_callback(
 				static_cast<scalar>(k.value())/mouse_inverse_speed;
 			break;
 		case sge::input::kc::mouse_y_axis:
-			rotate_x_ -= 
+			rotate_x_ += 
 				static_cast<scalar>(k.value())/mouse_inverse_speed;
 			break;
 		case sge::input::kc::key_space:
@@ -151,6 +177,12 @@ insula::graphics::camera::input_callback(
 
 			if (k.key().char_code() == FCPPT_TEXT('d'))
 				dirs_.x() = !k.value() ? 0 : -1;
+
+			if (k.key().char_code() == FCPPT_TEXT('q'))
+				do_rotate_z_ = !k.value() ? 0 : 1;
+
+			if (k.key().char_code() == FCPPT_TEXT('e'))
+				do_rotate_z_ = !k.value() ? 0 : -1;
 			break;
 	}
 }

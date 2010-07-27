@@ -27,6 +27,7 @@ public:
 		scalar near,
 		scalar far,
 		scalar camera_speed,
+		scalar roll_speed,
 		vec3 const &position);
 	
 	void
@@ -37,12 +38,20 @@ public:
 	world() const;
 
 	mat4 const
+	rotation() const;
+
+	mat4 const
+	translation() const;
+
+	mat4 const
 	perspective() const;
 private:
 	fcppt::signal::scoped_connection input_connection_;
 	scalar aspect_,fov_,near_,far_;
 	scalar speed_;
-	scalar rotate_x_,rotate_y_;
+	scalar roll_speed_;
+	scalar do_rotate_z_;
+	scalar rotate_x_,rotate_y_,rotate_z_;
 	vec3 dirs_;
 	vec3 position_;
 

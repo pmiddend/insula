@@ -48,6 +48,7 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/input.hpp>
+#include <fcppt/math/twopi.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/exception.hpp>
@@ -90,7 +91,7 @@ try
 		("near",boost::program_options::value<graphics::scalar>()->default_value(1),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
 		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(4),"How many latitude iterations")
-		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(10),"How many longitude iterations")
+		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(6),"How many longitude iterations")
 		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)");
 	
 	boost::program_options::variables_map vm;
@@ -154,6 +155,7 @@ try
 		vm["near"].as<graphics::scalar>(),
 		vm["far"].as<graphics::scalar>(),
 		graphics::scalar(0.5),
+		fcppt::math::twopi<graphics::scalar>()/8,
 		graphics::vec3::null());
 
 	skydome::object s(

@@ -49,6 +49,7 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/input.hpp>
+#include <fcppt/math/twopi.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/exception.hpp>
@@ -93,6 +94,7 @@ try
 		("grid-sizes",boost::program_options::value<graphics::vec2>()->default_value(graphics::vec2(20,20)),"Size of a grid cell")
 		("height-scale",boost::program_options::value<graphics::scalar>()->default_value(1000),"Height scaling")
 		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
+		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera")
 		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
 		("gradient-texture",boost::program_options::value<fcppt::string>()->required(),"Texture for the gradient")
 		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture")
@@ -164,6 +166,7 @@ try
 		vm["near"].as<graphics::scalar>(),
 		vm["far"].as<graphics::scalar>(),
 		vm["camera-speed"].as<graphics::scalar>(),
+		vm["roll-speed"].as<graphics::scalar>(),
 		graphics::vec3::null());
 
 	height_map::object h(

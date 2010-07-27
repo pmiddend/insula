@@ -1,3 +1,4 @@
+#include "sphere_point.hpp"
 #include "object.hpp"
 #include "vf/packed_position.hpp"
 #include "vf/format.hpp"
@@ -38,8 +39,9 @@
 #include <fcppt/math/matrix/transpose.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/twopi.hpp>
+#include <fcppt/math/matrix/output.hpp>
+#include <fcppt/math/rad_to_deg.hpp>
 #include <fcppt/text.hpp>
-#include <fcppt/assert_message.hpp>
 #include <fcppt/variant/apply_unary.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <boost/foreach.hpp>
@@ -47,7 +49,13 @@
 #include <cmath>
 #include <algorithm>
 #include <fcppt/text.hpp>
+#include <fcppt/assert.hpp>
+#include <fcppt/assert_message.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
+
+// DEBUG
+#include <fcppt/io/cout.hpp>
+#include <fcppt/math/vector/output.hpp>
 
 namespace
 {
@@ -62,13 +70,17 @@ public:
 	insula::skydome::size_type
 	size_type;
 
+	size_type ib_size;
 	size_type it_lat,it_lon;
 
 	explicit
 	index_visitor(
+		size_type const ib_size,
 		size_type const it_lat,
 		size_type const it_lon)
 	:
+		ib_size(
+			ib_size),
 		it_lat(
 			it_lat),
 		it_lon(
@@ -87,12 +99,28 @@ public:
 
 		typename T::iterator it = t.begin();
 
+		size_type indices = 0;
+
 		// First, the triangles at the top
 		for (size_type lons = 1; lons <= it_lon; ++lons)
 		{
+			/* DEBUG
+			fcppt::io::cout
+				<< "Adding triangle: "
+				<< 0
+				<< ","
+				<< ((lons == it_lon) ? 1 : (lons+1))
+				<< ","
+				<< lons
+				<< "\n";*/
 			*it++ = 0;
-			*it++ = static_cast<value_type>(lons+1);
-			*it++ = static_cast<value_type>(lons);
+			*it++ = 
+				static_cast<value_type>(
+					lons == it_lon ? 1 : (lons+1));
+			*it++ = 
+				static_cast<value_type>(
+					lons);
+			indices += 3;
 		}
 
 		// Start at the first vertex after the top
@@ -114,10 +142,14 @@ public:
 				*it++ = static_cast<value_type>(current+1);
 				*it++ = static_cast<value_type>(below+1);
 				*it++ = static_cast<value_type>(below);
+
+				indices += 6;
 			
 				++current;
 			}
 		}
+		
+		FCPPT_ASSERT(indices < ib_size);
 	}
 };
 }
@@ -144,10 +176,11 @@ insula::skydome::object::object(
 		obj)
 {
 	regenerate_buffer(
-		fcppt::math::deg_to_rad(
-			angle),
+		angle,
 		iterations_lat,
 		iterations_long);
+
+	fcppt::io::cout << "rotation is: " << camera_.rotation() << "\n";
 }
 
 void
@@ -161,24 +194,36 @@ insula::skydome::object::render()
 		renderer_,
 		shader_.program());
 
+	//fcppt::io::cout << "rotation matrix: " << camera_.rotation() << ", translation matrix: " << camera_.translation() << "\n";
+
+	using fcppt::math::matrix::transpose;
+
 	shader_.set_uniform(
-		FCPPT_TEXT("mvp"),
-		fcppt::math::matrix::transpose(
-			camera_.perspective() * camera_.world()));
+		FCPPT_TEXT("translation"),
+		camera_.translation());
+
+	shader_.set_uniform(
+		FCPPT_TEXT("rotation"),
+		camera_.rotation());
+
+	shader_.set_uniform(
+		FCPPT_TEXT("perspective"),
+		camera_.perspective());
 
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::enable_lighting = false)
-		 	(sge::renderer::state::cull_mode::front)
+		 	(sge::renderer::state::cull_mode::off)
 		 	(sge::renderer::state::depth_func::off));
 
+	renderer_->render(
+		sge::renderer::first_vertex(
+			0),
+		sge::renderer::vertex_count(
+			vb_->size()),
+		sge::renderer::nonindexed_primitive_type::point);
 	/*
-	renderer_->texture(
-		lower_texture_,
-		0);
-	*/
-
 	renderer_->render(
 		ib_,
 		sge::renderer::first_vertex(
@@ -190,19 +235,19 @@ insula::skydome::object::render()
 			ib_->size() / 3),
 		sge::renderer::first_index(
 			0));
-
-	/*
-	renderer_->texture(
-		sge::renderer::device::no_texture,
-		0);*/
+*/
 }
 
 void
 insula::skydome::object::regenerate_buffer(
-	graphics::scalar const angle,
-	size_type const it_lat,
-	size_type const it_lon)
+	graphics::scalar,
+	size_type const lats,
+	size_type const lons)
 {
+	using graphics::scalar; 
+
+	// We have to activate the shader here because we want to fill the
+	// vertex buffer with "custom" attributes.
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
@@ -211,9 +256,10 @@ insula::skydome::object::regenerate_buffer(
 		renderer_->create_vertex_buffer(
 			sge::renderer::vf::dynamic::make_format<vf::format>(),
 			static_cast<sge::renderer::size_type>(
-				// for each latitude != 0 we have longitude vertices, but at
-				// the top we have only one vertex, which we add at the end
-				(it_lat - 1) * it_lon + 1),
+				// The top
+				1 + 
+				// The inner rings minus the two tops
+				(lats - 1) * lons),
 			sge::renderer::resource_flags::none);
 
 	FCPPT_ASSERT_MESSAGE(
@@ -222,27 +268,21 @@ insula::skydome::object::regenerate_buffer(
 			std::numeric_limits<sge::renderer::index::i32>::max()),
 		FCPPT_TEXT("The skydome is too big for a 32 bit index!"));
 
+	/*
 	ib_ = 
 		renderer_->create_index_buffer(
 			sge::renderer::index::dynamic::format::i32,
-			// For each pair of rings we have it_lon quads. We have it_lat-1
-			// rings and it_lat-2 pairs of rings.
-			// This makes for it_lat-2 quads, each having 2 triangles and
-			// each triangle has 3 indices.
+			// For each pair of rings we have "it_lon" quads. We have
+			// "it_lat-1" rings and "it_lat-2" pairs of rings.  This makes for
+			// "it_lat-2" quads, each having 2 triangles and each triangle has
+			// 3 indices.
 			static_cast<sge::renderer::size_type>(
-				(it_lat-2) * 2 * 3),
+				// the quads
+				(it_lat-2) * it_lon * 2 * 3 +
+				// the triangles
+				it_lon * 3), 
 			sge::renderer::resource_flags::none);
-
-	graphics::scalar const 
-		decrement_lat = 
-			angle / 
-			static_cast<graphics::scalar>(
-				it_lat),
-		increment_lon = 
-			fcppt::math::twopi<graphics::scalar>() /
-			static_cast<graphics::scalar>(
-				it_lon);
-
+*/
 
 	sge::renderer::scoped_vertex_lock const vblock(
 		vb_,
@@ -254,59 +294,77 @@ insula::skydome::object::regenerate_buffer(
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
 
-	graphics::scalar const radius = 
-		static_cast<graphics::scalar>(
+	scalar const radius = 
+		static_cast<scalar>(
 			1);
 
-	vb_it->set<vf::position>(
-		vf::packed_position(
-			static_cast<graphics::scalar>(
-				0),
+	scalar const halfpi = 
+		fcppt::math::pi<scalar>()/
+		static_cast<scalar>(2);
+
+	fcppt::io::cout << "The top has coordinates: " << 
+		sphere_point(
 			radius,
-			static_cast<graphics::scalar>(
-				0)));
+			0,
+			0) << "\n";
+
+	// The top
+	vb_it->set<vf::position>(
+		sphere_point(
+			radius,
+			0,
+			0));
 	
 	vb_it++;
 
-	// Latitude loop
-	for(
-		graphics::scalar lat = 
-			fcppt::math::deg_to_rad(
-				static_cast<graphics::scalar>(
-					90)) - 
-				// We decrement one latitude here to exclude the top point
-				decrement_lat; 
-		lat > static_cast<graphics::scalar>(90) - angle; 
-		lat -= 
-			decrement_lat)
+	vf::vertex_view::size_type vertex_count = 
+		1;
+
+	scalar const 
+		increment_lat = 
+			halfpi / static_cast<scalar>(lats),
+		increment_lon = 
+			fcppt::math::twopi<scalar>()/
+			static_cast<scalar>(lons);
+
+	scalar lat = increment_lat;
+	// We make one less iteration because we don't want the top
+	// NOTE: We use size_type here FOR A REASON! floating point loops are inaccurate
+	for (size_type i = 1; i < lats; ++i)
 	{
-		for(
-			graphics::scalar lon = 
-				static_cast<graphics::scalar>(
-					0);
-			lon < fcppt::math::twopi<graphics::scalar>();
-			lon += 
-				increment_lon)
+		//fcppt::io::cout << "current latitude: " << fcppt::math::rad_to_deg(lat) << "\n";
+		scalar lon = 
+			static_cast<scalar>(0);
+		for (size_type j = 0; j < lons; ++j)
 		{
-			using std::sin;
-			using std::cos;
+			//fcppt::io::cout << "current longitude: " << fcppt::math::rad_to_deg(lon) << "\n";
+			++vertex_count;
 
 			// TODO: Check if this is right!
 			vb_it->set<vf::position>(
-				vf::packed_position(
-					radius * sin(lat) * cos(lon),
-					radius * sin(lat),
-					radius * cos(lat) * sin(lon)));
+				sphere_point(
+					radius,
+					lat,
+					lon));
 
 			++vb_it;
+			lon += increment_lon;
 		}
+		lat += increment_lat;
 	}
+	
+	fcppt::io::cout << "there are " << vertex_count << " vertices, the buffer size is " << vb_->size() << "\n";
 
+	FCPPT_ASSERT(vertex_count <= vb_->size());
+
+	/*
 	fcppt::variant::apply_unary(
 		index_visitor(
+			static_cast<index_visitor::size_type>(
+				ib_->size()),
 			it_lat,
 			it_lon),
 		sge::renderer::scoped_index_lock(
 			ib_,
-			sge::renderer::lock_mode::writeonly).value().any());
+			sge::renderer::lock_mode::writeonly).value().any());*/
 }
