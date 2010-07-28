@@ -166,7 +166,6 @@ try
 		vm["near"].as<graphics::scalar>(),
 		vm["far"].as<graphics::scalar>(),
 		vm["camera-speed"].as<graphics::scalar>(),
-		vm["roll-speed"].as<graphics::scalar>(),
 		graphics::vec3::null());
 
 	height_map::object h(

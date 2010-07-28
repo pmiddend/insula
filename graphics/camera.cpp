@@ -16,7 +16,10 @@
 #include <fcppt/math/matrix/output.hpp>
 #include <fcppt/math/matrix/transpose.hpp>
 #include <fcppt/math/vector/narrow_cast.hpp>
+#include <fcppt/math/vector/construct.hpp>
+#include <fcppt/math/vector/cross.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/normalize.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/vector.hpp>
 #include <fcppt/math/pi.hpp>
@@ -35,6 +38,17 @@ mycompare(
 {
 	return std::abs(a-b) < static_cast<T>(0.0001);
 }
+
+insula::graphics::vec4 const
+myconstruct(
+	insula::graphics::vec3 const &v)
+{
+	return 
+		fcppt::math::vector::construct(
+			v,
+			static_cast<insula::graphics::scalar>(
+				0));
+}
 }
 
 insula::graphics::camera::camera(
@@ -44,7 +58,6 @@ insula::graphics::camera::camera(
 	scalar _near,
 	scalar _far,
 	scalar _speed,
-	//scalar _roll_speed,
 	vec3 const &_position)
 :
 	input_connection_(
@@ -63,18 +76,20 @@ insula::graphics::camera::camera(
 		_far),
 	speed_(
 		_speed),
-	roll_speed_(
-		_roll_speed),
-	rotate_x_(
-		static_cast<scalar>(
-			0)),
-	rotate_y_(
-		static_cast<scalar>(
-			0)),
 	dirs_(
 		vec3::null()),
 	position_(
-		_position)
+		_position),
+	forward_(
+		0,0,1,0),
+	right_(
+		1,0,0,0),
+	up_(
+		0,1,0,0),
+	do_roll_(
+		static_cast<scalar>(0)),
+	roll_speed_(
+		fcppt::math::pi<scalar>()/static_cast<scalar>(4))
 {
 }
 
@@ -82,24 +97,32 @@ void
 insula::graphics::camera::update(
 	scalar const t)
 {
-	mat4 const r = 
-		fcppt::math::matrix::transpose(
-			rotation());
-	
+	if (!fcppt::math::almost_zero(do_roll_))
+	{
+		using fcppt::math::matrix::rotation_axis;
+		using fcppt::math::vector::narrow_cast;
+
+		up_ = 
+			rotation_axis(
+				-do_roll_ * roll_speed_ * t,
+				narrow_cast<vec3>(forward_)) * up_;
+
+		right_ = myconstruct(cross(narrow_cast<vec3>(up_),narrow_cast<vec3>(forward_)));
+		forward_ = myconstruct(cross(narrow_cast<vec3>(right_),narrow_cast<vec3>(up_)));
+
+		right_ = myconstruct(normalize(narrow_cast<vec3>(right_)));
+		up_ = myconstruct(normalize(narrow_cast<vec3>(up_)));
+		forward_ = myconstruct(normalize(narrow_cast<vec3>(forward_)));
+	}
+
 	position_ = 
 		position_ + 
 		speed_ * 
 		t * 
-		(
-			dirs_.x() * 
-			vec3(r[0][0],r[0][1],r[0][2]) +
-
-			dirs_.y() * 
-			vec3(r[1][0],r[1][1],r[1][2]) +
-
-			dirs_.z() * 
-			vec3(r[2][0],r[2][1],r[2][2])
-		);
+		fcppt::math::vector::narrow_cast<vec3>(
+			dirs_[0] * right_ + 
+			dirs_[1] * up_ + 
+			dirs_[2] * forward_);
 }
 
 insula::graphics::mat4 const
@@ -114,17 +137,12 @@ insula::graphics::camera::world() const
 insula::graphics::mat4 const
 insula::graphics::camera::rotation() const
 {
-	mat4 const 
-		rotate = 
-			fcppt::math::matrix::rotation_x(
-				rotate_x_) *
-			fcppt::math::matrix::rotation_y(
-				rotate_y_) * 
-			fcppt::math::matrix::rotation_z(
-				rotate_z_);
-
 	return 
-		rotate;
+		mat4(
+			right_[0],right_[1],right_[2],static_cast<scalar>(0), 
+			up_[0],up_[1],up_[2],static_cast<scalar>(0), 
+			forward_[0],forward_[1],forward_[2],static_cast<scalar>(0), 
+			static_cast<scalar>(0), static_cast<scalar>(0), static_cast<scalar>(0), static_cast<scalar>(1));
 }
 
 insula::graphics::mat4 const
@@ -157,133 +175,72 @@ insula::graphics::camera::input_callback(
 {
 	scalar const mouse_inverse_speed = 
 		static_cast<scalar>(
-			100);
+			1000);
+
+	scalar const angle = 
+		static_cast<scalar>(k.value())/mouse_inverse_speed;
 
 	switch (k.key().code())
 	{
 		case sge::input::kc::mouse_x_axis:
 		{
-			break;
-			scalar const rotate_amount = 
-				static_cast<scalar>(k.value())/
-				mouse_inverse_speed;
+			using fcppt::math::matrix::rotation_axis;
+			using fcppt::math::vector::narrow_cast;
 
-			/*
-			fcppt::io::cout
-				<< "IN("<< rotate_x_ << "," << rotate_y_ << "," << rotate_z_ << ")\n";*/
+			forward_ = 
+				rotation_axis(
+					-angle,
+					narrow_cast<vec3>(up_)) * forward_;
 
-			vec4 const 
-				e2 = 
-					rotation() * vec4(0,1,0,1);
+			right_ = myconstruct(cross(narrow_cast<vec3>(up_),narrow_cast<vec3>(forward_)));
+			up_ = myconstruct(cross(narrow_cast<vec3>(forward_),narrow_cast<vec3>(right_)));
 
-			mat4 const r = 
-				fcppt::math::matrix::rotation_axis(
-					rotate_amount,
-					fcppt::math::vector::narrow_cast<vec3>(
-						e2)) *
-				rotation();
-			
-			vec4
-				e1 = 
-					r * vec4(1,0,0,1),
-				e3 = 
-					r * vec4(0,0,1,1);
-
-			 graphics::scalar dummy_x,dummy_y,dummy_z;
-
-			 fcppt::math::matrix::angles_from_matrix(
-			 	mat3(
-					e1[0],e2[0],e3[0],
-					e1[1],e2[1],e3[1],
-					e1[2],e2[2],e3[2]),
-				rotate_x_,
-				rotate_y_,
-				rotate_z_,
-				dummy_x,
-				dummy_y,
-				dummy_z,
-				&mycompare<graphics::scalar>);
-
-			/*
-			fcppt::io::cout 
-				<< "OUT(" << rotate_x_ << "," << rotate_y_ << "," << rotate_z_ << ")\n"
-				<< "OUT(" << dummy_x << "," << dummy_y << "," << dummy_z << ")\n";*/
-	//			<< "rotate y after: " 
-	//			<< rotate_y_ << "\n";
+			right_ = myconstruct(normalize(narrow_cast<vec3>(right_)));
+			up_ = myconstruct(normalize(narrow_cast<vec3>(up_)));
+			forward_ = myconstruct(normalize(narrow_cast<vec3>(forward_)));
 		}
-			break;
+		break;
 		case sge::input::kc::mouse_y_axis:
 		{
-			scalar const rotate_amount = 
-				static_cast<scalar>(k.value())/
-				mouse_inverse_speed;
+			using fcppt::math::matrix::rotation_axis;
+			using fcppt::math::vector::narrow_cast;
 
-			/*
-			fcppt::io::cout
-				<< "IN("<< rotate_x_ << "," << rotate_y_ << "," << rotate_z_ << ")\n";*/
+			forward_ = 
+				rotation_axis(
+					-angle,
+					narrow_cast<vec3>(right_)) * forward_;
+			up_ = myconstruct(cross(narrow_cast<vec3>(forward_),narrow_cast<vec3>(right_)));
+			right_ = myconstruct(cross(narrow_cast<vec3>(up_),narrow_cast<vec3>(forward_)));
 
-			vec4 const 
-				e1 = 
-					rotation() * vec4(1,0,0,0);
-
-			mat4 const r = 
-				fcppt::math::matrix::rotation_axis(
-					rotate_amount,
-					fcppt::math::vector::narrow_cast<vec3>(
-						e1)) *
-				rotation();
-			
-			vec4
-				e2 = 
-					r * vec4(0,1,0,0),
-				e3 = 
-					r * vec4(0,0,1,0);
-
-			 graphics::scalar dummy_x,dummy_y,dummy_z;
-
-			 fcppt::math::matrix::angles_from_matrix(
-			 	mat3(
-					e1[0],e2[0],e3[0],
-					e1[1],e2[1],e3[1],
-					e1[2],e2[2],e3[2]),
-				rotate_x_,
-				rotate_y_,
-				rotate_z_,
-				dummy_x,
-				dummy_y,
-				dummy_z,
-				&mycompare<graphics::scalar>);
-
-			/*
-			fcppt::io::cout 
-				<< "OUT(" << rotate_x_ << "," << rotate_y_ << "," << rotate_z_ << ")\n"
-				<< "OUT(" << dummy_x << "," << dummy_y << "," << dummy_z << ")\n";*/
+			right_ = myconstruct(normalize(narrow_cast<vec3>(right_)));
+			up_ = myconstruct(normalize(narrow_cast<vec3>(up_)));
+			forward_ = myconstruct(normalize(narrow_cast<vec3>(forward_)));
 		}
 		break;
 		case sge::input::kc::key_space:
-			dirs_.y() = !k.value() ? 0 : -1;
+			dirs_[1] = !k.value() ? 0 : -1;
 			break;
 		case sge::input::kc::key_lctrl:
-			dirs_.y() = !k.value() ? 0 : 1;
+			dirs_[1] = !k.value() ? 0 : 1;
 			break;
 		default:
 			if (k.key().char_code() == FCPPT_TEXT('w'))
-				dirs_.z() = !k.value() ? 0 : 1;
+				dirs_[2] = !k.value() ? 0 : 1;
 
 			if (k.key().char_code() == FCPPT_TEXT('s'))
-				dirs_.z() = !k.value() ? 0 : -1;
+				dirs_[2] = !k.value() ? 0 : -1;
 
 			if (k.key().char_code() == FCPPT_TEXT('a'))
-				dirs_.x() = !k.value() ? 0 : 1;
+				dirs_[0] = !k.value() ? 0 : 1;
 
 			if (k.key().char_code() == FCPPT_TEXT('d'))
-				dirs_.x() = !k.value() ? 0 : -1;
+				dirs_[0] = !k.value() ? 0 : -1;
 
 			if (k.key().char_code() == FCPPT_TEXT('q'))
-				do_rotate_z_ = !k.value() ? 0 : 1;
+				do_roll_ = !k.value() ? 0 : -1;
 
 			if (k.key().char_code() == FCPPT_TEXT('e'))
-				rotate_z_ = !k.value() ? 0 : -1;
+				do_roll_ = !k.value() ? 0 : 1;
 			break;
 	}
 }
