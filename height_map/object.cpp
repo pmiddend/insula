@@ -214,20 +214,22 @@ insula::height_map::object::render()
 		shader_.program());
 	
 	shader_.set_uniform(
-		FCPPT_TEXT("world"),
-		fcppt::math::matrix::transpose(
-			camera_.world()));
+		FCPPT_TEXT("translation"),
+		camera_.translation());
+
+	shader_.set_uniform(
+		FCPPT_TEXT("rotation"),
+		camera_.rotation());
 
 	shader_.set_uniform(
 		FCPPT_TEXT("perspective"),
-		fcppt::math::matrix::transpose(
-			camera_.perspective()));
+		camera_.perspective());
 	
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::enable_lighting = false)
-		 	(sge::renderer::state::cull_mode::front)
+		 	(sge::renderer::state::cull_mode::back)
 		 	(sge::renderer::state::depth_func::less));
 
 	sge::renderer::scoped_texture scoped_tex0(

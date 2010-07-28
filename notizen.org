@@ -56,8 +56,11 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 **** TODO render_height_map mit Kamera fixen
 **** DONE angle-Funktion in fcppt pushen (vorher test mit FCPPT_TEXT versehen)
 		 CLOSED: [2010-07-28 Wed 23:40]
+**** DONE Sonne einfügen
+		 CLOSED: [2010-07-29 Thu 00:50]
 **** TODO Maximalwinkel für den Skydome einstellen (nicht immer 90 Grad)
-**** TODO Neues Programm render_scene machen und render_height_map aufsplitten
+**** DONE Neues Programm render_scene machen und render_height_map aufsplitten
+		 CLOSED: [2010-07-29 Thu 00:52]
 **** TODO Skydome in render_scene einbauen
 
 **** TODO Suche bei Google nach "icosphere triangle strip"

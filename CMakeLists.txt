@@ -81,6 +81,11 @@ ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp
 	${graphics_files} 
 	${height_map_files}
 	${console_files})
+ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp
+	${texture_files}
+	${graphics_files} 
+	${height_map_files}
+	${console_files})
 ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
 	${height_map_files} ${texture_files} ${graphics_files} ${console_files})
 ADD_EXECUTABLE(render_skydome media_path.cpp render_skydome.cpp 
@@ -88,6 +93,7 @@ ADD_EXECUTABLE(render_skydome media_path.cpp render_skydome.cpp
 
 TARGET_LINK_LIBRARIES(load_image_to_array fcppt sgecore)
 TARGET_LINK_LIBRARIES(render_height_map fcppt sgecore)
+TARGET_LINK_LIBRARIES(render_scene fcppt sgecore)
 TARGET_LINK_LIBRARIES(generate_height_texture fcppt sgecore)
 TARGET_LINK_LIBRARIES(render_skydome fcppt sgecore)
 
@@ -96,6 +102,7 @@ IF(NOT MSVC)
 	TARGET_LINK_LIBRARIES(render_height_map ${Boost_LIBRARIES})
 	TARGET_LINK_LIBRARIES(generate_height_texture ${Boost_LIBRARIES})
 	TARGET_LINK_LIBRARIES(render_skydome ${Boost_LIBRARIES})
+	TARGET_LINK_LIBRARIES(render_scene ${Boost_LIBRARIES})
 ENDIF()
 
 ENABLE_TESTING()
