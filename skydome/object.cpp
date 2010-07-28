@@ -264,6 +264,10 @@ insula::skydome::object::regenerate_buffer(
 		renderer_,
 		shader_.program());
 
+	scalar const radius = 
+		static_cast<scalar>(
+			1);
+
 	vb_ = 
 		renderer_->create_vertex_buffer(
 			sge::renderer::vf::dynamic::make_format<vf::format>(),
@@ -303,10 +307,6 @@ insula::skydome::object::regenerate_buffer(
 
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
-
-	scalar const radius = 
-		static_cast<scalar>(
-			1);
 
 	scalar const halfpi = 
 		fcppt::math::pi<scalar>()/
