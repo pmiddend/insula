@@ -1,7 +1,31 @@
 * Aktivitäten
-** Perspektive
-*** Notizen
-** Skydome
+** TODO Perspektive
+*** DONE Winkel-Extraktion aus [[http://www.google.com/url?sa=t&source=web&cd=3&ved=0CCUQFjAC&url=http%3A%2F%2Fwww.gregslabaugh.name%2Fpublications%2Feuler.pdf&ei=5BNPTIbkB5rQ4wax7IiCCA&usg=AFQjCNGgP_-68fHn3TvPlqwAomC3TZV4fw][diesem]] Paper umsetzen (in fcppt-Funktion packen?)
+		 CLOSED: [2010-07-28 Wed 18:53]
+*** TODO 3-Vektor-Ansatz
+**** TODO 
+
+Definiere Right:=(1,0,0) und Forward:=(0,0,1). Finde heraus, ob 
+Right x Forward = (0,1,0) ist. Ansonsten müssen alle Kreuzprodukte 
+vertauscht werden.
+
+**** TODO Vorgehen
+
+Im Folgenden seien die Kreuzprodukte mit der rechten Hand auszuführen
+
+1. Statt 3 Rotationswinkeln speichert man 3 Vektoren, Forward, Right, Up
+2. Anfangs sind diese natürlich auf (0,0,1), (1,0,0) und (0,1,0) eingestellt
+3. Bei mouse_x_axis will man um die y-Achse rotieren.
+   1. Rotiere Forward um Up. Markiere alle Vektoren außer Forward 
+      als ungültig (idealerweise wären Forward und Up noch orthogonal, kann man
+      sich aber nicht drauf verlassen), kennzeichne mit *
+   2. Right := Up* x Forward, Right steht orthogonal auf Forward und Up*
+   3. Up := Forward x Right
+4. Bei mouse_y_axis will man um die x-Achse rotieren.
+	 1. Rotiere Forward um Right. Wieder alle Vektoren ungültig
+	 2. Up := Forward x Right*
+	 3. Right := Up x Forward
+** TODO Skydome
 *** Klassischer Ansatz
 **** TODO
 
@@ -25,16 +49,17 @@
 
 **** TODO Suche bei Google nach "icosphere triangle strip"
 
-** Wasser
+** TODO Wasser
 
-** Nebel
+** TODO Nebel
 
-** HDR-Faking für besseres Licht
+** TODO HDR-Faking für besseres Licht
 
-** Models (Bäume etc.)
+** TODO Models (Bäume etc.)
 
-** Shadow Maps
+** TODO Shadow MapsT
 
-** Physik, Fahrzeuge
 
-** Sounds?
+** TODO Physik, Fahrzeuge
+
+** TODO Wie gehts weiter? Sounds?
