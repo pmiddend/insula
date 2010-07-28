@@ -2,6 +2,7 @@
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/camera.hpp"
+#include "skydome/object.hpp"
 #include "height_map/image_to_array.hpp"
 #include "height_map/object.hpp"
 #include "console/object.hpp"
@@ -89,7 +90,7 @@ try
 	desc.add_options()
 		("help","produce help message")
 		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
-		("near",boost::program_options::value<graphics::scalar>()->default_value(1),"Distance to the near plane")
+		("near",boost::program_options::value<graphics::scalar>()->default_value(0.1f),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
 		("grid-sizes",boost::program_options::value<graphics::vec2>()->default_value(graphics::vec2(20,20)),"Size of a grid cell")
 		("height-scale",boost::program_options::value<graphics::scalar>()->default_value(1000),"Height scaling")
@@ -100,7 +101,10 @@ try
 		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture")
 		("ambient-light",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.4)),"Ambient lighting (in [0,1])")
 		("sun-direction",boost::program_options::value<graphics::vec3>()->default_value(graphics::vec3(100,100,100)),"Sun direction")
-		("texture-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)");
+		("texture-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
+		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
+		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
+		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -126,7 +130,7 @@ try
 		sge::systems::list() 
 		(
 			sge::window::parameters(
-				FCPPT_TEXT("render height map")))
+				FCPPT_TEXT("render scene")))
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
@@ -168,6 +172,45 @@ try
 		vm["camera-speed"].as<graphics::scalar>(),
 		graphics::vec3::null());
 
+	skydome::object s(
+		cam,
+		sys.renderer(),
+		console.model(),
+		vm["angle"].as<graphics::scalar>(),
+		vm["latitudes"].as<skydome::size_type>(),
+		vm["longitudes"].as<skydome::size_type>());
+
+	fcppt::signal::scoped_connection regenerate_skydome_conn(
+		console.model().insert(
+			FCPPT_TEXT("regenerate_skydome"),
+			[&s,&sys](sge::console::arg_list const &args,sge::console::object &ob) 
+			{ 
+				if (args.size() <= 3)
+				{
+					ob.emit_error(
+						FCPPT_TEXT("usage: ")+args[0]+FCPPT_TEXT(" <angle> <latitudes> <longitudes>"));
+					return;
+				}
+
+				try
+				{
+					s.regenerate_buffer(
+						fcppt::lexical_cast<graphics::scalar>(
+							args[1]),
+						fcppt::lexical_cast<skydome::size_type>(
+							args[2]),
+						fcppt::lexical_cast<skydome::size_type>(
+							args[3]));
+				}
+				catch (fcppt::bad_lexical_cast const &)
+				{
+					ob.emit_error(
+						FCPPT_TEXT("Parameter invalid"));
+					return;
+				}
+			},
+			FCPPT_TEXT("regenerate skydome, parameters are self-explanatory")));
+
 	height_map::object h(
 		cam,
 		sys.renderer(),
@@ -187,9 +230,9 @@ try
 		sys.image_loader().load(
 			height_textures[1]));
 	
-	fcppt::signal::scoped_connection regenerate_conn(
+	fcppt::signal::scoped_connection regenerate_height_map_conn(
 		console.model().insert(
-			FCPPT_TEXT("regenerate"),
+			FCPPT_TEXT("regenerate_height_map"),
 			[&h,&sys](sge::console::arg_list const &args,sge::console::object &ob) 
 			{ 
 				if (args.size() <= 4)
@@ -228,7 +271,7 @@ try
 				}
 			},
 			FCPPT_TEXT("Regenerate terrain from a file"),
-			FCPPT_TEXT("Usage: /regenerate <filename> <cell-size-x> <cell-size-y> <height-scaling>\nThe filename should exist and denote a grey-scale image.")));
+			FCPPT_TEXT("Usage: /regenerate_height_map <filename> <cell-size-x> <cell-size-y> <height-scaling>\nThe filename should exist and denote a grey-scale image.")));
 
 	bool running = 
 		true;
@@ -291,6 +334,7 @@ try
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
 	
+		s.render();
 		h.render();
 		console.render();
 	}

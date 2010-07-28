@@ -85,7 +85,8 @@ ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp
 	${texture_files}
 	${graphics_files} 
 	${height_map_files}
-	${console_files})
+	${console_files}
+	${skydome_files})
 ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
 	${height_map_files} ${texture_files} ${graphics_files} ${console_files})
 ADD_EXECUTABLE(render_skydome media_path.cpp render_skydome.cpp 

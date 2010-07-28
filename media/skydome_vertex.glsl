@@ -13,6 +13,7 @@ const vec3 color0 = vec3(0.765,0.87,1.0);
 const vec3 color1 = vec3(0.0,0.0,1.0);
 
 const float radius = 1;
+const float ypos = 0.5;
 
 void main()
 {
@@ -20,8 +21,8 @@ void main()
 		perspective * 
 //		world *
 		rotation * 
-		translation * 
-		vec4(position,1.0);
+	//	translation * 
+		vec4(position - vec3(0,ypos,0),1.0);
 
 	// The maximum distance of two points in the unit sphere is 2, so
 	// divide by 2*radius here

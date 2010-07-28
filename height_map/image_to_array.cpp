@@ -8,14 +8,10 @@
 #include <mizuiro/color/channel/gray.hpp>
 #include <fcppt/variant/object.hpp>
 #include <fcppt/variant/invalid_get.hpp>
-// DEBUG
-#include <fcppt/io/cout.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
 
 #include <functional>
-// DEBUG
-#include <algorithm>
 
 insula::height_map::array const
 insula::height_map::image_to_array(
@@ -33,9 +29,6 @@ try
 		v.end(),
 		h.data(),
 		[](gray_view::iterator::reference const &f) { return mizuiro::color::normalize<mizuiro::color::channel::gray,float>(f); });
-
-// DEBUG
-	std::for_each(h.data(),h.data() + h.num_elements(),[](scalar const s) { fcppt::io::cout << s << "\n"; });
 
 	return h;
 }

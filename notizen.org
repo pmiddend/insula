@@ -53,7 +53,8 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 
 *** TODO Icosphere-Ansatz
 *** TODO Weiteres Vorgehen
-**** TODO render_height_map mit Kamera fixen
+**** DONE render_height_map mit Kamera fixen
+		 CLOSED: [2010-07-29 Thu 01:10]
 **** DONE angle-Funktion in fcppt pushen (vorher test mit FCPPT_TEXT versehen)
 		 CLOSED: [2010-07-28 Wed 23:40]
 **** DONE Sonne einfügen
