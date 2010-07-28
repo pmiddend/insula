@@ -219,6 +219,10 @@ insula::skydome::object::render()
 		camera_.rotation());
 
 	shader_.set_uniform(
+		FCPPT_TEXT("world"),
+		camera_.rotation());
+
+	shader_.set_uniform(
 		FCPPT_TEXT("perspective"),
 		camera_.perspective());
 
@@ -267,6 +271,15 @@ insula::skydome::object::regenerate_buffer(
 	scalar const radius = 
 		static_cast<scalar>(
 			1);
+
+	shader_.set_uniform(
+		FCPPT_TEXT("sun_position"),
+		sphere_point(
+			radius,
+			fcppt::math::deg_to_rad(
+				static_cast<graphics::scalar>(20)),
+			fcppt::math::deg_to_rad(
+				static_cast<graphics::scalar>(0))));
 
 	vb_ = 
 		renderer_->create_vertex_buffer(

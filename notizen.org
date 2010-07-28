@@ -1,8 +1,10 @@
 * Aktivitäten
-** TODO Perspektive
+** DONE Kamera
+	 CLOSED: [2010-07-28 Wed 21:46]
 *** DONE Winkel-Extraktion aus [[http://www.google.com/url?sa=t&source=web&cd=3&ved=0CCUQFjAC&url=http%3A%2F%2Fwww.gregslabaugh.name%2Fpublications%2Feuler.pdf&ei=5BNPTIbkB5rQ4wax7IiCCA&usg=AFQjCNGgP_-68fHn3TvPlqwAomC3TZV4fw][diesem]] Paper umsetzen (in fcppt-Funktion packen?)
 		 CLOSED: [2010-07-28 Wed 18:53]
-*** TODO 3-Vektor-Ansatz
+*** DONE 3-Vektor-Ansatz
+		 CLOSED: [2010-07-28 Wed 21:46]
 **** DONE 
 		 CLOSED: [2010-07-28 Wed 19:24]
 
@@ -10,7 +12,8 @@ Definiere Right:=(1,0,0) und Forward:=(0,0,1). Finde heraus, ob
 Right x Forward = (0,1,0) ist. Ansonsten müssen alle Kreuzprodukte 
 vertauscht werden. 
 
-**** TODO Vorgehen
+**** DONE Vorgehen
+		 CLOSED: [2010-07-28 Wed 21:46]
 
 Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 
@@ -27,8 +30,10 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 	 2. Up := Forward x Right*
 	 3. Right := Up x Forward
 ** TODO Skydome
-*** Klassischer Ansatz
-**** TODO
+*** DONE Klassischer Ansatz
+		 CLOSED: [2010-07-28 Wed 21:47]
+**** DONE Vorgehen
+		 CLOSED: [2010-07-28 Wed 21:47]
 
 1. Erstelle Vertexbuffer für die _komplette_ Kugel
 
@@ -46,7 +51,14 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
    Gradient von hellblau zu blau wählt. Der Shader braucht 
    dafür vermutlich die maximal y-Koordinate.
 
-*** Icosphere-Ansatz
+*** TODO Icosphere-Ansatz
+*** TODO Weiteres Vorgehen
+**** TODO render_height_map mit Kamera fixen
+**** DONE angle-Funktion in fcppt pushen (vorher test mit FCPPT_TEXT versehen)
+		 CLOSED: [2010-07-28 Wed 23:40]
+**** TODO Maximalwinkel für den Skydome einstellen (nicht immer 90 Grad)
+**** TODO Neues Programm render_scene machen und render_height_map aufsplitten
+**** TODO Skydome in render_scene einbauen
 
 **** TODO Suche bei Google nach "icosphere triangle strip"
 

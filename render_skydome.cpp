@@ -90,8 +90,8 @@ try
 		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
 		("near",boost::program_options::value<graphics::scalar>()->default_value(0.1f),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(1000),"Distance to the far plane")
-		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(4),"How many latitude iterations")
-		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(6),"How many longitude iterations")
+		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
+		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
 		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)");
 	
 	boost::program_options::variables_map vm;
