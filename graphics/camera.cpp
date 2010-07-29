@@ -80,12 +80,14 @@ insula::graphics::camera::camera(
 		vec3::null()),
 	position_(
 		_position),
-	forward_(
-		0,0,1,0),
-	right_(
-		1,0,0,0),
-	up_(
-		0,1,0,0),
+	axes_(
+		gizmo_init()
+			.forward(
+				vec3(0,0,1))
+			.right(
+				vec3(1,0,0))
+			.up(
+				vec3(0,1,0))),
 	do_roll_(
 		static_cast<scalar>(0)),
 	roll_speed_(
@@ -101,28 +103,39 @@ insula::graphics::camera::update(
 	{
 		using fcppt::math::matrix::rotation_axis;
 		using fcppt::math::vector::narrow_cast;
+		using fcppt::math::vector::construct;
 
-		up_ = 
-			rotation_axis(
-				-do_roll_ * roll_speed_ * t,
-				narrow_cast<vec3>(forward_)) * up_;
+		vec3 
+			up = 
+				narrow_cast<vec3>(
+					rotation_axis(
+						-do_roll_ * roll_speed_ * t,
+						axes_.forward()) *
+					construct(
+						axes_.up(),
+						static_cast<scalar>(0))),
+			right = 
+				cross(up,axes_.forward()),
+			forward = 
+				cross(right,up); 
 
-		right_ = myconstruct(cross(narrow_cast<vec3>(up_),narrow_cast<vec3>(forward_)));
-		forward_ = myconstruct(cross(narrow_cast<vec3>(right_),narrow_cast<vec3>(up_)));
-
-		right_ = myconstruct(normalize(narrow_cast<vec3>(right_)));
-		up_ = myconstruct(normalize(narrow_cast<vec3>(up_)));
-		forward_ = myconstruct(normalize(narrow_cast<vec3>(forward_)));
+		axes_ = 
+			gizmo(
+				gizmo_init()
+					.forward(normalize(forward))
+					.up(normalize(up))
+					.right(normalize(right)));
 	}
 
 	position_ = 
 		position_ + 
 		speed_ * 
 		t * 
-		fcppt::math::vector::narrow_cast<vec3>(
-			dirs_[0] * right_ + 
-			dirs_[1] * up_ + 
-			dirs_[2] * forward_);
+		// FIXME: replace this by inner_product
+		(
+		dirs_[0] * axes_.right() + 
+		dirs_[1] * axes_.up() + 
+		dirs_[2] * axes_.forward());
 }
 
 insula::graphics::mat4 const
@@ -137,12 +150,17 @@ insula::graphics::camera::world() const
 insula::graphics::mat4 const
 insula::graphics::camera::rotation() const
 {
+	scalar const 
+		zero = 
+			static_cast<scalar>(0),
+		one = 
+			static_cast<scalar>(1);
 	return 
 		mat4(
-			right_[0],right_[1],right_[2],static_cast<scalar>(0), 
-			up_[0],up_[1],up_[2],static_cast<scalar>(0), 
-			forward_[0],forward_[1],forward_[2],static_cast<scalar>(0), 
-			static_cast<scalar>(0), static_cast<scalar>(0), static_cast<scalar>(0), static_cast<scalar>(1));
+			axes_.right()[0],axes_.right()[1],axes_.right()[2],zero, 
+			axes_.up()[0],axes_.up()[1],axes_.up()[2],zero, 
+			axes_.forward()[0],axes_.forward()[1],axes_.forward()[2],zero, 
+			zero,zero,zero,one);
 }
 
 insula::graphics::mat4 const
@@ -184,37 +202,59 @@ insula::graphics::camera::input_callback(
 	{
 		case sge::input::kc::mouse_x_axis:
 		{
-			using fcppt::math::matrix::rotation_axis;
-			using fcppt::math::vector::narrow_cast;
 
-			forward_ = 
-				rotation_axis(
-					-angle,
-					narrow_cast<vec3>(up_)) * forward_;
+		using fcppt::math::matrix::rotation_axis;
+		using fcppt::math::vector::narrow_cast;
+		using fcppt::math::vector::construct;
 
-			right_ = myconstruct(cross(narrow_cast<vec3>(up_),narrow_cast<vec3>(forward_)));
-			up_ = myconstruct(cross(narrow_cast<vec3>(forward_),narrow_cast<vec3>(right_)));
+		vec3 
+			forward = 
+				narrow_cast<vec3>(
+					rotation_axis(
+						-angle,
+						axes_.up()) *
+					construct(
+						axes_.forward(),
+						static_cast<scalar>(0))),
+			right = 
+				cross(axes_.up(),forward),
+			up = 
+				cross(forward,right); 
 
-			right_ = myconstruct(normalize(narrow_cast<vec3>(right_)));
-			up_ = myconstruct(normalize(narrow_cast<vec3>(up_)));
-			forward_ = myconstruct(normalize(narrow_cast<vec3>(forward_)));
+		axes_ = 
+			gizmo(
+				gizmo_init()
+					.forward(normalize(forward))
+					.up(normalize(up))
+					.right(normalize(right)));
 		}
 		break;
 		case sge::input::kc::mouse_y_axis:
 		{
 			using fcppt::math::matrix::rotation_axis;
 			using fcppt::math::vector::narrow_cast;
+			using fcppt::math::vector::construct;
 
-			forward_ = 
-				rotation_axis(
-					-angle,
-					narrow_cast<vec3>(right_)) * forward_;
-			up_ = myconstruct(cross(narrow_cast<vec3>(forward_),narrow_cast<vec3>(right_)));
-			right_ = myconstruct(cross(narrow_cast<vec3>(up_),narrow_cast<vec3>(forward_)));
+			vec3 
+				forward = 
+					narrow_cast<vec3>(
+						rotation_axis(
+							-angle,
+							axes_.right()) *
+						construct(
+							axes_.forward(),
+							static_cast<scalar>(0))),
+				up = 
+					cross(forward,axes_.right()),
+				right = 
+					cross(up,forward); 
 
-			right_ = myconstruct(normalize(narrow_cast<vec3>(right_)));
-			up_ = myconstruct(normalize(narrow_cast<vec3>(up_)));
-			forward_ = myconstruct(normalize(narrow_cast<vec3>(forward_)));
+			axes_ = 
+				gizmo(
+					gizmo_init()
+						.forward(normalize(forward))
+						.up(normalize(up))
+						.right(normalize(right)));
 		}
 		break;
 		case sge::input::kc::key_space:

@@ -5,6 +5,7 @@
 #include "mat4.hpp"
 #include "vec3.hpp"
 #include "vec4.hpp"
+#include "gizmo.hpp"
 #include "../console/object_fwd.hpp"
 #include <sge/input/system_ptr.hpp>
 #include <sge/input/key_pair_fwd.hpp>
@@ -51,7 +52,8 @@ private:
 	scalar speed_;
 	vec3 dirs_;
 	vec3 position_;
-	vec4 forward_,right_,up_;
+	gizmo axes_;
+	//vec4 forward_,right_,up_;
 	scalar do_roll_,roll_speed_;
 
 	void

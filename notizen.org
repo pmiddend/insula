@@ -29,7 +29,7 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 	 1. Rotiere Forward um Right. Wieder alle Vektoren ungültig
 	 2. Up := Forward x Right*
 	 3. Right := Up x Forward
-** TODO Skydome
+** TODO Skydome [1/3]
 *** DONE Klassischer Ansatz
 		 CLOSED: [2010-07-28 Wed 21:47]
 **** DONE Vorgehen
@@ -52,7 +52,8 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
    dafür vermutlich die maximal y-Koordinate.
 
 *** TODO Icosphere-Ansatz
-*** TODO Weiteres Vorgehen
+**** TODO Suche bei Google nach "icosphere triangle strip"
+*** TODO Weiteres Vorgehen [5/6]
 **** DONE render_height_map mit Kamera fixen
 		 CLOSED: [2010-07-29 Thu 01:10]
 **** DONE angle-Funktion in fcppt pushen (vorher test mit FCPPT_TEXT versehen)
@@ -62,12 +63,53 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 **** TODO Maximalwinkel für den Skydome einstellen (nicht immer 90 Grad)
 **** DONE Neues Programm render_scene machen und render_height_map aufsplitten
 		 CLOSED: [2010-07-29 Thu 00:52]
-**** TODO Skydome in render_scene einbauen
+**** DONE Skydome in render_scene einbauen
+		 CLOSED: [2010-07-29 Thu 18:05]
 
-**** TODO Suche bei Google nach "icosphere triangle strip"
+** TODO Wasser [0/5]
+*** TODO Variable =water_height= definieren, die per Kommandozeile einstellbar ist
+*** TODO Funktion einbauen, um die Kamera an der Wasser-Ebene zu spiegeln
+Dazu muss getan werden: 
+#+BEGIN_SRC emacs-c++-mode
+vec3 new_position = cam.position
+new_position.y = -cam.position.y + 2*water_height
+vec3 target = cam.position + cam.forward
+target.y = -target.y + 2*water_height
+vec3 forward = target - new_position
+// Streng genommen müsste man hier noch forward und right
+// orthogonalisieren, kann man sich aber vermutlich 
+// sparen
+cam.new_axes(forward,cam.right,forward x right);
+#+END_SRC
 
-** TODO Wasser
+Vorher sollte die aktuelle Kamera (bzw. das Achsentriplet) gespeichert
+werden (oder so)
+*** TODO Rendertarget
+Definiere (Konsolen-)Funktion, die die Kamera an der Wasser-Ebene
+spiegelt, dann rendert und das gerenderte in einer Datei abspeichert,
+die man sich dann angucken kann.
 
+Platzhalter für Clippingplanes einbauen. Außerdem die Möglichkeit
+offen lassen, das Wasser beim Rendern auszulassen. Am besten bekommt
+die Funktion ein Rendercallback, wo man dann =skydome.render()= und
+=height_map.render()= einbauen kann.
+*** TODO Quad für Wasser einbauen (mit Wassertextur), rendern
+*** TODO Wassershader
+Dieser Shader sollte geladen werden, wenn das Wasserquad gerendert
+wird. Er bekommt zwei World-Matrizen und eine Projektionsmatrix. Bei
+der einen steht der Betrachter "normal", bei der anderen gespiegelt
+unter der Wasseroberfläche (diese Spiegelungsmatrizen kann man aus dem
+ersten Renderpass copypasten). Rausschreiben tut er einerseits
+=gl_Position = projection * world * position=, damit das Wasserquad an
+der richtigen Stelle gezeichnet wird. Andererseits leitet er
+=out vec2 texcoord = vec2(projection * mirrored_world * position)=
+weiter, die im Fragmentshader als Texturkoordinaten (für die
+vorgerenderte Textur) gelten. Alternativ könnte man auch =out vec4
+texcoord = projection * mirrored_world * position= versuchen
+und dann im Fragmentshader: 
+=vec2 texcoord_new = vec2(texcoord.x/texcoord.w,texcoord.y/texcoord.w)=
+Der Kerl im Paper macht zusätzlich noch /2 +0.5, vermutlich aus
+Normierungsgründen. Das vielleicht auch noch probieren.
 ** TODO Nebel
 
 ** TODO HDR-Faking für besseres Licht
