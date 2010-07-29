@@ -51,6 +51,10 @@ public:
 	vec3 const &
 	position() const;
 
+	void
+	position(
+		vec3 const &);
+
 	// NOTE: Is it OK to return by reference here?
 	gizmo const &
 	axes() const;

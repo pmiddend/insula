@@ -65,6 +65,7 @@ FILE(GLOB_RECURSE graphics_files graphics/*)
 FILE(GLOB_RECURSE texture_files textures/*)
 FILE(GLOB_RECURSE console_files console/*)
 FILE(GLOB_RECURSE skydome_files skydome/*)
+FILE(GLOB_RECURSE water_files water/*)
 FILE(GLOB base_files media_path.cpp)
 
 set_source_files_properties(
@@ -86,7 +87,9 @@ ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp
 	${graphics_files} 
 	${height_map_files}
 	${console_files}
-	${skydome_files})
+	${skydome_files}
+	${water_files}
+	)
 ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
 	${height_map_files} ${texture_files} ${graphics_files} ${console_files})
 ADD_EXECUTABLE(render_skydome media_path.cpp render_skydome.cpp 

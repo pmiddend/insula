@@ -9,6 +9,7 @@
 #include "scalar.hpp"
 #include "array.hpp"
 #include "vec2.hpp"
+#include "../graphics/vec4.hpp"
 #include "normalize_and_stretch.hpp"
 #include "generate_gradient.hpp"
 #include "calculate_index_cell.hpp"

@@ -170,6 +170,13 @@ insula::graphics::camera::position() const
 	return position_;
 }
 
+void
+insula::graphics::camera::position(
+	vec3 const &_position)
+{
+	position_ = _position;
+}
+
 insula::graphics::gizmo const &
 insula::graphics::camera::axes() const
 {
@@ -180,6 +187,9 @@ void
 insula::graphics::camera::axes(
 	gizmo const &_axes)
 {
+	axes_ = _axes;
+
+	/*
 	FCPPT_ASSERT(
 		fcppt::math::compare(length(axes_.forward()),static_cast<scalar>(1)) && 
 		fcppt::math::compare(length(axes_.right()),static_cast<scalar>(1)) &&
@@ -187,7 +197,7 @@ insula::graphics::camera::axes(
 		fcppt::math::almost_zero(dot(axes_.forward(),axes_.right())) &&
 		fcppt::math::almost_zero(dot(axes_.forward(),axes_.up())) &&
 		fcppt::math::almost_zero(dot(axes_.right(),axes_.up())));
-	axes_ = _axes;
+*/
 }
 
 void

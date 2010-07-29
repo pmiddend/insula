@@ -6,6 +6,8 @@
 #include "height_map/image_to_array.hpp"
 #include "height_map/object.hpp"
 #include "console/object.hpp"
+#include "water/object.hpp"
+#include "media_path.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
@@ -104,7 +106,8 @@ try
 		("texture-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
 		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
 		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
-		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)");
+		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)")
+		("water-height",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(1)),"Water level");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -179,6 +182,7 @@ try
 		vm["angle"].as<graphics::scalar>(),
 		vm["latitudes"].as<skydome::size_type>(),
 		vm["longitudes"].as<skydome::size_type>());
+	
 
 	fcppt::signal::scoped_connection regenerate_skydome_conn(
 		console.model().insert(
@@ -211,15 +215,19 @@ try
 			},
 			FCPPT_TEXT("regenerate skydome, parameters are self-explanatory")));
 
+	height_map::array const preterrain(
+		height_map::image_to_array(
+			sys.image_loader().load(
+				filename)));
+
 	height_map::object h(
 		cam,
 		sys.renderer(),
-		console.model(),
-		height_map::image_to_array(
-			sys.image_loader().load(
-				filename)),
+		console.model() ,
+		preterrain,
 		vm["grid-sizes"].as<graphics::vec2>(),
 		vm["height-scale"].as<graphics::scalar>(),
+
 		vm["sun-direction"].as<graphics::vec3>(),
 		vm["ambient-light"].as<graphics::scalar>(),
 		vm["texture-scaling"].as<graphics::scalar>(),
@@ -229,6 +237,15 @@ try
 			height_textures[0]),
 		sys.image_loader().load(
 			height_textures[1]));
+
+	water::object w(
+		sys.renderer(),
+		cam,
+		vm["water-height"].as<graphics::scalar>(),
+		sys.image_loader(),
+		console.model(),
+		vm["grid-sizes"].as<graphics::vec2>()[0] * 
+		static_cast<graphics::scalar>(preterrain.shape()[0]));
 	
 	fcppt::signal::scoped_connection regenerate_height_map_conn(
 		console.model().insert(
@@ -247,6 +264,7 @@ try
 					ob.emit_error(
 						FCPPT_TEXT("File \"")+args[1]+FCPPT_TEXT("\" isn't regular"));
 					return;
+
 				}
 
 				try
@@ -324,6 +342,26 @@ try
 			(sge::renderer::state::bool_::clear_zbuffer = true)
 		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f));
 
+	fcppt::signal::scoped_connection render_water_conn(
+		console.model().insert(
+			FCPPT_TEXT("render_mirrored"),
+			[&w,&sys,&s,&h](sge::console::arg_list const &args,sge::console::object &ob) 
+			{ 
+				w.render_mirrored(
+					[&s,&h]()
+					{
+						s.render();
+						h.render();
+					},
+					media_path()/FCPPT_TEXT("results")/
+					FCPPT_TEXT("test.png"));
+			},
+			FCPPT_TEXT("Render the scene from below sea level and save the result in a file"),
+			FCPPT_TEXT("Usage: /render_mirrored\nThe file will be saved in media/results/test.png")));
+	
+
+
+
 	while(running)
 	{
 		sge::mainloop::dispatch();
@@ -336,6 +374,7 @@ try
 	
 		s.render();
 		h.render();
+		w.render();
 		console.render();
 	}
 }

@@ -66,9 +66,11 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 **** DONE Skydome in render_scene einbauen
 		 CLOSED: [2010-07-29 Thu 18:05]
 
-** TODO Wasser [0/5]
-*** TODO Variable =water_height= definieren, die per Kommandozeile einstellbar ist
-*** TODO Funktion einbauen, um die Kamera an der Wasser-Ebene zu spiegeln
+** TODO Wasser [3/6]
+*** DONE Variable =water_height= definieren, die per Kommandozeile einstellbar ist
+		 CLOSED: [2010-07-30 Fri 00:02]
+*** DONE Funktion einbauen, um die Kamera an der Wasser-Ebene zu spiegeln
+		 CLOSED: [2010-07-30 Fri 00:02]
 Dazu muss getan werden: 
 #+BEGIN_SRC emacs-c++-mode
 vec3 new_position = cam.position
@@ -84,7 +86,8 @@ cam.new_axes(forward,cam.right,forward x right);
 
 Vorher sollte die aktuelle Kamera (bzw. das Achsentriplet) gespeichert
 werden (oder so)
-*** TODO Rendertarget
+*** DONE Rendertarget
+		 CLOSED: [2010-07-30 Fri 00:10]
 Definiere (Konsolen-)Funktion, die die Kamera an der Wasser-Ebene
 spiegelt, dann rendert und das gerenderte in einer Datei abspeichert,
 die man sich dann angucken kann.
@@ -110,6 +113,7 @@ und dann im Fragmentshader:
 =vec2 texcoord_new = vec2(texcoord.x/texcoord.w,texcoord.y/texcoord.w)=
 Der Kerl im Paper macht zusätzlich noch /2 +0.5, vermutlich aus
 Normierungsgründen. Das vielleicht auch noch probieren.
+*** TODO Clipping in den Shadern machen
 ** TODO Nebel
 
 ** TODO HDR-Faking für besseres Licht
