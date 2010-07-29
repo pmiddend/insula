@@ -8,9 +8,6 @@
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/matrix/perspective.hpp>
 #include <fcppt/math/matrix/translation.hpp>
-#include <fcppt/math/matrix/rotation_x.hpp>
-#include <fcppt/math/matrix/rotation_y.hpp>
-#include <fcppt/math/matrix/rotation_z.hpp>
 #include <fcppt/math/matrix/rotation_axis.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/output.hpp>
@@ -20,36 +17,17 @@
 #include <fcppt/math/vector/cross.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/vector/normalize.hpp>
+#include <fcppt/math/vector/length.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/vector.hpp>
+#include <fcppt/math/almost_zero.hpp>
+#include <fcppt/math/compare.hpp>
 #include <fcppt/math/pi.hpp>
 #include <fcppt/io/cout.hpp>
+#include <fcppt/assert.hpp>
 
 #include <functional>
 #include <cmath>
-
-namespace
-{
-template<typename T>
-bool
-mycompare(
-	T const &a,
-	T const &b)
-{
-	return std::abs(a-b) < static_cast<T>(0.0001);
-}
-
-insula::graphics::vec4 const
-myconstruct(
-	insula::graphics::vec3 const &v)
-{
-	return 
-		fcppt::math::vector::construct(
-			v,
-			static_cast<insula::graphics::scalar>(
-				0));
-}
-}
 
 insula::graphics::camera::camera(
 	console::object &_con,
@@ -120,11 +98,10 @@ insula::graphics::camera::update(
 				cross(right,up); 
 
 		axes_ = 
-			gizmo(
-				gizmo_init()
-					.forward(normalize(forward))
-					.up(normalize(up))
-					.right(normalize(right)));
+			gizmo_init()
+				.forward(normalize(forward))
+				.up(normalize(up))
+				.right(normalize(right));
 	}
 
 	position_ = 
@@ -187,6 +164,32 @@ insula::graphics::camera::perspective() const
 			far_);
 }
 
+insula::graphics::vec3 const &
+insula::graphics::camera::position() const
+{
+	return position_;
+}
+
+insula::graphics::gizmo const &
+insula::graphics::camera::axes() const
+{
+	return axes_;
+}
+
+void
+insula::graphics::camera::axes(
+	gizmo const &_axes)
+{
+	FCPPT_ASSERT(
+		fcppt::math::compare(length(axes_.forward()),static_cast<scalar>(1)) && 
+		fcppt::math::compare(length(axes_.right()),static_cast<scalar>(1)) &&
+		fcppt::math::compare(length(axes_.up()),static_cast<scalar>(1)) &&
+		fcppt::math::almost_zero(dot(axes_.forward(),axes_.right())) &&
+		fcppt::math::almost_zero(dot(axes_.forward(),axes_.up())) &&
+		fcppt::math::almost_zero(dot(axes_.right(),axes_.up())));
+	axes_ = _axes;
+}
+
 void
 insula::graphics::camera::input_callback(
 	sge::input::key_pair const &k)
@@ -222,11 +225,10 @@ insula::graphics::camera::input_callback(
 				cross(forward,right); 
 
 		axes_ = 
-			gizmo(
-				gizmo_init()
-					.forward(normalize(forward))
-					.up(normalize(up))
-					.right(normalize(right)));
+			gizmo_init()
+				.forward(normalize(forward))
+				.up(normalize(up))
+				.right(normalize(right));
 		}
 		break;
 		case sge::input::kc::mouse_y_axis:
@@ -250,11 +252,10 @@ insula::graphics::camera::input_callback(
 					cross(up,forward); 
 
 			axes_ = 
-				gizmo(
-					gizmo_init()
-						.forward(normalize(forward))
-						.up(normalize(up))
-						.right(normalize(right)));
+				gizmo_init()
+					.forward(normalize(forward))
+					.up(normalize(up))
+					.right(normalize(right));
 		}
 		break;
 		case sge::input::kc::key_space:

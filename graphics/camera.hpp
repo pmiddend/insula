@@ -46,6 +46,18 @@ public:
 
 	mat4 const
 	perspective() const;
+
+	// NOTE: Is it OK to return by reference here?
+	vec3 const &
+	position() const;
+
+	// NOTE: Is it OK to return by reference here?
+	gizmo const &
+	axes() const;
+
+	void
+	axes(
+		gizmo const &);
 private:
 	fcppt::signal::scoped_connection input_connection_;
 	scalar aspect_,fov_,near_,far_;

@@ -122,3 +122,6 @@ Normierungsgründen. Das vielleicht auch noch probieren.
 ** TODO Physik, Fahrzeuge
 
 ** TODO Wie gehts weiter? Sounds?
+** TODO Diverses [0/2]
+*** TODO Framecounter einbauen
+*** TODO gizmo_init fixen

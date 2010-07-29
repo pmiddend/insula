@@ -12,6 +12,15 @@ insula::graphics::gizmo::gizmo(
 {
 }
 
+insula::graphics::gizmo &insula::graphics::gizmo::operator=(
+	gizmo_init const &init)
+{
+	*this = 
+		gizmo(
+			init);
+	return *this;
+}
+
 insula::graphics::vec3 const &
 insula::graphics::gizmo::forward() const
 {

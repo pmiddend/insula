@@ -12,8 +12,11 @@ namespace graphics
 class gizmo
 {
 public:
-	explicit
+	// NOTE: One of the few places where explicit is not really needed
 	gizmo(
+		gizmo_init const &);
+
+	gizmo &operator=(
 		gizmo_init const &);
 
 	vec3 const &
