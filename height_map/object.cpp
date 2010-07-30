@@ -135,8 +135,8 @@ insula::height_map::object::object(
 		_renderer),
 	shader_(
 		renderer_,
-		media_path()/FCPPT_TEXT("vertex.glsl"),
-		media_path()/FCPPT_TEXT("fragment.glsl")),
+		media_path()/FCPPT_TEXT("height_map_vertex.glsl"),
+		media_path()/FCPPT_TEXT("height_map_fragment.glsl")),
 	shader_console_(
 		FCPPT_TEXT("terrain"),
 		shader_,
