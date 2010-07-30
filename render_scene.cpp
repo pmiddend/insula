@@ -34,6 +34,7 @@
 #include <sge/renderer/state/bool.hpp>
 #include <sge/renderer/state/color.hpp>
 #include <sge/renderer/state/float.hpp>
+#include <sge/renderer/state/scoped.hpp>
 #include <sge/mainloop/dispatch.hpp>
 #include <sge/renderer/scoped_block.hpp>
 #include <sge/exception.hpp>
@@ -382,6 +383,12 @@ try
 				s.render();
 				h.render();
 			});
+
+		sge::renderer::state::scoped const sstate(
+			sys.renderer(),
+			sge::renderer::state::list
+				(sge::renderer::state::bool_::clear_zbuffer = true)
+				(sge::renderer::state::float_::zbuffer_clear_val = 1.f));
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
