@@ -130,3 +130,5 @@ Normierungsgründen. Das vielleicht auch noch probieren.
 *** TODO Framecounter einbauen
 *** TODO gizmo_init fixen
 *** TODO Average-Filter übers Terrain laufen lassen
+*** TODO Skydome-Unterfarbe weiterreichen
+*** TODO fov und aspect an skydome weiterreichen (near und far nicht)

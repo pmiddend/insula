@@ -21,13 +21,12 @@
 #include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/scoped_texture.hpp>
 #include <sge/renderer/state/scoped.hpp>
-#include <sge/renderer/state/alpha_func.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/state/depth_func.hpp>
-#include <sge/renderer/state/source_blend_func.hpp>
-#include <sge/renderer/state/dest_blend_func.hpp>
+#include <sge/renderer/state/color.hpp>
+#include <sge/image/color/rgba8.hpp>
 #include <sge/renderer/vf/view.hpp>
 #include <sge/renderer/vf/vertex.hpp>
 #include <sge/renderer/vf/iterator.hpp>
@@ -36,6 +35,7 @@
 #include <sge/image/loader.hpp>
 #include <sge/image/view/make_const.hpp>
 #include <sge/image/file.hpp>
+#include <mizuiro/color/init.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/vector/cross.hpp>
@@ -131,9 +131,6 @@ insula::water::object::render()
 		renderer_,
 		sge::renderer::state::list
 		 	(sge::renderer::state::cull_mode::off)
-//		 	(sge::renderer::state::alpha_func::always)
-		 	(sge::renderer::state::source_blend_func::one)
-		 	(sge::renderer::state::dest_blend_func::inv_dest_alpha)
 		 	(sge::renderer::state::depth_func::less));
 
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
@@ -221,7 +218,14 @@ insula::water::object::update_reflection(
 			renderer_,
 			sge::renderer::state::list
 				(sge::renderer::state::bool_::clear_zbuffer = true)
-				(sge::renderer::state::float_::zbuffer_clear_val = 1.f));
+				(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
+				(sge::renderer::state::bool_::clear_backbuffer = true)
+				(sge::renderer::state::color::clear_color = 
+					sge::image::color::rgba8(
+						(mizuiro::color::init::red %= 0.765) 
+						(mizuiro::color::init::green %= 0.87) 
+						(mizuiro::color::init::blue %= 1.0) 
+						(mizuiro::color::init::alpha %= 1.0))));
 
 		sge::renderer::scoped_block const sblock(
 			renderer_);

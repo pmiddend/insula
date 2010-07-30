@@ -338,38 +338,6 @@ try
 		sge::time::second(
 			1));
 	
-	sys.renderer()->state(
-		sge::renderer::state::list
-		 	(sge::renderer::state::bool_::clear_backbuffer = true)
-			//(sge::renderer::state::color::clear_color = sge::image::colors::black())
-			(sge::renderer::state::color::clear_color = 
-				sge::image::color::rgba8(
-					(mizuiro::color::init::red %= 0.765) 
-					(mizuiro::color::init::green %= 0.87) 
-					(mizuiro::color::init::blue %= 1.0) 
-					(mizuiro::color::init::alpha %= 1.0)))
-			(sge::renderer::state::bool_::clear_zbuffer = true)
-		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f));
-
-#if 0
-	fcppt::signal::scoped_connection render_water_conn(
-		console.model().insert(
-			FCPPT_TEXT("render_mirrored"),
-			[&w,&sys,&s,&h](sge::console::arg_list const &args,sge::console::object &ob) 
-			{ 
-				w.render_mirrored(
-					[&s,&h]()
-					{
-						s.render();
-						h.render();
-					},
-					media_path()/FCPPT_TEXT("results")/
-					FCPPT_TEXT("test.png"));
-			},
-			FCPPT_TEXT("Render the scene from below sea level and save the result in a file"),
-			FCPPT_TEXT("Usage: /render_mirrored\nThe file will be saved in media/results/test.png")));
-#endif
-
 	while(running)
 	{
 		sge::mainloop::dispatch();
@@ -388,7 +356,14 @@ try
 			sys.renderer(),
 			sge::renderer::state::list
 				(sge::renderer::state::bool_::clear_zbuffer = true)
-				(sge::renderer::state::float_::zbuffer_clear_val = 1.f));
+				(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
+				(sge::renderer::state::bool_::clear_backbuffer = true)
+				(sge::renderer::state::color::clear_color = 
+					sge::image::color::rgba8(
+						(mizuiro::color::init::red %= 0.765) 
+						(mizuiro::color::init::green %= 0.87) 
+						(mizuiro::color::init::blue %= 1.0) 
+						(mizuiro::color::init::alpha %= 1.0))));
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());

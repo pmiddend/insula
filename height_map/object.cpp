@@ -229,7 +229,6 @@ insula::height_map::object::render()
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
 		sge::renderer::state::list
-		 	(sge::renderer::state::bool_::enable_lighting = false)
 		 	(sge::renderer::state::cull_mode::back)
 		 	(sge::renderer::state::depth_func::less));
 

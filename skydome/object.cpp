@@ -224,6 +224,8 @@ insula::skydome::object::render()
 		FCPPT_TEXT("world"),
 		camera_.rotation());
 
+	// We have to set our own perspective matrix here because near and far
+	// might be ill-chosen by the user (at least for the skydome)
 	shader_.set_uniform(
 		FCPPT_TEXT("perspective"),
 		fcppt::math::matrix::perspective(
@@ -236,7 +238,6 @@ insula::skydome::object::render()
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
 		sge::renderer::state::list
-		 	(sge::renderer::state::bool_::enable_lighting = false)
 		 	(sge::renderer::state::cull_mode::off)
 		 	(sge::renderer::state::depth_func::off));
 
