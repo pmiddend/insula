@@ -217,9 +217,14 @@ insula::water::object::update_reflection(
 			renderer_,
 			target_);
 
+		sge::renderer::state::scoped const sstate(
+			renderer_,
+			sge::renderer::state::list
+				(sge::renderer::state::bool_::clear_zbuffer = true)
+				(sge::renderer::state::float_::zbuffer_clear_val = 1.f));
+
 		sge::renderer::scoped_block const sblock(
 			renderer_);
-
 
 		graphics::vec3 const 
 			new_position(

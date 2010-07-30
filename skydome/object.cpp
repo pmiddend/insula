@@ -53,6 +53,8 @@
 #include <fcppt/assert_message.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
 
+#include <fcppt/math/matrix/perspective.hpp>
+
 namespace
 {
 struct index_visitor
@@ -224,7 +226,12 @@ insula::skydome::object::render()
 
 	shader_.set_uniform(
 		FCPPT_TEXT("perspective"),
-		camera_.perspective());
+		fcppt::math::matrix::perspective(
+			1024.0f/768.0f,
+			fcppt::math::deg_to_rad(90.0f),
+			0.1f,
+			3.0f));
+		//camera_.perspective());
 
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
