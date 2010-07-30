@@ -16,9 +16,9 @@
 #include <sge/console/arg_list.hpp>
 #include <sge/console/object.hpp>
 #include <sge/image/capabilities_field.hpp>
+#include <sge/image/color/rgba8.hpp>
 #include <sge/window/parameters.hpp>
 #include <sge/renderer/device.hpp>
-#include <sge/renderer/parameters.hpp>
 #include <sge/renderer/screen_size.hpp>
 #include <sge/renderer/display_mode.hpp>
 #include <sge/renderer/bit_depth.hpp>
@@ -39,6 +39,7 @@
 #include <sge/exception.hpp>
 #include <sge/image/colors.hpp>
 #include <sge/time/timer.hpp>
+
 #include <sge/time/second.hpp>
 #include <sge/input/system.hpp>
 #include <sge/input/action.hpp>
@@ -61,6 +62,7 @@
 #include <fcppt/bad_lexical_cast.hpp>
 #include <fcppt/filesystem/is_regular.hpp>
 #include <fcppt/io/ifstream.hpp>
+#include <mizuiro/color/init.hpp>
 #include <boost/program_options.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
@@ -107,7 +109,7 @@ try
 		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
 		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
 		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)")
-		("water-height",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(1)),"Water level");
+		("water-height",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -338,10 +340,17 @@ try
 	sys.renderer()->state(
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::clear_backbuffer = true)
-			(sge::renderer::state::color::clear_color = sge::image::colors::black())
+			//(sge::renderer::state::color::clear_color = sge::image::colors::black())
+			(sge::renderer::state::color::clear_color = 
+				sge::image::color::rgba8(
+					(mizuiro::color::init::red %= 0.765) 
+					(mizuiro::color::init::green %= 0.87) 
+					(mizuiro::color::init::blue %= 1.0) 
+					(mizuiro::color::init::alpha %= 1.0)))
 			(sge::renderer::state::bool_::clear_zbuffer = true)
 		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f));
 
+#if 0
 	fcppt::signal::scoped_connection render_water_conn(
 		console.model().insert(
 			FCPPT_TEXT("render_mirrored"),
@@ -358,9 +367,7 @@ try
 			},
 			FCPPT_TEXT("Render the scene from below sea level and save the result in a file"),
 			FCPPT_TEXT("Usage: /render_mirrored\nThe file will be saved in media/results/test.png")));
-	
-
-
+#endif
 
 	while(running)
 	{
@@ -368,6 +375,13 @@ try
 
 		cam.update(
 			frame_timer.reset());
+
+		w.update_reflection(
+			[&s,&h]()
+			{
+				s.render();
+				h.render();
+			});
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());

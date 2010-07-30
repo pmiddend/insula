@@ -129,3 +129,4 @@ Normierungsgründen. Das vielleicht auch noch probieren.
 ** TODO Diverses [0/2]
 *** TODO Framecounter einbauen
 *** TODO gizmo_init fixen
+*** TODO Average-Filter übers Terrain laufen lassen

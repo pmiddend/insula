@@ -19,11 +19,15 @@
 #include <sge/renderer/scoped_target.hpp>
 #include <sge/renderer/scoped_texture_lock.hpp>
 #include <sge/renderer/scoped_vertex_buffer.hpp>
+#include <sge/renderer/scoped_texture.hpp>
 #include <sge/renderer/state/scoped.hpp>
+#include <sge/renderer/state/alpha_func.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/state/depth_func.hpp>
+#include <sge/renderer/state/source_blend_func.hpp>
+#include <sge/renderer/state/dest_blend_func.hpp>
 #include <sge/renderer/vf/view.hpp>
 #include <sge/renderer/vf/vertex.hpp>
 #include <sge/renderer/vf/iterator.hpp>
@@ -127,6 +131,9 @@ insula::water::object::render()
 		renderer_,
 		sge::renderer::state::list
 		 	(sge::renderer::state::cull_mode::off)
+//		 	(sge::renderer::state::alpha_func::always)
+		 	(sge::renderer::state::source_blend_func::one)
+		 	(sge::renderer::state::dest_blend_func::inv_dest_alpha)
 		 	(sge::renderer::state::depth_func::less));
 
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
@@ -136,6 +143,11 @@ insula::water::object::render()
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
+
+	sge::renderer::scoped_texture scoped_tex(
+		renderer_,
+		target_,
+		0);
 
 	shader_.set_uniform(
 		FCPPT_TEXT("perspective"),
@@ -149,6 +161,45 @@ insula::water::object::render()
 		FCPPT_TEXT("translation"),
 		camera_.translation());
 
+	{
+		graphics::vec3 const 
+			new_position(
+				camera_.position().x(),
+				-camera_.position().y() + static_cast<graphics::scalar>(2)*water_height_,
+				camera_.position().z()),
+			target(
+				camera_.position() + camera_.axes().forward()),
+			new_target(
+				graphics::vec3(
+					target.x(),
+					-target.y() + static_cast<graphics::scalar>(2)*water_height_,
+					target.z())),
+			new_forward(
+				new_target - new_position),
+			new_right(
+				camera_.axes().right()),
+			new_up(
+				cross(
+					new_forward,
+					new_right));
+
+		scoped_camera cam(
+			camera_,
+			new_position,
+			graphics::gizmo_init()
+				.forward(new_forward)
+				.right(new_right)
+				.up(new_up));
+
+		shader_.set_uniform(
+			FCPPT_TEXT("rotation_mirror"),
+			camera_.rotation());
+
+		shader_.set_uniform(
+			FCPPT_TEXT("translation_mirror"),
+			camera_.translation());
+	}
+
 	renderer_->render(
 		sge::renderer::first_vertex(
 			0),
@@ -158,17 +209,17 @@ insula::water::object::render()
 }
 
 void
-insula::water::object::render_mirrored(
-	std::function<void ()> const &render_callback,
-	fcppt::filesystem::path const &filename)
+insula::water::object::update_reflection(
+	std::function<void ()> const &render_callback)
 {
 	{
+		sge::renderer::scoped_target const starget(
+			renderer_,
+			target_);
+
 		sge::renderer::scoped_block const sblock(
 			renderer_);
 
-		sge::renderer::scoped_target starget(
-			renderer_,
-			target_);
 
 		graphics::vec3 const 
 			new_position(
@@ -202,6 +253,7 @@ insula::water::object::render_mirrored(
 		render_callback();
 	}
 	
+	/*
 	// FIXME: Do we really need a lock here? We only want to read.
 	sge::renderer::scoped_texture_lock texlock(
 		target_,
@@ -211,6 +263,7 @@ insula::water::object::render_mirrored(
 		sge::image::view::make_const(
 			texlock.value()))->save(
 		filename);
+*/
 }
 
 void
@@ -222,6 +275,10 @@ insula::water::object::regenerate(
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
+
+	shader_.set_uniform(
+		FCPPT_TEXT("texture"),
+		0);
 
 	vb_ = 
 		renderer_->create_vertex_buffer(

@@ -10,7 +10,6 @@
 #include <sge/renderer/vertex_buffer_ptr.hpp>
 #include <sge/image/multi_loader_fwd.hpp>
 #include <sge/console/object_fwd.hpp>
-#include <fcppt/filesystem/path.hpp>
 #include <functional>
 
 namespace insula
@@ -33,9 +32,8 @@ public:
 		graphics::scalar dimension);
 
 	void
-	render_mirrored(
-		std::function<void ()> const &render_callback,
-		fcppt::filesystem::path const &);
+	update_reflection(
+		std::function<void ()> const &render_callback);
 
 	void 
 	render();
