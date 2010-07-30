@@ -124,24 +124,40 @@ ACHTUNG: Man muss die 0-te Clippingplane auch noch aktivieren.
 *** TODO Ripple-Effekt auf dem Wasser
 *** TODO Wasseroberfläche
 *** TODO Bug in Wassertextur fixen
-** TODO Nebel
+** TODO Nebel 
+
+#+BEGIN_SRC emacs-c++-mode
+const float LOG2 = 1.442695;
+float z = gl_FragCoord.z / gl_FragCoord.w;
+float fogFactor = exp2( -gl_Fog.density * 
+				   gl_Fog.density * 
+				   z * 
+				   z * 
+				   LOG2 );
+fogFactor = clamp(fogFactor, 0.0, 1.0);
+
+gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor ); Nebel
+#+END_SRC
+
+Oder doch lieber im Vertexshader, siehe [[http://www.ozone3d.net/tutorials/glsl_fog/p03.php][hier]].
 
 ** TODO HDR-Faking für besseres Licht
 
 ** TODO Models (Bäume etc.)
 
-** TODO Shadow MapsT
-
+** TODO Shadow Maps
 
 ** TODO Physik, Fahrzeuge
 
 ** TODO Wie gehts weiter? Sounds?
-** TODO Diverses [0/6]
-*** TODO Framecounter einbauen
+** TODO Diverses [1/6]
+*** DONE Framecounter einbauen
+		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
 *** TODO Average-Filter übers Terrain laufen lassen
 *** TODO Skydome-Unterfarbe weiterreichen
 *** TODO fov und aspect an skydome weiterreichen (near und far nicht)
 *** TODO z-Puffer-Artefakte minimieren
+*** TODO Matrixmultiplikationen durch mvp-Matrix ersetzen
 Dazu hift Nebel, sowie eine Near-Plane, die weiter weg ist und eine
 Far-Plane, die näher dran ist.

@@ -3,6 +3,7 @@
 #include "graphics/vec3.hpp"
 #include "graphics/camera.hpp"
 #include "skydome/object.hpp"
+#include "skydome/vec3_to_color.hpp"
 #include "console/object.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
@@ -14,6 +15,7 @@
 #include <sge/image/capabilities_field.hpp>
 #include <sge/window/parameters.hpp>
 #include <sge/renderer/device.hpp>
+#include <sge/renderer/aspect.hpp>
 #include <sge/renderer/parameters.hpp>
 #include <sge/renderer/screen_size.hpp>
 #include <sge/renderer/display_mode.hpp>
@@ -146,24 +148,31 @@ try
 	
 	graphics::camera cam(
 		console,
-		static_cast<graphics::scalar>(
-			1024.0/768.0),
-		static_cast<graphics::scalar>(
-			fcppt::math::deg_to_rad(
-				static_cast<graphics::scalar>(
-					vm["fov"].as<graphics::scalar>()))),
+		sge::renderer::aspect<graphics::scalar>(
+			sys.renderer()->screen_size()),
+		fcppt::math::deg_to_rad(
+			vm["fov"].as<graphics::scalar>()),
 		vm["near"].as<graphics::scalar>(),
 		vm["far"].as<graphics::scalar>(),
 		graphics::scalar(0.5),
 		graphics::vec3::null());
 
+	skydome::gradient skydome_gradient(
+		skydome::vec3_to_color(graphics::vec3(0.765f,0.87f,1.0f)),
+		skydome::vec3_to_color(graphics::vec3(0.0f,0.0f,1.0f)));
+
 	skydome::object s(
 		cam,
 		sys.renderer(),
 		console.model(),
+		sge::renderer::aspect<graphics::scalar>(
+			sys.renderer()->screen_size()),
+		fcppt::math::deg_to_rad(
+			vm["fov"].as<graphics::scalar>()),
 		vm["angle"].as<graphics::scalar>(),
 		vm["latitudes"].as<skydome::size_type>(),
-		vm["longitudes"].as<skydome::size_type>());
+		vm["longitudes"].as<skydome::size_type>(),
+		skydome_gradient);
 	
 	fcppt::signal::scoped_connection regenerate_conn(
 		console.model().insert(

@@ -1,5 +1,6 @@
 #include "sphere_point.hpp"
 #include "object.hpp"
+#include "color_to_vec3.hpp"
 #include "vf/packed_position.hpp"
 #include "vf/format.hpp"
 #include "vf/vertex_view.hpp"
@@ -176,8 +177,11 @@ insula::skydome::object::object(
 	sge::renderer::device_ptr const _renderer,
 	sge::console::object &obj,
 	graphics::scalar const angle,
+	graphics::scalar const _aspect,
+	graphics::scalar const _fov,
 	size_type const iterations_lat,
-	size_type const iterations_long)
+	size_type const iterations_long,
+	gradient const &g)
 :
 	camera_(
 		_camera),
@@ -190,8 +194,31 @@ insula::skydome::object::object(
 	shader_to_console_(
 		FCPPT_TEXT("skydome"),
 		shader_,
-		obj)
+		obj),
+	perspective_(
+		fcppt::math::matrix::perspective(
+			_aspect,
+			_fov,
+			0.1f,
+			3.0f))
 {
+	{
+		sge::renderer::glsl::scoped_program scoped_shader_(
+			renderer_,
+			shader_.program());
+
+		shader_.set_uniform(
+			FCPPT_TEXT("color0"),
+			color_to_vec3(
+				std::get<0>(
+					g)));
+	
+		shader_.set_uniform(
+			FCPPT_TEXT("color1"),
+			color_to_vec3(
+				std::get<1>(
+					g)));
+	}
 	regenerate_buffer(
 		angle,
 		iterations_lat,
@@ -220,20 +247,11 @@ insula::skydome::object::render()
 		FCPPT_TEXT("rotation"),
 		camera_.rotation());
 
-	shader_.set_uniform(
-		FCPPT_TEXT("world"),
-		camera_.rotation());
-
 	// We have to set our own perspective matrix here because near and far
 	// might be ill-chosen by the user (at least for the skydome)
 	shader_.set_uniform(
 		FCPPT_TEXT("perspective"),
-		fcppt::math::matrix::perspective(
-			1024.0f/768.0f,
-			fcppt::math::deg_to_rad(90.0f),
-			0.1f,
-			3.0f));
-		//camera_.perspective());
+		perspective_);
 
 	sge::renderer::state::scoped scoped_state(
 		renderer_,

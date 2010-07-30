@@ -4,6 +4,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/frame_counter.hpp"
 #include "skydome/object.hpp"
+#include "skydome/vec3_to_color.hpp"
 #include "height_map/image_to_array.hpp"
 #include "height_map/object.hpp"
 #include "console/object.hpp"
@@ -30,6 +31,7 @@
 #include <sge/renderer/vsync.hpp>
 #include <sge/renderer/no_multi_sampling.hpp>
 #include <sge/renderer/state/list.hpp>
+#include <sge/renderer/aspect.hpp>
 #include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/state/draw_mode.hpp>
 #include <sge/renderer/state/bool.hpp>
@@ -168,24 +170,31 @@ try
 	
 	graphics::camera cam(
 		console,
-		static_cast<graphics::scalar>(
-			1024.0/768.0),
-		static_cast<graphics::scalar>(
-			fcppt::math::deg_to_rad(
-				static_cast<graphics::scalar>(
-					vm["fov"].as<graphics::scalar>()))),
+		sge::renderer::aspect<graphics::scalar>(
+			sys.renderer()->screen_size()),
+		fcppt::math::deg_to_rad(
+			vm["fov"].as<graphics::scalar>()),
 		vm["near"].as<graphics::scalar>(),
 		vm["far"].as<graphics::scalar>(),
 		vm["camera-speed"].as<graphics::scalar>(),
 		graphics::vec3::null());
 
+	skydome::gradient skydome_gradient(
+		skydome::vec3_to_color(graphics::vec3(0.765f,0.87f,1.0f)),
+		skydome::vec3_to_color(graphics::vec3(0.0f,0.0f,1.0f)));
+
 	skydome::object s(
 		cam,
 		sys.renderer(),
 		console.model(),
+		sge::renderer::aspect<graphics::scalar>(
+			sys.renderer()->screen_size()),
+		fcppt::math::deg_to_rad(
+			vm["fov"].as<graphics::scalar>()),
 		vm["angle"].as<graphics::scalar>(),
 		vm["latitudes"].as<skydome::size_type>(),
-		vm["longitudes"].as<skydome::size_type>());
+		vm["longitudes"].as<skydome::size_type>(),
+		skydome_gradient);
 	
 
 	fcppt::signal::scoped_connection regenerate_skydome_conn(
@@ -360,6 +369,13 @@ try
 		},
 		FCPPT_TEXT("Toggle the frame rate display"));
 
+	sge::renderer::state::list const global_state = 
+		sge::renderer::state::list
+			(sge::renderer::state::bool_::clear_zbuffer = true)
+			(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
+			(sge::renderer::state::bool_::clear_backbuffer = true)
+			(sge::renderer::state::color::clear_color = std::get<0>(skydome_gradient));
+
 	while(running)
 	{
 		sge::mainloop::dispatch();
@@ -368,24 +384,18 @@ try
 			frame_timer.reset());
 
 		w.update_reflection(
-			[&s,&h]()
+			[&sys,&global_state,&s,&h]()
 			{
+				sge::renderer::state::scoped const sstate(
+					sys.renderer(),
+					global_state);
 				s.render();
 				h.render();
 			});
 
 		sge::renderer::state::scoped const sstate(
 			sys.renderer(),
-			sge::renderer::state::list
-				(sge::renderer::state::bool_::clear_zbuffer = true)
-				(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
-				(sge::renderer::state::bool_::clear_backbuffer = true)
-				(sge::renderer::state::color::clear_color = 
-					sge::image::color::rgba8(
-						(mizuiro::color::init::red %= 0.765) 
-						(mizuiro::color::init::green %= 0.87) 
-						(mizuiro::color::init::blue %= 1.0) 
-						(mizuiro::color::init::alpha %= 1.0))));
+			global_state);
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());

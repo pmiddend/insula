@@ -8,6 +8,7 @@
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
+#include <sge/renderer/aspect.hpp>
 #include <sge/systems/parameterless.hpp>
 #include <sge/systems/image_loader.hpp>
 #include <sge/console/arg_list.hpp>
@@ -157,12 +158,10 @@ try
 	
 	graphics::camera cam(
 		console,
-		static_cast<graphics::scalar>(
-			1024.0/768.0),
-		static_cast<graphics::scalar>(
-			fcppt::math::deg_to_rad(
-				static_cast<graphics::scalar>(
-					vm["fov"].as<graphics::scalar>()))),
+		sge::renderer::aspect<graphics::scalar>(
+			sys.renderer()->screen_size()),
+		fcppt::math::deg_to_rad(
+				vm["fov"].as<graphics::scalar>()),
 		vm["near"].as<graphics::scalar>(),
 		vm["far"].as<graphics::scalar>(),
 		vm["camera-speed"].as<graphics::scalar>(),
