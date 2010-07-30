@@ -309,14 +309,14 @@ insula::water::object::regenerate(
 	(vb_it++)->set<vf::position>(
 		vf::packed_position(0,water_height_,0));
 	(vb_it++)->set<vf::position>(
-		vf::packed_position(dimension,water_height_,0));
+		vf::packed_position(10*dimension,water_height_,0));
 	(vb_it++)->set<vf::position>(
-		vf::packed_position(dimension,water_height_,dimension));
+		vf::packed_position(10*dimension,water_height_,10*dimension));
 
 	(vb_it++)->set<vf::position>(
-		vf::packed_position(dimension,water_height_,dimension));
+		vf::packed_position(10*dimension,water_height_,10*dimension));
 	(vb_it++)->set<vf::position>(
-		vf::packed_position(0,water_height_,dimension));
+		vf::packed_position(0,water_height_,10*dimension));
 	(vb_it++)->set<vf::position>(
 		vf::packed_position(0,water_height_,0));
 }

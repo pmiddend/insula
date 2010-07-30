@@ -2,6 +2,7 @@
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/frame_counter.hpp"
 #include "skydome/object.hpp"
 #include "height_map/image_to_array.hpp"
 #include "height_map/object.hpp"
@@ -223,6 +224,13 @@ try
 			sys.image_loader().load(
 				filename)));
 
+	// FIXME: This is more of a hack
+	cam.position(
+		graphics::vec3(
+			static_cast<graphics::scalar>(-preterrain.shape()[0]) * vm["grid-sizes"].as<graphics::vec2>()[0],
+			-vm["height-scale"].as<graphics::scalar>()/2,
+			static_cast<graphics::scalar>(-preterrain.shape()[0]) * vm["grid-sizes"].as<graphics::vec2>()[0] / 2));
+
 	height_map::object h(
 		cam,
 		sys.renderer(),
@@ -337,7 +345,21 @@ try
 	sge::time::timer frame_timer(
 		sge::time::second(
 			1));
-	
+
+	graphics::frame_counter fc(
+		sys.renderer(),
+		sys.font_system());
+
+	bool show_fps = true;
+
+	console.model().insert(
+		FCPPT_TEXT("toggle_fps"),
+		[&show_fps](sge::console::arg_list const &,sge::console::object &) 
+		{
+			show_fps = !show_fps;
+		},
+		FCPPT_TEXT("Toggle the frame rate display"));
+
 	while(running)
 	{
 		sge::mainloop::dispatch();
@@ -371,6 +393,8 @@ try
 		s.render();
 		h.render();
 		w.render();
+		if (show_fps)
+			fc.update_and_render();
 		console.render();
 	}
 }

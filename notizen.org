@@ -66,7 +66,7 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 **** DONE Skydome in render_scene einbauen
 		 CLOSED: [2010-07-29 Thu 18:05]
 
-** TODO Wasser [3/6]
+** TODO Wasser [5/9]
 *** DONE Variable =water_height= definieren, die per Kommandozeile einstellbar ist
 		 CLOSED: [2010-07-30 Fri 00:02]
 *** DONE Funktion einbauen, um die Kamera an der Wasser-Ebene zu spiegeln
@@ -96,8 +96,10 @@ Platzhalter für Clippingplanes einbauen. Außerdem die Möglichkeit
 offen lassen, das Wasser beim Rendern auszulassen. Am besten bekommt
 die Funktion ein Rendercallback, wo man dann =skydome.render()= und
 =height_map.render()= einbauen kann.
-*** TODO Quad für Wasser einbauen (mit Wassertextur), rendern
-*** TODO Wassershader
+*** DONE Quad für Wasser einbauen (mit Wassertextur), rendern
+		 CLOSED: [2010-07-30 Fri 17:38]
+*** DONE Wassershader
+		 CLOSED: [2010-07-30 Fri 17:38]
 Dieser Shader sollte geladen werden, wenn das Wasserquad gerendert
 wird. Er bekommt zwei World-Matrizen und eine Projektionsmatrix. Bei
 der einen steht der Betrachter "normal", bei der anderen gespiegelt
@@ -114,6 +116,14 @@ und dann im Fragmentshader:
 Der Kerl im Paper macht zusätzlich noch /2 +0.5, vermutlich aus
 Normierungsgründen. Das vielleicht auch noch probieren.
 *** TODO Clipping in den Shadern machen
+Hierzu braucht der height_map-Shader die Wasserhöhe. Außerdem brauch
+er das boolsche Flag, ob er clippen soll. Ist dies true, berechnet er
+=position.y - wasserhöhe= und speichert dies in gl_ClipDistance[0].
+
+ACHTUNG: Man muss die 0-te Clippingplane auch noch aktivieren.
+*** TODO Ripple-Effekt auf dem Wasser
+*** TODO Wasseroberfläche
+*** TODO Bug in Wassertextur fixen
 ** TODO Nebel
 
 ** TODO HDR-Faking für besseres Licht
@@ -126,9 +136,12 @@ Normierungsgründen. Das vielleicht auch noch probieren.
 ** TODO Physik, Fahrzeuge
 
 ** TODO Wie gehts weiter? Sounds?
-** TODO Diverses [0/2]
+** TODO Diverses [0/6]
 *** TODO Framecounter einbauen
 *** TODO gizmo_init fixen
 *** TODO Average-Filter übers Terrain laufen lassen
 *** TODO Skydome-Unterfarbe weiterreichen
 *** TODO fov und aspect an skydome weiterreichen (near und far nicht)
+*** TODO z-Puffer-Artefakte minimieren
+Dazu hift Nebel, sowie eine Near-Plane, die weiter weg ist und eine
+Far-Plane, die näher dran ist.
