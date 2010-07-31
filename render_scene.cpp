@@ -98,10 +98,10 @@ try
 	desc.add_options()
 		("help","produce help message")
 		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
-		("near",boost::program_options::value<graphics::scalar>()->default_value(0.1f),"Distance to the near plane")
+		("near",boost::program_options::value<graphics::scalar>()->default_value(1.0f),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
 		("grid-sizes",boost::program_options::value<graphics::vec2>()->default_value(graphics::vec2(20,20)),"Size of a grid cell")
-		("height-scale",boost::program_options::value<graphics::scalar>()->default_value(1000),"Height scaling")
+		("height-scale",boost::program_options::value<graphics::scalar>()->default_value(5000),"Height scaling")
 		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
 		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera")
 		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
@@ -247,10 +247,10 @@ try
 		preterrain,
 		vm["grid-sizes"].as<graphics::vec2>(),
 		vm["height-scale"].as<graphics::scalar>(),
-
 		vm["sun-direction"].as<graphics::vec3>(),
 		vm["ambient-light"].as<graphics::scalar>(),
 		vm["texture-scaling"].as<graphics::scalar>(),
+		vm["water-height"].as<graphics::scalar>(),
 		sys.image_loader().load(
 			vm["gradient-texture"].as<fcppt::string>()),
 		sys.image_loader().load(
@@ -266,7 +266,7 @@ try
 		console.model(),
 		vm["grid-sizes"].as<graphics::vec2>()[0] * 
 		static_cast<graphics::scalar>(preterrain.shape()[0]));
-	
+
 	fcppt::signal::scoped_connection regenerate_height_map_conn(
 		console.model().insert(
 			FCPPT_TEXT("regenerate_height_map"),
@@ -390,7 +390,8 @@ try
 					sys.renderer(),
 					global_state);
 				s.render();
-				h.render();
+				h.render(
+					height_map::render_mode::clip);
 			});
 
 		sge::renderer::state::scoped const sstate(
@@ -401,7 +402,8 @@ try
 			sys.renderer());
 	
 		s.render();
-		h.render();
+		h.render(
+			height_map::render_mode::none);
 		w.render();
 		if (show_fps)
 			fc.update_and_render();

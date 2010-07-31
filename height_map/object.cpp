@@ -35,6 +35,7 @@
 #include <sge/renderer/state/cull_mode.hpp>
 #include <sge/renderer/state/depth_func.hpp>
 #include <sge/renderer/glsl/scoped_program.hpp>
+#include <sge/renderer/glsl/scoped_program.hpp>
 #include <sge/renderer/first_vertex.hpp>
 #include <sge/renderer/vertex_count.hpp>
 #include <sge/renderer/indexed_primitive_type.hpp>
@@ -49,6 +50,7 @@
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/image/file.hpp>
 #include <fcppt/math/vector/cross.hpp>
+#include <fcppt/math/vector/normalize.hpp>
 #include <fcppt/math/matrix/transpose.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/text.hpp>
@@ -125,6 +127,7 @@ insula::height_map::object::object(
 	graphics::vec3 const &sun_direction,
 	graphics::scalar const ambient_light,
 	graphics::scalar const texture_scaling,
+	graphics::scalar const water_height,
 	sge::image::file_ptr const &gradient_texture_image,
 	sge::image::file_ptr const &lower_texture_image,
 	sge::image::file_ptr const &upper_texture_image)
@@ -165,7 +168,7 @@ insula::height_map::object::object(
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("sun_direction"),
-		sun_direction);
+		normalize(sun_direction));
 
 	shader_.set_uniform(
 		FCPPT_TEXT("ambient_light"),
@@ -174,6 +177,10 @@ insula::height_map::object::object(
 	shader_.set_uniform(
 		FCPPT_TEXT("texture_scaling"),
 		texture_scaling);
+
+	shader_.set_uniform(
+		FCPPT_TEXT("water_height"),
+		water_height);
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("grid_size"),
@@ -204,7 +211,8 @@ insula::height_map::object::object(
 }
 
 void
-insula::height_map::object::render()
+insula::height_map::object::render(
+	render_mode::type const _render_mode)
 {
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,
@@ -213,6 +221,17 @@ insula::height_map::object::render()
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
+
+	shader_.set_uniform(
+		FCPPT_TEXT("do_clip"),
+		// There is no overload for booleans
+		static_cast<int>(
+			_render_mode == render_mode::clip));
+
+	renderer_->enable_clip_plane(
+		static_cast<sge::renderer::clip_plane_index>(
+			0),
+		_render_mode == render_mode::clip);
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("translation"),
@@ -362,12 +381,13 @@ insula::height_map::object::regenerate_buffers(
 				p);
 
 			(*vb_it).set<vf::normal>(
-				calculate_normal(
-					raw,
-					height_scaling,
-					cell_sizes,
-					x,
-					y));
+				normalize(
+					calculate_normal(
+						raw,
+						height_scaling,
+						cell_sizes,
+						x,
+						y)));
 
 			(*vb_it).set<vf::height_and_gradient>(
 				vf::packed_height_and_gradient(

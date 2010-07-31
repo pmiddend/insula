@@ -6,7 +6,6 @@ uniform sampler2D sand,rock,grass;
 in vec2 texcoord;
 in vec2 height_and_gradient_out;
 in float light_intensity;
-in vec3 eye_space;
 
 void main()
 {

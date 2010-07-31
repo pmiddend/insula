@@ -124,6 +124,8 @@ ACHTUNG: Man muss die 0-te Clippingplane auch noch aktivieren.
 *** TODO Ripple-Effekt auf dem Wasser
 *** TODO Wasseroberfläche
 *** TODO Bug in Wassertextur fixen
+*** TODO Optimierung
+gl_FragCoord nehmen statt die Texturkoordinate mit der anderen Modelview-Matrix auszurechnen?
 ** TODO Nebel 
 
 #+BEGIN_SRC emacs-c++-mode
@@ -150,14 +152,18 @@ Oder doch lieber im Vertexshader, siehe [[http://www.ozone3d.net/tutorials/glsl_
 ** TODO Physik, Fahrzeuge
 
 ** TODO Wie gehts weiter? Sounds?
-** TODO Diverses [1/6]
+** TODO Diverses [4/7]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
 *** TODO Average-Filter übers Terrain laufen lassen
-*** TODO Skydome-Unterfarbe weiterreichen
-*** TODO fov und aspect an skydome weiterreichen (near und far nicht)
-*** TODO z-Puffer-Artefakte minimieren
+*** DONE Skydome-Unterfarbe weiterreichen
+		 CLOSED: [2010-07-31 Sat 01:30]
+*** DONE fov und aspect an skydome weiterreichen (near und far nicht)
+		 CLOSED: [2010-07-31 Sat 01:30]
+*** DONE z-Puffer-Artefakte minimieren
+		 CLOSED: [2010-07-31 Sat 01:31]
 *** TODO Matrixmultiplikationen durch mvp-Matrix ersetzen
+*** TODO water_height durch water_level ersetzen
 Dazu hift Nebel, sowie eine Near-Plane, die weiter weg ist und eine
 Far-Plane, die näher dran ist.

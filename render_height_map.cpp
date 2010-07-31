@@ -101,7 +101,9 @@ try
 		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture")
 		("ambient-light",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.4)),"Ambient lighting (in [0,1])")
 		("sun-direction",boost::program_options::value<graphics::vec3>()->default_value(graphics::vec3(100,100,100)),"Sun direction")
-		("texture-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)");
+		("texture-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
+		("clip",boost::program_options::value<bool>()->default_value(false),"Clip at the water level")
+		("water-level",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level to clip at (has no effect if clipping is disabled)");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -179,6 +181,7 @@ try
 		vm["sun-direction"].as<graphics::vec3>(),
 		vm["ambient-light"].as<graphics::scalar>(),
 		vm["texture-scaling"].as<graphics::scalar>(),
+		vm["water-level"].as<graphics::scalar>(),
 		sys.image_loader().load(
 			vm["gradient-texture"].as<fcppt::string>()),
 		sys.image_loader().load(
@@ -290,7 +293,8 @@ try
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
 	
-		h.render();
+		h.render(
+			vm["clip"].as<bool>() ? height_map::render_mode::clip : height_map::render_mode::none);
 		console.render();
 	}
 }

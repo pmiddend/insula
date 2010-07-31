@@ -43,9 +43,63 @@
 #include <fcppt/container/bitfield/bitfield.hpp>
 #include "../media_path.hpp"
 #include "object.hpp"
+#include <tuple>
 
 namespace
 {
+typedef
+std::tuple
+<
+	insula::graphics::gizmo,
+	insula::graphics::vec3
+>
+camera_tuple;
+
+camera_tuple const
+invert_camera(
+	camera_tuple const &c,
+	insula::graphics::scalar const water_height)
+{
+	using namespace insula;
+
+	graphics::vec3 const 
+		new_position(
+			std::get<1>(c).x(),
+			-std::get<1>(c).y() + static_cast<graphics::scalar>(2)*water_height,
+			std::get<1>(c).z()),
+		forward_target(
+			std::get<1>(c) + std::get<0>(c).forward()),
+		new_forward_target(
+			graphics::vec3(
+				forward_target.x(),
+				-forward_target.y() + static_cast<graphics::scalar>(2)*water_height,
+				forward_target.z())),
+		new_forward(
+			new_forward_target - new_position),
+		up_target(
+			std::get<1>(c) + std::get<0>(c).up()),
+		new_up_target(
+			graphics::vec3(
+				up_target.x(),
+				-up_target.y() + static_cast<graphics::scalar>(2)*water_height,
+				up_target.z())),
+		new_up(
+			new_up_target - new_position),
+		new_right(
+			cross(
+				new_up,
+				new_forward));
+
+	return 
+		camera_tuple(
+			graphics::gizmo(
+				graphics::gizmo_init()
+					.forward(new_forward)
+					.right(new_right)
+					.up(new_up)),
+			new_position);
+}
+
 class scoped_camera
 {
 public:
@@ -55,8 +109,7 @@ public:
 	explicit
 	scoped_camera(
 		insula::graphics::camera &_camera,
-		insula::graphics::vec3 const position_new,
-		insula::graphics::gizmo const &gizmo_new)
+		camera_tuple const &new_cam)
 	:
 		camera_(
 			_camera),
@@ -67,10 +120,10 @@ public:
 			camera_.axes())
 	{
 		camera_.position(
-			position_new);
+			std::get<1>(new_cam));
 		// ... and set the new state
 		camera_.axes(
-			gizmo_new);
+			std::get<0>(new_cam));
 	}
 
 	~scoped_camera()
@@ -124,6 +177,7 @@ insula::water::object::object(
 		_dimension);
 }
 
+
 void
 insula::water::object::render()
 {
@@ -159,34 +213,14 @@ insula::water::object::render()
 		camera_.translation());
 
 	{
-		graphics::vec3 const 
-			new_position(
-				camera_.position().x(),
-				-camera_.position().y() + static_cast<graphics::scalar>(2)*water_height_,
-				camera_.position().z()),
-			target(
-				camera_.position() + camera_.axes().forward()),
-			new_target(
-				graphics::vec3(
-					target.x(),
-					-target.y() + static_cast<graphics::scalar>(2)*water_height_,
-					target.z())),
-			new_forward(
-				new_target - new_position),
-			new_right(
-				camera_.axes().right()),
-			new_up(
-				cross(
-					new_forward,
-					new_right));
 
 		scoped_camera cam(
 			camera_,
-			new_position,
-			graphics::gizmo_init()
-				.forward(new_forward)
-				.right(new_right)
-				.up(new_up));
+			invert_camera(
+				camera_tuple(
+					camera_.axes(),
+					camera_.position()),
+				water_height_));
 
 		shader_.set_uniform(
 			FCPPT_TEXT("rotation_mirror"),
@@ -230,34 +264,13 @@ insula::water::object::update_reflection(
 		sge::renderer::scoped_block const sblock(
 			renderer_);
 
-		graphics::vec3 const 
-			new_position(
-				camera_.position().x(),
-				-camera_.position().y() + static_cast<graphics::scalar>(2)*water_height_,
-				camera_.position().z()),
-			target(
-				camera_.position() + camera_.axes().forward()),
-			new_target(
-				graphics::vec3(
-					target.x(),
-					-target.y() + static_cast<graphics::scalar>(2)*water_height_,
-					target.z())),
-			new_forward(
-				new_target - new_position),
-			new_right(
-				camera_.axes().right()),
-			new_up(
-				cross(
-					new_forward,
-					new_right));
-
 		scoped_camera cam(
 			camera_,
-			new_position,
-			graphics::gizmo_init()
-				.forward(new_forward)
-				.right(new_right)
-				.up(new_up));
+			invert_camera(
+				camera_tuple(
+					camera_.axes(),
+					camera_.position()),
+				water_height_));
 
 		render_callback();
 	}

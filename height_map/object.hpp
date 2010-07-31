@@ -7,6 +7,7 @@
 #include "../graphics/scalar.hpp"
 #include "../graphics/shader_to_console.hpp"
 #include "../graphics/shader.hpp"
+#include "render_mode.hpp"
 #include "array.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
@@ -33,17 +34,20 @@ public:
 		graphics::vec3 const &sun_direction,
 		graphics::scalar const ambient_light,
 		graphics::scalar const texture_scaling,
+		graphics::scalar const water_height,
 		sge::image::file_ptr const &gradient_texture_image,
 		sge::image::file_ptr const &lower_texture_image,
 		sge::image::file_ptr const &upper_texture_image);
 	
 	object &operator=(
 		object &) = delete;
+
 	object(
 		object const &) = delete;
 	
 	void
-	render();
+	render(
+		render_mode::type);
 
 	void
 	regenerate(
