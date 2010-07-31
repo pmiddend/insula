@@ -7,6 +7,7 @@
 #include <sge/renderer/glsl/optional_istream.hpp>
 #include <sge/renderer/glsl/uniform/variable_ptr.hpp>
 #include <sge/renderer/glsl/uniform/single_value.hpp>
+#include <sge/renderer/glsl/no_program.hpp>
 #include <fcppt/optional.hpp>
 #include <fcppt/io/cifstream.hpp>
 #include <fcppt/math/matrix/transpose.hpp>
@@ -62,7 +63,7 @@ void
 insula::graphics::shader::deactivate()
 {
 	renderer_->glsl_program(
-		sge::renderer::device::no_program);
+		sge::renderer::glsl::no_program());
 }
 
 sge::renderer::glsl::program_ptr const

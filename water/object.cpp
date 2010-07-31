@@ -20,12 +20,14 @@
 #include <sge/renderer/scoped_texture_lock.hpp>
 #include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/scoped_texture.hpp>
+#include <sge/renderer/target.hpp>
 #include <sge/renderer/state/scoped.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/state/depth_func.hpp>
 #include <sge/renderer/state/color.hpp>
+#include <sge/renderer/texture.hpp>
 #include <sge/image/color/rgba8.hpp>
 #include <sge/renderer/vf/view.hpp>
 #include <sge/renderer/vf/vertex.hpp>
@@ -150,7 +152,7 @@ insula::water::object::object(
 :
 	renderer_(
 		_renderer),
-	target_(
+	target_texture_(
 		renderer_->create_texture(
 			sge::renderer::texture::dim_type(
 				fcppt::math::dim::structure_cast<sge::renderer::texture::dim_type>(
@@ -158,6 +160,9 @@ insula::water::object::object(
 				sge::image::color::format::rgb8,
 				sge::renderer::filter::linear,
 				sge::renderer::resource_flags::readable)),
+	target_(
+		renderer_->create_target(
+			target_texture_)),
 	camera_(
 		_camera),
 	water_height_(
@@ -197,7 +202,7 @@ insula::water::object::render()
 
 	sge::renderer::scoped_texture scoped_tex(
 		renderer_,
-		target_,
+		target_texture_,
 		0);
 
 	shader_.set_uniform(
@@ -243,49 +248,35 @@ void
 insula::water::object::update_reflection(
 	std::function<void ()> const &render_callback)
 {
-	{
-		sge::renderer::scoped_target const starget(
-			renderer_,
-			target_);
+	sge::renderer::scoped_target const starget(
+		renderer_,
+		target_);
 
-		sge::renderer::state::scoped const sstate(
-			renderer_,
-			sge::renderer::state::list
-				(sge::renderer::state::bool_::clear_zbuffer = true)
-				(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
-				(sge::renderer::state::bool_::clear_backbuffer = true)
-				(sge::renderer::state::color::clear_color = 
-					sge::image::color::rgba8(
-						(mizuiro::color::init::red %= 0.765) 
-						(mizuiro::color::init::green %= 0.87) 
-						(mizuiro::color::init::blue %= 1.0) 
-						(mizuiro::color::init::alpha %= 1.0))));
+	sge::renderer::state::scoped const sstate(
+		renderer_,
+		sge::renderer::state::list
+			(sge::renderer::state::bool_::clear_zbuffer = true)
+			(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
+			(sge::renderer::state::bool_::clear_backbuffer = true)
+			(sge::renderer::state::color::clear_color = 
+				sge::image::color::rgba8(
+					(mizuiro::color::init::red %= 0.765) 
+					(mizuiro::color::init::green %= 0.87) 
+					(mizuiro::color::init::blue %= 1.0) 
+					(mizuiro::color::init::alpha %= 1.0))));
 
-		sge::renderer::scoped_block const sblock(
-			renderer_);
+	sge::renderer::scoped_block const sblock(
+		renderer_);
 
-		scoped_camera cam(
-			camera_,
-			invert_camera(
-				camera_tuple(
-					camera_.axes(),
-					camera_.position()),
-				water_height_));
+	scoped_camera cam(
+		camera_,
+		invert_camera(
+			camera_tuple(
+				camera_.axes(),
+				camera_.position()),
+			water_height_));
 
-		render_callback();
-	}
-	
-	/*
-	// FIXME: Do we really need a lock here? We only want to read.
-	sge::renderer::scoped_texture_lock texlock(
-		target_,
-		sge::renderer::lock_mode::readwrite);
-
-	image_loader_.loaders().at(0)->create(
-		sge::image::view::make_const(
-			texlock.value()))->save(
-		filename);
-*/
+	render_callback();
 }
 
 void
