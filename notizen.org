@@ -66,7 +66,7 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 **** DONE Skydome in render_scene einbauen
 		 CLOSED: [2010-07-29 Thu 18:05]
 
-** TODO Wasser [5/9]
+** TODO Wasser [6/8]
 *** DONE Variable =water_height= definieren, die per Kommandozeile einstellbar ist
 		 CLOSED: [2010-07-30 Fri 00:02]
 *** DONE Funktion einbauen, um die Kamera an der Wasser-Ebene zu spiegeln
@@ -115,19 +115,40 @@ und dann im Fragmentshader:
 =vec2 texcoord_new = vec2(texcoord.x/texcoord.w,texcoord.y/texcoord.w)=
 Der Kerl im Paper macht zusätzlich noch /2 +0.5, vermutlich aus
 Normierungsgründen. Das vielleicht auch noch probieren.
-*** TODO Clipping in den Shadern machen
+*** DONE Clipping in den Shadern machen
+		 CLOSED: [2010-08-01 Sun 17:56]
 Hierzu braucht der height_map-Shader die Wasserhöhe. Außerdem brauch
 er das boolsche Flag, ob er clippen soll. Ist dies true, berechnet er
 =position.y - wasserhöhe= und speichert dies in gl_ClipDistance[0].
 
 ACHTUNG: Man muss die 0-te Clippingplane auch noch aktivieren.
 *** TODO Ripple-Effekt auf dem Wasser
-*** TODO Wasseroberfläche
+1. Hierzu muss eine Bump-Textur geladen werden. Hier interessieren
+   aber nur die rg-Werte.
+2. Diese Bump-Textur wird mit einer Texturskalierung auf das
+   Wasserquad gelegt (Konsolenvariable und Kommandozeilenvariable für
+   die Skalierung, Kommandozeilenvariable für die Bumptextur, außerdem
+   Konsolenfunktion dafür?)
+3. Eine Zeitvariable wird eingeführt
+4. Es wird nicht mehr die aktuelle Texturkoordinate im Fragmentshader
+   genommen sondern die perturbierte. Im Vertexshader: 
+	 texcoord_projected = perspective * ...
+	 texcoord_bump = bump_coord + time * move_direction
+	 Die bump-Textur wird skaliert auf das Quad gelegt, dessen Ursprung
+   wird aber mit der move_direction verschoben. Man kann hier die
+   Geschwindigkeit der Zeit noch vergrößern damit es schneller gepannt
+   wird.
+	 Im Fragmentshader:
+	 vec4 bump_color = texture(bump_texture,texcoord_bump);
+	 vec2 perturbation = wave_height * (bump_color.rg – 0.5); 
+	 vec2 perturbed_coords = texcoord_projected + perturbation;
+5. Dull-Color wird eingebaut, im Fragmentshader:
+	 vec4 dull_color(0.1f, 0.1f, 0.2f, 1.0f);
+	 float dull_factor = 0.2;
+	 frag_color = mix(real_color,dull_color,dull_factor);
 *** TODO Bug in Wassertextur fixen
-*** TODO Optimierung
-gl_FragCoord nehmen statt die Texturkoordinate mit der anderen Modelview-Matrix auszurechnen?
-** TODO Nebel 
-
+** TODO Nebel
+1. Im Pixelshader:
 #+BEGIN_SRC emacs-c++-mode
 const float LOG2 = 1.442695;
 float z = gl_FragCoord.z / gl_FragCoord.w;
@@ -138,17 +159,29 @@ float fogFactor = exp2( -gl_Fog.density *
 				   LOG2 );
 fogFactor = clamp(fogFactor, 0.0, 1.0);
 
-gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor ); Nebel
+gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 #+END_SRC
 
-Oder doch lieber im Vertexshader, siehe [[http://www.ozone3d.net/tutorials/glsl_fog/p03.php][hier]].
+2. Oder doch lieber im Vertexshader, siehe [[http://www.ozone3d.net/tutorials/glsl_fog/p03.php][hier]]:
 
-** TODO HDR-Faking für besseres Licht
+	"Fremde" Methode:
+
+	1. Berechne gl_Position, nehme davon die Länge =n= (?)
+	2. Berechne: =faktor = exp2(-dichte^2 * n^2 *1.442695)=, clampe
+		 zwischen 0 und 1, gebe an PS weiter
+	3. Berechne =frag_color = mix(fog_color,final_color,fog_factor)=
+	
+	"Eigene" Methode:
+	
+	1. Gebe Augenpunkt als uniform mit.
+  2. Berechne Abstand Augenpunkt und aktueller Vertex
+	3. Berechne =faktor = exp2(-dichte^2 * abstand^2 *1.442695)=, gebe an PS weiter
+	4. Mache dasselbe wie bei der fremden Methode.
 
 ** TODO Models (Bäume etc.)
-
 ** TODO Shadow Maps
 
+** TODO HDR-Faking für besseres Licht
 ** TODO Physik, Fahrzeuge
 
 ** TODO Wie gehts weiter? Sounds?
@@ -165,5 +198,20 @@ Oder doch lieber im Vertexshader, siehe [[http://www.ozone3d.net/tutorials/glsl_
 		 CLOSED: [2010-07-31 Sat 01:31]
 *** TODO Matrixmultiplikationen durch mvp-Matrix ersetzen
 *** TODO water_height durch water_level ersetzen
+*** TODO water sollte ein rect bekommen statt einen Dimensionwert
+Dahinter steckt der Gedanke, dass das Wasser abgeschlossen sein sollte!
+*** TODO Kleiner Rewrite der Subsysteme
+Die Subsysteme sollten abgeschlossener sein und somit selber mit der
+Konsole und der Kommandozeile kommunizieren.
+
+Jedes Subsystem sollte eine Klasse haben, das einen Vermittler
+zwischen Konsole und Subsystem darstellt (es sollte also beide im
+Konstruktor bekommen). Diese Klasse registriert sich die Callbacks und
+steuert deren Ausführung.
+
+Jedes Subsystem eine Funktion bereitstellen, die eine
+options_description zurückliefert. Außerdem sollte eine
+factory-Methode bereitgestellt werden, die die options_description
+bekommt und ggf. zusätzliche Parameter und daraus ein Objekt erstellt.
 Dazu hift Nebel, sowie eine Near-Plane, die weiter weg ist und eine
 Far-Plane, die näher dran ist.

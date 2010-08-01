@@ -5,7 +5,6 @@
 #include "../graphics/scalar.hpp"
 #include "../graphics/shader.hpp"
 #include "../graphics/shader_to_console.hpp"
-#include "render_mode.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/target_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
@@ -34,7 +33,7 @@ public:
 		sge::console::object &,
 		graphics::scalar dimension,
 		sge::renderer::dim_type const &,
-		render_mode::type);
+		sge::image::file_ptr );
 
 	void
 	update_reflection(
@@ -44,7 +43,7 @@ public:
 	render();
 private:
 	sge::renderer::device_ptr const renderer_;
-	sge::renderer::texture_ptr target_texture_;
+	sge::renderer::texture_ptr target_texture_,bump_texture_;
 	sge::renderer::target_ptr target_;
 	graphics::camera &camera_;
 	graphics::scalar const water_height_;
@@ -52,13 +51,11 @@ private:
 	graphics::shader shader_;
 	graphics::shader_to_console shader_console_;
 	sge::renderer::vertex_buffer_ptr vb_;
-	render_mode::type render_mode_;
 
 	void
 	regenerate(
 		graphics::scalar,
-		sge::renderer::dim_type const &,
-		render_mode::type);
+		sge::renderer::dim_type const &);
 };
 }
 }

@@ -21,6 +21,7 @@
 #include <sge/image/color/rgba8.hpp>
 #include <sge/window/parameters.hpp>
 #include <sge/renderer/device.hpp>
+#include <sge/renderer/viewport.hpp>
 #include <sge/renderer/screen_size.hpp>
 #include <sge/renderer/display_mode.hpp>
 #include <sge/renderer/bit_depth.hpp>
@@ -267,11 +268,8 @@ try
 		vm["grid-sizes"].as<graphics::vec2>()[0] * 
 		static_cast<graphics::scalar>(preterrain.shape()[0]),
 		vm["water-reflection-size"].as<sge::renderer::dim_type>(),
-		vm["disable-reflection"].as<bool>() 
-		? 
-			water::render_mode::no_reflection
-		:
-			water::render_mode::reflection);
+		sys.image_loader().load(
+			media_path()/FCPPT_TEXT("bumps.png")));
 
 	fcppt::signal::scoped_connection regenerate_height_map_conn(
 		console.model().insert(
@@ -400,6 +398,12 @@ try
 				h.render(
 					height_map::render_mode::clip);
 			});
+
+		// FIXME: This is a hack for a bug in renderer
+		sys.renderer()->viewport(
+			sge::renderer::viewport(
+				sge::renderer::pixel_pos::null(),
+				sys.renderer()->screen_size()));
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
