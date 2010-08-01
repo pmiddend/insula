@@ -1,5 +1,7 @@
 #include "../graphics/camera.hpp"
 #include "../graphics/vec3.hpp"
+#include "mirror_camera.hpp"
+#include "../graphics/scoped_camera.hpp"
 #include "vf/vertex_view.hpp"
 #include "vf/position.hpp"
 #include "vf/packed_position.hpp"
@@ -20,127 +22,28 @@
 #include <sge/renderer/scoped_texture_lock.hpp>
 #include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/scoped_texture.hpp>
-#include <sge/renderer/target.hpp>
-#include <sge/renderer/state/scoped.hpp>
-#include <sge/renderer/state/cull_mode.hpp>
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/trampoline.hpp>
+#include <sge/renderer/state/scoped.hpp>
+#include <sge/renderer/state/cull_mode.hpp>
 #include <sge/renderer/state/depth_func.hpp>
-#include <sge/renderer/state/color.hpp>
+#include <sge/renderer/target.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/image/color/rgba8.hpp>
 #include <sge/renderer/vf/view.hpp>
 #include <sge/renderer/vf/vertex.hpp>
 #include <sge/renderer/vf/iterator.hpp>
 #include <sge/renderer/lock_mode.hpp>
+#include <sge/renderer/dim_type.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/image/loader.hpp>
 #include <sge/image/view/make_const.hpp>
 #include <sge/image/file.hpp>
-#include <mizuiro/color/init.hpp>
-#include <fcppt/math/dim/structure_cast.hpp>
+#include <fcppt/math/dim/basic_impl.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/cross.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
 #include "../media_path.hpp"
 #include "object.hpp"
-#include <tuple>
-
-namespace
-{
-typedef
-std::tuple
-<
-	insula::graphics::gizmo,
-	insula::graphics::vec3
->
-camera_tuple;
-
-camera_tuple const
-invert_camera(
-	camera_tuple const &c,
-	insula::graphics::scalar const water_height)
-{
-	using namespace insula;
-
-	graphics::vec3 const 
-		new_position(
-			std::get<1>(c).x(),
-			-std::get<1>(c).y() + static_cast<graphics::scalar>(2)*water_height,
-			std::get<1>(c).z()),
-		forward_target(
-			std::get<1>(c) + std::get<0>(c).forward()),
-		new_forward_target(
-			graphics::vec3(
-				forward_target.x(),
-				-forward_target.y() + static_cast<graphics::scalar>(2)*water_height,
-				forward_target.z())),
-		new_forward(
-			new_forward_target - new_position),
-		up_target(
-			std::get<1>(c) + std::get<0>(c).up()),
-		new_up_target(
-			graphics::vec3(
-				up_target.x(),
-				-up_target.y() + static_cast<graphics::scalar>(2)*water_height,
-				up_target.z())),
-		new_up(
-			new_up_target - new_position),
-		new_right(
-			cross(
-				new_up,
-				new_forward));
-
-	return 
-		camera_tuple(
-			graphics::gizmo(
-				graphics::gizmo_init()
-					.forward(new_forward)
-					.right(new_right)
-					.up(new_up)),
-			new_position);
-}
-
-class scoped_camera
-{
-public:
-	scoped_camera(scoped_camera const &) = delete;
-	scoped_camera &operator=(scoped_camera const &) = delete;
-	
-	explicit
-	scoped_camera(
-		insula::graphics::camera &_camera,
-		camera_tuple const &new_cam)
-	:
-		camera_(
-			_camera),
-		// Save the old state...
-		position_(
-			camera_.position()),
-		gizmo_(
-			camera_.axes())
-	{
-		camera_.position(
-			std::get<1>(new_cam));
-		// ... and set the new state
-		camera_.axes(
-			std::get<0>(new_cam));
-	}
-
-	~scoped_camera()
-	{
-		camera_.axes(
-			gizmo_);
-		camera_.position(
-			position_);
-	}
-private:
-	insula::graphics::camera &camera_;
-	insula::graphics::vec3 const position_;
-	insula::graphics::gizmo const gizmo_;
-};
-}
 
 insula::water::object::object(
 	sge::renderer::device_ptr const _renderer,
@@ -148,21 +51,11 @@ insula::water::object::object(
 	graphics::scalar const _water_height,
 	sge::image::multi_loader &_image_loader,
 	sge::console::object &_console,
-	graphics::scalar const _dimension)
+	graphics::scalar const _dimension,
+	sge::renderer::dim_type const &reflection_texture_size)
 :
 	renderer_(
 		_renderer),
-	target_texture_(
-		renderer_->create_texture(
-			sge::renderer::texture::dim_type(
-				fcppt::math::dim::structure_cast<sge::renderer::texture::dim_type>(
-					renderer_->screen_size())),
-				sge::image::color::format::rgb8,
-				sge::renderer::filter::linear,
-				sge::renderer::resource_flags::readable)),
-	target_(
-		renderer_->create_target(
-			target_texture_)),
 	camera_(
 		_camera),
 	water_height_(
@@ -179,7 +72,8 @@ insula::water::object::object(
 		_console)
 {
 	regenerate(
-		_dimension);
+		_dimension,
+		reflection_texture_size);
 }
 
 
@@ -217,25 +111,6 @@ insula::water::object::render()
 		FCPPT_TEXT("translation"),
 		camera_.translation());
 
-	{
-
-		scoped_camera cam(
-			camera_,
-			invert_camera(
-				camera_tuple(
-					camera_.axes(),
-					camera_.position()),
-				water_height_));
-
-		shader_.set_uniform(
-			FCPPT_TEXT("rotation_mirror"),
-			camera_.rotation());
-
-		shader_.set_uniform(
-			FCPPT_TEXT("translation_mirror"),
-			camera_.translation());
-	}
-
 	renderer_->render(
 		sge::renderer::first_vertex(
 			0),
@@ -252,37 +127,53 @@ insula::water::object::update_reflection(
 		renderer_,
 		target_);
 
-	sge::renderer::state::scoped const sstate(
-		renderer_,
-		sge::renderer::state::list
-			(sge::renderer::state::bool_::clear_zbuffer = true)
-			(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
-			(sge::renderer::state::bool_::clear_backbuffer = true)
-			(sge::renderer::state::color::clear_color = 
-				sge::image::color::rgba8(
-					(mizuiro::color::init::red %= 0.765) 
-					(mizuiro::color::init::green %= 0.87) 
-					(mizuiro::color::init::blue %= 1.0) 
-					(mizuiro::color::init::alpha %= 1.0))));
-
 	sge::renderer::scoped_block const sblock(
-		renderer_);
+		renderer_); 
 
-	scoped_camera cam(
+	std::tuple<graphics::vec3,graphics::gizmo> const new_camera = 
+		mirror_camera(
+			camera_.position(),
+			camera_.axes(),
+			water_height_);
+
+	graphics::scoped_camera cam(
 		camera_,
-		invert_camera(
-			camera_tuple(
-				camera_.axes(),
-				camera_.position()),
-			water_height_));
+		std::get<0>(new_camera),
+		std::get<1>(new_camera));
+
+	{
+		sge::renderer::glsl::scoped_program scoped_shader_(
+			renderer_,
+			shader_.program());
+
+			shader_.set_uniform(
+			FCPPT_TEXT("rotation_mirror"),
+			camera_.rotation());
+
+		shader_.set_uniform(
+			FCPPT_TEXT("translation_mirror"),
+			camera_.translation());
+	}
 
 	render_callback();
 }
 
 void
 insula::water::object::regenerate(
-	graphics::scalar const dimension)
+	graphics::scalar const dimension,
+	sge::renderer::dim_type const &reflection_texture_size)
 {
+	target_texture_ = 
+		renderer_->create_texture(
+			reflection_texture_size,
+			sge::image::color::format::rgb8,
+			sge::renderer::filter::linear,
+			sge::renderer::resource_flags::readable);
+
+	target_ = 
+		renderer_->create_target(
+			target_texture_);
+
 	// We have to activate the shader here because we want to fill the
 	// vertex buffer with "custom" attributes.
 	sge::renderer::glsl::scoped_program scoped_shader_(

@@ -9,6 +9,7 @@
 #include <sge/renderer/target_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
+#include <sge/renderer/dim_type.hpp>
 #include <sge/image/multi_loader_fwd.hpp>
 #include <sge/console/object_fwd.hpp>
 #include <functional>
@@ -30,7 +31,8 @@ public:
 		graphics::scalar water_height,
 		sge::image::multi_loader &,
 		sge::console::object &,
-		graphics::scalar dimension);
+		graphics::scalar dimension,
+		sge::renderer::dim_type const &);
 
 	void
 	update_reflection(
@@ -40,7 +42,7 @@ public:
 	render();
 private:
 	sge::renderer::device_ptr const renderer_;
-	sge::renderer::texture_ptr const target_texture_;
+	sge::renderer::texture_ptr target_texture_;
 	sge::renderer::target_ptr target_;
 	graphics::camera &camera_;
 	graphics::scalar const water_height_;
@@ -51,7 +53,8 @@ private:
 
 	void
 	regenerate(
-		graphics::scalar);
+		graphics::scalar,
+		sge::renderer::dim_type const &);
 };
 }
 }

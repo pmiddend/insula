@@ -265,7 +265,10 @@ try
 		sys.image_loader(),
 		console.model(),
 		vm["grid-sizes"].as<graphics::vec2>()[0] * 
-		static_cast<graphics::scalar>(preterrain.shape()[0]));
+		static_cast<graphics::scalar>(preterrain.shape()[0]),
+		sge::renderer::dim_type(
+			640,
+			480));
 
 	fcppt::signal::scoped_connection regenerate_height_map_conn(
 		console.model().insert(
@@ -376,6 +379,10 @@ try
 			(sge::renderer::state::bool_::clear_backbuffer = true)
 			(sge::renderer::state::color::clear_color = std::get<0>(skydome_gradient));
 
+	sge::renderer::state::scoped const sstate(
+		sys.renderer(),
+		global_state);
+
 	while(running)
 	{
 		sge::mainloop::dispatch();
@@ -386,17 +393,10 @@ try
 		w.update_reflection(
 			[&sys,&global_state,&s,&h]()
 			{
-				sge::renderer::state::scoped const sstate(
-					sys.renderer(),
-					global_state);
 				s.render();
 				h.render(
 					height_map::render_mode::clip);
 			});
-
-		sge::renderer::state::scoped const sstate(
-			sys.renderer(),
-			global_state);
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
