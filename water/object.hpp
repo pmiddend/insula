@@ -5,6 +5,7 @@
 #include "../graphics/scalar.hpp"
 #include "../graphics/shader.hpp"
 #include "../graphics/shader_to_console.hpp"
+#include "render_mode.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/target_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
@@ -32,7 +33,8 @@ public:
 		sge::image::multi_loader &,
 		sge::console::object &,
 		graphics::scalar dimension,
-		sge::renderer::dim_type const &);
+		sge::renderer::dim_type const &,
+		render_mode::type);
 
 	void
 	update_reflection(
@@ -50,11 +52,13 @@ private:
 	graphics::shader shader_;
 	graphics::shader_to_console shader_console_;
 	sge::renderer::vertex_buffer_ptr vb_;
+	render_mode::type render_mode_;
 
 	void
 	regenerate(
 		graphics::scalar,
-		sge::renderer::dim_type const &);
+		sge::renderer::dim_type const &,
+		render_mode::type);
 };
 }
 }

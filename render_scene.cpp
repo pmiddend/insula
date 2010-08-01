@@ -70,8 +70,6 @@
 #include <fcppt/io/ifstream.hpp>
 #include <mizuiro/color/init.hpp>
 #include <boost/program_options.hpp>
-#include <boost/spirit/home/phoenix/core/reference.hpp>
-#include <boost/spirit/home/phoenix/operator/self.hpp>
 #include <vector>
 #include <cstdlib>
 #include <exception>
@@ -117,7 +115,8 @@ try
 		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
 		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)")
 		("water-height",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level")
-		("water-reflection-size",boost::program_options::value<sge::renderer::dim_type>()->default_value(sge::renderer::dim_type(1024,768)),"Size of the water reflection texture. If it is equivalent to the screen size");
+		("water-reflection-size",boost::program_options::value<sge::renderer::dim_type>()->default_value(sge::renderer::dim_type(1024,768)),"Size of the water reflection texture. If it is equivalent to the screen size")
+		("disable-reflection",boost::program_options::value<bool>()->zero_tokens()->default_value(false),"Do not render reflection");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -267,7 +266,12 @@ try
 		console.model(),
 		vm["grid-sizes"].as<graphics::vec2>()[0] * 
 		static_cast<graphics::scalar>(preterrain.shape()[0]),
-		vm["water-reflection-size"].as<sge::renderer::dim_type>());
+		vm["water-reflection-size"].as<sge::renderer::dim_type>(),
+		vm["disable-reflection"].as<bool>() 
+		? 
+			water::render_mode::no_reflection
+		:
+			water::render_mode::reflection);
 
 	fcppt::signal::scoped_connection regenerate_height_map_conn(
 		console.model().insert(
@@ -320,7 +324,7 @@ try
 		sys.input_system()->register_callback(
 			sge::input::action(
 				sge::input::kc::key_escape,
-				boost::phoenix::ref(running) = false)));
+				[&running]() { running = false; })));
 	
 	fcppt::signal::scoped_connection wireframe_conn(
 		console.model().insert(

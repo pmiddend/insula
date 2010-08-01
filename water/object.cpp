@@ -52,7 +52,8 @@ insula::water::object::object(
 	sge::image::multi_loader &_image_loader,
 	sge::console::object &_console,
 	graphics::scalar const _dimension,
-	sge::renderer::dim_type const &reflection_texture_size)
+	sge::renderer::dim_type const &reflection_texture_size,
+	render_mode::type const _render_mode)
 :
 	renderer_(
 		_renderer),
@@ -73,7 +74,8 @@ insula::water::object::object(
 {
 	regenerate(
 		_dimension,
-		reflection_texture_size);
+		reflection_texture_size,
+		_render_mode);
 }
 
 
@@ -123,6 +125,9 @@ void
 insula::water::object::update_reflection(
 	std::function<void ()> const &render_callback)
 {
+	if (render_mode_ == render_mode::no_reflection)
+		return;
+
 	sge::renderer::scoped_target const starget(
 		renderer_,
 		target_);
@@ -161,18 +166,11 @@ insula::water::object::update_reflection(
 void
 insula::water::object::regenerate(
 	graphics::scalar const dimension,
-	sge::renderer::dim_type const &reflection_texture_size)
+	sge::renderer::dim_type const &reflection_texture_size,
+	render_mode::type const _render_mode)
 {
-	target_texture_ = 
-		renderer_->create_texture(
-			reflection_texture_size,
-			sge::image::color::format::rgb8,
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::readable);
-
-	target_ = 
-		renderer_->create_target(
-			target_texture_);
+	render_mode_ = 
+		_render_mode;
 
 	// We have to activate the shader here because we want to fill the
 	// vertex buffer with "custom" attributes.
@@ -183,6 +181,30 @@ insula::water::object::regenerate(
 	shader_.set_uniform(
 		FCPPT_TEXT("texture"),
 		0);
+
+	shader_.set_uniform(
+		FCPPT_TEXT("reflection"),
+		render_mode::reflection ? 1 : 0);
+
+	switch (render_mode_)
+	{
+		case render_mode::reflection:
+			target_texture_ = 
+				renderer_->create_texture(
+					reflection_texture_size,
+					sge::image::color::format::rgb8,
+					sge::renderer::filter::linear,
+					sge::renderer::resource_flags::readable);
+
+			target_ = 
+				renderer_->create_target(
+					target_texture_);
+		break;
+		case render_mode::no_reflection:
+			target_texture_.reset();
+			target_.reset();
+			break;
+	}
 
 	vb_ = 
 		renderer_->create_vertex_buffer(
