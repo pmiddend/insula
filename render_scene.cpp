@@ -57,6 +57,8 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/input.hpp>
+#include <fcppt/math/dim/output.hpp>
+#include <fcppt/math/dim/input.hpp>
 #include <fcppt/math/twopi.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/string.hpp>
@@ -97,6 +99,7 @@ try
 
 	desc.add_options()
 		("help","produce help message")
+		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen")
 		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
 		("near",boost::program_options::value<graphics::scalar>()->default_value(1.0f),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
@@ -113,7 +116,8 @@ try
 		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
 		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
 		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)")
-		("water-height",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level");
+		("water-height",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level")
+		("water-reflection-size",boost::program_options::value<sge::renderer::dim_type>()->default_value(sge::renderer::dim_type(1024,768)),"Size of the water reflection texture. If it is equivalent to the screen size");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -143,10 +147,7 @@ try
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
-					sge::renderer::screen_size(
-						1024,
-						768
-					),
+					vm["screen-size"].as<sge::renderer::screen_size>(),
 					sge::renderer::bit_depth::depth32,
 					sge::renderer::refresh_rate_dont_care
 				),
@@ -266,9 +267,7 @@ try
 		console.model(),
 		vm["grid-sizes"].as<graphics::vec2>()[0] * 
 		static_cast<graphics::scalar>(preterrain.shape()[0]),
-		sge::renderer::dim_type(
-			640,
-			480));
+		vm["water-reflection-size"].as<sge::renderer::dim_type>());
 
 	fcppt::signal::scoped_connection regenerate_height_map_conn(
 		console.model().insert(
