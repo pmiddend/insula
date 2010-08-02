@@ -5,10 +5,13 @@
 #include "graphics/camera.hpp"
 #include "graphics/frame_counter.hpp"
 #include "skydome/object.hpp"
-#include "skydome/vec3_to_color.hpp"
+#include "skydome/console_proxy.hpp"
+#include "skydome/cli_options.hpp"
+#include "skydome/cli_factory.hpp"
 #include "height_map/object.hpp"
 #include "height_map/cli_factory.hpp"
 #include "height_map/cli_options.hpp"
+#include "height_map/console_proxy.hpp"
 #include "console/object.hpp"
 #include "water/object.hpp"
 #include "water/cli_options.hpp"
@@ -107,6 +110,9 @@ try
 
 	desc.add(
 		water::cli_options());
+
+	desc.add(
+		skydome::cli_options());
 	
 	desc.add_options()
 		("help","produce help message")
@@ -115,10 +121,7 @@ try
 		("near",boost::program_options::value<graphics::scalar>()->default_value(1.0f),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
 		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
-		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera")
-		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
-		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
-		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)");
+		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -178,54 +181,15 @@ try
 		get_option<graphics::scalar>(vm,"camera-speed"),
 		graphics::vec3::null());
 
-	skydome::gradient skydome_gradient(
-		skydome::vec3_to_color(graphics::vec3(0.765f,0.87f,1.0f)),
-		skydome::vec3_to_color(graphics::vec3(0.0f,0.0f,1.0f)));
+	skydome::object_ptr skydome = 
+		skydome::cli_factory(
+			vm,
+			cam,
+			sys.renderer());
 
-	skydome::object s(
-		cam,
-		sys.renderer(),
-		console.model(),
-		sge::renderer::aspect<graphics::scalar>(
-			sys.renderer()->screen_size()),
-		fcppt::math::deg_to_rad(
-			get_option<graphics::scalar>(vm,"fov")),
-		get_option<graphics::scalar>(vm,"angle"),
-		get_option<skydome::size_type>(vm,"latitudes"),
-		get_option<skydome::size_type>(vm,"longitudes"),
-		skydome_gradient);
-	
-
-	fcppt::signal::scoped_connection regenerate_skydome_conn(
-		console.model().insert(
-			FCPPT_TEXT("regenerate_skydome"),
-			[&s,&sys](sge::console::arg_list const &args,sge::console::object &ob) 
-			{ 
-				if (args.size() <= 3)
-				{
-					ob.emit_error(
-						FCPPT_TEXT("usage: ")+args[0]+FCPPT_TEXT(" <angle> <latitudes> <longitudes>"));
-					return;
-				}
-
-				try
-				{
-					s.regenerate_buffer(
-						fcppt::lexical_cast<graphics::scalar>(
-							args[1]),
-						fcppt::lexical_cast<skydome::size_type>(
-							args[2]),
-						fcppt::lexical_cast<skydome::size_type>(
-							args[3]));
-				}
-				catch (fcppt::bad_lexical_cast const &)
-				{
-					ob.emit_error(
-						FCPPT_TEXT("Parameter invalid"));
-					return;
-				}
-			},
-			FCPPT_TEXT("regenerate skydome, parameters are self-explanatory")));
+	skydome::console_proxy skydome_console(
+		*skydome,
+		console.model());
 
 	height_map::object_ptr const terrain = 
 		height_map::cli_factory(
@@ -233,6 +197,11 @@ try
 			cam,
 			sys.renderer(),
 			sys.image_loader());
+
+	height_map::console_proxy terrain_console(
+		*terrain,
+		console.model(),
+		sys.image_loader());
 
 	// NOTE: The - is needed here, "position" is really not well-defined.
 	cam.position(
@@ -304,7 +273,7 @@ try
 		sge::time::second(
 			1));
 
-	graphics::frame_counter fc(
+	graphics::frame_counter frame_counter(
 		sys.renderer(),
 		sys.font_system());
 
@@ -323,7 +292,7 @@ try
 			(sge::renderer::state::bool_::clear_zbuffer = true)
 			(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
 			(sge::renderer::state::bool_::clear_backbuffer = true)
-			(sge::renderer::state::color::clear_color = std::get<0>(skydome_gradient));
+			(sge::renderer::state::color::clear_color = std::get<0>(skydome->gradient()));
 
 	sge::renderer::state::scoped const sstate(
 		sys.renderer(),
@@ -337,9 +306,9 @@ try
 			frame_timer.reset());
 
 		water->update_reflection(
-			[&sys,&global_state,&s,&terrain,&water]()
+			[&sys,&global_state,&skydome,&terrain,&water]()
 			{
-				s.render();
+				skydome->render();
 				terrain->render(
 					water->water_level());
 			});
@@ -353,11 +322,11 @@ try
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
 	
-		s.render();
+		skydome->render();
 		terrain->render();
 		water->render();
 		if (show_fps)
-			fc.update_and_render();
+			frame_counter.update_and_render();
 		console.render();
 	}
 }

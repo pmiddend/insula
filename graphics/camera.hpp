@@ -62,6 +62,12 @@ public:
 	void
 	axes(
 		gizmo const &);
+
+	graphics::scalar 
+	aspect() const;
+
+	graphics::scalar 
+	fov() const;
 private:
 	fcppt::signal::scoped_connection input_connection_;
 	scalar aspect_,fov_,near_,far_;

@@ -5,9 +5,7 @@
 #include "gradient.hpp"
 #include "../graphics/camera.hpp"
 #include "../graphics/shader.hpp"
-#include "../graphics/shader_to_console.hpp"
 #include <fcppt/math/matrix/basic_impl.hpp>
-#include <sge/console/object_fwd.hpp>
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
 #include <sge/renderer/index_buffer_ptr.hpp>
@@ -28,14 +26,11 @@ public:
 	object(
 		graphics::camera const &,
 		sge::renderer::device_ptr,
-		sge::console::object &,
-		graphics::scalar aspect,
-		graphics::scalar fov,
 		graphics::scalar angle_in_degrees,
 		// von oben nach unten
 		size_type iterations_latitude,
 		size_type iterations_longitude,
-		gradient const &);
+		insula::skydome::gradient const &);
 	
 	void
 	render();
@@ -45,14 +40,20 @@ public:
 		graphics::scalar,
 		size_type,
 		size_type);
+
+	graphics::shader &
+	shader();
+
+	insula::skydome::gradient const
+	gradient() const;
 private:
 	graphics::camera const &camera_;
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;
 	graphics::shader shader_;
-	graphics::shader_to_console shader_to_console_;
 	graphics::mat4 const perspective_;
+	insula::skydome::gradient gradient_;
 };
 }
 }

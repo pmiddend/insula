@@ -200,6 +200,18 @@ insula::graphics::camera::axes(
 */
 }
 
+insula::graphics::scalar
+insula::graphics::camera::aspect() const
+{
+	return aspect_;
+}
+
+insula::graphics::scalar
+insula::graphics::camera::fov() const
+{
+	return fov_;
+}
+
 void
 insula::graphics::camera::input_callback(
 	sge::input::key_pair const &k)

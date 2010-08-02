@@ -175,13 +175,10 @@ public:
 insula::skydome::object::object(
 	graphics::camera const &_camera,
 	sge::renderer::device_ptr const _renderer,
-	sge::console::object &obj,
 	graphics::scalar const angle,
-	graphics::scalar const _aspect,
-	graphics::scalar const _fov,
 	size_type const iterations_lat,
 	size_type const iterations_long,
-	gradient const &g)
+	insula::skydome::gradient const &_gradient)
 :
 	camera_(
 		_camera),
@@ -191,16 +188,14 @@ insula::skydome::object::object(
 		renderer_,
 		media_path()/FCPPT_TEXT("skydome_vertex.glsl"),
 		media_path()/FCPPT_TEXT("skydome_fragment.glsl")),
-	shader_to_console_(
-		FCPPT_TEXT("skydome"),
-		shader_,
-		obj),
 	perspective_(
 		fcppt::math::matrix::perspective(
-			_aspect,
-			_fov,
+			camera_.aspect(),
+			camera_.fov(),
 			0.1f,
-			3.0f))
+			3.0f)),
+	gradient_(
+		_gradient)
 {
 	{
 		sge::renderer::glsl::scoped_program scoped_shader_(
@@ -211,13 +206,13 @@ insula::skydome::object::object(
 			FCPPT_TEXT("color0"),
 			color_to_vec3(
 				std::get<0>(
-					g)));
+					gradient_)));
 	
 		shader_.set_uniform(
 			FCPPT_TEXT("color1"),
 			color_to_vec3(
 				std::get<1>(
-					g)));
+					gradient_)));
 	}
 	regenerate_buffer(
 		angle,
@@ -404,4 +399,16 @@ insula::skydome::object::regenerate_buffer(
 		sge::renderer::scoped_index_lock(
 			ib_,
 			sge::renderer::lock_mode::writeonly).value().any());
+}
+
+insula::graphics::shader &
+insula::skydome::object::shader()
+{
+	return shader_;
+}
+
+insula::skydome::gradient const
+insula::skydome::object::gradient() const
+{
+	return gradient_;
 }
