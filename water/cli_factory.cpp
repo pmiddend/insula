@@ -27,5 +27,6 @@ insula::water::cli_factory(
 			extents,
 			get_option<sge::renderer::dim_type>(vm,"water-reflection-size"),
 			image_loader.load(
-				media_path()/get_option<fcppt::string>(vm,"water-bump-map")));
+				media_path()/get_option<fcppt::string>(vm,"water-bump-map")),
+			get_option<graphics::scalar>(vm,"water-bump-scaling"));
 }

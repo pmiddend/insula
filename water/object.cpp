@@ -4,7 +4,9 @@
 #include "../graphics/scoped_camera.hpp"
 #include "vf/vertex_view.hpp"
 #include "vf/position.hpp"
+#include "vf/texture_coordinate.hpp"
 #include "vf/packed_position.hpp"
+#include "vf/packed_texture_coordinate.hpp"
 #include "vf/format.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
@@ -36,6 +38,7 @@
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/renderer/dim_type.hpp>
 #include <sge/image/file.hpp>
+#include <sge/time/second.hpp>
 #include <fcppt/math/dim/basic_impl.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
@@ -49,7 +52,8 @@ insula::water::object::object(
 	graphics::scalar const _water_level,
 	graphics::rect const &extents,
 	sge::renderer::dim_type const &reflection_texture_size,
-	sge::image::file_ptr const _bump_texture)
+	sge::image::file_ptr const _bump_texture,
+	graphics::scalar const texture_scaling)
 :
 	renderer_(
 		_renderer),
@@ -65,11 +69,16 @@ insula::water::object::object(
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("water_vertex.glsl"),
-		media_path()/FCPPT_TEXT("water_fragment.glsl"))
+		media_path()/FCPPT_TEXT("water_fragment.glsl")),
+	wave_timer_(
+		sge::time::second(1)),
+	current_time_(
+		static_cast<graphics::scalar>(0))
 {
 	regenerate(
 		extents,
-		reflection_texture_size);
+		reflection_texture_size,
+		texture_scaling);
 }
 
 
@@ -90,10 +99,15 @@ insula::water::object::render()
 		renderer_,
 		shader_.program());
 
-	sge::renderer::scoped_texture scoped_tex(
+	sge::renderer::scoped_texture scoped_tex0(
 		renderer_,
 		target_texture_,
 		0);
+
+	sge::renderer::scoped_texture scoped_tex1(
+		renderer_,
+		bump_texture_,
+		1);
 
 	shader_.set_uniform(
 		FCPPT_TEXT("perspective"),
@@ -106,6 +120,13 @@ insula::water::object::render()
 	shader_.set_uniform(
 		FCPPT_TEXT("translation"),
 		camera_.translation());
+
+	current_time_ += 
+		wave_timer_.reset();
+
+	shader_.set_uniform(
+		FCPPT_TEXT("time"),
+		current_time_);
 
 	renderer_->render(
 		sge::renderer::first_vertex(
@@ -169,7 +190,8 @@ insula::water::object::update_reflection(
 void
 insula::water::object::regenerate(
 	graphics::rect const &extents,
-	sge::renderer::dim_type const &reflection_texture_size)
+	sge::renderer::dim_type const &reflection_texture_size,
+	graphics::scalar const texture_scaling)
 {
 	// We have to activate the shader here because we want to fill the
 	// vertex buffer with "custom" attributes.
@@ -178,8 +200,12 @@ insula::water::object::regenerate(
 		shader_.program());
 
 	shader_.set_uniform(
-		FCPPT_TEXT("texture"),
+		FCPPT_TEXT("reflection_texture"),
 		0);
+
+	shader_.set_uniform(
+		FCPPT_TEXT("bump_texture"),
+		1);
 
 	target_texture_ = 
 		renderer_->create_texture(
@@ -209,35 +235,57 @@ insula::water::object::regenerate(
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
 
-	(vb_it++)->set<vf::position>(
+	(vb_it)->set<vf::position>(
 		vf::packed_position(
 			extents.pos().x(),
 			water_level_,
 			extents.pos().y()));
-	(vb_it++)->set<vf::position>(
-		vf::packed_position(
-			extents.pos().x() + extents.dimension().w(),
-			water_level_,
-			extents.pos().y()));
-	(vb_it++)->set<vf::position>(
-		vf::packed_position(
-			extents.pos().x() + extents.dimension().w(),
-			water_level_,
-			extents.pos().y() + extents.dimension().h()));
+	(vb_it++)->set<vf::texture_coordinate>(
+		vf::packed_texture_coordinate(
+			0,0)); 
 
-	(vb_it++)->set<vf::position>(
+	(vb_it)->set<vf::position>(
+		vf::packed_position(
+			extents.pos().x() + extents.dimension().w(),
+			water_level_,
+			extents.pos().y()));
+	(vb_it++)->set<vf::texture_coordinate>(
+		vf::packed_texture_coordinate(
+			texture_scaling,0)); 
+
+	(vb_it)->set<vf::position>(
 		vf::packed_position(
 			extents.pos().x() + extents.dimension().w(),
 			water_level_,
 			extents.pos().y() + extents.dimension().h()));
-	(vb_it++)->set<vf::position>(
+	(vb_it++)->set<vf::texture_coordinate>(
+		vf::packed_texture_coordinate(
+			texture_scaling,texture_scaling)); 
+
+	(vb_it)->set<vf::position>(
+		vf::packed_position(
+			extents.pos().x() + extents.dimension().w(),
+			water_level_,
+			extents.pos().y() + extents.dimension().h()));
+	(vb_it++)->set<vf::texture_coordinate>(
+		vf::packed_texture_coordinate(
+			texture_scaling,texture_scaling)); 
+
+	(vb_it)->set<vf::position>(
 		vf::packed_position(
 			extents.pos().x(),
 			water_level_,
 			extents.pos().y() + extents.dimension().h()));
-	(vb_it++)->set<vf::position>(
+	(vb_it++)->set<vf::texture_coordinate>(
+		vf::packed_texture_coordinate(
+			0,texture_scaling)); 
+
+	(vb_it)->set<vf::position>(
 		vf::packed_position(
 			extents.pos().x(),
 			water_level_,
 			extents.pos().y()));
+	(vb_it)->set<vf::texture_coordinate>(
+		vf::packed_texture_coordinate(
+			0,0)); 
 }

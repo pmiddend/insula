@@ -190,7 +190,7 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 ** TODO Physik, Fahrzeuge
 
 ** TODO Wie gehts weiter? Sounds?
-** TODO Diverses [4/7]
+** TODO Diverses [8/12]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
@@ -202,11 +202,15 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 *** DONE z-Puffer-Artefakte minimieren
 		 CLOSED: [2010-07-31 Sat 01:31]
 *** TODO Matrixmultiplikationen durch mvp-Matrix ersetzen
-*** TODO water_height durch water_level ersetzen
-*** TODO water sollte ein rect bekommen statt einen Dimensionwert
+*** DONE water_height durch water_level ersetzen
+		 CLOSED: [2010-08-02 Mon 20:16]
+*** DONE water sollte ein rect bekommen statt einen Dimensionwert
+		 CLOSED: [2010-08-02 Mon 20:16]
 Dahinter steckt der Gedanke, dass das Wasser abgeschlossen sein sollte!
-*** TODO Kleiner Rewrite der Subsysteme
-*** TODO Wo weitermachen?
+*** DONE Kleiner Rewrite der Subsysteme
+		 CLOSED: [2010-08-02 Mon 20:16]
+*** DONE Wo weitermachen?
+		 CLOSED: [2010-08-02 Mon 20:15]
 
 water::object bekommt ein rect, was die Ausmaße angibt. Hier nehmen
 wir das extents()-rect von der height_map, aber "aufgepustet", dafür

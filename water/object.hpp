@@ -10,6 +10,7 @@
 #include <sge/renderer/texture_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
 #include <sge/renderer/dim_type.hpp>
+#include <sge/time/timer.hpp>
 #include <sge/image/file_ptr.hpp>
 #include <functional>
 
@@ -30,7 +31,8 @@ public:
 		graphics::scalar water_level,
 		graphics::rect const &,
 		sge::renderer::dim_type const &reflection_texture_size,
-		sge::image::file_ptr bump_texture);
+		sge::image::file_ptr bump_texture,
+		graphics::scalar texture_scaling);
 
 	void
 	update_reflection(
@@ -52,11 +54,14 @@ private:
 	graphics::scalar const water_level_;
 	graphics::shader shader_;
 	sge::renderer::vertex_buffer_ptr vb_;
+	sge::time::timer wave_timer_;
+	graphics::scalar current_time_;
 
 	void
 	regenerate(
 		graphics::rect const &,
-		sge::renderer::dim_type const &);
+		sge::renderer::dim_type const &,
+		graphics::scalar texture_scaling);
 };
 }
 }
