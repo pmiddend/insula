@@ -35,9 +35,6 @@
 #include <sge/renderer/vf/iterator.hpp>
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/renderer/dim_type.hpp>
-#include <sge/image/multi_loader.hpp>
-#include <sge/image/loader.hpp>
-#include <sge/image/view/make_const.hpp>
 #include <sge/image/file.hpp>
 #include <fcppt/math/dim/basic_impl.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
@@ -46,16 +43,10 @@
 #include "../media_path.hpp"
 #include "object.hpp"
 
-// DEBUG
-#include <fcppt/io/cout.hpp>
-#include <fcppt/math/box/output.hpp>
-
 insula::water::object::object(
 	sge::renderer::device_ptr const _renderer,
 	graphics::camera &_camera,
 	graphics::scalar const _water_level,
-	sge::image::multi_loader &_image_loader,
-	sge::console::object &_console,
 	graphics::rect const &extents,
 	sge::renderer::dim_type const &reflection_texture_size,
 	sge::image::file_ptr const _bump_texture)
@@ -71,16 +62,10 @@ insula::water::object::object(
 		_camera),
 	water_level_(
 		_water_level),
-	image_loader_(
-		_image_loader),
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("water_vertex.glsl"),
-		media_path()/FCPPT_TEXT("water_fragment.glsl")),
-	shader_console_(
-		FCPPT_TEXT("water"),
-		shader_,
-		_console)
+		media_path()/FCPPT_TEXT("water_fragment.glsl"))
 {
 	regenerate(
 		extents,
@@ -128,6 +113,12 @@ insula::water::object::render()
 		sge::renderer::vertex_count(
 			vb_->size()),
 		sge::renderer::nonindexed_primitive_type::triangle);
+}
+
+insula::graphics::shader &
+insula::water::object::shader()
+{
+	return shader_;
 }
 
 insula::graphics::scalar
@@ -217,8 +208,6 @@ insula::water::object::regenerate(
 
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
-
-	fcppt::io::cout << "water extents are: " << extents << "\n";
 
 	(vb_it++)->set<vf::position>(
 		vf::packed_position(

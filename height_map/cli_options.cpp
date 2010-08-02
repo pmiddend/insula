@@ -2,11 +2,11 @@
 #include "../graphics/vec2.hpp"
 #include "../graphics/vec3.hpp"
 #include "../graphics/scalar.hpp"
-#include <boost/program_options/value_semantic.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/input.hpp>
 #include <fcppt/string.hpp>
+#include <boost/program_options/value_semantic.hpp>
 #include <vector>
 
 boost::program_options::options_description const

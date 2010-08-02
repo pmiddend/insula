@@ -11,6 +11,9 @@
 #include "height_map/cli_options.hpp"
 #include "console/object.hpp"
 #include "water/object.hpp"
+#include "water/cli_options.hpp"
+#include "water/cli_factory.hpp"
+#include "water/console_proxy.hpp"
 #include "media_path.hpp"
 #include "get_option.hpp"
 #include <sge/log/global.hpp>
@@ -101,6 +104,9 @@ try
 
 	desc.add(
 		height_map::cli_options());
+
+	desc.add(
+		water::cli_options());
 	
 	desc.add_options()
 		("help","produce help message")
@@ -110,13 +116,9 @@ try
 		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
 		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
 		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera")
-		("ambient-light",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.4)),"Ambient lighting (in [0,1])")
 		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
 		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
-		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)")
-		("water-level",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level")
-		("water-reflection-size",boost::program_options::value<sge::renderer::dim_type>()->default_value(sge::renderer::dim_type(1024,768)),"Size of the water reflection texture. If it is equivalent to the screen size")
-		("disable-reflection",boost::program_options::value<bool>()->zero_tokens()->default_value(false),"Do not render reflection");
+		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -237,25 +239,26 @@ try
 		-fcppt::math::box::center(
 			terrain->extents()));
 
-	water::object w(
-		sys.renderer(),
-		cam,
-		get_option<graphics::scalar>(vm,"water-level"),
-		sys.image_loader(),
-		console.model(),
-		fcppt::math::box::stretch(
-			graphics::rect(
-				graphics::vec2(
-					terrain->extents().pos().x(),
-					terrain->extents().pos().z()),
-				graphics::dim2(
-					terrain->extents().dimension().w(),
-					terrain->extents().dimension().d())),
-				static_cast<graphics::scalar>(
-					2)),
-		get_option<sge::renderer::dim_type>(vm,"water-reflection-size"),
-		sys.image_loader().load(
-			media_path()/FCPPT_TEXT("bumps.png")));
+	water::object_ptr water = 
+		water::cli_factory(
+			vm,
+			sys.renderer(),
+			cam,
+			fcppt::math::box::stretch(
+				graphics::rect(
+					graphics::vec2(
+						terrain->extents().pos().x(),
+						terrain->extents().pos().z()),
+					graphics::dim2(
+						terrain->extents().dimension().w(),
+						terrain->extents().dimension().d())),
+					static_cast<graphics::scalar>(
+						2)),
+			sys.image_loader());
+
+	water::console_proxy water_console(
+		*water,
+		console.model());
 
 	bool running = 
 		true;
@@ -333,12 +336,12 @@ try
 		cam.update(
 			frame_timer.reset());
 
-		w.update_reflection(
-			[&sys,&global_state,&s,&terrain,&w]()
+		water->update_reflection(
+			[&sys,&global_state,&s,&terrain,&water]()
 			{
 				s.render();
 				terrain->render(
-					w.water_level());
+					water->water_level());
 			});
 
 		// FIXME: This is a hack for a bug in renderer
@@ -352,7 +355,7 @@ try
 	
 		s.render();
 		terrain->render();
-		w.render();
+		water->render();
 		if (show_fps)
 			fc.update_and_render();
 		console.render();

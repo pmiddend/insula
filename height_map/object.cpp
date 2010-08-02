@@ -63,10 +63,6 @@
 #include <cmath>
 #include <algorithm>
 
-// DEBUG
-#include <fcppt/io/cout.hpp>
-#include <fcppt/math/box/output.hpp>
-
 namespace
 {
 struct index_visitor
@@ -300,8 +296,6 @@ insula::height_map::object::regenerate(
 				height_scaling,
 				cell_size * static_cast<graphics::scalar>(raw.shape()[1])));
 
-	fcppt::io::cout << "terrain extents are " << extents_ << "\n";
-	
 	array stretched(
 		raw);
 	

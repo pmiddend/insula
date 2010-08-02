@@ -4,15 +4,13 @@
 #include "../graphics/camera_fwd.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/shader.hpp"
-#include "../graphics/shader_to_console.hpp"
 #include "../graphics/rect.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/target_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
 #include <sge/renderer/dim_type.hpp>
-#include <sge/image/multi_loader_fwd.hpp>
-#include <sge/console/object_fwd.hpp>
+#include <sge/image/file_ptr.hpp>
 #include <functional>
 
 namespace insula
@@ -30,11 +28,9 @@ public:
 		sge::renderer::device_ptr,
 		graphics::camera &,
 		graphics::scalar water_level,
-		sge::image::multi_loader &,
-		sge::console::object &,
 		graphics::rect const &,
-		sge::renderer::dim_type const &,
-		sge::image::file_ptr);
+		sge::renderer::dim_type const &reflection_texture_size,
+		sge::image::file_ptr bump_texture);
 
 	void
 	update_reflection(
@@ -42,6 +38,9 @@ public:
 
 	void 
 	render();
+
+	graphics::shader &
+	shader();
 
 	graphics::scalar
 	water_level() const;
@@ -51,9 +50,7 @@ private:
 	sge::renderer::target_ptr target_;
 	graphics::camera &camera_;
 	graphics::scalar const water_level_;
-	sge::image::multi_loader &image_loader_;
 	graphics::shader shader_;
-	graphics::shader_to_console shader_console_;
 	sge::renderer::vertex_buffer_ptr vb_;
 
 	void
