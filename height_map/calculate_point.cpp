@@ -7,7 +7,7 @@ insula::height_map::vf::packed_normal const
 insula::height_map::calculate_point(
 	array const &heights,
 	scalar const height_scaling,
-	vec2 const &cell_sizes,
+	scalar const &cell_size,
 	std::make_signed<array::size_type>::type rx,
 	std::make_signed<array::size_type>::type ry)
 {
@@ -33,7 +33,7 @@ insula::height_map::calculate_point(
 			static_cast<insula::graphics::scalar>(
 					static_cast<scalar>(
 						x) * 
-					cell_sizes.x()),
+					cell_size),
 				static_cast<insula::graphics::scalar>(
 					static_cast<scalar>(
 						height_scaling) * 
@@ -41,5 +41,5 @@ insula::height_map::calculate_point(
 				static_cast<insula::graphics::scalar>(
 					static_cast<scalar>(
 						y) * 
-					cell_sizes.y()));
+					cell_size));
 }

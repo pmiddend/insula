@@ -11,16 +11,16 @@ insula::height_map::vf::packed_normal const
 insula::height_map::calculate_normal(
 	array const &heights,
 	scalar const height_scaling,
-	vec2 const &cell_sizes,
+	scalar const &cell_size,
 	array::size_type const x,
 	array::size_type const y)
 {
 	insula::height_map::vf::packed_normal const
-		point = calculate_point(heights,height_scaling,cell_sizes,x,y),
-		left = calculate_point(heights,height_scaling,cell_sizes,x-1,y),
-		right = calculate_point(heights,height_scaling,cell_sizes,x+1,y),
-		top = calculate_point(heights,height_scaling,cell_sizes,x,y-1),
-		bottom = calculate_point(heights,height_scaling,cell_sizes,x,y+1),
+		point = calculate_point(heights,height_scaling,cell_size,x,y),
+		left = calculate_point(heights,height_scaling,cell_size,x-1,y),
+		right = calculate_point(heights,height_scaling,cell_size,x+1,y),
+		top = calculate_point(heights,height_scaling,cell_size,x,y-1),
+		bottom = calculate_point(heights,height_scaling,cell_size,x,y+1),
 		to_top = top - point,
 		to_right = right - point,
 		to_bottom = bottom - point,

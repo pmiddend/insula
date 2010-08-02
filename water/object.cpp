@@ -41,17 +41,22 @@
 #include <sge/image/file.hpp>
 #include <fcppt/math/dim/basic_impl.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/box/basic_impl.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
 #include "../media_path.hpp"
 #include "object.hpp"
 
+// DEBUG
+#include <fcppt/io/cout.hpp>
+#include <fcppt/math/box/output.hpp>
+
 insula::water::object::object(
 	sge::renderer::device_ptr const _renderer,
 	graphics::camera &_camera,
-	graphics::scalar const _water_height,
+	graphics::scalar const _water_level,
 	sge::image::multi_loader &_image_loader,
 	sge::console::object &_console,
-	graphics::scalar const _dimension,
+	graphics::rect const &extents,
 	sge::renderer::dim_type const &reflection_texture_size,
 	sge::image::file_ptr const _bump_texture)
 :
@@ -64,8 +69,8 @@ insula::water::object::object(
 			sge::renderer::resource_flags::none)),
 	camera_(
 		_camera),
-	water_height_(
-		_water_height),
+	water_level_(
+		_water_level),
 	image_loader_(
 		_image_loader),
 	shader_(
@@ -78,7 +83,7 @@ insula::water::object::object(
 		_console)
 {
 	regenerate(
-		_dimension,
+		extents,
 		reflection_texture_size);
 }
 
@@ -125,6 +130,12 @@ insula::water::object::render()
 		sge::renderer::nonindexed_primitive_type::triangle);
 }
 
+insula::graphics::scalar
+insula::water::object::water_level() const
+{
+	return water_level_;
+}
+
 void
 insula::water::object::update_reflection(
 	std::function<void ()> const &render_callback)
@@ -140,7 +151,7 @@ insula::water::object::update_reflection(
 		mirror_camera(
 			camera_.position(),
 			camera_.axes(),
-			water_height_);
+			water_level_);
 
 	graphics::scoped_camera cam(
 		camera_,
@@ -166,7 +177,7 @@ insula::water::object::update_reflection(
 
 void
 insula::water::object::regenerate(
-	graphics::scalar const dimension,
+	graphics::rect const &extents,
 	sge::renderer::dim_type const &reflection_texture_size)
 {
 	// We have to activate the shader here because we want to fill the
@@ -207,17 +218,37 @@ insula::water::object::regenerate(
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
 
-	(vb_it++)->set<vf::position>(
-		vf::packed_position(0,water_height_,0));
-	(vb_it++)->set<vf::position>(
-		vf::packed_position(10*dimension,water_height_,0));
-	(vb_it++)->set<vf::position>(
-		vf::packed_position(10*dimension,water_height_,10*dimension));
+	fcppt::io::cout << "water extents are: " << extents << "\n";
 
 	(vb_it++)->set<vf::position>(
-		vf::packed_position(10*dimension,water_height_,10*dimension));
+		vf::packed_position(
+			extents.pos().x(),
+			water_level_,
+			extents.pos().y()));
 	(vb_it++)->set<vf::position>(
-		vf::packed_position(0,water_height_,10*dimension));
+		vf::packed_position(
+			extents.pos().x() + extents.dimension().w(),
+			water_level_,
+			extents.pos().y()));
 	(vb_it++)->set<vf::position>(
-		vf::packed_position(0,water_height_,0));
+		vf::packed_position(
+			extents.pos().x() + extents.dimension().w(),
+			water_level_,
+			extents.pos().y() + extents.dimension().h()));
+
+	(vb_it++)->set<vf::position>(
+		vf::packed_position(
+			extents.pos().x() + extents.dimension().w(),
+			water_level_,
+			extents.pos().y() + extents.dimension().h()));
+	(vb_it++)->set<vf::position>(
+		vf::packed_position(
+			extents.pos().x(),
+			water_level_,
+			extents.pos().y() + extents.dimension().h()));
+	(vb_it++)->set<vf::position>(
+		vf::packed_position(
+			extents.pos().x(),
+			water_level_,
+			extents.pos().y()));
 }

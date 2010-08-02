@@ -148,6 +148,10 @@ ACHTUNG: Man muss die 0-te Clippingplane auch noch aktivieren.
 	 frag_color = mix(real_color,dull_color,dull_factor);
 *** TODO Bug in Wassertextur fixen
 ** TODO Nebel
+
+
+
+
 1. Im Pixelshader:
 #+BEGIN_SRC emacs-c++-mode
 const float LOG2 = 1.442695;
@@ -178,6 +182,7 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 	3. Berechne =faktor = exp2(-dichte^2 * abstand^2 *1.442695)=, gebe an PS weiter
 	4. Mache dasselbe wie bei der fremden Methode.
 
+** TODO Terraingenerierung
 ** TODO Models (Bäume etc.)
 ** TODO Shadow Maps
 
@@ -201,6 +206,13 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 *** TODO water sollte ein rect bekommen statt einen Dimensionwert
 Dahinter steckt der Gedanke, dass das Wasser abgeschlossen sein sollte!
 *** TODO Kleiner Rewrite der Subsysteme
+*** TODO Wo weitermachen?
+
+water::object bekommt ein rect, was die Ausmaße angibt. Hier nehmen
+wir das extents()-rect von der height_map, aber "aufgepustet", dafür
+könnte man eine generische Funktion schreiben. Danach muss
+render_scene.cpp weiter angeguckt werden um Anpassungen für die neuen
+Variablen zu machen.
 Die Subsysteme sollten abgeschlossener sein und somit selber mit der
 Konsole und der Kommandozeile kommunizieren.
 
@@ -215,3 +227,5 @@ factory-Methode bereitgestellt werden, die die options_description
 bekommt und ggf. zusätzliche Parameter und daraus ein Objekt erstellt.
 Dazu hift Nebel, sowie eine Near-Plane, die weiter weg ist und eine
 Far-Plane, die näher dran ist.
+
+*** TODO cout/cerr zu Konsole weiterleiten

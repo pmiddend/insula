@@ -4,7 +4,6 @@
 #include "vf/packed_normal.hpp"
 #include "array.hpp"
 #include "scalar.hpp"
-#include "vec2.hpp"
 #include <type_traits>
 
 namespace insula
@@ -15,7 +14,7 @@ vf::packed_normal const
 calculate_point(
 	array const &heights,
 	scalar const height_scaling,
-	vec2 const &cell_sizes,
+	scalar const &cell_size,
 	std::make_signed<array::size_type>::type rx,
 	std::make_signed<array::size_type>::type ry);
 }

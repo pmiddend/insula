@@ -1,3 +1,3 @@
 #!/bin/bash
 
-build/render_scene --height-map media/real_insula.png --gradient-texture media/textures/rock_512.png --height-texture media/textures/grass_512.png media/textures/sand_512.png "$@"
+build/render_scene --height-map real_insula.png --gradient-texture textures/rock_512.png --height-texture textures/grass_512.png textures/sand_512.png "$@"

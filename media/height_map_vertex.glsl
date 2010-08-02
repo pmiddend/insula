@@ -7,7 +7,7 @@ uniform vec3 sun_direction;
 uniform float ambient_light;
 uniform float texture_scaling;
 uniform bool do_clip;
-uniform float water_height;
+uniform float water_level;
 in vec3 position;
 in vec3 normal;
 in vec2 height_and_gradient;
@@ -32,5 +32,5 @@ void main()
 	gl_Position = perspective * rotation * translation * vec4(position,1.0);
 
 	if (do_clip)
-		gl_ClipDistance[0] = position.y - water_height;
+		gl_ClipDistance[0] = position.y - water_level;
 }

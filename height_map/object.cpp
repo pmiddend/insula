@@ -6,17 +6,19 @@
 #include "vf/packed_height_and_gradient.hpp"
 #include "vf/normal.hpp"
 #include "vf/vertex_view.hpp"
+#include "../graphics/scalar.hpp"
+#include "../graphics/camera.hpp"
+#include "../graphics/dim3.hpp"
+#include "../graphics/rect.hpp"
+#include "../media_path.hpp"
+#include "../graphics/vec4.hpp"
 #include "scalar.hpp"
 #include "array.hpp"
 #include "vec2.hpp"
-#include "../graphics/vec4.hpp"
 #include "normalize_and_stretch.hpp"
 #include "generate_gradient.hpp"
 #include "calculate_index_cell.hpp"
 #include "calculate_normal.hpp"
-#include "../graphics/scalar.hpp"
-#include "../graphics/camera.hpp"
-#include "../media_path.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/vertex_buffer.hpp>
@@ -60,6 +62,10 @@
 #include <type_traits>
 #include <cmath>
 #include <algorithm>
+
+// DEBUG
+#include <fcppt/io/cout.hpp>
+#include <fcppt/math/box/output.hpp>
 
 namespace
 {
@@ -120,14 +126,12 @@ private:
 insula::height_map::object::object(
 	graphics::camera const &_camera,
 	sge::renderer::device_ptr const _renderer,
-	sge::console::object &_console,
 	height_map::array const &raw,
-	graphics::vec2 const &cell_sizes,
+	graphics::scalar const &cell_size,
 	graphics::scalar const height_scaling,
 	graphics::vec3 const &sun_direction,
 	graphics::scalar const ambient_light,
 	graphics::scalar const texture_scaling,
-	graphics::scalar const water_height,
 	sge::image::file_ptr const &gradient_texture_image,
 	sge::image::file_ptr const &lower_texture_image,
 	sge::image::file_ptr const &upper_texture_image)
@@ -139,14 +143,10 @@ insula::height_map::object::object(
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("height_map_vertex.glsl"),
-		media_path()/FCPPT_TEXT("height_map_fragment.glsl")),
-	shader_console_(
-		FCPPT_TEXT("terrain"),
-		shader_,
-		_console)
+		media_path()/FCPPT_TEXT("height_map_fragment.glsl"))
 {
 	regenerate(
-		cell_sizes,
+		cell_size,
 		height_scaling,
 		raw);
 
@@ -168,7 +168,8 @@ insula::height_map::object::object(
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("sun_direction"),
-		normalize(sun_direction));
+		normalize(
+			sun_direction));
 
 	shader_.set_uniform(
 		FCPPT_TEXT("ambient_light"),
@@ -177,10 +178,6 @@ insula::height_map::object::object(
 	shader_.set_uniform(
 		FCPPT_TEXT("texture_scaling"),
 		texture_scaling);
-
-	shader_.set_uniform(
-		FCPPT_TEXT("water_height"),
-		water_height);
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("grid_size"),
@@ -189,7 +186,7 @@ insula::height_map::object::object(
 				raw.shape()[0]),
 			static_cast<graphics::scalar>(
 				raw.shape()[1])) * 
-		cell_sizes);
+		cell_size);
 	
 	lower_texture_ = 
 		renderer_->create_texture(
@@ -212,7 +209,7 @@ insula::height_map::object::object(
 
 void
 insula::height_map::object::render(
-	render_mode::type const _render_mode)
+	fcppt::optional<graphics::scalar> const &clip_height)
 {
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,
@@ -226,12 +223,20 @@ insula::height_map::object::render(
 		FCPPT_TEXT("do_clip"),
 		// There is no overload for booleans
 		static_cast<int>(
-			_render_mode == render_mode::clip));
+			clip_height ? 1 : 0));
+
+	if (clip_height)
+	{
+		shader_.set_uniform(
+			FCPPT_TEXT("water_level"),
+			// There is no overload for booleans
+			*clip_height);
+	}
 
 	renderer_->enable_clip_plane(
 		static_cast<sge::renderer::clip_plane_index>(
 			0),
-		_render_mode == render_mode::clip);
+		clip_height);
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("translation"),
@@ -283,10 +288,20 @@ insula::height_map::object::render(
 
 void
 insula::height_map::object::regenerate(
-	graphics::vec2 const &cell_sizes,
+	graphics::scalar const &cell_size,
 	graphics::scalar const height_scaling,
 	array const &raw)
 {
+	extents_ = 
+		graphics::box(
+			graphics::vec3::null(),
+			graphics::dim3(
+				cell_size * static_cast<graphics::scalar>(raw.shape()[0]),
+				height_scaling,
+				cell_size * static_cast<graphics::scalar>(raw.shape()[1])));
+
+	fcppt::io::cout << "terrain extents are " << extents_ << "\n";
+	
 	array stretched(
 		raw);
 	
@@ -307,16 +322,29 @@ insula::height_map::object::regenerate(
 		[](array::element const s) { return std::sin(s); });
 	
 	regenerate_buffers(
-		cell_sizes,
+		cell_size,
 		height_scaling,
 		raw,
 		stretched,
 		gradient);
 }
 
+insula::graphics::shader &
+insula::height_map::object::shader()
+{
+	return shader_;
+}
+
+insula::graphics::box const
+insula::height_map::object::extents()
+{
+	return 
+		extents_;
+}
+
 void
 insula::height_map::object::regenerate_buffers(
-	graphics::vec2 const &cell_sizes,
+	graphics::scalar const &cell_size,
 	graphics::scalar const height_scaling,
 	array const &raw,
 	array const &stretched,
@@ -367,7 +395,7 @@ insula::height_map::object::regenerate_buffers(
 				static_cast<graphics::scalar>(
 					static_cast<scalar>(
 						x) * 
-					cell_sizes.x()),
+					cell_size),
 				static_cast<graphics::scalar>(
 					static_cast<scalar>(
 						height_scaling) * 
@@ -375,7 +403,7 @@ insula::height_map::object::regenerate_buffers(
 				static_cast<graphics::scalar>(
 					static_cast<scalar>(
 						y) * 
-					cell_sizes.y()));
+					cell_size));
 			// Just to be safe, we put the 0 here
 			(*vb_it).set<vf::position>(
 				p);
@@ -385,7 +413,7 @@ insula::height_map::object::regenerate_buffers(
 					calculate_normal(
 						raw,
 						height_scaling,
-						cell_sizes,
+						cell_size,
 						x,
 						y)));
 

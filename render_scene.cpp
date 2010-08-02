@@ -1,15 +1,18 @@
 #include "graphics/scalar.hpp"
 #include "graphics/vec2.hpp"
+#include "graphics/dim2.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_counter.hpp"
 #include "skydome/object.hpp"
 #include "skydome/vec3_to_color.hpp"
-#include "height_map/image_to_array.hpp"
 #include "height_map/object.hpp"
+#include "height_map/cli_factory.hpp"
+#include "height_map/cli_options.hpp"
 #include "console/object.hpp"
 #include "water/object.hpp"
 #include "media_path.hpp"
+#include "get_option.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
@@ -58,6 +61,8 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/input.hpp>
+#include <fcppt/math/box/center.hpp>
+#include <fcppt/math/box/stretch.hpp>
 #include <fcppt/math/dim/output.hpp>
 #include <fcppt/math/dim/input.hpp>
 #include <fcppt/math/twopi.hpp>
@@ -93,29 +98,23 @@ try
 	string_vector;
 
 	boost::program_options::options_description desc("Allowed options");
-	
-	string_vector height_textures;
 
+	desc.add(
+		height_map::cli_options());
+	
 	desc.add_options()
 		("help","produce help message")
 		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen")
 		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
 		("near",boost::program_options::value<graphics::scalar>()->default_value(1.0f),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
-		("grid-sizes",boost::program_options::value<graphics::vec2>()->default_value(graphics::vec2(20,20)),"Size of a grid cell")
-		("height-scale",boost::program_options::value<graphics::scalar>()->default_value(5000),"Height scaling")
 		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
 		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera")
-		("height-map",boost::program_options::value<fcppt::string>()->required(),"Height map (has to be greyscale)")
-		("gradient-texture",boost::program_options::value<fcppt::string>()->required(),"Texture for the gradient")
-		("height-texture",boost::program_options::value<string_vector>(&height_textures)->multitoken(),"Height texture")
 		("ambient-light",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.4)),"Ambient lighting (in [0,1])")
-		("sun-direction",boost::program_options::value<graphics::vec3>()->default_value(graphics::vec3(100,100,100)),"Sun direction")
-		("texture-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"Texture scaling (the higher the value, the more often the texture is repeating)")
 		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
 		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
 		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)")
-		("water-height",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level")
+		("water-level",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level")
 		("water-reflection-size",boost::program_options::value<sge::renderer::dim_type>()->default_value(sge::renderer::dim_type(1024,768)),"Size of the water reflection texture. If it is equivalent to the screen size")
 		("disable-reflection",boost::program_options::value<bool>()->zero_tokens()->default_value(false),"Do not render reflection");
 	
@@ -136,9 +135,6 @@ try
 		return EXIT_SUCCESS;
 	}
 
-	fcppt::filesystem::path const filename(
-		vm["height-map"].as<fcppt::string>());
-
 	sge::systems::instance sys(
 		sge::systems::list() 
 		(
@@ -147,7 +143,7 @@ try
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
-					vm["screen-size"].as<sge::renderer::screen_size>(),
+					get_option<sge::renderer::screen_size>(vm,"screen-size"),
 					sge::renderer::bit_depth::depth32,
 					sge::renderer::refresh_rate_dont_care
 				),
@@ -174,10 +170,10 @@ try
 		sge::renderer::aspect<graphics::scalar>(
 			sys.renderer()->screen_size()),
 		fcppt::math::deg_to_rad(
-			vm["fov"].as<graphics::scalar>()),
-		vm["near"].as<graphics::scalar>(),
-		vm["far"].as<graphics::scalar>(),
-		vm["camera-speed"].as<graphics::scalar>(),
+			get_option<graphics::scalar>(vm,"fov")),
+		get_option<graphics::scalar>(vm,"near"),
+		get_option<graphics::scalar>(vm,"far"),
+		get_option<graphics::scalar>(vm,"camera-speed"),
 		graphics::vec3::null());
 
 	skydome::gradient skydome_gradient(
@@ -191,10 +187,10 @@ try
 		sge::renderer::aspect<graphics::scalar>(
 			sys.renderer()->screen_size()),
 		fcppt::math::deg_to_rad(
-			vm["fov"].as<graphics::scalar>()),
-		vm["angle"].as<graphics::scalar>(),
-		vm["latitudes"].as<skydome::size_type>(),
-		vm["longitudes"].as<skydome::size_type>(),
+			get_option<graphics::scalar>(vm,"fov")),
+		get_option<graphics::scalar>(vm,"angle"),
+		get_option<skydome::size_type>(vm,"latitudes"),
+		get_option<skydome::size_type>(vm,"longitudes"),
 		skydome_gradient);
 	
 
@@ -229,91 +225,37 @@ try
 			},
 			FCPPT_TEXT("regenerate skydome, parameters are self-explanatory")));
 
-	height_map::array const preterrain(
-		height_map::image_to_array(
-			sys.image_loader().load(
-				filename)));
+	height_map::object_ptr const terrain = 
+		height_map::cli_factory(
+			vm,
+			cam,
+			sys.renderer(),
+			sys.image_loader());
 
-	// FIXME: This is more of a hack
+	// NOTE: The - is needed here, "position" is really not well-defined.
 	cam.position(
-		graphics::vec3(
-			static_cast<graphics::scalar>(-preterrain.shape()[0]) * vm["grid-sizes"].as<graphics::vec2>()[0],
-			-vm["height-scale"].as<graphics::scalar>()/2,
-			static_cast<graphics::scalar>(-preterrain.shape()[0]) * vm["grid-sizes"].as<graphics::vec2>()[0] / 2));
-
-	height_map::object h(
-		cam,
-		sys.renderer(),
-		console.model() ,
-		preterrain,
-		vm["grid-sizes"].as<graphics::vec2>(),
-		vm["height-scale"].as<graphics::scalar>(),
-		vm["sun-direction"].as<graphics::vec3>(),
-		vm["ambient-light"].as<graphics::scalar>(),
-		vm["texture-scaling"].as<graphics::scalar>(),
-		vm["water-height"].as<graphics::scalar>(),
-		sys.image_loader().load(
-			vm["gradient-texture"].as<fcppt::string>()),
-		sys.image_loader().load(
-			height_textures[0]),
-		sys.image_loader().load(
-			height_textures[1]));
+		-fcppt::math::box::center(
+			terrain->extents()));
 
 	water::object w(
 		sys.renderer(),
 		cam,
-		vm["water-height"].as<graphics::scalar>(),
+		get_option<graphics::scalar>(vm,"water-level"),
 		sys.image_loader(),
 		console.model(),
-		vm["grid-sizes"].as<graphics::vec2>()[0] * 
-		static_cast<graphics::scalar>(preterrain.shape()[0]),
-		vm["water-reflection-size"].as<sge::renderer::dim_type>(),
+		fcppt::math::box::stretch(
+			graphics::rect(
+				graphics::vec2(
+					terrain->extents().pos().x(),
+					terrain->extents().pos().z()),
+				graphics::dim2(
+					terrain->extents().dimension().w(),
+					terrain->extents().dimension().d())),
+				static_cast<graphics::scalar>(
+					2)),
+		get_option<sge::renderer::dim_type>(vm,"water-reflection-size"),
 		sys.image_loader().load(
 			media_path()/FCPPT_TEXT("bumps.png")));
-
-	fcppt::signal::scoped_connection regenerate_height_map_conn(
-		console.model().insert(
-			FCPPT_TEXT("regenerate_height_map"),
-			[&h,&sys](sge::console::arg_list const &args,sge::console::object &ob) 
-			{ 
-				if (args.size() <= 4)
-				{
-					ob.emit_error(
-						FCPPT_TEXT("usage: ")+args[0]+FCPPT_TEXT(" <filename> <cell-size-x> <cell-size-y> <height-scaling>"));
-					return;
-				}
-
-				if (!fcppt::filesystem::is_regular(args[1]))
-				{
-					ob.emit_error(
-						FCPPT_TEXT("File \"")+args[1]+FCPPT_TEXT("\" isn't regular"));
-					return;
-
-				}
-
-				try
-				{
-					h.regenerate(
-						graphics::vec2(
-							fcppt::lexical_cast<graphics::scalar>(
-							args[2]),
-							fcppt::lexical_cast<graphics::scalar>(
-								args[3])),
-						fcppt::lexical_cast<graphics::scalar>(
-							args[4]),
-						height_map::image_to_array(
-							sys.image_loader().load(
-								args[1])));
-				}
-				catch (fcppt::bad_lexical_cast const &)
-				{
-					ob.emit_error(
-						FCPPT_TEXT("Cell size/height scaling invalid"));
-					return;
-				}
-			},
-			FCPPT_TEXT("Regenerate terrain from a file"),
-			FCPPT_TEXT("Usage: /regenerate_height_map <filename> <cell-size-x> <cell-size-y> <height-scaling>\nThe filename should exist and denote a grey-scale image.")));
 
 	bool running = 
 		true;
@@ -392,11 +334,11 @@ try
 			frame_timer.reset());
 
 		w.update_reflection(
-			[&sys,&global_state,&s,&h]()
+			[&sys,&global_state,&s,&terrain,&w]()
 			{
 				s.render();
-				h.render(
-					height_map::render_mode::clip);
+				terrain->render(
+					w.water_level());
 			});
 
 		// FIXME: This is a hack for a bug in renderer
@@ -409,8 +351,7 @@ try
 			sys.renderer());
 	
 		s.render();
-		h.render(
-			height_map::render_mode::none);
+		terrain->render();
 		w.render();
 		if (show_fps)
 			fc.update_and_render();
