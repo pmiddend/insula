@@ -2,8 +2,10 @@
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/camera.hpp"
+#include "skydome/cli_options.hpp"
 #include "skydome/object.hpp"
-#include "skydome/vec3_to_color.hpp"
+#include "skydome/cli_factory.hpp"
+#include "skydome/console_proxy.hpp"
 #include "console/object.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
@@ -60,8 +62,6 @@
 #include <fcppt/filesystem/is_regular.hpp>
 #include <fcppt/io/ifstream.hpp>
 #include <boost/program_options.hpp>
-#include <boost/spirit/home/phoenix/core/reference.hpp>
-#include <boost/spirit/home/phoenix/operator/self.hpp>
 #include <vector>
 #include <cstdlib>
 #include <exception>
@@ -78,22 +78,15 @@ try
 		fcppt::log::level::debug
 	);
 
-	// We need this to read the filename vector for the height textures
-	typedef
-	std::vector<fcppt::string>
-	string_vector;
-
 	boost::program_options::options_description desc("Allowed options");
-	
-	string_vector height_textures;
+
+	desc.add(skydome::cli_options());
 
 	desc.add_options()
 		("help","produce help message")
 		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
 		("near",boost::program_options::value<graphics::scalar>()->default_value(0.1f),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(1000),"Distance to the far plane")
-		("latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
-		("longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
 		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)");
 	
 	boost::program_options::variables_map vm;
@@ -157,54 +150,16 @@ try
 		graphics::scalar(0.5),
 		graphics::vec3::null());
 
-	skydome::gradient skydome_gradient(
-		skydome::vec3_to_color(graphics::vec3(0.765f,0.87f,1.0f)),
-		skydome::vec3_to_color(graphics::vec3(0.0f,0.0f,1.0f)));
+	skydome::object_ptr skydome = 
+		skydome::cli_factory(
+			vm,
+			cam,
+			sys.renderer());
 
-	skydome::object s(
-		cam,
-		sys.renderer(),
-		console.model(),
-		sge::renderer::aspect<graphics::scalar>(
-			sys.renderer()->screen_size()),
-		fcppt::math::deg_to_rad(
-			vm["fov"].as<graphics::scalar>()),
-		vm["angle"].as<graphics::scalar>(),
-		vm["latitudes"].as<skydome::size_type>(),
-		vm["longitudes"].as<skydome::size_type>(),
-		skydome_gradient);
-	
-	fcppt::signal::scoped_connection regenerate_conn(
-		console.model().insert(
-			FCPPT_TEXT("regenerate"),
-			[&s,&sys](sge::console::arg_list const &args,sge::console::object &ob) 
-			{ 
-				if (args.size() <= 3)
-				{
-					ob.emit_error(
-						FCPPT_TEXT("usage: ")+args[0]+FCPPT_TEXT(" <angle> <latitudes> <longitudes>"));
-					return;
-				}
-
-				try
-				{
-					s.regenerate_buffer(
-						fcppt::lexical_cast<graphics::scalar>(
-							args[1]),
-						fcppt::lexical_cast<skydome::size_type>(
-							args[2]),
-						fcppt::lexical_cast<skydome::size_type>(
-							args[3]));
-				}
-				catch (fcppt::bad_lexical_cast const &)
-				{
-					ob.emit_error(
-						FCPPT_TEXT("Parameter invalid"));
-					return;
-				}
-			},
-			FCPPT_TEXT("regenerate skydome")));
-
+	skydome::console_proxy skydome_console(
+		*skydome,
+		console.model());
+		
 	bool running = 
 		true;
 
@@ -212,7 +167,7 @@ try
 		sys.input_system()->register_callback(
 			sge::input::action(
 				sge::input::kc::key_escape,
-				boost::phoenix::ref(running) = false)));
+				[&running]() { running = false; })));
 	
 	fcppt::signal::scoped_connection wireframe_conn(
 		console.model().insert(
@@ -264,7 +219,7 @@ try
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
 	
-		s.render();
+		skydome->render();
 		console.render();
 	}
 }
