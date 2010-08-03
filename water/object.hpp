@@ -32,7 +32,9 @@ public:
 		graphics::rect const &,
 		sge::renderer::dim_type const &reflection_texture_size,
 		sge::image::file_ptr bump_texture,
-		graphics::scalar texture_scaling);
+		graphics::scalar texture_scaling,
+		graphics::scalar wave_height,
+		graphics::scalar wind_speed);
 
 	void
 	update_reflection(

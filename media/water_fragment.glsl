@@ -1,12 +1,12 @@
 #version 140
 
+uniform float wave_height;
+uniform float wind_speed;
 uniform sampler2D reflection_texture;
 uniform sampler2D bump_texture;
 in vec4 texcoord_projected;
 in vec2 texcoord_bump;
 out vec4 frag_color;
-
-const float wave_height = 1;
 
 void main()
 {
@@ -29,12 +29,7 @@ void main()
 	vec4 real_color = 
 		texture2D(
 			reflection_texture,
-			perturbed_coords);
+			clamp(perturbed_coords,0.0,1.0));
 
 	frag_color = real_color;
-	/*
-	frag_color = 
-		vec4(
-			vec3(real_color),
-			0.5);*/
 }

@@ -205,6 +205,7 @@ insula::height_map::object::object(
 
 void
 insula::height_map::object::render(
+	sge::renderer::state::cull_mode::type const culling,
 	fcppt::optional<graphics::scalar> const &clip_height)
 {
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
@@ -249,7 +250,7 @@ insula::height_map::object::render(
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
 		sge::renderer::state::list
-		 	(sge::renderer::state::cull_mode::back)
+		 	(culling)
 		 	(sge::renderer::state::depth_func::less));
 
 	sge::renderer::scoped_texture scoped_tex0(

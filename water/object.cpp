@@ -53,7 +53,10 @@ insula::water::object::object(
 	graphics::rect const &extents,
 	sge::renderer::dim_type const &reflection_texture_size,
 	sge::image::file_ptr const _bump_texture,
-	graphics::scalar const texture_scaling)
+	graphics::scalar const texture_scaling,
+	graphics::scalar const wave_height,
+	graphics::scalar const wind_speed
+)
 :
 	renderer_(
 		_renderer),
@@ -75,6 +78,21 @@ insula::water::object::object(
 	current_time_(
 		static_cast<graphics::scalar>(0))
 {
+	{
+		sge::renderer::glsl::scoped_program scoped_shader_(
+			renderer_,
+			shader_.program());
+
+		shader_.set_uniform(
+			FCPPT_TEXT("wave_height"),
+			wave_height);
+
+		shader_.set_uniform(
+			FCPPT_TEXT("wind_speed"),
+			wind_speed);
+	}
+	
+	
 	regenerate(
 		extents,
 		reflection_texture_size,

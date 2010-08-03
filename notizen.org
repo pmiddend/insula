@@ -66,7 +66,7 @@ Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
 **** DONE Skydome in render_scene einbauen
 		 CLOSED: [2010-07-29 Thu 18:05]
 
-** TODO Wasser [6/8]
+** TODO Wasser [7/9]
 *** DONE Variable =water_height= definieren, die per Kommandozeile einstellbar ist
 		 CLOSED: [2010-07-30 Fri 00:02]
 *** DONE Funktion einbauen, um die Kamera an der Wasser-Ebene zu spiegeln
@@ -122,7 +122,10 @@ er das boolsche Flag, ob er clippen soll. Ist dies true, berechnet er
 =position.y - wasserhöhe= und speichert dies in gl_ClipDistance[0].
 
 ACHTUNG: Man muss die 0-te Clippingplane auch noch aktivieren.
-*** TODO Ripple-Effekt auf dem Wasser
+*** DONE Ripple-Effekt auf dem Wasser
+		 CLOSED: [2010-08-03 Tue 00:56]
+
+
 1. Hierzu muss eine Bump-Textur geladen werden. Hier interessieren
    aber nur die rg-Werte.
 2. Diese Bump-Textur wird mit einer Texturskalierung auf das
@@ -146,7 +149,12 @@ ACHTUNG: Man muss die 0-te Clippingplane auch noch aktivieren.
 	 vec4 dull_color(0.1f, 0.1f, 0.2f, 1.0f);
 	 float dull_factor = 0.2;
 	 frag_color = mix(real_color,dull_color,dull_factor);
+*** TODO Ripple-Effekt fixen
+Um die Grenzfälle zu beheben, muss beim Rendern des Terrains Culling
+beidseitig aktiviert werden. Außerdem müssen die Texturkoordinaten der
+projizierten Textur auf [0,1] geclampt werden.
 *** TODO Bug in Wassertextur fixen
+*** TODO Nichtreflektierendes Wasser anbieten, um Performance zu sparen.
 ** TODO Nebel
 
 
@@ -233,3 +241,18 @@ Dazu hift Nebel, sowie eine Near-Plane, die weiter weg ist und eine
 Far-Plane, die näher dran ist.
 
 *** TODO cout/cerr zu Konsole weiterleiten
+*** TODO fcppt::shared_ptr durch std::shared_ptr ersetzen
+*** TODO Besseres attribute/uniform-System
+1. Funktion T -> glsl-Typ Diese Funktion sollte z.B vector<float/double,N>
+   erkennen und vecN draus machen. 
+2. Funktion vf::format -> string, die z.B. ausgibt: "in vec3 position; in vec2
+   texcoord;" 
+3. Definiere Datenstruktur "uniform", die enthaelt "name, typ_string, const"
+4. Definiere Funktion "[uniform] -> string", die Zeilen der Form "uniform
+   <typ_string> <name>" oder "const <typ_string> <name>" generiert, je nachdem,
+   wie das const-Flag gesetzt ist
+5. Erweitere Shaderklasse, sodass sie "[uniform]" bekommt und im Vertex- und im
+	 Fragmentshader den String $$$uniforms$$$ durch die Liste der Uniforms
+	 ersetzt. Ausserdem muesste die Klasse das Vertexformat kennen und daraus den
+	 in 2 genannten String definieren. Der wird im Vertexshader durch
+	 $$$inputs$$$ ersetzt.

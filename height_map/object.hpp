@@ -13,6 +13,7 @@
 #include <sge/renderer/vertex_buffer_ptr.hpp>
 #include <sge/renderer/index_buffer_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
+#include <sge/renderer/state/cull_mode.hpp>
 #include <sge/image/file_ptr.hpp>
 #include <sge/console/object_fwd.hpp>
 #include <fcppt/optional.hpp>
@@ -47,6 +48,7 @@ public:
 	
 	void
 	render(
+		sge::renderer::state::cull_mode::type,
 		fcppt::optional<graphics::scalar> const &clip_height = 
 			fcppt::optional<graphics::scalar>());
 

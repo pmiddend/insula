@@ -310,6 +310,7 @@ try
 			{
 				skydome->render();
 				terrain->render(
+					sge::renderer::state::cull_mode::off,
 					water->water_level());
 			});
 
@@ -323,7 +324,8 @@ try
 			sys.renderer());
 	
 		skydome->render();
-		terrain->render();
+		terrain->render(
+			sge::renderer::state::cull_mode::back);
 		water->render();
 		if (show_fps)
 			frame_counter.update_and_render();
