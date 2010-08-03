@@ -13,6 +13,7 @@
 #include "../media_path.hpp"
 #include "../graphics/vec4.hpp"
 #include "scalar.hpp"
+#include "average_convolute.hpp"
 #include "array.hpp"
 #include "vec2.hpp"
 #include "normalize_and_stretch.hpp"
@@ -319,7 +320,10 @@ insula::height_map::object::regenerate(
 	regenerate_buffers(
 		cell_size,
 		height_scaling,
-		raw,
+		average_convolute(
+			average_convolute(
+				average_convolute(
+					raw))),
 		stretched,
 		gradient);
 }

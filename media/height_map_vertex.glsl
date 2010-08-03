@@ -21,11 +21,11 @@ void main()
 		texture_scaling * position.xz / grid_size;
 	
 	light_intensity = 
-		max(
-			ambient_light,
+		//max(
+			ambient_light + 
 			max(
 				0.0, 
-				dot(normal, sun_direction)));
+				dot(normal, sun_direction))/*)*/;
 
 	height_and_gradient_out = height_and_gradient;
 

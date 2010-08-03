@@ -11,9 +11,7 @@ out vec4 frag_color;
 void main()
 {
 	vec2 transposed_projected = 
-		vec2(
-			(texcoord_projected.x/texcoord_projected.w) / 2.0 + 0.5,
-			(texcoord_projected.y/texcoord_projected.w) / 2.0 + 0.5);
+		texcoord_projected.xy / texcoord_projected.w * 0.5 + 0.5;
 
 	vec4 bump_color = 
 		texture2D(

@@ -45,5 +45,6 @@ ENDFUNCTION()
 
 ADD_INSULA_TEST(display_2d_array)
 ADD_INSULA_TEST(calculate_index)
+ADD_INSULA_TEST(convolute ../height_map/convolute.cpp)
 ADD_INSULA_TEST(gradient ../height_map/generate_gradient.cpp)
 ADD_INSULA_TEST(bernstein_polynomial ../textures/interpolators/bernstein_polynomial.cpp ../textures/weights.cpp)

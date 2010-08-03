@@ -256,3 +256,4 @@ Far-Plane, die näher dran ist.
 	 ersetzt. Ausserdem muesste die Klasse das Vertexformat kennen und daraus den
 	 in 2 genannten String definieren. Der wird im Vertexshader durch
 	 $$$inputs$$$ ersetzt.
+*** TODO Die anderen Tests wieder lauffähig machen
