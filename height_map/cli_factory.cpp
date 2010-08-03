@@ -27,7 +27,7 @@ insula::height_map::cli_factory(
 		FCPPT_TEXT("There must be exactly two height textures"));
 
 	return 
-		fcppt::make_shared_ptr<object>(
+		std::make_shared<object>(
 			camera,
 			renderer,
 			image_to_array(

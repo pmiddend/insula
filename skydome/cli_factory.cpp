@@ -19,7 +19,7 @@ insula::skydome::cli_factory(
 	sge::renderer::device_ptr const renderer)
 {
 	return 
-		fcppt::make_shared_ptr<object>(
+		std::make_shared<object>(
 			camera,
 			renderer,
 			get_option<graphics::scalar>(vm,"skydome-angle"),

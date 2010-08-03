@@ -19,7 +19,7 @@ insula::water::cli_factory(
 	sge::image::multi_loader &image_loader)
 {
 	return 
-		fcppt::make_shared_ptr<object>(
+		std::make_shared<object>(
 			renderer,
 			std::ref(
 				camera),
