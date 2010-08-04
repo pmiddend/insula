@@ -52,6 +52,12 @@ public:
 
 	sge::console::object const &
 	model() const;
+
+	sge::console::gfx &
+	view();
+
+	sge::console::gfx const &
+	view() const;
 private:
 	fcppt::signal::object<sge::input::key_pair_function> signal_;
 	fcppt::signal::object<sge::input::key_type_function> repeat_signal_;

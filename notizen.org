@@ -1,3 +1,129 @@
+* Kurzzeitvorgehen
+** bullet
+1. kdevelop neu installieren
+2. bullet in kdevelop öffnen
+3. HelloWorld verstehen, dazu Manual lesen
+4. 3D-Physikbeispiel in sge nachbauen (Ball, der auf schiefe Ebene fällt, oder so)
+** math
+Hierzu folgender Test: Definiere in fcppt zwei Matrizen,
+multipliziere, gucke was der Output ist. Mache dasselbe in
+Mathematica.
+** cour/cerr zu Konsole
+Noch nichts
+* Roadmap
+** Spielbeschreibung
+Das Spiel soll ein Multiplayerspiel werden. Netzwerkmodus
+möglicherweise, aber erstmal nur Hotseat. Man sitzt in einem Fahrzeug
+und muss über das Terrain fahren.
+
+Zwei denkbare Spielmodi: 
+
+1. Ziel ist es, in möglichst kurzer Zeit eine bestimmte Anzahl Punkte
+   einzusammeln, die im Level willkürlich verteilt sind (also
+   letztlich eine TSP-Abart zu lösen). Die Punkte nennen wir im
+   folgenden mal "Dots", damits nicht zu Verwechslungen kommt.
+2. Es wird zufällig ein Dot im Level generiert, den man erreichen
+   muss, ehe die Zeit abläuft. Hat man ihn erreicht, wird Zeit
+   draufaddiert und man muss zum nächsten Dot fahren. Damit alle
+   Spieler dieselben Bedingungen haben, werden die Dots
+   vorgeneriert. Hier hat man kein TSP mehr, weil die Reihenfolge
+   vorgegeben ist.
+
+Damit der erste Spieler keinen großen Nachteil hat, könnte man das
+Terrain mitsamt Dots am Anfang von oben zeigen oder mit einer freien
+Kamera.
+
+Beim Fahren behindern einen Höhenunterschiede im Terrain, Bäume und
+Steine. Außerdem könnte die Sonne blenden und im Nachtmodus (wenn es
+einen gibt) hat man natürlich eingeschränkte Sicht. Man könnte auch
+(starken) Nebel einbauen. Landminen, über die man fahren kann, wären
+auch eine Idee und im weiteren Sinne ein Schadensmodell - aber das
+ist eher was für die Zukunft.
+
+Wenn der Spieler umkippt oder sich sonst verhakt, kann man ihn per
+Tastendruck wieder aufsetzen.
+
+Das Spiel soll auch Soundeffekte enthalten für die Umgebung, das Auto
+und vielleicht sogar Musik im Hintergrund (ist aber auch erstmal nicht
+so wichtig).
+
+Zufallsgenerieren könnte man:
+
+-Das Terrain
+-Die Leveleigenschaften (Anzahl Bäume, Nebel, Sonnenstand)
+
+Da keine gute GUI zur Verfügung steht, muss man alle Spielernamen und
+alle Spieleinstellungen auf der Konsole übergeben.
+
+Eine Runde ist vorbei, wenn alle Spieler einmal gefahren sind. Dann
+wird eine Tabelle mit allen Namen und Zeiten ausgegeben. Zur
+Vereinfachung könnte man dann das Spiel danach stumpf wieder
+beenden. Ein Script wie...
+
+while true; do 
+./insula --players "$@"
+done
+
+...könnte bewerkstelligen, dass das Spiel nach dem Beenden immer
+wieder gestartet wird (mit denselben Spielern).
+
+Somit bräuchte man für das Spiel nicht allzu viel:
+
+-Fahrphysik
+-Objekte (Bäume, Steine)
+-Eine Funktion, die die Dinger zufällig verteilt
+-Zufällige Landschaftsgenerierung (wobei man auch erst Bilder nehmen könnte).
+-Eine Kamera, die dem Fahrzeug folgt (ist aber hier nicht so schwer,
+ weil die sich nicht um Kollision mit Wänden und Decken kümmern muss)
+-Soundkrams (wobei der in sge schon ganz gut integriert ist)
+
+** Vorgehen der Reihe nach [0/9]
+1. [ ] bullet-Beispiele zu Fahrzeugen genau studieren, dabei drauf
+   achten, wie man Models in Bullet integriert
+2. [ ] Gucken ob es Beispiele zu bullet mit Terrain gibt
+3. [ ] md2-Loader von sge ausprobieren, ein Model laden
+4. [ ] Probieren, ein md2-Model mit einem bullet-Model zu verbinden,
+   sodass man z.B. einen Klotz über die Landschaft purzeln lassen kann
+5. [ ] Ein Fahrzeug auf die Landschaft tun
+6. [ ] Die Kamera von hinten oben auf das Fahrzeug richten, darauf
+   achten dass der Abstand konstant ist.
+7. [ ] Das Fahrzeug mit den Pfeiltasten steuerbar machen
+8. [ ] Fahrsounds einbauen [0/3]
+   1. [ ] Soundtest erstellen, wo ein Grundton mit den Pfeiltasten langsam
+      verschnellert bzw. verlangsamt wird (mit AL_PITCH z.B.), als ob
+      man Gas gebe
+   2. [ ] Gangschaltung simulieren: Bei kontinuierlichem Drücken sollte
+      ein Geschwindigkeitswert stetig erhöht werden. Auf der
+      Geschwindigkeitsskala werden Stützpunkte angebracht. Zwischen
+      zwei Stützpunkten wird die Geschwindigkeit des Sounds von 0 bis
+      1 interpoliert.
+   3. [ ] Diese Sounds in das Spiel integrieren und mit der
+      Fahrgeschwindigkeit koppeln.
+9. [ ] Spielmechanik einbauen [0/4]
+   1. [ ] Generiere zufällig Punkte auf der Landschaft. Die Punkte sollten
+      als Models visualisiert sein (auf nille warten). Generiere auch
+      einen Startpunkt für das Auto.
+   2. [ ] Kollision Punkt mit Fahrzeug einbauen, die den Punkt
+      verschwinden lassen und einen globalen Counter erhöhen.
+   3. [ ] Timer einbauen, der bei Spielanfang beginnt und beim Einsammeln
+      des letzten Punktes aufhört.
+   4. [ ] Spielstates einbauen: 
+			1. Freelook: Punkte sind schon generiert, die Kamera ist frei
+         und man kann sich einen Weg aussuchen.
+			2. Pregame: Es wird der Spielername angezeigt, der jetzt dran
+         ist und die Aufforderung, eine Taste zu drücken um
+         anzufangen. Die Kamera ist hier schon über dem Fahrzeug
+         angebracht.
+			3. Ingame: Das Spiel läuft, Punkte können eingesammelt
+         werden. Der Timer wird im Konstruktor gestartet. Ist der
+         letzte Punkt eingesammelt, wird das Ergebnis in eine globale
+         Tabelle für den Spieler eingetragen und der nächste Spieler
+         ist dran. Es wird in Pregame gewechselt, es sei denn, alle
+         Spieler sind fertig. In dem Fall wird in Gameover gewechselt.
+			4. Gameover: Die Kamera wird um die Landschaft rotiert, eine
+         Tabelle mit dem Sieger und den anderen wird angezeigt. Ein
+         Tastendruck beendet das Spiel.
+
 * Aktivitäten
 ** DONE Kamera
 	 CLOSED: [2010-07-28 Wed 21:46]
@@ -153,7 +279,6 @@ ACHTUNG: Man muss die 0-te Clippingplane auch noch aktivieren.
 Um die Grenzfälle zu beheben, muss beim Rendern des Terrains Culling
 beidseitig aktiviert werden. Außerdem müssen die Texturkoordinaten der
 projizierten Textur auf [0,1] geclampt werden.
-*** TODO Bug in Wassertextur fixen
 *** TODO Nichtreflektierendes Wasser anbieten, um Performance zu sparen.
 ** TODO Nebel
 
@@ -198,11 +323,12 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 ** TODO Physik, Fahrzeuge
 
 ** TODO Wie gehts weiter? Sounds?
-** TODO Diverses [8/12]
+** TODO Diverses [11/15]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
-*** TODO Average-Filter übers Terrain laufen lassen
+*** DONE Average-Filter übers Terrain laufen lassen
+		 CLOSED: [2010-08-03 Tue 20:44]
 *** DONE Skydome-Unterfarbe weiterreichen
 		 CLOSED: [2010-07-31 Sat 01:30]
 *** DONE fov und aspect an skydome weiterreichen (near und far nicht)
@@ -210,6 +336,9 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 *** DONE z-Puffer-Artefakte minimieren
 		 CLOSED: [2010-07-31 Sat 01:31]
 *** TODO Matrixmultiplikationen durch mvp-Matrix ersetzen
+Hierzu folgender Test: Definiere in fcppt zwei Matrizen,
+multipliziere, gucke was der Output ist. Mache dasselbe in
+Mathematica.
 *** DONE water_height durch water_level ersetzen
 		 CLOSED: [2010-08-02 Mon 20:16]
 *** DONE water sollte ein rect bekommen statt einen Dimensionwert
@@ -241,7 +370,8 @@ Dazu hift Nebel, sowie eine Near-Plane, die weiter weg ist und eine
 Far-Plane, die näher dran ist.
 
 *** TODO cout/cerr zu Konsole weiterleiten
-*** TODO fcppt::shared_ptr durch std::shared_ptr ersetzen
+*** DONE fcppt::shared_ptr durch std::shared_ptr ersetzen
+		 CLOSED: [2010-08-03 Tue 20:44]
 *** TODO Besseres attribute/uniform-System
 1. Funktion T -> glsl-Typ Diese Funktion sollte z.B vector<float/double,N>
    erkennen und vecN draus machen. 
@@ -256,4 +386,5 @@ Far-Plane, die näher dran ist.
 	 ersetzt. Ausserdem muesste die Klasse das Vertexformat kennen und daraus den
 	 in 2 genannten String definieren. Der wird im Vertexshader durch
 	 $$$inputs$$$ ersetzt.
-*** TODO Die anderen Tests wieder lauffähig machen
+*** DONE Die anderen Tests wieder lauffähig machen
+		 CLOSED: [2010-08-03 Tue 20:44

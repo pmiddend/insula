@@ -42,6 +42,7 @@
 #include <fcppt/math/dim/basic_impl.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
 #include "../media_path.hpp"
 #include "object.hpp"
@@ -128,6 +129,10 @@ insula::water::object::render()
 		1);
 
 	shader_.set_uniform(
+		FCPPT_TEXT("mvp"),
+		camera_.perspective() * camera_.rotation() * camera_.translation());
+	/*
+	shader_.set_uniform(
 		FCPPT_TEXT("perspective"),
 		camera_.perspective());
 
@@ -138,6 +143,7 @@ insula::water::object::render()
 	shader_.set_uniform(
 		FCPPT_TEXT("translation"),
 		camera_.translation());
+*/
 
 	current_time_ += 
 		wave_timer_.reset();
@@ -193,6 +199,10 @@ insula::water::object::update_reflection(
 			renderer_,
 			shader_.program());
 
+		shader_.set_uniform(
+			FCPPT_TEXT("mvp_mirror"),
+			camera_.perspective() * camera_.rotation() * camera_.translation());
+			/*
 			shader_.set_uniform(
 			FCPPT_TEXT("rotation_mirror"),
 			camera_.rotation());
@@ -200,6 +210,7 @@ insula::water::object::update_reflection(
 		shader_.set_uniform(
 			FCPPT_TEXT("translation_mirror"),
 			camera_.translation());
+			*/
 	}
 
 	render_callback();

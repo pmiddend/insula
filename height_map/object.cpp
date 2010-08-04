@@ -54,7 +54,7 @@
 #include <sge/image/file.hpp>
 #include <fcppt/math/vector/cross.hpp>
 #include <fcppt/math/vector/normalize.hpp>
-#include <fcppt/math/matrix/transpose.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/assert_message.hpp>
@@ -237,6 +237,10 @@ insula::height_map::object::render(
 		clip_height);
 	
 	shader_.set_uniform(
+		FCPPT_TEXT("mvp"),
+		camera_.perspective() * camera_.rotation() * camera_.translation());
+	/*
+	shader_.set_uniform(
 		FCPPT_TEXT("translation"),
 		camera_.translation());
 
@@ -247,6 +251,7 @@ insula::height_map::object::render(
 	shader_.set_uniform(
 		FCPPT_TEXT("perspective"),
 		camera_.perspective());
+*/
 	
 	sge::renderer::state::scoped scoped_state(
 		renderer_,

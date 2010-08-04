@@ -1,6 +1,6 @@
 #version 140
 
-uniform mat4 translation,rotation,perspective;
+uniform mat4 mvp;
 uniform sampler2D sand,rock,grass;
 uniform vec2 grid_size;
 uniform vec3 sun_direction;
@@ -29,7 +29,7 @@ void main()
 
 	height_and_gradient_out = height_and_gradient;
 
-	gl_Position = perspective * rotation * translation * vec4(position,1.0);
+	gl_Position = mvp * vec4(position,1.0);
 
 	if (do_clip)
 		gl_ClipDistance[0] = position.y - water_level;

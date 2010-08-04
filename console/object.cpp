@@ -110,6 +110,18 @@ insula::console::object::model() const
 	return object_;
 }
 
+sge::console::gfx &
+insula::console::object::view()
+{
+	return gfx_;
+}
+
+sge::console::gfx const &
+insula::console::object::view() const
+{
+	return gfx_;
+}
+
 void
 insula::console::object::callback(
 	sge::input::key_pair const &c)

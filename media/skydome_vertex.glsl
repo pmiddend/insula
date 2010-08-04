@@ -1,8 +1,6 @@
 #version 140
 
-uniform mat4 translation;
-uniform mat4 rotation;
-uniform mat4 perspective;
+uniform mat4 mvp;
 uniform vec3 sun_position;
 uniform vec3 color0;
 uniform vec3 color1;
@@ -17,8 +15,7 @@ const float ypos = 0.5;
 void main()
 {
 	vec4 result = 
-		perspective * 
-		rotation * 
+		mvp * 
 		vec4(position - vec3(0,ypos,0),1.0);
 
 	// The maximum distance of two points in the unit sphere is 2, so

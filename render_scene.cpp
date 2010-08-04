@@ -13,6 +13,7 @@
 #include "height_map/cli_factory.hpp"
 #include "height_map/cli_options.hpp"
 #include "console/object.hpp"
+#include "console/scoped_rdbuf.hpp"
 #include "water/object.hpp"
 #include "water/console_proxy.hpp"
 #include "water/cli_options.hpp"
@@ -69,6 +70,7 @@
 #include <fcppt/string.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
+#include <fcppt/io/ostream.hpp>
 #include <boost/program_options.hpp>
 #include <vector>
 #include <cstdlib>
@@ -157,6 +159,15 @@ try
 		sys.renderer(),
 		sys.font_system(),
 		sys.image_loader());
+
+	/*
+	console::scoped_rdbuf 
+		scoped_cout_tee(
+			fcppt::io::cout,
+			console.view()),
+		scoped_cerr_tee(
+			fcppt::io::cerr,
+			console.view());*/
 	
 	graphics::camera cam(
 		console,

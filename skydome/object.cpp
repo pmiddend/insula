@@ -234,19 +234,11 @@ insula::skydome::object::render()
 
 	using fcppt::math::matrix::transpose;
 
-	shader_.set_uniform(
-		FCPPT_TEXT("translation"),
-		camera_.translation());
-
-	shader_.set_uniform(
-		FCPPT_TEXT("rotation"),
-		camera_.rotation());
-
 	// We have to set our own perspective matrix here because near and far
 	// might be ill-chosen by the user (at least for the skydome)
 	shader_.set_uniform(
-		FCPPT_TEXT("perspective"),
-		perspective_);
+		FCPPT_TEXT("mvp"),
+		perspective_ * camera_.rotation());
 
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
