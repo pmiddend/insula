@@ -241,7 +241,8 @@ try
 	physics::height_field physics_height_field(
 		physics_world,
 		terrain->heights(),
-		terrain->cell_size());
+		terrain->cell_size(),
+		terrain->height_scaling());
 
 	physics::vec3 physics_sphere_pos = 
 		fcppt::math::vector::structure_cast<physics::vec3>(

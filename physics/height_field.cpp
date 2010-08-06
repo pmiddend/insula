@@ -9,13 +9,15 @@
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 #include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/io/cout.hpp>
 #include <algorithm>
 #include <type_traits>
 
 insula::physics::height_field::height_field(
 	world &_world,
 	height_map::array const &_array,
-	height_map::scalar const grid_size)
+	height_map::scalar const grid_size,
+	height_map::scalar const height_scaling)
 :
 	world_(
 		_world),
@@ -50,12 +52,12 @@ insula::physics::height_field::height_field(
 			// possibilities)
 			false));
 
+
 	// Set local scaling (grid sizes)
 	shape_->setLocalScaling(
 		btVector3(
 			grid_size,
-			static_cast<scalar>(
-				0),
+			height_scaling,
 			grid_size));
 
 	// The position of the height field is the center of the AABB
@@ -64,7 +66,7 @@ insula::physics::height_field::height_field(
 			transform_from_vec3(
 				vec3(
 					static_cast<scalar>(array_.shape()[0]/2) * grid_size,
-					(*(minmax.first) + *(minmax.second)) / 2,
+					(*(minmax.first) + *(minmax.second)) / 2 * height_scaling,
 					static_cast<scalar>(array_.shape()[0]/2) * grid_size))));
 
 	body_.reset(
@@ -79,10 +81,6 @@ insula::physics::height_field::height_field(
 					0,
 					0,
 					0))));
-
-	// Can improve stability
-	body_->setContactProcessingThreshold(
-		BT_LARGE_FLOAT);
 
 	world_.add(
 		*body_);

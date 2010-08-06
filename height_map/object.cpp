@@ -348,6 +348,13 @@ insula::height_map::object::cell_size() const
 		cell_size_;
 }
 
+insula::graphics::scalar
+insula::height_map::object::height_scaling() const
+{
+	return 
+		height_scaling_;
+}
+
 void
 insula::height_map::object::regenerate_buffers(
 	graphics::scalar const &cell_size,
@@ -367,11 +374,8 @@ insula::height_map::object::regenerate_buffers(
 	cell_size_ = 
 		cell_size;
 
-	std::transform(
-		heights_.data(),
-		heights_.data() + heights_.num_elements(),
-		heights_.data(),
-		[&height_scaling](array::element const e) { return e * height_scaling; });
+	height_scaling_ = 
+		height_scaling;
 
 	vb_ = 
 		renderer_->create_vertex_buffer(

@@ -70,6 +70,9 @@ public:
 	
 	graphics::scalar
 	cell_size() const;
+
+	graphics::scalar
+	height_scaling() const;
 private:
 	graphics::camera const &camera_;
 	sge::renderer::device_ptr const renderer_;
@@ -80,6 +83,7 @@ private:
 	graphics::box extents_;
 	array heights_;
 	graphics::scalar cell_size_;
+	graphics::scalar height_scaling_;
 
 	void 
 	regenerate_buffers(

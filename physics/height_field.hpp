@@ -23,9 +23,9 @@ public:
 	explicit
 	height_field(
 		world &,
-		// NOTE: This array has to be scaled with the height scaling constant!
 		height_map::array const &,
-		height_map::scalar grid_size);
+		height_map::scalar grid_size,
+		height_map::scalar height_scaling);
 
 	~height_field();
 private:

@@ -235,10 +235,6 @@ insula::physics::sphere::sphere(
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
 
-	scalar const halfpi = 
-		fcppt::math::pi<scalar>()/
-		static_cast<scalar>(2);
-
 	// The top
 	vb_it->set<vf::position>(
 		skydome::sphere_point(
@@ -376,9 +372,11 @@ insula::physics::sphere::setWorldTransform(
 {
 	transform_ = t;
 	mat_transformed_ = 
-		bullet_to_mat4(
-			t.getBasis()) * 
+		
+		// NOTE: The order here is important. It has to be like this.
 		(fcppt::math::matrix::translation(
 			bullet_to_vec3(
-				t.getOrigin())));
+				t.getOrigin()))) * 
+		bullet_to_mat4(
+			t.getBasis());
 }
