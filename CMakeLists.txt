@@ -58,6 +58,11 @@ ENDIF ()
 
 ADD_DEFINITIONS(${SGE_CFLAGS})
 
+# Bullet begin
+FIND_PACKAGE(Bullet REQUIRED)
+INCLUDE_DIRECTORIES(${BULLET_INCLUDE_DIRS})
+# Bullet End
+
 SET(media_path ${CMAKE_SOURCE_DIR}/media)
 
 FILE(GLOB_RECURSE height_map_files height_map/*)
@@ -66,9 +71,10 @@ FILE(GLOB_RECURSE texture_files textures/*)
 FILE(GLOB_RECURSE console_files console/*)
 FILE(GLOB_RECURSE skydome_files skydome/*)
 FILE(GLOB_RECURSE water_files water/*)
+FILE(GLOB_RECURSE physics_files physics/*)
 FILE(GLOB base_files media_path.cpp)
 
-set_source_files_properties(
+SET_SOURCE_FILES_PROPERTIES(
 	media_path.cpp
 	PROPERTIES
 	COMPILE_FLAGS
@@ -83,6 +89,7 @@ ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp
 	${graphics_files} 
 	${height_map_files}
 	${console_files})
+
 ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp
 	${texture_files}
 	${graphics_files} 
@@ -90,6 +97,7 @@ ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp
 	${console_files}
 	${skydome_files}
 	${water_files}
+	${physics_files}
 	)
 ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
 	${height_map_files} ${texture_files} ${graphics_files} ${console_files})
@@ -107,7 +115,7 @@ IF(NOT MSVC)
 	TARGET_LINK_LIBRARIES(render_height_map ${Boost_LIBRARIES})
 	TARGET_LINK_LIBRARIES(generate_height_texture ${Boost_LIBRARIES})
 	TARGET_LINK_LIBRARIES(render_skydome ${Boost_LIBRARIES})
-	TARGET_LINK_LIBRARIES(render_scene ${Boost_LIBRARIES})
+	TARGET_LINK_LIBRARIES(render_scene ${Boost_LIBRARIES} ${BULLET_LIBRARIES})
 ENDIF()
 
 ENABLE_TESTING()

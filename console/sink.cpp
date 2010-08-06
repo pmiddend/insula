@@ -10,7 +10,9 @@ insula::console::sink::sink(
 	sge::console::gfx &_gfx)
 :
 	gfx_(
-		_gfx)
+		_gfx),
+	file_(
+		new fcppt::io::ofstream("/tmp/log"))
 {
 }
 
@@ -19,6 +21,9 @@ insula::console::sink::write(
 	char_type const * const s,
 	std::streamsize const n)
 {
+	if (!n)
+		return n;
+
 	buffer_ += 
 		fcppt::string(
 			s,
@@ -41,8 +46,9 @@ insula::console::sink::write(
 		string_vector::const_iterator i = lines.begin(); 
 		i != std::prev(lines.end()); 
 		++i)
-		gfx_.print(
-			*i);
+		(*file_) << (*i) << std::endl;
+	//	gfx_.print(
+		//	*i);
 
 	return n;
 }

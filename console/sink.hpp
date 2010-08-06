@@ -7,6 +7,9 @@
 #include <fcppt/string.hpp>
 #include <iosfwd>
 
+// DEBUG
+#include <fcppt/io/ofstream.hpp>
+
 namespace insula
 {
 namespace console
@@ -26,6 +29,7 @@ public:
 		std::streamsize);
 private:
 	sge::console::gfx &gfx_;
+	fcppt::io::ofstream *file_;
 	fcppt::string buffer_;
 };
 }

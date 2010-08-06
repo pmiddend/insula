@@ -14,6 +14,9 @@ namespace console
 class scoped_rdbuf
 {
 public:
+	scoped_rdbuf(scoped_rdbuf const &) = delete;
+	scoped_rdbuf &operator=(scoped_rdbuf const &) = delete;
+	
 	explicit
 	scoped_rdbuf(
 		fcppt::io::ostream &,

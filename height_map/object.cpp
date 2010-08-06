@@ -56,6 +56,7 @@
 #include <fcppt/math/vector/normalize.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/container/assign_multi_array.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/variant/apply_unary.hpp>
@@ -239,19 +240,6 @@ insula::height_map::object::render(
 	shader_.set_uniform(
 		FCPPT_TEXT("mvp"),
 		camera_.perspective() * camera_.rotation() * camera_.translation());
-	/*
-	shader_.set_uniform(
-		FCPPT_TEXT("translation"),
-		camera_.translation());
-
-	shader_.set_uniform(
-		FCPPT_TEXT("rotation"),
-		camera_.rotation());
-
-	shader_.set_uniform(
-		FCPPT_TEXT("perspective"),
-		camera_.perspective());
-*/
 	
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
@@ -346,6 +334,20 @@ insula::height_map::object::extents()
 		extents_;
 }
 
+insula::height_map::array const &
+insula::height_map::object::heights() const
+{
+	return 
+		heights_;
+}
+
+insula::graphics::scalar
+insula::height_map::object::cell_size() const
+{
+	return 
+		cell_size_;
+}
+
 void
 insula::height_map::object::regenerate_buffers(
 	graphics::scalar const &cell_size,
@@ -357,6 +359,19 @@ insula::height_map::object::regenerate_buffers(
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
+
+	fcppt::container::assign_multi_array(
+		heights_,
+		raw);
+
+	cell_size_ = 
+		cell_size;
+
+	std::transform(
+		heights_.data(),
+		heights_.data() + heights_.num_elements(),
+		heights_.data(),
+		[&height_scaling](array::element const e) { return e * height_scaling; });
 
 	vb_ = 
 		renderer_->create_vertex_buffer(

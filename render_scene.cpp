@@ -18,6 +18,11 @@
 #include "water/console_proxy.hpp"
 #include "water/cli_options.hpp"
 #include "water/cli_factory.hpp"
+#include "physics/world.hpp"
+#include "physics/sphere.hpp"
+#include "physics/height_field.hpp"
+#include "physics/scalar.hpp"
+#include "physics/vec3.hpp"
 #include "get_option.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
@@ -66,6 +71,7 @@
 #include <fcppt/math/box/stretch.hpp>
 #include <fcppt/math/dim/output.hpp>
 #include <fcppt/math/dim/input.hpp>
+#include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/twopi.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/exception.hpp>
@@ -164,10 +170,10 @@ try
 	console::scoped_rdbuf 
 		scoped_cout_tee(
 			fcppt::io::cout,
-			console.view()),
+			console.view())*//*,
 		scoped_cerr_tee(
 			fcppt::io::cerr,
-			console.view());*/
+			console.view())*/;
 	
 	graphics::camera cam(
 		console,
@@ -227,6 +233,32 @@ try
 	water::console_proxy water_console(
 		*water,
 		console.model());
+
+	physics::world physics_world(
+		// FIXME: structure_cast!
+		terrain->extents());
+
+	physics::height_field physics_height_field(
+		physics_world,
+		terrain->heights(),
+		terrain->cell_size());
+
+	physics::vec3 physics_sphere_pos = 
+		fcppt::math::vector::structure_cast<physics::vec3>(
+			fcppt::math::box::center(
+				terrain->extents()));
+
+	physics_sphere_pos[1] = terrain->extents().dimension()[1];
+
+	physics::sphere physics_sphere(
+		sys.renderer(),
+		cam,
+		physics_world,
+		static_cast<physics::scalar>(
+			50),
+		static_cast<physics::scalar>(
+			5000),
+		physics_sphere_pos);
 
 	bool running = 
 		true;
@@ -301,8 +333,11 @@ try
 	{
 		sge::mainloop::dispatch();
 
+		sge::time::timer::frames_type const time_delta = 
+			frame_timer.reset();
+
 		cam.update(
-			frame_timer.reset());
+			time_delta);
 
 		water->update_reflection(
 			[&sys,&global_state,&skydome,&terrain,&water]()
@@ -326,6 +361,12 @@ try
 		terrain->render(
 			sge::renderer::state::cull_mode::back);
 		water->render();
+
+		physics_world.update(
+			time_delta);
+
+		physics_sphere.render();
+		
 		if (show_fps)
 			frame_counter.update_and_render();
 		console.render();

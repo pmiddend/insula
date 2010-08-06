@@ -64,6 +64,12 @@ public:
 
 	graphics::box const
 	extents();
+
+	array const &
+	heights() const;
+	
+	graphics::scalar
+	cell_size() const;
 private:
 	graphics::camera const &camera_;
 	sge::renderer::device_ptr const renderer_;
@@ -72,6 +78,8 @@ private:
 	graphics::shader shader_;
 	sge::renderer::texture_ptr lower_texture_,upper_texture_,gradient_texture_;
 	graphics::box extents_;
+	array heights_;
+	graphics::scalar cell_size_;
 
 	void 
 	regenerate_buffers(

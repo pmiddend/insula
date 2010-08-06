@@ -4,12 +4,21 @@
 2. bullet in kdevelop öffnen
 3. HelloWorld verstehen, dazu Manual lesen
 4. 3D-Physikbeispiel in sge nachbauen (Ball, der auf schiefe Ebene fällt, oder so)
-** math
-Hierzu folgender Test: Definiere in fcppt zwei Matrizen,
-multipliziere, gucke was der Output ist. Mache dasselbe in
-Mathematica.
-** cour/cerr zu Konsole
-Noch nichts
+	 Mathematica.
+
+1. btCollisionObject hat eine Shape und ein Transform
+2. Eine Shape kann von mehreren btCollisionObjects benutzt
+   werden. D.h. ein Fahrzeug oder ein Baum würde nur _einmal_ als Shape
+   modelliert und dann nur weitergegeben.
+3. btCollisionWorld enthält btCollisionObjects (btDiscreteDynamicsWorld
+   ist davon abgeleitet)
+4. btPersistentManifold ist ein Cache für ein Paar von Objekten. Es
+   werden Kontaktpunkt gespeichert.
+5. Für Terrain: btHeightfieldTerrainShape als Shape.
+6. Für Auto: Dynamics/Vehicle/*?
+7. btMotionState überladen
+8. [[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
+
 * Roadmap
 ** Spielbeschreibung
 Das Spiel soll ein Multiplayerspiel werden. Netzwerkmodus
@@ -323,7 +332,7 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 ** TODO Physik, Fahrzeuge
 
 ** TODO Wie gehts weiter? Sounds?
-** TODO Diverses [11/15]
+** TODO Diverses [12/15]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
@@ -335,7 +344,8 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 		 CLOSED: [2010-07-31 Sat 01:30]
 *** DONE z-Puffer-Artefakte minimieren
 		 CLOSED: [2010-07-31 Sat 01:31]
-*** TODO Matrixmultiplikationen durch mvp-Matrix ersetzen
+*** DONE Matrixmultiplikationen durch mvp-Matrix ersetzen
+		 CLOSED: [2010-08-05 Thu 12:45]
 Hierzu folgender Test: Definiere in fcppt zwei Matrizen,
 multipliziere, gucke was der Output ist. Mache dasselbe in
 Mathematica.
@@ -387,4 +397,5 @@ Far-Plane, die näher dran ist.
 	 in 2 genannten String definieren. Der wird im Vertexshader durch
 	 $$$inputs$$$ ersetzt.
 *** DONE Die anderen Tests wieder lauffähig machen
+*** TODO height_map brauch ein Signal "heights_changed", was an die Physik weitergegeben wird
 		 CLOSED: [2010-08-03 Tue 20:44
