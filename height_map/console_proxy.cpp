@@ -18,6 +18,7 @@ insula::height_map::console_proxy::console_proxy(
 		FCPPT_TEXT("terrain"),
 		obj_.shader(),
 		console),
+	/*
 	regenerate_connection_(
 		console.insert(
 			FCPPT_TEXT("terrain_regenerate"),
@@ -27,7 +28,7 @@ insula::height_map::console_proxy::console_proxy(
 				std::placeholders::_1,
 				std::placeholders::_2),
 			FCPPT_TEXT("Regenerate terrain from a file"),
-			FCPPT_TEXT("Usage: /terrain_regenerate <filename> <cell-size> <height-scaling>\nThe height-scaling is arbitrary (can even be negative). The file name is below media/"))),
+			FCPPT_TEXT("Usage: /terrain_regenerate <filename> <cell-size> <height-scaling>\nThe height-scaling is arbitrary (can even be negative). The file name is below media/"))),*/
 	image_loader_(
 		_image_loader),
 	obj_(
@@ -40,6 +41,7 @@ insula::height_map::console_proxy::regenerate(
 	sge::console::arg_list const &args,
 	sge::console::object &con)
 {
+/*
 	if (args.size() <= 3)
 	{
 		con.emit_error(
@@ -74,4 +76,5 @@ insula::height_map::console_proxy::regenerate(
 			FCPPT_TEXT("Cell size/height scaling invalid"));
 		return;
 	}
+*/
 }

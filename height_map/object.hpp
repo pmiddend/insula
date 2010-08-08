@@ -52,12 +52,6 @@ public:
 		fcppt::optional<graphics::scalar> const &clip_height = 
 			fcppt::optional<graphics::scalar>());
 
-	void
-	regenerate(
-		graphics::scalar const &cell_size,
-		graphics::scalar const height_scaling,
-		array const &raw);
-
 	// The console_proxy needs this
 	graphics::shader &
 	shader();
@@ -84,6 +78,12 @@ private:
 	array heights_;
 	graphics::scalar cell_size_;
 	graphics::scalar height_scaling_;
+
+	void
+	regenerate(
+		graphics::scalar const &cell_size,
+		graphics::scalar const height_scaling,
+		array const &raw);
 
 	void 
 	regenerate_buffers(

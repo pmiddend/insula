@@ -86,18 +86,19 @@ Somit bräuchte man für das Spiel nicht allzu viel:
  weil die sich nicht um Kollision mit Wänden und Decken kümmern muss)
 -Soundkrams (wobei der in sge schon ganz gut integriert ist)
 
-** Vorgehen der Reihe nach [0/9]
-1. [ ] bullet-Beispiele zu Fahrzeugen genau studieren, dabei drauf
+** Vorgehen der Reihe nach [1/9]
+1. [X] Gucken ob es Beispiele zu bullet mit Terrain gibt 
+2. [ ] md3-Loader von sge ausprobieren, ein Model laden
+3. [ ] Das Model in einem separaten Programm anzeigen lassen
+4. [ ] bullet-Beispiele zu Fahrzeugen genau studieren, dabei drauf
    achten, wie man Models in Bullet integriert
-2. [ ] Gucken ob es Beispiele zu bullet mit Terrain gibt
-3. [ ] md2-Loader von sge ausprobieren, ein Model laden
-4. [ ] Probieren, ein md2-Model mit einem bullet-Model zu verbinden,
+5. [ ] Probieren, ein md2-Model mit einem bullet-Model zu verbinden,
    sodass man z.B. einen Klotz über die Landschaft purzeln lassen kann
-5. [ ] Ein Fahrzeug auf die Landschaft tun
-6. [ ] Die Kamera von hinten oben auf das Fahrzeug richten, darauf
+6. [ ] Ein Fahrzeug auf die Landschaft tun
+7. [ ] Die Kamera von hinten oben auf das Fahrzeug richten, darauf
    achten dass der Abstand konstant ist.
-7. [ ] Das Fahrzeug mit den Pfeiltasten steuerbar machen
-8. [ ] Fahrsounds einbauen [0/3]
+8. [ ] Das Fahrzeug mit den Pfeiltasten steuerbar machen
+9. [ ] Fahrsounds einbauen [0/3]
    1. [ ] Soundtest erstellen, wo ein Grundton mit den Pfeiltasten langsam
       verschnellert bzw. verlangsamt wird (mit AL_PITCH z.B.), als ob
       man Gas gebe
@@ -108,30 +109,30 @@ Somit bräuchte man für das Spiel nicht allzu viel:
       1 interpoliert.
    3. [ ] Diese Sounds in das Spiel integrieren und mit der
       Fahrgeschwindigkeit koppeln.
-9. [ ] Spielmechanik einbauen [0/4]
-   1. [ ] Generiere zufällig Punkte auf der Landschaft. Die Punkte sollten
-      als Models visualisiert sein (auf nille warten). Generiere auch
-      einen Startpunkt für das Auto.
-   2. [ ] Kollision Punkt mit Fahrzeug einbauen, die den Punkt
-      verschwinden lassen und einen globalen Counter erhöhen.
-   3. [ ] Timer einbauen, der bei Spielanfang beginnt und beim Einsammeln
-      des letzten Punktes aufhört.
-   4. [ ] Spielstates einbauen: 
-			1. Freelook: Punkte sind schon generiert, die Kamera ist frei
-         und man kann sich einen Weg aussuchen.
-			2. Pregame: Es wird der Spielername angezeigt, der jetzt dran
-         ist und die Aufforderung, eine Taste zu drücken um
-         anzufangen. Die Kamera ist hier schon über dem Fahrzeug
-         angebracht.
-			3. Ingame: Das Spiel läuft, Punkte können eingesammelt
-         werden. Der Timer wird im Konstruktor gestartet. Ist der
-         letzte Punkt eingesammelt, wird das Ergebnis in eine globale
-         Tabelle für den Spieler eingetragen und der nächste Spieler
-         ist dran. Es wird in Pregame gewechselt, es sei denn, alle
-         Spieler sind fertig. In dem Fall wird in Gameover gewechselt.
-			4. Gameover: Die Kamera wird um die Landschaft rotiert, eine
-         Tabelle mit dem Sieger und den anderen wird angezeigt. Ein
-         Tastendruck beendet das Spiel.
+10. [ ] Spielmechanik einbauen [0/4]
+		1. [ ] Generiere zufällig Punkte auf der Landschaft. Die Punkte sollten
+       als Models visualisiert sein (auf nille warten). Generiere auch
+       einen Startpunkt für das Auto.
+		2. [ ] Kollision Punkt mit Fahrzeug einbauen, die den Punkt
+       verschwinden lassen und einen globalen Counter erhöhen.
+		3. [ ] Timer einbauen, der bei Spielanfang beginnt und beim Einsammeln
+       des letzten Punktes aufhört.
+		4. [ ] Spielstates einbauen: 
+			 1. Freelook: Punkte sind schon generiert, die Kamera ist frei
+					und man kann sich einen Weg aussuchen.
+			 2. Pregame: Es wird der Spielername angezeigt, der jetzt dran
+					ist und die Aufforderung, eine Taste zu drücken um
+					anzufangen. Die Kamera ist hier schon über dem Fahrzeug
+					angebracht.
+			 3. Ingame: Das Spiel läuft, Punkte können eingesammelt
+					werden. Der Timer wird im Konstruktor gestartet. Ist der
+					letzte Punkt eingesammelt, wird das Ergebnis in eine globale
+					Tabelle für den Spieler eingetragen und der nächste Spieler
+					ist dran. Es wird in Pregame gewechselt, es sei denn, alle
+					Spieler sind fertig. In dem Fall wird in Gameover gewechselt.
+			 4. Gameover: Die Kamera wird um die Landschaft rotiert, eine
+					Tabelle mit dem Sieger und den anderen wird angezeigt. Ein
+					Tastendruck beendet das Spiel.
 
 * Aktivitäten
 ** DONE Kamera
@@ -330,7 +331,13 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 
 ** TODO HDR-Faking für besseres Licht
 ** TODO Physik, Fahrzeuge
+*** TODO insula::physics::model
+Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der angibt, wie dieses Model in der Physikengine dargestellt werden soll:
 
+-Boundingbox
+-Boundingcylinder
+-Boundingsphere
+-Exact
 ** TODO Wie gehts weiter? Sounds?
 ** TODO Diverses [12/15]
 *** DONE Framecounter einbauen

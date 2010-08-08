@@ -277,6 +277,40 @@ insula::height_map::object::render(
 
 
 
+insula::graphics::shader &
+insula::height_map::object::shader()
+{
+	return shader_;
+}
+
+insula::graphics::box const
+insula::height_map::object::extents()
+{
+	return 
+		extents_;
+}
+
+insula::height_map::array const &
+insula::height_map::object::heights() const
+{
+	return 
+		heights_;
+}
+
+insula::graphics::scalar
+insula::height_map::object::cell_size() const
+{
+	return 
+		cell_size_;
+}
+
+insula::graphics::scalar
+insula::height_map::object::height_scaling() const
+{
+	return 
+		height_scaling_;
+}
+
 void
 insula::height_map::object::regenerate(
 	graphics::scalar const &cell_size,
@@ -321,39 +355,6 @@ insula::height_map::object::regenerate(
 		gradient);
 }
 
-insula::graphics::shader &
-insula::height_map::object::shader()
-{
-	return shader_;
-}
-
-insula::graphics::box const
-insula::height_map::object::extents()
-{
-	return 
-		extents_;
-}
-
-insula::height_map::array const &
-insula::height_map::object::heights() const
-{
-	return 
-		heights_;
-}
-
-insula::graphics::scalar
-insula::height_map::object::cell_size() const
-{
-	return 
-		cell_size_;
-}
-
-insula::graphics::scalar
-insula::height_map::object::height_scaling() const
-{
-	return 
-		height_scaling_;
-}
 
 void
 insula::height_map::object::regenerate_buffers(

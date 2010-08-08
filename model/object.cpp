@@ -1,0 +1,218 @@
+#include "object.hpp"
+#include "vf/format.hpp"
+#include "vf/vertex_view.hpp"
+#include "vf/position.hpp"
+#include "vf/packed_position.hpp"
+#include "vf/texcoord.hpp"
+#include "vf/packed_texcoord.hpp"
+#include "../graphics/shader.hpp"
+#include "../graphics/camera.hpp"
+#include <sge/renderer/glsl/scoped_program.hpp>
+#include <sge/renderer/device.hpp>
+#include <sge/renderer/resource_flags_none.hpp>
+#include <sge/renderer/vf/dynamic/make_format.hpp>
+#include <sge/renderer/size_type.hpp>
+#include <sge/renderer/scoped_vertex_lock.hpp>
+#include <sge/renderer/vertex_buffer.hpp>
+#include <sge/renderer/index_buffer.hpp>
+#include <sge/renderer/lock_mode.hpp>
+#include <sge/renderer/scoped_index_lock.hpp>
+#include <sge/renderer/scoped_texture.hpp>
+#include <sge/renderer/scoped_vertex_buffer.hpp>
+#include <sge/renderer/first_vertex.hpp>
+#include <sge/renderer/vertex_count.hpp>
+#include <sge/renderer/indexed_primitive_type.hpp>
+#include <sge/renderer/primitive_count.hpp>
+#include <sge/renderer/texture.hpp>
+#include <sge/renderer/first_index.hpp>
+#include <sge/renderer/vf/view.hpp>
+#include <sge/renderer/vf/vertex.hpp>
+#include <sge/renderer/vf/iterator.hpp>
+#include <sge/model/index.hpp>
+#include <sge/model/object.hpp>
+#include <sge/model/index_sequence.hpp>
+#include <sge/model/vertex_sequence.hpp>
+#include <sge/model/texcoord.hpp>
+#include <sge/model/texcoord_sequence.hpp>
+#include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/text.hpp>
+#include <fcppt/io/cerr.hpp>
+#include <fcppt/variant/apply_unary.hpp>
+#include <type_traits>
+#include <algorithm>
+
+namespace
+{
+struct index_visitor
+{
+public:
+	typedef 
+	void 
+	result_type;
+
+	explicit
+	index_visitor(
+		sge::model::index_sequence const &indices)
+	:
+		indices(
+			indices)
+	{
+	}
+
+	template<typename T>
+	result_type
+	operator()(
+		T const &t) const
+	{
+		typedef typename 
+		T::value_type 
+		value_type;
+
+		typename T::iterator it = t.begin();
+
+		std::transform(
+			indices.begin(),
+			indices.end(),
+			it,
+			[](sge::model::index const &i) { return static_cast<value_type>(i); });
+	}
+private:
+	sge::model::index_sequence const &indices;
+};
+}
+
+insula::model::object::object(
+	graphics::camera const &_camera,
+	sge::model::object_ptr const model,
+	sge::renderer::device_ptr const _renderer,
+	graphics::shader &_shader,
+	sge::renderer::texture_ptr const _texture)
+:
+	camera_(
+		_camera),
+	renderer_(
+		_renderer),
+	shader_(
+		_shader),
+	texture_(
+		_texture)
+{
+	sge::renderer::glsl::scoped_program scoped_shader_(
+		renderer_,
+		shader_.program());
+
+	shader_.set_uniform(
+		FCPPT_TEXT("texture"),
+		0);
+
+	sge::model::vertex_sequence const vertices = 
+		model->vertices();
+
+	fcppt::io::cerr << "Got our vertex list" << "\n";
+
+	FCPPT_ASSERT(
+		model->texcoords());
+
+	fcppt::io::cerr << "Tex coords are present" << "\n";
+
+	sge::model::texcoord_sequence const texcoords = 
+		*(model->texcoords());
+
+	fcppt::io::cerr << "Got our texture coordinates" << "\n";
+
+	static_assert(
+		std::is_same
+		<
+			sge::model::vertex_sequence::size_type,
+			sge::model::texcoord_sequence::size_type
+		>::value,
+		"vertex_sequence und texcoord_sequence have to have the same size_type");
+
+	FCPPT_ASSERT(
+		vertices.size() == texcoords.size());
+
+	vb_ = 
+		renderer_->create_vertex_buffer(
+	 		sge::renderer::vf::dynamic::make_format<vf::format>(),
+	 		static_cast<sge::renderer::size_type>(
+	 			vertices.size()),
+	 		sge::renderer::resource_flags::none);
+
+	 sge::renderer::scoped_vertex_lock const vblock(
+	 	vb_,
+	 	sge::renderer::lock_mode::writeonly);
+
+	vf::vertex_view const vertices_view(
+		vblock.value());
+
+	vf::vertex_view::iterator vb_it(
+		vertices_view.begin());
+
+	for (
+		sge::model::vertex_sequence::size_type i = 0; 
+		i < vertices.size(); 
+		++i)
+	{
+		vb_it->set<vf::position>(
+			fcppt::math::vector::structure_cast<vf::packed_position>(
+				vertices[i]));
+		vb_it->set<vf::texcoord>(
+			fcppt::math::vector::structure_cast<vf::packed_texcoord>(
+				texcoords[i]));
+		vb_it++;
+	}
+
+	sge::model::index_sequence const indices = 
+		model->indices();
+
+	ib_ = 
+		renderer_->create_index_buffer(
+			sge::renderer::index::dynamic::format::i32,
+			static_cast<sge::renderer::size_type>(
+				indices.size()),
+			sge::renderer::resource_flags::none);
+
+	fcppt::variant::apply_unary(
+		index_visitor(
+			indices),
+		sge::renderer::scoped_index_lock(
+			ib_,
+			sge::renderer::lock_mode::writeonly).value().any());
+}
+
+void
+insula::model::object::render()
+{
+	sge::renderer::scoped_vertex_buffer const scoped_vb_(
+		renderer_,
+		vb_);
+
+	sge::renderer::glsl::scoped_program scoped_shader_(
+		renderer_,
+		shader_.program());
+
+	shader_.set_uniform(
+		FCPPT_TEXT("mvp"),
+		camera_.perspective() * 
+		camera_.rotation() * 
+		camera_.translation());
+
+	sge::renderer::scoped_texture scoped_tex(
+		renderer_,
+		texture_,
+		0);
+
+	renderer_->render(
+		ib_,
+		sge::renderer::first_vertex(
+			0),
+		sge::renderer::vertex_count(
+			vb_->size()),
+		sge::renderer::indexed_primitive_type::triangle,
+		sge::renderer::primitive_count(
+			ib_->size() / 3),
+		sge::renderer::first_index(
+			0));
+}
