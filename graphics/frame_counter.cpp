@@ -24,10 +24,11 @@ insula::graphics::frame_counter::frame_counter(
 :
 	renderer_(
 		_renderer),
-	font_(
+	metrics_(
 		fs->create_font(
 			sge::config::media_path()/FCPPT_TEXT("fonts")/FCPPT_TEXT("default.ttf"),
-			static_cast<sge::font::size_type>(15)),
+			static_cast<sge::font::size_type>(15))),
+	drawer_(
 		fcppt::make_shared_ptr<sge::font::drawer_3d>(
 			renderer_,
 			sge::image::colors::white()))
@@ -40,7 +41,8 @@ insula::graphics::frame_counter::update_and_render()
 	counter_.update();
 
 	sge::font::draw_text(
-		font_,
+		metrics_,
+		drawer_,
 		FCPPT_TEXT("FPS: ")+counter_.frames_str(),
 		sge::font::pos::null(),
 		fcppt::math::dim::structure_cast<sge::font::dim>(

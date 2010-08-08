@@ -6,6 +6,7 @@
 #include "model/object.hpp"
 #include "get_option.hpp"
 #include "media_path.hpp"
+#include "stdlib/copy.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
 #include <sge/image/create_texture.hpp>
@@ -46,8 +47,9 @@
 #include <sge/image/multi_loader.hpp>
 #include <sge/extension_set.hpp>
 #include <sge/plugin/manager.hpp>
-#include <sge/plugin/plugin.hpp>
+#include <sge/plugin/object.hpp>
 #include <sge/model/loader_ptr.hpp>
+#include <sge/model/object.hpp>
 #include <sge/model/object_ptr.hpp>
 #include <sge/model/loader.hpp>
 #include <sge/model/plugin.hpp>
@@ -63,6 +65,7 @@
 #include <fcppt/math/twopi.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/string.hpp>
+#include <fcppt/char_type.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/math/dim/output.hpp>
@@ -74,6 +77,7 @@
 #include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <iterator>
 #include <ostream>
 
 int main(int argc,char *argv[])
@@ -91,7 +95,9 @@ try
 	desc.add_options()
 		("help","produce help message")
 		("model",boost::program_options::value<fcppt::string>()->required(),"The model file to load")
-		("texture",boost::program_options::value<fcppt::string>()->required(),"The texture")
+		("texture",boost::program_options::value<fcppt::string>(),"The texture")
+		("list-parts",boost::program_options::value<bool>()->zero_tokens()->default_value(false),"List all the available parts")
+		("part",boost::program_options::value<fcppt::string>(),"Which part of the model we shall load")
 		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen")
 		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
 		("near",boost::program_options::value<graphics::scalar>()->default_value(1.0f),"Distance to the near plane")
@@ -139,20 +145,6 @@ try
 			sge::systems::image_loader(
 				sge::image::capabilities_field::null(),
 				fcppt::assign::make_container<sge::extension_set>(FCPPT_TEXT("png")))));
-	
-	sge::plugin::plugin<sge::model::loader>::ptr_type const model_plugin(
-		sys.plugin_manager().plugin<sge::model::loader>().load()); 
-
-	sge::model::loader_ptr const loader(
-		model_plugin->get()()); 
-
-	fcppt::io::cifstream ifs(
-		get_option<fcppt::string>(vm,"model"),
-		std::ios_base::binary);
-
-	sys.renderer()->state(
-		sge::renderer::state::list
-			(sge::renderer::state::cull_mode::off));
 
 	console::object console(
 		sys.input_system(),
@@ -176,10 +168,42 @@ try
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"));
 
-	model::object model(
-		cam,
+	
+	sge::plugin::object<sge::model::loader>::ptr_type const model_plugin(
+		sys.plugin_manager().plugin<sge::model::loader>().load()); 
+
+	sge::model::loader_ptr const loader(
+		model_plugin->get()()); 
+
+	fcppt::io::cifstream ifs(
+		get_option<fcppt::string>(vm,"model"),
+		std::ios_base::binary);
+	
+	sge::model::object_ptr const model_object = 
 		loader->load(
-			ifs),
+			ifs);
+
+	if (get_option<bool>(vm,"list-parts"))
+	{
+		fcppt::io::cout << FCPPT_TEXT("Available model parts are: \n\n");
+		stdlib::copy(
+			model_object->part_names(),
+			std::ostream_iterator<fcppt::string,fcppt::char_type>(
+				fcppt::io::cout,
+				FCPPT_TEXT("\n")));
+		return EXIT_SUCCESS;
+	}
+
+	if (!vm.count("texture"))
+	{
+		fcppt::io::cerr << FCPPT_TEXT("You have to specify a texture!\n");
+		return EXIT_FAILURE;
+	}
+
+	model::object model(
+		get_option<fcppt::string>(vm,"part"),
+		cam,
+		model_object,
 		sys.renderer(),
 		model_shader,
 		sge::image::create_texture(
@@ -236,9 +260,11 @@ try
 	sys.renderer()->state(
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::clear_backbuffer = true)
-			(sge::renderer::state::color::clear_color = sge::image::colors::black())
+			(sge::renderer::state::color::clear_color = sge::image::colors::white())
 			(sge::renderer::state::bool_::clear_zbuffer = true)
-		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f));
+		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
+			(sge::renderer::state::cull_mode::off)
+			(sge::renderer::state::depth_func::less));
 
 	while(running)
 	{

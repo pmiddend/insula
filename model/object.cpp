@@ -38,10 +38,14 @@
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/text.hpp>
-#include <fcppt/io/cerr.hpp>
 #include <fcppt/variant/apply_unary.hpp>
 #include <type_traits>
 #include <algorithm>
+
+// DEBUG
+#include <fcppt/math/vector/output.hpp>
+#include <fcppt/io/cerr.hpp>
+#include <fcppt/io/cout.hpp>
 
 namespace
 {
@@ -84,6 +88,7 @@ private:
 }
 
 insula::model::object::object(
+	fcppt::string const &part,
 	graphics::camera const &_camera,
 	sge::model::object_ptr const model,
 	sge::renderer::device_ptr const _renderer,
@@ -108,17 +113,19 @@ insula::model::object::object(
 		0);
 
 	sge::model::vertex_sequence const vertices = 
-		model->vertices();
+		model->vertices(
+			part);
 
 	fcppt::io::cerr << "Got our vertex list" << "\n";
 
 	FCPPT_ASSERT(
-		model->texcoords());
+		model->texcoords(
+			part));
 
 	fcppt::io::cerr << "Tex coords are present" << "\n";
 
 	sge::model::texcoord_sequence const texcoords = 
-		*(model->texcoords());
+		*(model->texcoords(part));
 
 	fcppt::io::cerr << "Got our texture coordinates" << "\n";
 
@@ -158,6 +165,7 @@ insula::model::object::object(
 		vb_it->set<vf::position>(
 			fcppt::math::vector::structure_cast<vf::packed_position>(
 				vertices[i]));
+
 		vb_it->set<vf::texcoord>(
 			fcppt::math::vector::structure_cast<vf::packed_texcoord>(
 				texcoords[i]));
@@ -165,7 +173,8 @@ insula::model::object::object(
 	}
 
 	sge::model::index_sequence const indices = 
-		model->indices();
+		model->indices(
+			part);
 
 	ib_ = 
 		renderer_->create_index_buffer(

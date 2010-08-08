@@ -8,7 +8,7 @@
 #include <sge/renderer/index_buffer_ptr.hpp>
 #include <sge/model/object_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
-#include <fcppt/filesystem/path.hpp>
+#include <fcppt/string.hpp>
 
 namespace insula
 {
@@ -22,6 +22,7 @@ public:
 
 	explicit 
 	object(
+		fcppt::string const &part,
 		graphics::camera const &,
 		sge::model::object_ptr,
 		sge::renderer::device_ptr,

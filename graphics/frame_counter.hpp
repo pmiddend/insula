@@ -3,7 +3,8 @@
 
 #include <sge/time/frames_counter.hpp>
 #include <sge/renderer/device_ptr.hpp>
-#include <sge/font/object.hpp>
+#include <sge/font/metrics_ptr.hpp>
+#include <sge/font/drawer_ptr.hpp>
 #include <sge/font/system_ptr.hpp>
 
 namespace insula
@@ -26,7 +27,8 @@ public:
 private:
 	sge::time::frames_counter counter_;
 	sge::renderer::device_ptr const renderer_;
-	sge::font::object font_;
+	sge::font::metrics_ptr metrics_;
+	sge::font::drawer_ptr drawer_;
 };
 }
 }
