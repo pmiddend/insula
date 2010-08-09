@@ -276,7 +276,8 @@ try
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
 
-		model.render();
+		model.render(
+			graphics::mat4::identity());
 		console.render();
 	}
 }

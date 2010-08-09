@@ -1,4 +1,5 @@
 * Kurzzeitvorgehen
+
 ** bullet
 1. kdevelop neu installieren
 2. bullet in kdevelop öffnen
@@ -18,6 +19,27 @@
 6. Für Auto: Dynamics/Vehicle/*?
 7. btMotionState überladen
 8. [[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
+
+- Erstelle Klasse physics::vehicle. 
+- Die kriegt ein Model "chassis" im Konstruktor, was zum Chassis wird
+  (als Boxshape). D.h. man muss sich die Boundingbox merken. 
+- Zudem kriegt die ein Model "wheel", was für die Räder eingesetzt wird.
+- Es kriegt dazu noch einen Container aus "wheel_infos". Dazu gehört:
+  - Relative Position des Zentrums des Wheels
+	- Ein Flag, ob es ein Vorderrad ist.
+	- Suspension-Stiffness
+  - Damping Relaxation
+  - DampingCompression
+  - Frictionslip
+  - Rollinfluence
+	- Maxium Suspension Force (erstmal nicht beachten)
+	- Gets Engine Force
+  - Gets Breaking Force
+  - Gets Steering
+- Es kriegt ein Gewicht
+
+- Schreibe Klasse, die Input-Events auf Fahrzeugaktionen umleitet
+  (Steering ändert etc.)
 
 * Roadmap
 ** Spielbeschreibung
@@ -338,8 +360,9 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 -Boundingcylinder
 -Boundingsphere
 -Exact
+*** TODO Die Fahrzeugeigenschaften sollten in einer json-Datei zusammengefasst werden
 ** TODO Wie gehts weiter? Sounds?
-** TODO Diverses [12/15]
+** TODO Diverses [13/16]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
@@ -404,5 +427,10 @@ Far-Plane, die näher dran ist.
 	 in 2 genannten String definieren. Der wird im Vertexshader durch
 	 $$$inputs$$$ ersetzt.
 *** DONE Die anderen Tests wieder lauffähig machen
-*** TODO height_map brauch ein Signal "heights_changed", was an die Physik weitergegeben wird
+*** DONE height_map brauch ein Signal "heights_changed", was an die Physik weitergegeben wird
+*** TODO Das Terrain muss flipQuadEdges haben
+		 CLOSED: [2010-08-08 Sun 23:10]
 		 CLOSED: [2010-08-03 Tue 20:44
+		 
+*** TODO wheel_info muss in cpp ausgelagert werden.
+*** TODO world muss mehr RAII kriegen

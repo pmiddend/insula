@@ -11,6 +11,6 @@ void main()
 			texture,
 			vec2(
 				texcoord_out.s,
-				1.0 - texcoord_out.t));
+				texcoord_out.t));
 }
 

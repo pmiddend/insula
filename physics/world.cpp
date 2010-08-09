@@ -68,6 +68,28 @@ insula::physics::world::remove(
 		&b);
 }
 
+void
+insula::physics::world::add(
+	btActionInterface &b)
+{
+	world_->addAction(
+		&b);
+}
+
+void
+insula::physics::world::remove(
+	btActionInterface &b)
+{
+	world_->removeAction(
+		&b);
+}
+
+btDynamicsWorld &
+insula::physics::world::handle()
+{
+	return *world_;
+}
+
 insula::physics::world::~world()
 {
 }

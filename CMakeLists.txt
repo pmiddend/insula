@@ -46,7 +46,7 @@ IF (${CMAKE_COMPILER_IS_GNUCXX})
 	"-std=c++0x")
 
 	IF (ENABLE_OPTIMIZATIONS)
-		ADD_DEFINITIONS("-O0")
+		ADD_DEFINITIONS("-O3")
 	ENDIF()
 	# we don't use long long but boost does :(
 
@@ -107,6 +107,7 @@ ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp
 	${skydome_files}
 	${water_files}
 	${physics_files}
+	${model_files}
 	)
 ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
 	${height_map_files} ${texture_files} ${graphics_files} ${console_files})

@@ -50,7 +50,7 @@ insula::physics::height_field::height_field(
 			to_bullet_type<scalar>::value,
 			// This determines how the quads are triangulated (there are two
 			// possibilities)
-			false));
+			true));
 
 
 	// Set local scaling (grid sizes)

@@ -10,6 +10,7 @@ class btBroadphaseInterface;
 class btConstraintSolver;
 class btDynamicsWorld;
 class btRigidBody;
+class btActionInterface;
 
 namespace insula
 {
@@ -36,6 +37,18 @@ public:
 	void
 	remove(
 		btRigidBody &);
+
+	void
+	add(
+		btActionInterface &);
+
+	void
+	remove(
+		btActionInterface &);
+
+	// The raycast vehicle needs this in the constructor
+	btDynamicsWorld &
+	handle();
 
 	// Has to be there because of the destructors of incomplete types
 	~world();

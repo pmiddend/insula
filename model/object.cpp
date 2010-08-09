@@ -7,6 +7,7 @@
 #include "vf/packed_texcoord.hpp"
 #include "../graphics/shader.hpp"
 #include "../graphics/camera.hpp"
+#include "../graphics/dim3.hpp"
 #include <sge/renderer/glsl/scoped_program.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
@@ -28,6 +29,11 @@
 #include <sge/renderer/vf/view.hpp>
 #include <sge/renderer/vf/vertex.hpp>
 #include <sge/renderer/vf/iterator.hpp>
+#include <sge/renderer/state/list.hpp>
+#include <sge/renderer/state/trampoline.hpp>
+#include <sge/renderer/state/cull_mode.hpp>
+#include <sge/renderer/state/scoped.hpp>
+#include <sge/renderer/state/depth_func.hpp>
 #include <sge/model/index.hpp>
 #include <sge/model/object.hpp>
 #include <sge/model/index_sequence.hpp>
@@ -36,7 +42,10 @@
 #include <sge/model/texcoord_sequence.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/box/basic_impl.hpp>
+#include <fcppt/math/box/extend_bounding_box.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/variant/apply_unary.hpp>
 #include <type_traits>
@@ -49,6 +58,14 @@
 
 namespace
 {
+sge::model::position const
+transform(
+	sge::model::position p)
+{
+	std::swap(p[1],p[2]);
+	return p;
+}
+
 struct index_visitor
 {
 public:
@@ -93,7 +110,8 @@ insula::model::object::object(
 	sge::model::object_ptr const model,
 	sge::renderer::device_ptr const _renderer,
 	graphics::shader &_shader,
-	sge::renderer::texture_ptr const _texture)
+	sge::renderer::texture_ptr const _texture,
+	sge::model::scalar const scaling)
 :
 	camera_(
 		_camera),
@@ -102,7 +120,8 @@ insula::model::object::object(
 	shader_(
 		_shader),
 	texture_(
-		_texture)
+		_texture),
+	bounding_box_()
 {
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
@@ -157,14 +176,34 @@ insula::model::object::object(
 	vf::vertex_view::iterator vb_it(
 		vertices_view.begin());
 
+	FCPPT_ASSERT(
+		vertices.size());
+
+	bounding_box_.pos(
+		scaling * 
+		transform(
+			vertices[0]));
+	bounding_box_.dimension(
+		graphics::dim3::null());
+
 	for (
 		sge::model::vertex_sequence::size_type i = 0; 
 		i < vertices.size(); 
 		++i)
 	{
+		sge::model::position real_pos = 
+			scaling * 
+			transform(
+				vertices[i]);
+
+		bounding_box_ = 
+			fcppt::math::box::extend_bounding_box(
+				bounding_box_,
+				real_pos);
+
 		vb_it->set<vf::position>(
-			fcppt::math::vector::structure_cast<vf::packed_position>(
-				vertices[i]));
+			vf::packed_position(
+				real_pos));
 
 		vb_it->set<vf::texcoord>(
 			fcppt::math::vector::structure_cast<vf::packed_texcoord>(
@@ -192,8 +231,15 @@ insula::model::object::object(
 }
 
 void
-insula::model::object::render()
+insula::model::object::render(
+	graphics::mat4 const &transform)
 {
+	sge::renderer::state::scoped const sstate(
+		renderer_,
+		sge::renderer::state::list
+			(sge::renderer::state::cull_mode::back)
+			(sge::renderer::state::depth_func::less));
+
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,
 		vb_);
@@ -206,7 +252,8 @@ insula::model::object::render()
 		FCPPT_TEXT("mvp"),
 		camera_.perspective() * 
 		camera_.rotation() * 
-		camera_.translation());
+		camera_.translation() * 
+		transform);
 
 	sge::renderer::scoped_texture scoped_tex(
 		renderer_,
@@ -224,4 +271,10 @@ insula::model::object::render()
 			ib_->size() / 3),
 		sge::renderer::first_index(
 			0));
+}
+
+insula::graphics::box const
+insula::model::object::bounding_box() const
+{
+	return bounding_box_;
 }
