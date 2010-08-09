@@ -19,6 +19,9 @@
 // DEBUG
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/vector/output.hpp>
+#include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/box/output.hpp>
+#include "bullet_to_vec3.hpp"
 
 namespace
 {
@@ -86,11 +89,6 @@ insula::physics::vehicle::vehicle(
 	compound_.reset(
 		new btCompoundShape());
 
-	btVector3 local_inertia;
-	compound_->calculateLocalInertia(
-		mass,
-		local_inertia);
-
 	compound_->addChildShape(
 		btTransform(
 			btMatrix3x3::getIdentity(),
@@ -99,6 +97,11 @@ insula::physics::vehicle::vehicle(
 				chassis_position,
 				0)),
 		chassis_box_.get());
+
+	btVector3 local_inertia;
+	compound_->calculateLocalInertia(
+		mass,
+		local_inertia);
 
 	car_body_.reset(
 		new btRigidBody(
@@ -117,6 +120,9 @@ insula::physics::vehicle::vehicle(
 
 	graphics::box const wheel_box = 
 		wheel_model_.bounding_box();
+
+	// DEBUG
+	fcppt::io::cout << "the wheel box is " << wheel_box << "\n";
 
 	scalar const 
 		wheel_halfwidth = 
@@ -194,8 +200,8 @@ insula::physics::vehicle::update()
 		if (wheels_[i].gets_engine_force())
 		{
 			vehicle_->applyEngineForce(
-				//current_engine_force_,
-				max_engine_force_,
+				current_engine_force_,
+				//max_engine_force_,
 				static_cast<int>(
 					i));
 		}
@@ -216,25 +222,24 @@ insula::physics::vehicle::update()
 			static_cast<int>(
 				i),
 			true);
-
-		wheel_model_.render(
-			transform_to_mat4(
-				vehicle_->getWheelInfo(static_cast<int>(i)).m_worldTransform));
 	}
-
-	chassis_model_.render(
-		matrix_transform_);
 }
 
 void
 insula::physics::vehicle::render()
 {
+	// DEBUG
+	//fcppt::io::cout << "wheel begin\n";
 	for (wheel_info_sequence::size_type i = 0; i < wheels_.size(); ++i)
 	{
+		// DEBUG
+		//fcppt::io::cout << "wheel translation: " << bullet_to_vec3(vehicle_->getWheelInfo(static_cast<int>(i)).m_worldTransform.getOrigin()) << "\n";
 		wheel_model_.render(
 			transform_to_mat4(
 				vehicle_->getWheelInfo(static_cast<int>(i)).m_worldTransform));
 	}
+	// DEBUG
+	//fcppt::io::cout << "wheel end\n";
 
 	chassis_model_.render(
 		matrix_transform_);

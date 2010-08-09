@@ -25,7 +25,7 @@ public:
 		suspension_damping_(
 			static_cast<scalar>(0.88)),
 		suspension_rest_length_(
-			static_cast<scalar>(0)),
+			static_cast<scalar>(10)),
 		damping_relaxation_(
 			static_cast<scalar>(2.3)),
 		damping_compression_(

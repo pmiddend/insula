@@ -337,13 +337,15 @@ try
 
 	physics_vehicle_pos[1] = terrain->extents().dimension()[1];
 
+	physics::scalar const wheel_offset = static_cast<physics::scalar>(-0.8);
+
 	physics::wheel_info_sequence wheels;
 	wheels.push_back(
 		physics::wheel_info()
 			.position(
 				vehicle_scaling * physics::vec3(
 					0.9f,
-					0.0f,
+					wheel_offset,
 					1.2f))
 			.is_front_wheel()
 			.gets_steering()
@@ -353,7 +355,7 @@ try
 			.position(
 				vehicle_scaling * physics::vec3(
 					-0.9f,
-					0.0f,
+					wheel_offset,
 					1.2f))
 			.is_front_wheel()
 			.gets_steering()
@@ -363,7 +365,7 @@ try
 			.position(
 				vehicle_scaling * physics::vec3(
 					0.9f,
-					0.0f,
+					wheel_offset,
 					-0.85f))
 			.gets_engine_force()
 			.gets_breaking_force()
@@ -373,7 +375,7 @@ try
 			.position(
 				vehicle_scaling * physics::vec3(
 					-0.9f,
-					0.0f,
+					wheel_offset,
 					-0.85f))
 			.gets_engine_force()
 			.gets_breaking_force()
@@ -384,7 +386,7 @@ try
 		sys.renderer(),
 		chassis_model,
 		get_option<physics::scalar>(vm,"vehicle-mass"),
-		get_option<physics::scalar>(vm,"chassis-offset"),
+		vehicle_scaling * get_option<physics::scalar>(vm,"chassis-offset"),
 		physics_vehicle_pos, 
 		// max engine force
 		100,

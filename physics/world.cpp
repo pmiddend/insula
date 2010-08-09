@@ -72,7 +72,10 @@ void
 insula::physics::world::add(
 	btActionInterface &b)
 {
-	world_->addAction(
+	// DEBUG
+	//world_->addAction(
+		//&b);
+	world_->addVehicle(
 		&b);
 }
 
@@ -80,7 +83,10 @@ void
 insula::physics::world::remove(
 	btActionInterface &b)
 {
-	world_->removeAction(
+	// DEBUG
+	//world_->removeAction(
+		//&b);
+	world_->removeVehicle(
 		&b);
 }
 
