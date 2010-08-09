@@ -1,7 +1,7 @@
 #ifndef INSULA_PHYSICS_VEHICLE_HPP_INCLUDED
 #define INSULA_PHYSICS_VEHICLE_HPP_INCLUDED
 
-#include "../model/object_fwd.hpp"
+#include "../model/object_ptr.hpp"
 #include "../graphics/mat4.hpp"
 #include "wheel_info_sequence.hpp"
 #include "vec3.hpp"
@@ -35,13 +35,13 @@ public:
 	vehicle(
 		world &,
 		sge::renderer::device_ptr,
-		model::object &chassis,
+		model::object_ptr chassis,
 		scalar mass,
 		scalar chassis_position,
 		vec3 const &position,
 		scalar max_engine_force,
 		scalar max_breaking_force,
-		model::object &wheel,
+		model::object_ptr wheel,
  		wheel_info_sequence const &);
 
 	void
@@ -66,8 +66,8 @@ private:
 	scalar current_engine_force_;
 	scalar current_breaking_force_;
 	scalar current_steering_;
-	model::object &chassis_model_;
-	model::object &wheel_model_;
+	model::object_ptr chassis_model_;
+	model::object_ptr wheel_model_;
 	btTransform transform_;
 	graphics::mat4 matrix_transform_;
 

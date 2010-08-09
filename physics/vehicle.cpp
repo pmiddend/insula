@@ -43,13 +43,13 @@ create_tuning(
 insula::physics::vehicle::vehicle(
 	world &_world,
 	sge::renderer::device_ptr const _renderer,
-	model::object &_chassis_model,
+	model::object_ptr _chassis_model,
 	scalar const mass,
 	scalar const chassis_position,
 	vec3 const &_position,
 	scalar const _max_engine_force,
 	scalar const _max_breaking_force,
-	model::object &_wheel_model,
+	model::object_ptr _wheel_model,
 	wheel_info_sequence const &_wheels)
 :
 	renderer_(
@@ -84,7 +84,7 @@ insula::physics::vehicle::vehicle(
 		new btBoxShape(
 			dim3_to_bullet(
 				fcppt::math::dim::structure_cast<dim3>(
-					chassis_model_.bounding_box().dimension()))));
+					chassis_model_->bounding_box().dimension()))));
 	
 	compound_.reset(
 		new btCompoundShape());
@@ -119,10 +119,7 @@ insula::physics::vehicle::vehicle(
 		DISABLE_DEACTIVATION);
 
 	graphics::box const wheel_box = 
-		wheel_model_.bounding_box();
-
-	// DEBUG
-	fcppt::io::cout << "the wheel box is " << wheel_box << "\n";
+		wheel_model_->bounding_box();
 
 	scalar const 
 		wheel_halfwidth = 
@@ -165,7 +162,6 @@ insula::physics::vehicle::vehicle(
 		wheel_info const &w,
 		wheels_)
 	{
-		fcppt::io::cout << "wheel's position is " << w.position() << "\n";
 		vehicle_->addWheel(
 			vec3_to_bullet(
 				w.position()),
@@ -228,20 +224,14 @@ insula::physics::vehicle::update()
 void
 insula::physics::vehicle::render()
 {
-	// DEBUG
-	//fcppt::io::cout << "wheel begin\n";
 	for (wheel_info_sequence::size_type i = 0; i < wheels_.size(); ++i)
 	{
-		// DEBUG
-		//fcppt::io::cout << "wheel translation: " << bullet_to_vec3(vehicle_->getWheelInfo(static_cast<int>(i)).m_worldTransform.getOrigin()) << "\n";
-		wheel_model_.render(
+		wheel_model_->render(
 			transform_to_mat4(
 				vehicle_->getWheelInfo(static_cast<int>(i)).m_worldTransform));
 	}
-	// DEBUG
-	//fcppt::io::cout << "wheel end\n";
 
-	chassis_model_.render(
+	chassis_model_->render(
 		matrix_transform_);
 }
 

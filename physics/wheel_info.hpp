@@ -48,7 +48,7 @@ public:
 	wheel_info &position(vec3 const &p) { position_ = p; return *this; }
 	vec3 const &position() const { return position_; }
 
-	wheel_info &is_front_wheel() { is_front_wheel_ = true; return *this; }
+	wheel_info &is_front_wheel(bool const i) { is_front_wheel_ = i; return *this; }
 	bool is_front_wheel() const { return is_front_wheel_; }
 
 	wheel_info &suspension_stiffness(scalar const s) { suspension_stiffness_ = s; return *this; }
@@ -78,13 +78,13 @@ public:
 	wheel_info &maximum_suspension_force(scalar const s) { maximum_suspension_force_ = s; return *this; }
 	scalar maximum_suspension_force() const { return maximum_suspension_force_; }
 
-	wheel_info &gets_engine_force() { gets_engine_force_ = true; return *this; }
+	wheel_info &gets_engine_force(bool const i) { gets_engine_force_ = i; return *this; }
 	bool gets_engine_force() const { return gets_engine_force_; }
 
-	wheel_info &gets_breaking_force() { gets_breaking_force_ = true; return *this; }
+	wheel_info &gets_breaking_force(bool const i) { gets_breaking_force_ = i; return *this; }
 	bool gets_breaking_force() const { return gets_breaking_force_; }
 
-	wheel_info &gets_steering() { gets_steering_ = true; return *this; }
+	wheel_info &gets_steering(bool const i) { gets_steering_ = i; return *this; }
 	bool gets_steering() const { return gets_steering_; }
 private:
 	vec3 position_;

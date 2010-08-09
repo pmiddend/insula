@@ -1,0 +1,47 @@
+{
+	"chassis" : 
+		{
+			"model" : "insula_car.md3",
+			"texture" : "insula_car.png"
+		},
+	"wheel" : 
+		{
+			"model" : "insula_car_wheel.md3",
+			"texture" : "insula_car.png"
+		},
+
+	"mass" : 20.0,
+	"chassis_center_of_mass_shift" : 1.384,
+	"max_engine_force" : 100.0,
+	"max_breaking_force" : 100.0,
+	"scaling" : 40.0,
+
+	"default_wheel" : 
+		{
+			"offset" : [0.0,0.0,0.0]
+		},
+		
+	"wheels" : 
+		[
+			{
+				"offset" : [0.9,-0.8,1.2],
+				"front_wheel" : true,
+				"gets_steering" : true
+			},
+			{
+				"offset" : [-0.9,-0.8,1.2],
+				"front_wheel" : true,
+				"gets_steering" : true
+			},
+			{
+				"offset" : [0.9,-0.8,-0.85],
+				"gets_engine_force" : true,
+				"gets_breaking_force" : true
+			},
+			{
+				"offset" : [-0.9,-0.8,-0.85],
+				"gets_engine_force" : true,
+				"gets_breaking_force" : true
+			}
+		]
+}

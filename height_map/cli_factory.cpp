@@ -32,7 +32,9 @@ insula::height_map::cli_factory(
 			renderer,
 			image_to_array(
 				image_loader.load(
-					media_path()/get_option<fcppt::string>(vm,"height-map"))),
+					media_path()/
+					FCPPT_TEXT("heightfields")/
+					get_option<fcppt::string>(vm,"height-map"))),
 			get_option<graphics::scalar>(vm,"cell-size"),
 	//		get_option<graphics::scalar>(vm,"cell-size"),
 			get_option<graphics::scalar>(vm,"height-scaling"),
@@ -40,9 +42,15 @@ insula::height_map::cli_factory(
 			get_option<graphics::scalar>(vm,"ambient-light"),
 			get_option<graphics::scalar>(vm,"texture-scaling"),
 			image_loader.load(
-				media_path()/get_option<fcppt::string>(vm,"gradient-texture")),
+				media_path()/
+				FCPPT_TEXT("textures")/
+				get_option<fcppt::string>(vm,"gradient-texture")),
 			image_loader.load(
-				media_path()/height_textures[0]),
+				media_path()/
+				FCPPT_TEXT("textures")/
+				height_textures[0]),
 			image_loader.load(
-				media_path()/height_textures[1]));
+				media_path()/
+				FCPPT_TEXT("textures")/
+				height_textures[1]));
 }

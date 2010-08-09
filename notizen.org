@@ -1,45 +1,32 @@
 * Kurzzeitvorgehen
 
-** bullet
-1. kdevelop neu installieren
-2. bullet in kdevelop öffnen
-3. HelloWorld verstehen, dazu Manual lesen
-4. 3D-Physikbeispiel in sge nachbauen (Ball, der auf schiefe Ebene fällt, oder so)
-	 Mathematica.
-
-1. btCollisionObject hat eine Shape und ein Transform
-2. Eine Shape kann von mehreren btCollisionObjects benutzt
-   werden. D.h. ein Fahrzeug oder ein Baum würde nur _einmal_ als Shape
-   modelliert und dann nur weitergegeben.
-3. btCollisionWorld enthält btCollisionObjects (btDiscreteDynamicsWorld
-   ist davon abgeleitet)
-4. btPersistentManifold ist ein Cache für ein Paar von Objekten. Es
-   werden Kontaktpunkt gespeichert.
-5. Für Terrain: btHeightfieldTerrainShape als Shape.
-6. Für Auto: Dynamics/Vehicle/*?
-7. btMotionState überladen
-8. [[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
-
-- Erstelle Klasse physics::vehicle. 
-- Die kriegt ein Model "chassis" im Konstruktor, was zum Chassis wird
-  (als Boxshape). D.h. man muss sich die Boundingbox merken. 
-- Zudem kriegt die ein Model "wheel", was für die Räder eingesetzt wird.
-- Es kriegt dazu noch einen Container aus "wheel_infos". Dazu gehört:
-  - Relative Position des Zentrums des Wheels
-	- Ein Flag, ob es ein Vorderrad ist.
-	- Suspension-Stiffness
-  - Damping Relaxation
-  - DampingCompression
-  - Frictionslip
-  - Rollinfluence
-	- Maxium Suspension Force (erstmal nicht beachten)
-	- Gets Engine Force
-  - Gets Breaking Force
-  - Gets Steering
-- Es kriegt ein Gewicht
-
 - Schreibe Klasse, die Input-Events auf Fahrzeugaktionen umleitet
   (Steering ändert etc.)
+- Hierzu muss ein Vehikel eine Funktion "set_steering" bekommen, die
+  das Steering als Bogenmaß oder so setzt. Mal gucken was bullet dafür
+  nimmt.
+- Außerdem brauch ein Vehikel eine Funktion "set_force", die am besten
+  ein float in [0,1] bekommt und das anteilig an der maximum-Force
+  macht.
+- Dasselbe beim Bremsen.
+- Der Fahrzeugtest bekommt als Kommandozeilenparameter eine
+  json-Datei, die dann geladen wird.
+- Man kann die Kamera (in einer festlegbaren Entfernung) an ein festes
+  oder sich bewegendes Objekt binden. Das läuft so: Es gibt eine
+  globale Funktion "lock_camera_to". Diese bekommt:
+	- die Kamera und
+	- ein gizmo (forward,right,up), also ein Koordinatenkreuz
+	- eine Position p
+	- zwei Abstände, d_forward und d_up
+  Die Kamera bewegt sich dann von p ausgehend -d_forward nach "hinten"
+  und dann d_up nach "oben". Es wird dann natürlich das lokale
+  Koordinatensystem des Fahrzeugs übergeben (wie kommt man da ran?)
+- Danach Nebel einbauen
+- Dann Fahrsounds einbauen (bzw. allgemein Sounds)
+- Dann Spielmechanik implementieren (einsammeln von Checkpoints) und
+  somit erste Version des Spiels komplettieren
+- Danach Shadowmaps einbauen
+- Dann Hindernisse
 
 * Roadmap
 ** Spielbeschreibung
@@ -108,15 +95,15 @@ Somit bräuchte man für das Spiel nicht allzu viel:
  weil die sich nicht um Kollision mit Wänden und Decken kümmern muss)
 -Soundkrams (wobei der in sge schon ganz gut integriert ist)
 
-** Vorgehen der Reihe nach [1/9]
+** Vorgehen der Reihe nach [6/10]
 1. [X] Gucken ob es Beispiele zu bullet mit Terrain gibt 
-2. [ ] md3-Loader von sge ausprobieren, ein Model laden
-3. [ ] Das Model in einem separaten Programm anzeigen lassen
-4. [ ] bullet-Beispiele zu Fahrzeugen genau studieren, dabei drauf
+2. [X] md3-Loader von sge ausprobieren, ein Model laden
+3. [X] Das Model in einem separaten Programm anzeigen lassen
+4. [X] bullet-Beispiele zu Fahrzeugen genau studieren, dabei drauf
    achten, wie man Models in Bullet integriert
-5. [ ] Probieren, ein md2-Model mit einem bullet-Model zu verbinden,
+5. [X] Probieren, ein md2-Model mit einem bullet-Model zu verbinden,
    sodass man z.B. einen Klotz über die Landschaft purzeln lassen kann
-6. [ ] Ein Fahrzeug auf die Landschaft tun
+6. [X] Ein Fahrzeug auf die Landschaft tun
 7. [ ] Die Kamera von hinten oben auf das Fahrzeug richten, darauf
    achten dass der Abstand konstant ist.
 8. [ ] Das Fahrzeug mit den Pfeiltasten steuerbar machen
@@ -348,11 +335,9 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 	4. Mache dasselbe wie bei der fremden Methode.
 
 ** TODO Terraingenerierung
-** TODO Models (Bäume etc.)
 ** TODO Shadow Maps
 
-** TODO HDR-Faking für besseres Licht
-** TODO Physik, Fahrzeuge
+** TODO Physik, Fahrzeuge [0/6]
 *** TODO insula::physics::model
 Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der angibt, wie dieses Model in der Physikengine dargestellt werden soll:
 
@@ -360,9 +345,13 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 -Boundingcylinder
 -Boundingsphere
 -Exact
-*** TODO Die Fahrzeugeigenschaften sollten in einer json-Datei zusammengefasst werden
-** TODO Wie gehts weiter? Sounds?
-** TODO Diverses [13/16]
+*** TODO Setter für gravity
+*** TODO json-Part muss in mehrere Dateien aufgeteilt werden
+*** TODO Nach weiteren Eigenschaften von Fahrzeugen gucken, die noch nicht in wheel_info sind
+*** TODO wheel_info muss in cpp ausgelagert werden.
+*** TODO world muss mehr RAII kriegen
+** TODO Sounds
+** TODO Diverses [14/18]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
@@ -428,9 +417,7 @@ Far-Plane, die näher dran ist.
 	 $$$inputs$$$ ersetzt.
 *** DONE Die anderen Tests wieder lauffähig machen
 *** DONE height_map brauch ein Signal "heights_changed", was an die Physik weitergegeben wird
-*** TODO Das Terrain muss flipQuadEdges haben
-		 CLOSED: [2010-08-08 Sun 23:10]
+*** DONE Das Terrain muss flipQuadEdges haben
+		 CLOSED: [2010-08-09 Mon 20:58]
 		 CLOSED: [2010-08-03 Tue 20:44
 		 
-*** TODO wheel_info muss in cpp ausgelagert werden.
-*** TODO world muss mehr RAII kriegen

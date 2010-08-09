@@ -18,16 +18,6 @@
 #include "water/console_proxy.hpp"
 #include "water/cli_options.hpp"
 #include "water/cli_factory.hpp"
-// vehicle begin
-#include "model/object.hpp"
-#include "physics/world.hpp"
-#include "physics/sphere.hpp"
-#include "physics/height_field.hpp"
-#include "physics/scalar.hpp"
-#include "physics/vec3.hpp"
-#include "physics/vehicle.hpp"
-#include "media_path.hpp"
-// vehicle end
 #include "get_option.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
@@ -67,18 +57,17 @@
 #include <sge/input/key_code.hpp>
 #include <sge/all_extensions.hpp>
 // vehicle begin
+#include "physics/world.hpp"
+#include "physics/height_field.hpp"
+#include "physics/json/parse_vehicle.hpp"
+#include "physics/vehicle.hpp"
+#include "media_path.hpp"
 #include <sge/model/loader_ptr.hpp>
-#include <sge/model/loader.hpp>
-#include <sge/model/object_ptr.hpp>
-#include <sge/model/object.hpp>
 #include <sge/model/plugin.hpp>
-#include <sge/plugin/manager.hpp>
-#include <sge/plugin/context.hpp>
+#include <sge/model/object_ptr.hpp>
 #include <sge/plugin/object.hpp>
-#include <sge/image/create_texture.hpp>
-#include <sge/renderer/filter/linear.hpp>
-#include <sge/renderer/resource_flags_none.hpp>
-#include <fcppt/io/cifstream.hpp>
+#include <sge/plugin/context.hpp>
+#include <sge/plugin/manager.hpp>
 // vehicle end
 #include <sge/model/loader_ptr.hpp>
 #include <fcppt/log/activate_levels.hpp>
@@ -139,12 +128,7 @@ try
 		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
 		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera")
 		// vehicle begin
-		("chassis-model",boost::program_options::value<fcppt::string>()->required(),"chassis model")
-		("chassis-texture",boost::program_options::value<fcppt::string>()->required(),"chassis texture")
-		("wheel-model",boost::program_options::value<fcppt::string>()->required(),"Wheel model")
-		("wheel-texture",boost::program_options::value<fcppt::string>()->required(),"Wheel texture")
-		("vehicle-mass",boost::program_options::value<physics::scalar>()->default_value(static_cast<physics::scalar>(500)),"Mass of the vehicle")
-		("chassis-offset",boost::program_options::value<physics::scalar>()->required(),"Vertical offset of the chassis");
+		("vehicle-file",boost::program_options::value<fcppt::string>(),"The json file below media_path/vehicles that specifies the vehicle to load");
 		// vehicle end
 	
 	boost::program_options::variables_map vm;
@@ -264,6 +248,35 @@ try
 		terrain->height_scaling());
 
 	// vehicle begin
+	physics::vec3 physics_vehicle_pos = 
+		fcppt::math::vector::structure_cast<physics::vec3>(
+			fcppt::math::box::center(
+				terrain->extents()));
+
+	physics_vehicle_pos[1] = terrain->extents().dimension()[1];
+
+	sge::plugin::object<sge::model::loader>::ptr_type const model_plugin(
+		sys.plugin_manager().plugin<sge::model::loader>().load()); 
+
+	sge::model::loader_ptr const model_loader(
+		model_plugin->get()()); 
+
+	graphics::shader model_shader(
+		sys.renderer(),
+		media_path()/FCPPT_TEXT("model_vertex.glsl"),
+		media_path()/FCPPT_TEXT("model_fragment.glsl"));
+
+	physics::vehicle_ptr const vehicle = 
+		physics::json::parse_vehicle(
+			media_path()/FCPPT_TEXT("vehicles")/get_option<fcppt::string>(vm,"vehicle-file"),
+			physics_world,
+			physics_vehicle_pos,
+			sys.renderer(),
+			sys.image_loader(),
+			model_loader,
+			model_shader,
+			cam);
+#if 0
 
 	graphics::shader model_shader(
 		sys.renderer(),
@@ -394,6 +407,7 @@ try
 		100,
 		wheel_model,
 		wheels);
+#endif
 	// vehicle end
 
 	/*
@@ -521,8 +535,8 @@ try
 			time_delta);
 
 		// vehicle begin
-		vehicle.update();
-		vehicle.render();
+		vehicle->update();
+		vehicle->render();
 		// vehicle end
 		
 		if (show_fps)

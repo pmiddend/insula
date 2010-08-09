@@ -11,6 +11,7 @@
 #include <sge/model/object_ptr.hpp>
 #include <sge/model/scalar.hpp>
 #include <sge/renderer/texture_ptr.hpp>
+#include <fcppt/math/box/basic_impl.hpp>
 #include <fcppt/string.hpp>
 
 namespace insula

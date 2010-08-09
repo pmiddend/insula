@@ -2,4 +2,4 @@
 
 #build/render_scene --height-map real_insula.png --gradient-texture textures/rock_512.png --height-texture textures/grass_512.png textures/sand_512.png "$@"
 #build/render_scene --height-map black_257.png --gradient-texture textures/rock_512.png --height-texture textures/grass_512.png textures/sand_512.png "$@"
-build/render_scene --height-map real_insula.png --gradient-texture textures/rock_512.png --height-texture textures/grass_512.png textures/sand_512.png --height-scaling 1000 "$@"
+build/render_scene --height-map real_insula.png --gradient-texture rock_512.png --height-texture grass_512.png sand_512.png --height-scaling 1000 "$@"
