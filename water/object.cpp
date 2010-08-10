@@ -1,7 +1,7 @@
 #include "../graphics/camera/object.hpp"
 #include "../graphics/vec3.hpp"
-#include "mirror_camera.hpp"
 #include "../graphics/camera/scoped.hpp"
+#include "../gizmo/mirror_at_plane.hpp"
 #include "vf/vertex_view.hpp"
 #include "vf/position.hpp"
 #include "vf/texture_coordinate.hpp"
@@ -183,16 +183,11 @@ insula::water::object::update_reflection(
 	sge::renderer::scoped_block const sblock(
 		renderer_); 
 
-	std::tuple<graphics::vec3,graphics::gizmo> const new_camera = 
-		mirror_camera(
-			camera_.position(),
-			camera_.axes(),
-			water_level_);
-
 	graphics::camera::scoped cam(
 		camera_,
-		std::get<0>(new_camera),
-		std::get<1>(new_camera));
+		gizmo::mirror_at_plane<graphics::scalar>(
+			camera_.gizmo(),
+			water_level_));
 
 	{
 		sge::renderer::glsl::scoped_program scoped_shader_(

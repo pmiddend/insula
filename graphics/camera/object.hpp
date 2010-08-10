@@ -51,21 +51,11 @@ public:
 	mat4 const
 	perspective() const;
 
-	// NOTE: Is it OK to return by reference here?
-	vec3 const &
-	position() const;
+	insula::graphics::gizmo const &
+	gizmo() const;
 
-	void
-	position(
-		vec3 const &);
-
-	// NOTE: Is it OK to return by reference here?
-	gizmo const &
-	axes() const;
-
-	void
-	axes(
-		gizmo const &);
+	insula::graphics::gizmo &
+	gizmo();
 
 	graphics::scalar 
 	aspect() const;
@@ -78,8 +68,7 @@ private:
 	scalar speed_;
 	vec3 dirs_;
 	vec3 position_;
-	gizmo axes_;
-	//vec4 forward_,right_,up_;
+	insula::graphics::gizmo gizmo_;
 	scalar do_roll_,roll_speed_;
 
 	void

@@ -7,7 +7,7 @@
 #include "world.hpp"
 #include "../graphics/box.hpp"
 #include "../graphics/mat3.hpp"
-#include "../graphics/gizmo_from_mat3.hpp"
+#include "../gizmo/from_mat3.hpp"
 #include "../model/object.hpp"
 #include <LinearMath/btMatrix3x3.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
@@ -266,23 +266,17 @@ insula::physics::vehicle::steering(
 	current_steering_ = s * steering_clamp_;
 }
 
-insula::graphics::gizmo const
-insula::physics::vehicle::axes()
+insula::physics::gizmo const
+insula::physics::vehicle::gizmo() const
 {
-	return 
-		graphics::gizmo_from_mat3<graphics::vec3>(
-			fcppt::math::matrix::structure_cast<graphics::mat3>(
-				bullet_to_mat3(
-					transform_.getBasis())));
-}
-
-insula::physics::vec3 const
-insula::physics::vehicle::position()
-{
-	return 
-		fcppt::math::vector::structure_cast<graphics::vec3>(
-			bullet_to_vec3(
-				transform_.getOrigin()));
+	insula::physics::gizmo g = 
+		insula::gizmo::from_mat3<scalar>(
+			bullet_to_mat3(
+				transform_.getBasis()));
+	g.position(
+		bullet_to_vec3(
+			transform_.getOrigin()));
+	return g;
 }
 
 insula::physics::vehicle::~vehicle()

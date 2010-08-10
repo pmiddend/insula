@@ -2,6 +2,7 @@
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/dim2.hpp"
+#include "gizmo/structure_cast.hpp"
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
@@ -215,7 +216,7 @@ try
 		sys.image_loader());
 
 	// NOTE: The - is needed here, "position" is really not well-defined.
-	cam->position(
+	cam->gizmo().position(
 		-fcppt::math::box::center(
 			terrain->extents()));
 
@@ -383,8 +384,8 @@ try
 
 		graphics::camera::lock_to(
 			*cam,
-			vehicle->position(),
-			vehicle->axes(),
+			gizmo::structure_cast<physics::gizmo>(
+				vehicle->gizmo()),
 			get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
 			fcppt::math::deg_to_rad(
 				get_option<graphics::scalar>(vm,"camera-vehicle-angle")));

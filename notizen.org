@@ -414,9 +414,7 @@ wurde.
 *** TODO gizmo verallgemeinern und dann in vehicle nutzen?
 
 -gizmo_to_mat4, dann in camera::object nutzen
--FIXME in camera/object
 -Funktion, um gizmo um right/up/forward zu drehen
--structure_cast für gizmo
 -mirror_camera aus water rausziehen?
 
 *** TODO Anzeigebug fuer Skydome fixen

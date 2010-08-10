@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include "../../gizmo/rotation_to_mat4.hpp"
 #include "../scalar.hpp"
 #include "../vec4.hpp"
 #include "../mat3.hpp"
@@ -57,10 +58,10 @@ insula::graphics::camera::object::object(
 		_speed),
 	dirs_(
 		vec3::null()),
-	position_(
-		_position),
-	axes_(
-		gizmo::init()
+	gizmo_(
+		insula::graphics::gizmo::init()
+			.position(
+				_position)
 			.forward(
 				vec3(0,0,1))
 			.right(
@@ -89,17 +90,17 @@ insula::graphics::camera::object::update(
 				narrow_cast<vec3>(
 					rotation_axis(
 						-do_roll_ * roll_speed_ * t,
-						axes_.forward()) *
+						gizmo_.forward()) *
 					construct(
-						axes_.up(),
+						gizmo_.up(),
 						static_cast<scalar>(0))),
 			right = 
-				cross(up,axes_.forward()),
+				cross(up,gizmo_.forward()),
 			forward = 
 				cross(right,up); 
 
-		axes_ = 
-			gizmo::init()
+		gizmo_ = 
+			insula::graphics::gizmo::init()
 				.forward(normalize(forward))
 				.up(normalize(up))
 				.right(normalize(right));
@@ -109,11 +110,11 @@ insula::graphics::camera::object::update(
 		position_ + 
 		speed_ * 
 		t * 
-		// FIXME: replace this by inner_product
-		(
-		dirs_[0] * axes_.right() + 
-		dirs_[1] * axes_.up() + 
-		dirs_[2] * axes_.forward());
+		std::inner_product(
+			gizmo_.array().begin(),
+			gizmo_.array().end(),
+			dirs_.data(),
+			vec3::null());
 }
 
 insula::graphics::mat4 const
@@ -128,27 +129,14 @@ insula::graphics::camera::object::world() const
 insula::graphics::mat4 const
 insula::graphics::camera::object::rotation() const
 {
-	scalar const 
-		zero = 
-			static_cast<scalar>(0),
-		one = 
-			static_cast<scalar>(1);
 	return 
-		mat4(
-			axes_.right()[0],axes_.right()[1],axes_.right()[2],zero, 
-			axes_.up()[0],axes_.up()[1],axes_.up()[2],zero, 
-			axes_.forward()[0],axes_.forward()[1],axes_.forward()[2],zero, 
-			zero,zero,zero,one);
+		insula::gizmo::rotation_to_mat4(
+			gizmo_);
 }
 
 insula::graphics::mat4 const
 insula::graphics::camera::object::translation() const
 {
-	mat4 const 
-		translate =
-				fcppt::math::matrix::translation(
-					position_);
-
 	return 
 		fcppt::math::matrix::translation(
 			position_);
@@ -166,30 +154,16 @@ insula::graphics::camera::object::perspective() const
 			far_);
 }
 
-insula::graphics::vec3 const &
-insula::graphics::camera::object::position() const
-{
-	return position_;
-}
-
-void
-insula::graphics::camera::object::position(
-	vec3 const &_position)
-{
-	position_ = _position;
-}
-
 insula::graphics::gizmo const &
-insula::graphics::camera::object::axes() const
+insula::graphics::camera::object::gizmo() const
 {
-	return axes_;
+	return gizmo_;
 }
 
-void
-insula::graphics::camera::object::axes(
-	gizmo const &_axes)
+insula::graphics::gizmo &
+insula::graphics::camera::object::gizmo()
 {
-	axes_ = _axes;
+	return gizmo_;
 }
 
 insula::graphics::scalar
@@ -229,16 +203,16 @@ insula::graphics::camera::object::input_callback(
 				narrow_cast<vec3>(
 					rotation_axis(
 						-angle,
-						axes_.up()) *
+						gizmo_.up()) *
 					construct(
-						axes_.forward(),
+						gizmo_.forward(),
 						static_cast<scalar>(0))),
 			right = 
-				cross(axes_.up(),forward),
+				cross(gizmo_.up(),forward),
 			up = 
 				cross(forward,right); 
 
-		axes_ = 
+		gizmo_ = 
 			gizmo::init()
 				.forward(normalize(forward))
 				.up(normalize(up))
@@ -256,16 +230,16 @@ insula::graphics::camera::object::input_callback(
 					narrow_cast<vec3>(
 						rotation_axis(
 							-angle,
-							axes_.right()) *
+							gizmo_.right()) *
 						construct(
-							axes_.forward(),
+							gizmo_.forward(),
 							static_cast<scalar>(0))),
 				up = 
-					cross(forward,axes_.right()),
+					cross(forward,gizmo_.right()),
 				right = 
 					cross(up,forward); 
 
-			axes_ = 
+			gizmo_ = 
 				gizmo::init()
 					.forward(normalize(forward))
 					.up(normalize(up))

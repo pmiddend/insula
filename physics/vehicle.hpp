@@ -2,7 +2,7 @@
 #define INSULA_PHYSICS_VEHICLE_HPP_INCLUDED
 
 #include "../model/object_ptr.hpp"
-#include "../graphics/gizmo.hpp"
+#include "gizmo.hpp"
 #include "../graphics/mat4.hpp"
 #include "../graphics/vec3.hpp"
 #include "wheel_info_sequence.hpp"
@@ -67,11 +67,8 @@ public:
 		scalar);
 
 	// The camera needs this
-	graphics::gizmo const
-	axes();
-
-	graphics::vec3 const
-	position();
+	insula::physics::gizmo const
+	gizmo() const;
 
 	~vehicle();
 private:

@@ -13,13 +13,12 @@
 void
 insula::graphics::camera::lock_to(
 	object &c,
-	vec3 const &position,
 	gizmo const &g,
 	scalar const distance,
 	scalar const angle)
 {
-	c.position(
- 		-(position + 
+	c.gizmo().position( 
+ 		-(g.position() + 
 		fcppt::math::vector::narrow_cast<vec3>(
 			fcppt::math::matrix::rotation_axis(
 				angle,

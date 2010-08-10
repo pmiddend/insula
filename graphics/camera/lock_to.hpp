@@ -14,7 +14,6 @@ namespace camera
 void
 lock_to(
 	object &,
-	vec3 const &position,
 	gizmo const &,
 	scalar distance,
 	scalar angle);

@@ -1,6 +1,8 @@
 #ifndef INSULA_GRAPHICS_BASIC_GIZMO_HPP_INCLUDED
 #define INSULA_GRAPHICS_BASIC_GIZMO_HPP_INCLUDED
 
+#include <array>
+
 namespace insula
 {
 namespace graphics
@@ -46,45 +48,53 @@ public:
 		T right_,up_,forward_;
 	};
 
+	typedef
+	std::array<T,3>
+	array_type;
+
 	// NOTE: One of the few places where explicit is not really needed
 	basic_gizmo(
 		init const &b)
-	:
-		forward_(b.forward()),
-		right_(b.right()),
-		up_(b.up())
 	{
-
+		array_[0] = b.right();
+		array_[1] = b.up();
+		array_[2] = b.forward();
 	}
 
 	basic_gizmo &operator=(
 		init const &b)
 	{
-		right_ = b.right();
-		up_ = b.up();
-		forward_ = b.forward();
+		array_[0] = b.right();
+		array_[1] = b.up();
+		array_[2] = b.forward();
 		return *this;
-	}
-
-	T const &
-	forward() const
-	{
-		return forward_;
 	}
 
 	T const &
 	right() const
 	{
-		return right_;
+		return array_[0];
 	}
 
 	T const &
 	up() const
 	{
-		return up_;
+		return array_[1];
+	}
+
+	T const &
+	forward() const
+	{
+		return array_[2];
+	}
+
+	array_type const &
+	array() const
+	{
+		return array_;
 	}
 private:
-	T forward_,right_,up_;
+	array_type array_;
 };
 }
 }
