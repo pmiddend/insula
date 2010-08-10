@@ -4,6 +4,7 @@
 #include "graphics/dim2.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_counter.hpp"
+#include "graphics/lock_camera_to.hpp"
 #include "skydome/object.hpp"
 #include "skydome/console_proxy.hpp"
 #include "skydome/cli_options.hpp"
@@ -62,6 +63,7 @@
 #include "physics/height_field.hpp"
 #include "physics/json/parse_vehicle.hpp"
 #include "physics/vehicle.hpp"
+#include "physics/vehicle_controller.hpp"
 #include "media_path.hpp"
 #include <sge/model/loader_ptr.hpp>
 #include <sge/model/plugin.hpp>
@@ -127,6 +129,8 @@ try
 		("near",boost::program_options::value<graphics::scalar>()->default_value(1.0f),"Distance to the near plane")
 		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
 		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
+		("camera-vehicle-distance",boost::program_options::value<graphics::scalar>()->default_value(500),"Distance to the vehicle")
+		("camera-vehicle-angle",boost::program_options::value<graphics::scalar>()->default_value(30),"Angle of the camera in degrees")
 		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera")
 		// vehicle begin
 		("vehicle-file",boost::program_options::value<fcppt::string>(),"The json file below media_path/vehicles that specifies the vehicle to load");
@@ -281,158 +285,11 @@ try
 			model_loader,
 			model_shader,
 			cam);
-#if 0
 
-	graphics::shader model_shader(
-		sys.renderer(),
-		media_path()/FCPPT_TEXT("model_vertex.glsl"),
-		media_path()/FCPPT_TEXT("model_fragment.glsl"));
-
-	sge::plugin::object<sge::model::loader>::ptr_type const model_plugin(
-		sys.plugin_manager().plugin<sge::model::loader>().load()); 
-
-	sge::model::loader_ptr const loader(
-		model_plugin->get()()); 
-
-	fcppt::io::cifstream ifs_chassis_model(
-		get_option<fcppt::string>(vm,"chassis-model"),
-		std::ios_base::binary);
-
-	fcppt::io::cifstream ifs_wheel_model(
-		get_option<fcppt::string>(vm,"wheel-model"),
-		std::ios_base::binary);
-
-	sge::model::object_ptr const chassis_model_object = 
-		loader->load(
-			ifs_chassis_model);
-
-	sge::model::object_ptr const wheel_model_object = 
-		loader->load(
-			ifs_wheel_model);
-
-	FCPPT_ASSERT(
-		chassis_model_object->part_names().size());
-
-	sge::model::scalar const vehicle_scaling = 
-		static_cast<sge::model::scalar>(
-			20);
-
-	model::object chassis_model(
-		chassis_model_object->part_names()[0],
-		cam,
-		chassis_model_object,
-		sys.renderer(),
-		model_shader,
-		sge::image::create_texture(
-			get_option<fcppt::string>(vm,"chassis-texture"),
-			sys.renderer(),
-			sys.image_loader(),
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::none),
-		vehicle_scaling);
-
-	FCPPT_ASSERT(
-		wheel_model_object->part_names().size());
-
-	model::object wheel_model(
-		wheel_model_object->part_names()[0],
-		cam,
-		wheel_model_object,
-		sys.renderer(),
-		model_shader,
-		sge::image::create_texture(
-			get_option<fcppt::string>(vm,"wheel-texture"),
-			sys.renderer(),
-			sys.image_loader(),
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::none),
-		vehicle_scaling);
-
-	physics::vec3 physics_vehicle_pos = 
-		fcppt::math::vector::structure_cast<physics::vec3>(
-			fcppt::math::box::center(
-				terrain->extents()));
-
-	physics_vehicle_pos[1] = terrain->extents().dimension()[1];
-
-	physics::scalar const wheel_offset = static_cast<physics::scalar>(-0.8);
-
-	physics::wheel_info_sequence wheels;
-	wheels.push_back(
-		physics::wheel_info()
-			.position(
-				vehicle_scaling * physics::vec3(
-					0.9f,
-					wheel_offset,
-					1.2f))
-			.is_front_wheel()
-			.gets_steering()
-			);
-	wheels.push_back(
-		physics::wheel_info()
-			.position(
-				vehicle_scaling * physics::vec3(
-					-0.9f,
-					wheel_offset,
-					1.2f))
-			.is_front_wheel()
-			.gets_steering()
-			);
-	wheels.push_back(
-		physics::wheel_info()
-			.position(
-				vehicle_scaling * physics::vec3(
-					0.9f,
-					wheel_offset,
-					-0.85f))
-			.gets_engine_force()
-			.gets_breaking_force()
-			);
-	wheels.push_back(
-		physics::wheel_info()
-			.position(
-				vehicle_scaling * physics::vec3(
-					-0.9f,
-					wheel_offset,
-					-0.85f))
-			.gets_engine_force()
-			.gets_breaking_force()
-			);
-
-	physics::vehicle vehicle(
-		physics_world,
-		sys.renderer(),
-		chassis_model,
-		get_option<physics::scalar>(vm,"vehicle-mass"),
-		vehicle_scaling * get_option<physics::scalar>(vm,"chassis-offset"),
-		physics_vehicle_pos, 
-		// max engine force
-		100,
-		// max breaking force
-		100,
-		wheel_model,
-		wheels);
-#endif
+	physics::vehicle_controller vehicle_controller(
+		sys.input_system(),
+		*vehicle);
 	// vehicle end
-
-	/*
-	physics::vec3 physics_sphere_pos = 
-		fcppt::math::vector::structure_cast<physics::vec3>(
-			fcppt::math::box::center(
-				terrain->extents()));
-
-	physics_sphere_pos[1] = terrain->extents().dimension()[1];
-
-	physics::sphere physics_sphere(
-		sys.renderer(),
-		cam,
-		physics_world,
-		static_cast<physics::scalar>(
-			50),
-		static_cast<physics::scalar>(
-			5000),
-		physics_sphere_pos);
-	*/
 
 	bool running = 
 		true;
@@ -527,6 +384,14 @@ try
 			sge::renderer::viewport(
 				sge::renderer::pixel_pos::null(),
 				sys.renderer()->screen_size()));
+
+		graphics::lock_camera_to(
+			cam,
+			vehicle->position(),
+			vehicle->axes(),
+			get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
+			fcppt::math::deg_to_rad(
+				get_option<graphics::scalar>(vm,"camera-vehicle-angle")));
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());

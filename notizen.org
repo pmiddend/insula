@@ -355,7 +355,7 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 *** TODO wheel_info muss in cpp ausgelagert werden.
 *** TODO world muss mehr RAII kriegen
 ** TODO Sounds
-** TODO Diverses [14/18]
+** TODO Diverses [15/20]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
@@ -422,6 +422,7 @@ Far-Plane, die näher dran ist.
 *** DONE Die anderen Tests wieder lauffähig machen
 *** DONE height_map brauch ein Signal "heights_changed", was an die Physik weitergegeben wird
 *** DONE Das Terrain muss flipQuadEdges haben
+
 		 CLOSED: [2010-08-09 Mon 20:58]
 		 CLOSED: [2010-08-03 Tue 20:44
 		 
@@ -429,7 +430,8 @@ Far-Plane, die näher dran ist.
 Vielleicht so machen, dass man einen Pfad mit '/' prependen kann und
 der dann den absoluten Pfad nimmt. Dürfte ja einfach in eine Funktion
 packbar sein.
-*** TODO Schreibe Klasse "input_delegator", die die Eingabe delegieren kann
+*** DONE Schreibe Klasse "input_delegator", die die Eingabe delegieren kann
+		 CLOSED: [2010-08-10 Tue 15:43]
 Momentan brauchen 3 Systeme Inputs: die Konsole, das Fahrzeug, die
 Kamera. Der Inputdelegator sollte alle diese Klassen kennen. Die
 Konsole kann eh jede Eingabe überschreiben. Dann sollte man noch
@@ -438,3 +440,4 @@ zwischen dem Fahrzeug und der Kamera umschalten können.
 Notiz: Die Kamera und das Fahrzeug können koexistieren, wenn die
 Kamera immer neu gesetzt wird nachdem sie durch den Input geändert
 wurde.
+*** TODO gizmo verallgemeinern und dann in vehicle nutzen?

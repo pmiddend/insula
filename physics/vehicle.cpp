@@ -1,9 +1,13 @@
 #include "vehicle.hpp"
 #include "dim3_to_bullet.hpp"
 #include "vec3_to_bullet.hpp"
+#include "bullet_to_vec3.hpp"
+#include "bullet_to_mat3.hpp"
 #include "transform_to_mat4.hpp"
 #include "world.hpp"
 #include "../graphics/box.hpp"
+#include "../graphics/mat3.hpp"
+#include "../graphics/gizmo_from_mat3.hpp"
 #include "../model/object.hpp"
 #include <LinearMath/btMatrix3x3.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
@@ -12,7 +16,10 @@
 #include <BulletCollision/CollisionShapes/btCompoundShape.h>
 #include <BulletCollision/CollisionShapes/btCylinderShape.h>
 #include <fcppt/math/matrix/translation.hpp>
+#include <fcppt/math/matrix/structure_cast.hpp>
+#include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
+#include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
 #include <boost/foreach.hpp>
 
@@ -46,6 +53,7 @@ insula::physics::vehicle::vehicle(
 	model::object_ptr _chassis_model,
 	scalar const mass,
 	scalar const chassis_position,
+	scalar const _steering_clamp,
 	vec3 const &_position,
 	scalar const _max_engine_force,
 	scalar const _max_breaking_force,
@@ -68,6 +76,8 @@ insula::physics::vehicle::vehicle(
 		0),
 	current_steering_(
 		0),
+	steering_clamp_(
+		_steering_clamp),
 	chassis_model_(
 		_chassis_model),
 	wheel_model_(
@@ -235,6 +245,45 @@ insula::physics::vehicle::render()
 		matrix_transform_);
 }
 
+void
+insula::physics::vehicle::engine_force(
+	scalar const v)
+{
+	current_engine_force_ = v * max_engine_force_;
+}
+
+void
+insula::physics::vehicle::breaking_force(
+	scalar const v)
+{
+	current_breaking_force_ = v * max_breaking_force_;
+}
+
+void
+insula::physics::vehicle::steering(
+	scalar const s)
+{
+	current_steering_ = s * steering_clamp_;
+}
+
+insula::graphics::gizmo const
+insula::physics::vehicle::axes()
+{
+	return 
+		graphics::gizmo_from_mat3(
+			fcppt::math::matrix::structure_cast<graphics::mat3>(
+				bullet_to_mat3(
+					transform_.getBasis())));
+}
+
+insula::physics::vec3 const
+insula::physics::vehicle::position()
+{
+	return 
+		fcppt::math::vector::structure_cast<graphics::vec3>(
+			bullet_to_vec3(
+				transform_.getOrigin()));
+}
 
 insula::physics::vehicle::~vehicle()
 {

@@ -10,9 +10,10 @@
 			"texture" : "insula_car.png"
 		},
 
-	"mass" : 20.0,
+	"mass" : 100.0,
 	"chassis_center_of_mass_shift" : 1.384,
-	"max_engine_force" : 100.0,
+	"steering_clamp" : 0.3,
+	"max_engine_force" : 1000.0,
 	"max_breaking_force" : 100.0,
 	"scaling" : 40.0,
 

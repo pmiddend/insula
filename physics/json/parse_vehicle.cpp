@@ -62,6 +62,10 @@ insula::physics::json::parse_vehicle(
 				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
 					json_file.members,
 					FCPPT_TEXT("chassis_center_of_mass_shift"))),
+			static_cast<scalar>(
+				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+					json_file.members,
+					FCPPT_TEXT("steering_clamp"))),
 			position,
 			static_cast<scalar>(
 				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
