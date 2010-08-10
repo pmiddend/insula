@@ -28,6 +28,9 @@
 - Danach Shadowmaps einbauen
 - Dann Hindernisse
 
+[[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=e
+n][Vehicles in Bullet]]
+
 * Roadmap
 ** Spielbeschreibung
 Das Spiel soll ein Multiplayerspiel werden. Netzwerkmodus
@@ -337,7 +340,7 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 ** TODO Terraingenerierung
 ** TODO Shadow Maps
 
-** TODO Physik, Fahrzeuge [0/6]
+** TODO Physik, Fahrzeuge [1/6]
 *** TODO insula::physics::model
 Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der angibt, wie dieses Model in der Physikengine dargestellt werden soll:
 
@@ -346,7 +349,8 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 -Boundingsphere
 -Exact
 *** TODO Setter für gravity
-*** TODO json-Part muss in mehrere Dateien aufgeteilt werden
+*** DONE json-Part muss in mehrere Dateien aufgeteilt werden
+		 CLOSED: [2010-08-10 Tue 01:34]
 *** TODO Nach weiteren Eigenschaften von Fahrzeugen gucken, die noch nicht in wheel_info sind
 *** TODO wheel_info muss in cpp ausgelagert werden.
 *** TODO world muss mehr RAII kriegen
@@ -421,3 +425,7 @@ Far-Plane, die näher dran ist.
 		 CLOSED: [2010-08-09 Mon 20:58]
 		 CLOSED: [2010-08-03 Tue 20:44
 		 
+*** TODO Absolute Pfade bei Dateien auf Kommandozeile
+Vielleicht so machen, dass man einen Pfad mit '@' prependen kann und
+der dann den absoluten Pfad nimmt. Dürfte ja einfach in eine Funktion
+packbar sein.

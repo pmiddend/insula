@@ -18,7 +18,8 @@
 
 	"default_wheel" : 
 		{
-			"offset" : [0.0,0.0,0.0]
+			"offset" : [0.0,0.0,0.0],
+			"friction_slip" : 0.8
 		},
 		
 	"wheels" : 
