@@ -2,6 +2,7 @@
 #define INSULA_PHYSICS_WORLD_HPP_INCLUDED
 
 #include "box.hpp"
+#include "vec3.hpp"
 #include <memory>
 
 class btCollisionConfiguration;
@@ -24,7 +25,8 @@ public:
 
 	explicit
 	world(
-		box const &world_size);
+		box const &world_size,
+		vec3 const &gravity);
 
 	void
 	update(

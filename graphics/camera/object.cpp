@@ -1,8 +1,8 @@
-#include "camera.hpp"
-#include "scalar.hpp"
-#include "vec4.hpp"
-#include "mat3.hpp"
-#include "../input_delegator.hpp"
+#include "object.hpp"
+#include "../scalar.hpp"
+#include "../vec4.hpp"
+#include "../mat3.hpp"
+#include "../../input_delegator.hpp"
 #include <sge/input/key_pair.hpp>
 #include <sge/input/system.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
@@ -29,19 +29,20 @@
 #include <functional>
 #include <cmath>
 
-insula::graphics::camera::camera(
+insula::graphics::camera::object::object(
 	input_delegator &input_delegator_,
 	scalar _aspect,
 	scalar _fov,
 	scalar _near,
 	scalar _far,
 	scalar _speed,
+	scalar _roll_speed,
 	vec3 const &_position)
 :
 	input_connection_(
 		input_delegator_.register_callback(
 			std::bind(
-				&camera::input_callback,
+				&object::input_callback,
 				this,
 				std::placeholders::_1))),
 	aspect_(
@@ -59,7 +60,7 @@ insula::graphics::camera::camera(
 	position_(
 		_position),
 	axes_(
-		gizmo_init()
+		gizmo::init()
 			.forward(
 				vec3(0,0,1))
 			.right(
@@ -69,12 +70,12 @@ insula::graphics::camera::camera(
 	do_roll_(
 		static_cast<scalar>(0)),
 	roll_speed_(
-		fcppt::math::pi<scalar>()/static_cast<scalar>(4))
+		_roll_speed)
 {
 }
 
 void
-insula::graphics::camera::update(
+insula::graphics::camera::object::update(
 	scalar const t)
 {
 	if (!fcppt::math::almost_zero(do_roll_))
@@ -98,7 +99,7 @@ insula::graphics::camera::update(
 				cross(right,up); 
 
 		axes_ = 
-			gizmo_init()
+			gizmo::init()
 				.forward(normalize(forward))
 				.up(normalize(up))
 				.right(normalize(right));
@@ -116,7 +117,7 @@ insula::graphics::camera::update(
 }
 
 insula::graphics::mat4 const
-insula::graphics::camera::world() const
+insula::graphics::camera::object::world() const
 {
 	return 
 		rotation() * 
@@ -125,7 +126,7 @@ insula::graphics::camera::world() const
 }
 
 insula::graphics::mat4 const
-insula::graphics::camera::rotation() const
+insula::graphics::camera::object::rotation() const
 {
 	scalar const 
 		zero = 
@@ -141,7 +142,7 @@ insula::graphics::camera::rotation() const
 }
 
 insula::graphics::mat4 const
-insula::graphics::camera::translation() const
+insula::graphics::camera::object::translation() const
 {
 	mat4 const 
 		translate =
@@ -149,12 +150,13 @@ insula::graphics::camera::translation() const
 					position_);
 
 	return 
-		translate;
+		fcppt::math::matrix::translation(
+			position_);
 	
 }
 
 insula::graphics::mat4 const
-insula::graphics::camera::perspective() const
+insula::graphics::camera::object::perspective() const
 {
 	return 
 		fcppt::math::matrix::perspective(
@@ -165,55 +167,45 @@ insula::graphics::camera::perspective() const
 }
 
 insula::graphics::vec3 const &
-insula::graphics::camera::position() const
+insula::graphics::camera::object::position() const
 {
 	return position_;
 }
 
 void
-insula::graphics::camera::position(
+insula::graphics::camera::object::position(
 	vec3 const &_position)
 {
 	position_ = _position;
 }
 
 insula::graphics::gizmo const &
-insula::graphics::camera::axes() const
+insula::graphics::camera::object::axes() const
 {
 	return axes_;
 }
 
 void
-insula::graphics::camera::axes(
+insula::graphics::camera::object::axes(
 	gizmo const &_axes)
 {
 	axes_ = _axes;
-
-	/*
-	FCPPT_ASSERT(
-		fcppt::math::compare(length(axes_.forward()),static_cast<scalar>(1)) && 
-		fcppt::math::compare(length(axes_.right()),static_cast<scalar>(1)) &&
-		fcppt::math::compare(length(axes_.up()),static_cast<scalar>(1)) &&
-		fcppt::math::almost_zero(dot(axes_.forward(),axes_.right())) &&
-		fcppt::math::almost_zero(dot(axes_.forward(),axes_.up())) &&
-		fcppt::math::almost_zero(dot(axes_.right(),axes_.up())));
-*/
 }
 
 insula::graphics::scalar
-insula::graphics::camera::aspect() const
+insula::graphics::camera::object::aspect() const
 {
 	return aspect_;
 }
 
 insula::graphics::scalar
-insula::graphics::camera::fov() const
+insula::graphics::camera::object::fov() const
 {
 	return fov_;
 }
 
 void
-insula::graphics::camera::input_callback(
+insula::graphics::camera::object::input_callback(
 	sge::input::key_pair const &k)
 {
 	scalar const mouse_inverse_speed = 
@@ -247,7 +239,7 @@ insula::graphics::camera::input_callback(
 				cross(forward,right); 
 
 		axes_ = 
-			gizmo_init()
+			gizmo::init()
 				.forward(normalize(forward))
 				.up(normalize(up))
 				.right(normalize(right));
@@ -274,7 +266,7 @@ insula::graphics::camera::input_callback(
 					cross(up,forward); 
 
 			axes_ = 
-				gizmo_init()
+				gizmo::init()
 					.forward(normalize(forward))
 					.up(normalize(up))
 					.right(normalize(right));

@@ -5,7 +5,7 @@
 #include "../vec3.hpp"
 #include "../world_fwd.hpp"
 #include "../../graphics/shader_fwd.hpp"
-#include "../../graphics/camera_fwd.hpp"
+#include "../../graphics/camera/object_fwd.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/image/multi_loader_fwd.hpp>
 #include <sge/model/loader_ptr.hpp>
@@ -26,7 +26,7 @@ parse_vehicle(
 	sge::image::multi_loader &il,
 	sge::model::loader_ptr const model_loader,
 	graphics::shader &shader,
-	graphics::camera &cam);
+	graphics::camera::object &cam);
 }
 }
 }

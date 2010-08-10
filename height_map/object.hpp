@@ -1,7 +1,7 @@
 #ifndef INSULA_HEIGHT_MAP_OBJECT_HPP_INCLUDED
 #define INSULA_HEIGHT_MAP_OBJECT_HPP_INCLUDED
 
-#include "../graphics/camera_fwd.hpp"
+#include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/vec2.hpp"
 #include "../graphics/vec3.hpp"
 #include "../graphics/scalar.hpp"
@@ -28,7 +28,7 @@ class object
 public:
 	explicit
 	object(
-		graphics::camera const &,
+		graphics::camera::object const &,
 		sge::renderer::device_ptr,
 		height_map::array const &,
 		graphics::scalar const &cell_size,
@@ -68,7 +68,7 @@ public:
 	graphics::scalar
 	height_scaling() const;
 private:
-	graphics::camera const &camera_;
+	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;

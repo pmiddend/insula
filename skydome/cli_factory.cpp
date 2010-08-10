@@ -15,7 +15,7 @@
 insula::skydome::object_ptr const
 insula::skydome::cli_factory(
 	boost::program_options::variables_map const &vm,
-	graphics::camera &camera,
+	graphics::camera::object &camera,
 	sge::renderer::device_ptr const renderer)
 {
 	return 

@@ -21,7 +21,7 @@ insula::physics::json::parse_model(
 	sge::model::loader_ptr const loader,
 	sge::image::multi_loader &il,
 	sge::renderer::device_ptr const rend,
-	graphics::camera &cam,
+	graphics::camera::object &cam,
 	graphics::shader &shader,
 	physics::scalar const scaling)
 {

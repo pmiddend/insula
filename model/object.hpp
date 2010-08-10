@@ -1,7 +1,7 @@
 #ifndef INSULA_MODEL_OBJECT_HPP_INCLUDED
 #define INSULA_MODEL_OBJECT_HPP_INCLUDED
 
-#include "../graphics/camera_fwd.hpp"
+#include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/shader_fwd.hpp"
 #include "../graphics/box.hpp"
 #include "../graphics/mat4.hpp"
@@ -27,7 +27,7 @@ public:
 	explicit 
 	object(
 		fcppt::string const &part,
-		graphics::camera const &,
+		graphics::camera::object const &,
 		sge::model::object_ptr,
 		sge::renderer::device_ptr,
 		graphics::shader &,
@@ -42,7 +42,7 @@ public:
 	graphics::box const
 	bounding_box() const;
 private:
-	graphics::camera const &camera_;
+	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr renderer_;
 	graphics::shader &shader_;
 	sge::renderer::texture_ptr const texture_;

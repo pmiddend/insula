@@ -1,7 +1,9 @@
 #include "graphics/scalar.hpp"
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/object.hpp"
+#include "graphics/camera/cli_options.hpp"
+#include "graphics/camera/cli_factory.hpp"
 #include "skydome/cli_options.hpp"
 #include "skydome/object.hpp"
 #include "skydome/cli_factory.hpp"
@@ -82,6 +84,7 @@ try
 	boost::program_options::options_description desc("Allowed options");
 
 	desc.add(skydome::cli_options());
+	desc.add(graphics::camera::cli_options());
 
 	desc.add_options()
 		("help","produce help message")
@@ -144,21 +147,18 @@ try
 		sys.input_system(),
 		console);
 	
-	graphics::camera cam(
-		input_delegator_,
-		sge::renderer::aspect<graphics::scalar>(
-			sys.renderer()->screen_size()),
-		fcppt::math::deg_to_rad(
-			vm["fov"].as<graphics::scalar>()),
-		vm["near"].as<graphics::scalar>(),
-		vm["far"].as<graphics::scalar>(),
-		graphics::scalar(0.5),
-		graphics::vec3::null());
+	graphics::camera::object_ptr cam = 
+		graphics::camera::cli_factory(
+			vm,
+			input_delegator_,
+			sge::renderer::aspect<graphics::scalar>(
+				sys.renderer()->screen_size()),
+			graphics::vec3::null());
 
 	skydome::object_ptr skydome = 
 		skydome::cli_factory(
 			vm,
-			cam,
+			*cam,
 			sys.renderer());
 
 	skydome::console_proxy skydome_console(
@@ -218,7 +218,7 @@ try
 	{
 		sge::mainloop::dispatch();
 
-		cam.update(
+		cam->update(
 			frame_timer.reset());
 
 		sge::renderer::scoped_block const block_(

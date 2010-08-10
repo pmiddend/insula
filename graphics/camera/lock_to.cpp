@@ -1,5 +1,6 @@
-#include "lock_camera_to.hpp"
-#include "camera.hpp"
+#include "lock_to.hpp"
+#include "object.hpp"
+#include "../scalar.hpp"
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/vector/construct.hpp>
@@ -10,8 +11,8 @@
 #include <fcppt/math/matrix/basic_impl.hpp>
 
 void
-insula::graphics::lock_camera_to(
-	camera &c,
+insula::graphics::camera::lock_to(
+	object &c,
 	vec3 const &position,
 	gizmo const &g,
 	scalar const distance,

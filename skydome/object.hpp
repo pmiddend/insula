@@ -3,7 +3,7 @@
 
 #include "size_type.hpp"
 #include "gradient.hpp"
-#include "../graphics/camera.hpp"
+#include "../graphics/camera/object.hpp"
 #include "../graphics/shader.hpp"
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <sge/renderer/device_ptr.hpp>
@@ -24,7 +24,7 @@ public:
 
 	explicit
 	object(
-		graphics::camera const &,
+		graphics::camera::object const &,
 		sge::renderer::device_ptr,
 		graphics::scalar angle_in_degrees,
 		// von oben nach unten
@@ -47,7 +47,7 @@ public:
 	insula::skydome::gradient const
 	gradient() const;
 private:
-	graphics::camera const &camera_;
+	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;

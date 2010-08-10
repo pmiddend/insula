@@ -6,7 +6,7 @@
 #include "vf/texcoord.hpp"
 #include "vf/packed_texcoord.hpp"
 #include "../graphics/shader.hpp"
-#include "../graphics/camera.hpp"
+#include "../graphics/camera/object.hpp"
 #include "../graphics/dim3.hpp"
 #include <sge/renderer/glsl/scoped_program.hpp>
 #include <sge/renderer/device.hpp>
@@ -106,7 +106,7 @@ private:
 
 insula::model::object::object(
 	fcppt::string const &part,
-	graphics::camera const &_camera,
+	graphics::camera::object const &_camera,
 	sge::model::object_ptr const model,
 	sge::renderer::device_ptr const _renderer,
 	graphics::shader &_shader,

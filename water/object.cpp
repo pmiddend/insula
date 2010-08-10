@@ -1,7 +1,7 @@
-#include "../graphics/camera.hpp"
+#include "../graphics/camera/object.hpp"
 #include "../graphics/vec3.hpp"
 #include "mirror_camera.hpp"
-#include "../graphics/scoped_camera.hpp"
+#include "../graphics/camera/scoped.hpp"
 #include "vf/vertex_view.hpp"
 #include "vf/position.hpp"
 #include "vf/texture_coordinate.hpp"
@@ -49,7 +49,7 @@
 
 insula::water::object::object(
 	sge::renderer::device_ptr const _renderer,
-	graphics::camera &_camera,
+	graphics::camera::object &_camera,
 	graphics::scalar const _water_level,
 	graphics::rect const &extents,
 	sge::renderer::dim_type const &reflection_texture_size,
@@ -189,7 +189,7 @@ insula::water::object::update_reflection(
 			camera_.axes(),
 			water_level_);
 
-	graphics::scoped_camera cam(
+	graphics::camera::scoped cam(
 		camera_,
 		std::get<0>(new_camera),
 		std::get<1>(new_camera));

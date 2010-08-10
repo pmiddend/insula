@@ -38,8 +38,8 @@ insula::height_map::console_proxy::console_proxy(
 
 void
 insula::height_map::console_proxy::regenerate(
-	sge::console::arg_list const &args,
-	sge::console::object &con)
+	sge::console::arg_list const &,
+	sge::console::object &)
 {
 /*
 	if (args.size() <= 3)

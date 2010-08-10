@@ -270,7 +270,7 @@ insula::graphics::gizmo const
 insula::physics::vehicle::axes()
 {
 	return 
-		graphics::gizmo_from_mat3(
+		graphics::gizmo_from_mat3<graphics::vec3>(
 			fcppt::math::matrix::structure_cast<graphics::mat3>(
 				bullet_to_mat3(
 					transform_.getBasis())));

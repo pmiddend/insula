@@ -1,7 +1,9 @@
 #include "graphics/scalar.hpp"
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/object.hpp"
+#include "graphics/camera/cli_options.hpp"
+#include "graphics/camera/cli_factory.hpp"
 #include "height_map/object.hpp"
 #include "height_map/cli_options.hpp"
 #include "height_map/cli_factory.hpp"
@@ -79,24 +81,13 @@ try
 		fcppt::log::level::debug
 	);
 
-	// We need this to read the filename vector for the height textures
-	typedef
-	std::vector<fcppt::string>
-	string_vector;
-
 	boost::program_options::options_description desc("Allowed options");
 	
-	string_vector height_textures;
-
 	desc.add(height_map::cli_options());
+	desc.add(graphics::camera::cli_options());
 
 	desc.add_options()
 		("help","produce help message")
-		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
-		("near",boost::program_options::value<graphics::scalar>()->default_value(1),"Distance to the near plane")
-		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
-		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
-		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera")
 		("clip",boost::program_options::value<bool>()->default_value(false),"Clip at the water level")
 		("water-level",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level to clip at (has no effect if clipping is disabled)");
 	
@@ -154,21 +145,18 @@ try
 		sys.input_system(),
 		console);
 	
-	graphics::camera cam(
-		input_delegator_,
-		sge::renderer::aspect<graphics::scalar>(
-			sys.renderer()->screen_size()),
-		fcppt::math::deg_to_rad(
-				vm["fov"].as<graphics::scalar>()),
-		vm["near"].as<graphics::scalar>(),
-		vm["far"].as<graphics::scalar>(),
-		vm["camera-speed"].as<graphics::scalar>(),
-		graphics::vec3::null());
+	graphics::camera::object_ptr cam = 
+		graphics::camera::cli_factory(
+			vm,
+			input_delegator_,
+			sge::renderer::aspect<graphics::scalar>(
+				sys.renderer()->screen_size()),
+			graphics::vec3::null());
 
 	height_map::object_ptr terrain = 
 		height_map::cli_factory(
 			vm,
-			cam,
+			*cam,
 			sys.renderer(),
 			sys.image_loader());
 
@@ -232,7 +220,7 @@ try
 	{
 		sge::mainloop::dispatch();
 
-		cam.update(
+		cam->update(
 			frame_timer.reset());
 
 		sge::renderer::scoped_block const block_(

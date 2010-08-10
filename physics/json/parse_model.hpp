@@ -2,7 +2,7 @@
 #define INSULA_PHYSICS_JSON_PARSE_MODEL_HPP_INCLUDED
 
 #include "../../model/object_ptr.hpp"
-#include "../../graphics/camera_fwd.hpp"
+#include "../../graphics/camera/object_fwd.hpp"
 #include "../../graphics/shader_fwd.hpp"
 #include "../scalar.hpp"
 #include <sge/parse/json/object.hpp>
@@ -22,9 +22,9 @@ parse_model(
 	sge::model::loader_ptr const loader,
 	sge::image::multi_loader &il,
 	sge::renderer::device_ptr const rend,
-	insula::graphics::camera &cam,
-	insula::graphics::shader &shader,
-	insula::physics::scalar const scaling);
+	graphics::camera::object &cam,
+	graphics::shader &shader,
+	physics::scalar const scaling);
 }
 }
 }

@@ -3,7 +3,7 @@
 #include "transform_from_vec3.hpp"
 #include "bullet_to_vec3.hpp"
 #include "bullet_to_mat4.hpp"
-#include "../graphics/camera.hpp"
+#include "../graphics/camera/object.hpp"
 #include "../media_path.hpp"
 #include "vf/packed_position.hpp"
 #include "vf/format.hpp"
@@ -173,7 +173,7 @@ public:
 
 insula::physics::sphere::sphere(
 	sge::renderer::device_ptr const _renderer,
-	graphics::camera &_camera,
+	graphics::camera::object &_camera,
 	world &_world,
 	scalar const radius,
 	scalar const mass,

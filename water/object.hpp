@@ -1,7 +1,7 @@
 #ifndef INSULA_WATER_OBJECT_HPP_INCLUDED
 #define INSULA_WATER_OBJECT_HPP_INCLUDED
 
-#include "../graphics/camera_fwd.hpp"
+#include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/shader.hpp"
 #include "../graphics/rect.hpp"
@@ -27,7 +27,7 @@ public:
 	explicit 
 	object(
 		sge::renderer::device_ptr,
-		graphics::camera &,
+		graphics::camera::object &,
 		graphics::scalar water_level,
 		graphics::rect const &,
 		sge::renderer::dim_type const &reflection_texture_size,
@@ -52,7 +52,7 @@ private:
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::texture_ptr target_texture_,bump_texture_;
 	sge::renderer::target_ptr target_;
-	graphics::camera &camera_;
+	graphics::camera::object &camera_;
 	graphics::scalar const water_level_;
 	graphics::shader shader_;
 	sge::renderer::vertex_buffer_ptr vb_;

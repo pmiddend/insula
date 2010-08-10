@@ -1,35 +1,6 @@
 * Kurzzeitvorgehen
 
-- Schreibe Klasse, die Input-Events auf Fahrzeugaktionen umleitet
-  (Steering ändert etc.)
-- Hierzu muss ein Vehikel eine Funktion "set_steering" bekommen, die
-  das Steering als Bogenmaß oder so setzt. Mal gucken was bullet dafür
-  nimmt.
-- Außerdem brauch ein Vehikel eine Funktion "set_force", die am besten
-  ein float in [0,1] bekommt und das anteilig an der maximum-Force
-  macht.
-- Dasselbe beim Bremsen.
-- Der Fahrzeugtest bekommt als Kommandozeilenparameter eine
-  json-Datei, die dann geladen wird.
-- Man kann die Kamera (in einer festlegbaren Entfernung) an ein festes
-  oder sich bewegendes Objekt binden. Das läuft so: Es gibt eine
-  globale Funktion "lock_camera_to". Diese bekommt:
-	- die Kamera und
-	- ein gizmo (forward,right,up), also ein Koordinatenkreuz
-	- eine Position p
-	- zwei Abstände, d_forward und d_up
-  Die Kamera bewegt sich dann von p ausgehend -d_forward nach "hinten"
-  und dann d_up nach "oben". Es wird dann natürlich das lokale
-  Koordinatensystem des Fahrzeugs übergeben (wie kommt man da ran?)
-- Danach Nebel einbauen
-- Dann Fahrsounds einbauen (bzw. allgemein Sounds)
-- Dann Spielmechanik implementieren (einsammeln von Checkpoints) und
-  somit erste Version des Spiels komplettieren
-- Danach Shadowmaps einbauen
-- Dann Hindernisse
-
-[[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=e
-n][Vehicles in Bullet]]
+[[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
 
 * Roadmap
 ** Spielbeschreibung
@@ -98,7 +69,7 @@ Somit bräuchte man für das Spiel nicht allzu viel:
  weil die sich nicht um Kollision mit Wänden und Decken kümmern muss)
 -Soundkrams (wobei der in sge schon ganz gut integriert ist)
 
-** Vorgehen der Reihe nach [6/10]
+** Vorgehen der Reihe nach [8/10]
 1. [X] Gucken ob es Beispiele zu bullet mit Terrain gibt 
 2. [X] md3-Loader von sge ausprobieren, ein Model laden
 3. [X] Das Model in einem separaten Programm anzeigen lassen
@@ -107,9 +78,9 @@ Somit bräuchte man für das Spiel nicht allzu viel:
 5. [X] Probieren, ein md2-Model mit einem bullet-Model zu verbinden,
    sodass man z.B. einen Klotz über die Landschaft purzeln lassen kann
 6. [X] Ein Fahrzeug auf die Landschaft tun
-7. [ ] Die Kamera von hinten oben auf das Fahrzeug richten, darauf
+7. [X] Die Kamera von hinten oben auf das Fahrzeug richten, darauf
    achten dass der Abstand konstant ist.
-8. [ ] Das Fahrzeug mit den Pfeiltasten steuerbar machen
+8. [X] Das Fahrzeug mit den Pfeiltasten steuerbar machen
 9. [ ] Fahrsounds einbauen [0/3]
    1. [ ] Soundtest erstellen, wo ein Grundton mit den Pfeiltasten langsam
       verschnellert bzw. verlangsamt wird (mit AL_PITCH z.B.), als ob
@@ -441,3 +412,13 @@ Notiz: Die Kamera und das Fahrzeug können koexistieren, wenn die
 Kamera immer neu gesetzt wird nachdem sie durch den Input geändert
 wurde.
 *** TODO gizmo verallgemeinern und dann in vehicle nutzen?
+
+-gizmo_to_mat4, dann in camera::object nutzen
+-FIXME in camera/object
+-Funktion, um gizmo um right/up/forward zu drehen
+-structure_cast für gizmo
+-mirror_camera aus water rausziehen?
+
+*** TODO Anzeigebug fuer Skydome fixen
+Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
+detailreichen Skydome erzeugt?

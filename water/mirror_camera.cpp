@@ -1,5 +1,5 @@
 #include "mirror_camera.hpp"
-#include "../graphics/gizmo_init.hpp"
+#include "../graphics/gizmo.hpp"
 #include "../graphics/scalar.hpp"
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/vector/cross.hpp>
@@ -52,7 +52,7 @@ insula::water::mirror_camera(
 		std::tuple<insula::graphics::vec3,insula::graphics::gizmo>(
 			new_position,
 			graphics::gizmo(
-				graphics::gizmo_init()
+				graphics::gizmo::init()
 					.forward(new_forward)
 					.right(new_right)
 					.up(new_up)));

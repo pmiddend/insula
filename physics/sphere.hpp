@@ -5,7 +5,7 @@
 #include "vec3.hpp"
 #include "scalar.hpp"
 #include "../graphics/mat4.hpp"
-#include "../graphics/camera_fwd.hpp"
+#include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/shader.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
@@ -34,7 +34,7 @@ public:
 	explicit
 	sphere(
 		sge::renderer::device_ptr,
-		graphics::camera &,
+		graphics::camera::object &,
 		world &,
 		scalar radius,
 		scalar mass,
@@ -46,7 +46,7 @@ public:
 	~sphere();
 private:
 	world &world_;
-	graphics::camera &camera_;
+	graphics::camera::object &camera_;
 	btTransform transform_;
 	std::unique_ptr<btSphereShape> shape_;
 	std::unique_ptr<btMotionState> motion_state_;

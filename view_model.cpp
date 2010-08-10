@@ -1,6 +1,8 @@
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/object.hpp"
+#include "graphics/camera/cli_options.hpp"
+#include "graphics/camera/cli_factory.hpp"
 #include "graphics/shader.hpp"
 #include "console/object.hpp"
 #include "model/object.hpp"
@@ -93,18 +95,16 @@ try
 
 	boost::program_options::options_description desc("Allowed options");
 
+	desc.add(
+		graphics::camera::cli_options());
+
 	desc.add_options()
 		("help","produce help message")
 		("model",boost::program_options::value<fcppt::string>()->required(),"The model file to load")
 		("texture",boost::program_options::value<fcppt::string>(),"The texture")
 		("list-parts",boost::program_options::value<bool>()->zero_tokens()->default_value(false),"List all the available parts")
 		("part",boost::program_options::value<fcppt::string>(),"Which part of the model we shall load")
-		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen")
-		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
-		("near",boost::program_options::value<graphics::scalar>()->default_value(1.0f),"Distance to the near plane")
-		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
-		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
-		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera");
+		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -157,16 +157,13 @@ try
 		sys.input_system(),
 		console);
 	
-	graphics::camera cam(
-		input_delegator_,
-		sge::renderer::aspect<graphics::scalar>(
-			sys.renderer()->screen_size()),
-		fcppt::math::deg_to_rad(
-				vm["fov"].as<graphics::scalar>()),
-		vm["near"].as<graphics::scalar>(),
-		vm["far"].as<graphics::scalar>(),
-		vm["camera-speed"].as<graphics::scalar>(),
-		graphics::vec3::null());
+	graphics::camera::object_ptr cam = 
+		graphics::camera::cli_factory(
+			vm,
+			input_delegator_,
+			sge::renderer::aspect<graphics::scalar>(
+				sys.renderer()->screen_size()),
+			graphics::vec3::null());
 
 	graphics::shader model_shader(
 		sys.renderer(),
@@ -207,7 +204,7 @@ try
 
 	model::object model(
 		get_option<fcppt::string>(vm,"part"),
-		cam,
+		*cam,
 		model_object,
 		sys.renderer(),
 		model_shader,
@@ -275,7 +272,7 @@ try
 	{
 		sge::mainloop::dispatch();
 
-		cam.update(
+		cam->update(
 			frame_timer.reset());
 
 		sge::renderer::scoped_block const block_(

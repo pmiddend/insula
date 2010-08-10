@@ -1,15 +1,14 @@
-#ifndef INSULA_GRAPHICS_CAMERA_HPP_INCLUDED
-#define INSULA_GRAPHICS_CAMERA_HPP_INCLUDED
+#ifndef INSULA_GRAPHICS_CAMERA_OBJECT_HPP_INCLUDED
+#define INSULA_GRAPHICS_CAMERA_OBJECT_HPP_INCLUDED
 
-#include "scalar.hpp"
-#include "mat4.hpp"
-#include "vec3.hpp"
-#include "vec4.hpp"
-#include "gizmo.hpp"
-#include "../input_delegator_fwd.hpp"
+#include "../scalar.hpp"
+#include "../mat4.hpp"
+#include "../vec3.hpp"
+#include "../vec4.hpp"
+#include "../gizmo.hpp"
+#include "../../input_delegator_fwd.hpp"
 #include <sge/input/system_ptr.hpp>
 #include <sge/input/key_pair_fwd.hpp>
-#include <fcppt/noncopyable.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 
@@ -17,18 +16,23 @@ namespace insula
 {
 namespace graphics
 {
-class camera
+namespace camera
 {
-FCPPT_NONCOPYABLE(camera)
+class object
+{
 public:
+	object(object const &) = delete;
+	object &operator=(object const &) = delete;
+
 	explicit
-	camera(
+	object(
 		input_delegator &,
 		scalar aspect,
 		scalar fov,
 		scalar near,
 		scalar far,
 		scalar camera_speed,
+		scalar roll_speed,
 		vec3 const &position);
 	
 	void
@@ -82,6 +86,7 @@ private:
 	input_callback(
 		sge::input::key_pair const &);
 };
+}
 }
 }
 

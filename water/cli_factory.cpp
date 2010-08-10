@@ -14,15 +14,14 @@ insula::water::object_ptr const
 insula::water::cli_factory(
 	boost::program_options::variables_map const &vm,
 	sge::renderer::device_ptr const renderer,
-	graphics::camera &camera,
+	graphics::camera::object &camera,
 	graphics::rect const &extents,
 	sge::image::multi_loader &image_loader)
 {
 	return 
 		std::make_shared<object>(
 			renderer,
-			std::ref(
-				camera),
+			camera,
 			get_option<graphics::scalar>(vm,"water-level"),
 			extents,
 			get_option<sge::renderer::dim_type>(vm,"water-reflection-size"),

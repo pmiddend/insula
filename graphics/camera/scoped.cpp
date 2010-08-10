@@ -1,8 +1,8 @@
-#include "scoped_camera.hpp"
-#include "camera.hpp"
+#include "scoped.hpp"
+#include "object.hpp"
 
-insula::graphics::scoped_camera::scoped_camera(
-	insula::graphics::camera &_camera,
+insula::graphics::camera::scoped::scoped(
+	object &_camera,
 	vec3 const &new_position,
 	gizmo const &new_gizmo)
 :
@@ -21,7 +21,7 @@ insula::graphics::scoped_camera::scoped_camera(
 		new_gizmo);
 }
 
-insula::graphics::scoped_camera::~scoped_camera()
+insula::graphics::camera::scoped::~scoped()
 {
 	camera_.axes(
 		gizmo_);

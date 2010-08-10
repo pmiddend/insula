@@ -7,7 +7,7 @@
 #include "vf/normal.hpp"
 #include "vf/vertex_view.hpp"
 #include "../graphics/scalar.hpp"
-#include "../graphics/camera.hpp"
+#include "../graphics/camera/object.hpp"
 #include "../graphics/dim3.hpp"
 #include "../graphics/rect.hpp"
 #include "../media_path.hpp"
@@ -122,7 +122,7 @@ private:
 }
 
 insula::height_map::object::object(
-	graphics::camera const &_camera,
+	graphics::camera::object const &_camera,
 	sge::renderer::device_ptr const _renderer,
 	height_map::array const &raw,
 	graphics::scalar const &cell_size,

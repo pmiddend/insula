@@ -10,7 +10,8 @@
 #include <fcppt/math/vector/dim.hpp>
 
 insula::physics::world::world(
-	box const &world_size)
+	box const &world_size,
+	vec3 const &gravity)
 :
 	configuration_(
 		new btDefaultCollisionConfiguration()),
@@ -34,10 +35,8 @@ insula::physics::world::world(
 {
 	// bullet sets some default value, so we better override this here
 	world_->setGravity(
-		btVector3(
-			static_cast<btScalar>(0),
-			static_cast<btScalar>(-100),
-			static_cast<btScalar>(0)));
+		vec3_to_bullet(
+			gravity));
 }
 
 void
@@ -49,7 +48,8 @@ insula::physics::world::update(
 		// Maximum simulation substeps: The fixed time step is 1/60. We
 		// have to choose the substep count so that time_delta is _just_
 		// less than the fixed time.
-		2);
+		//2);
+		10);
 }
 
 void

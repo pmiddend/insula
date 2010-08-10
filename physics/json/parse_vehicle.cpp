@@ -20,7 +20,7 @@ insula::physics::json::parse_vehicle(
 	sge::image::multi_loader &il,
 	sge::model::loader_ptr const model_loader,
 	graphics::shader &shader,
-	graphics::camera &cam)
+	graphics::camera::object &cam)
 {
 	sge::parse::json::object json_file;
 	if (!sge::parse::json::parse_file(fn,json_file))

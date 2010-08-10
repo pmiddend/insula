@@ -5,7 +5,7 @@
 #include "vf/format.hpp"
 #include "vf/vertex_view.hpp"
 #include "../graphics/scalar.hpp"
-#include "../graphics/camera.hpp"
+#include "../graphics/camera/object.hpp"
 #include "../media_path.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
@@ -173,7 +173,7 @@ public:
 }
 
 insula::skydome::object::object(
-	graphics::camera const &_camera,
+	graphics::camera::object const &_camera,
 	sge::renderer::device_ptr const _renderer,
 	graphics::scalar const angle,
 	size_type const iterations_lat,

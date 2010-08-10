@@ -15,7 +15,7 @@
 insula::height_map::object_ptr const
 insula::height_map::cli_factory(
 	boost::program_options::variables_map const &vm,
-	graphics::camera &camera,
+	graphics::camera::object &camera,
 	sge::renderer::device_ptr const renderer,
 	sge::image::multi_loader &image_loader)
 {

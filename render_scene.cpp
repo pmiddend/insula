@@ -2,9 +2,11 @@
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/dim2.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/object.hpp"
+#include "graphics/camera/cli_options.hpp"
+#include "graphics/camera/cli_factory.hpp"
+#include "graphics/camera/lock_to.hpp"
 #include "graphics/frame_counter.hpp"
-#include "graphics/lock_camera_to.hpp"
 #include "skydome/object.hpp"
 #include "skydome/console_proxy.hpp"
 #include "skydome/cli_options.hpp"
@@ -81,10 +83,12 @@
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/math/box/center.hpp>
 #include <fcppt/math/box/stretch.hpp>
+#include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/math/dim/output.hpp>
 #include <fcppt/math/dim/input.hpp>
+#include <fcppt/math/vector/output.hpp>
+#include <fcppt/math/vector/input.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/twopi.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
@@ -103,15 +107,12 @@ try
 
 	fcppt::log::activate_levels(
 		sge::log::global(),
-		fcppt::log::level::debug
-	);
-
-	// We need this to read the filename vector for the height textures
-	typedef
-	std::vector<fcppt::string>
-	string_vector;
+		fcppt::log::level::debug);
 
 	boost::program_options::options_description desc("Allowed options");
+
+	desc.add(
+		graphics::camera::cli_options());
 
 	desc.add(
 		height_map::cli_options());
@@ -125,15 +126,11 @@ try
 	desc.add_options()
 		("help","produce help message")
 		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen")
-		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
-		("near",boost::program_options::value<graphics::scalar>()->default_value(1.0f),"Distance to the near plane")
-		("far",boost::program_options::value<graphics::scalar>()->default_value(10000),"Distance to the far plane")
-		("camera-speed",boost::program_options::value<graphics::scalar>()->default_value(500),"Speed of the camera")
 		("camera-vehicle-distance",boost::program_options::value<graphics::scalar>()->default_value(500),"Distance to the vehicle")
 		("camera-vehicle-angle",boost::program_options::value<graphics::scalar>()->default_value(30),"Angle of the camera in degrees")
-		("roll-speed",boost::program_options::value<graphics::scalar>()->default_value(fcppt::math::twopi<graphics::scalar>()/8),"Rolling speed of the camera")
 		// vehicle begin
-		("vehicle-file",boost::program_options::value<fcppt::string>(),"The json file below media_path/vehicles that specifies the vehicle to load");
+		("vehicle-file",boost::program_options::value<fcppt::string>(),"The file to load the vehicle from")
+		("physics-gravity",boost::program_options::value<physics::vec3>()->default_value(physics::vec3(0,-10,0)),"The gravity");
 		// vehicle end
 	
 	boost::program_options::variables_map vm;
@@ -187,21 +184,18 @@ try
 		sys.input_system(),
 		console);
 
-	graphics::camera cam(
-		input_delegator_,
-		sge::renderer::aspect<graphics::scalar>(
-			sys.renderer()->screen_size()),
-		fcppt::math::deg_to_rad(
-			get_option<graphics::scalar>(vm,"fov")),
-		get_option<graphics::scalar>(vm,"near"),
-		get_option<graphics::scalar>(vm,"far"),
-		get_option<graphics::scalar>(vm,"camera-speed"),
-		graphics::vec3::null());
+	graphics::camera::object_ptr cam = 
+		graphics::camera::cli_factory(
+			vm,
+			input_delegator_,
+			sge::renderer::aspect<graphics::scalar>(
+				sys.renderer()->screen_size()),
+			graphics::vec3::null());
 
 	skydome::object_ptr skydome = 
 		skydome::cli_factory(
 			vm,
-			cam,
+			*cam,
 			sys.renderer());
 
 	skydome::console_proxy skydome_console(
@@ -211,7 +205,7 @@ try
 	height_map::object_ptr const terrain = 
 		height_map::cli_factory(
 			vm,
-			cam,
+			*cam,
 			sys.renderer(),
 			sys.image_loader());
 
@@ -221,7 +215,7 @@ try
 		sys.image_loader());
 
 	// NOTE: The - is needed here, "position" is really not well-defined.
-	cam.position(
+	cam->position(
 		-fcppt::math::box::center(
 			terrain->extents()));
 
@@ -229,7 +223,7 @@ try
 		water::cli_factory(
 			vm,
 			sys.renderer(),
-			cam,
+			*cam,
 			fcppt::math::box::stretch(
 				graphics::rect(
 					graphics::vec2(
@@ -248,7 +242,9 @@ try
 
 	physics::world physics_world(
 		// FIXME: structure_cast!
-		terrain->extents());
+		fcppt::math::box::structure_cast<physics::box>(
+			terrain->extents()),
+		get_option<physics::vec3>(vm,"physics-gravity"));
 
 	physics::height_field physics_height_field(
 		physics_world,
@@ -284,7 +280,7 @@ try
 			sys.image_loader(),
 			model_loader,
 			model_shader,
-			cam);
+			*cam);
 
 	physics::vehicle_controller vehicle_controller(
 		sys.input_system(),
@@ -367,7 +363,7 @@ try
 		sge::time::timer::frames_type const time_delta = 
 			frame_timer.reset();
 
-		cam.update(
+		cam->update(
 			time_delta);
 
 		water->update_reflection(
@@ -385,8 +381,8 @@ try
 				sge::renderer::pixel_pos::null(),
 				sys.renderer()->screen_size()));
 
-		graphics::lock_camera_to(
-			cam,
+		graphics::camera::lock_to(
+			*cam,
 			vehicle->position(),
 			vehicle->axes(),
 			get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
