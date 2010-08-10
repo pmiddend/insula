@@ -82,7 +82,7 @@ SET_SOURCE_FILES_PROPERTIES(
 	-DMEDIA_PATH="\\\"${media_path}\\\""
 )
 
-ADD_EXECUTABLE(load_image_to_array load_image_to_array.cpp media_path.cpp
+ADD_EXECUTABLE(load_image_to_array load_image_to_array.cpp media_path.cpp input_delegator.cpp
 	${height_map_files} ${graphics_files} ${console_files})
 
 ADD_EXECUTABLE(view_model 
@@ -91,15 +91,16 @@ ADD_EXECUTABLE(view_model
 	${console_files}
 	${model_files}
 	media_path.cpp
+	input_delegator.cpp
 	view_model.cpp)
 
-ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp
+ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp input_delegator.cpp
 	${texture_files}
 	${graphics_files} 
 	${height_map_files}
 	${console_files})
 
-ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp
+ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp input_delegator.cpp
 	${texture_files}
 	${graphics_files} 
 	${height_map_files}
@@ -109,9 +110,9 @@ ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp
 	${physics_files}
 	${model_files}
 	)
-ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp 
+ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp input_delegator.cpp
 	${height_map_files} ${texture_files} ${graphics_files} ${console_files})
-ADD_EXECUTABLE(render_skydome media_path.cpp render_skydome.cpp 
+ADD_EXECUTABLE(render_skydome media_path.cpp render_skydome.cpp  input_delegator.cpp
 	${texture_files} ${graphics_files} ${console_files} ${skydome_files})
 
 TARGET_LINK_LIBRARIES(load_image_to_array fcppt sgecore)

@@ -426,6 +426,15 @@ Far-Plane, die näher dran ist.
 		 CLOSED: [2010-08-03 Tue 20:44
 		 
 *** TODO Absolute Pfade bei Dateien auf Kommandozeile
-Vielleicht so machen, dass man einen Pfad mit '@' prependen kann und
+Vielleicht so machen, dass man einen Pfad mit '/' prependen kann und
 der dann den absoluten Pfad nimmt. Dürfte ja einfach in eine Funktion
 packbar sein.
+*** TODO Schreibe Klasse "input_delegator", die die Eingabe delegieren kann
+Momentan brauchen 3 Systeme Inputs: die Konsole, das Fahrzeug, die
+Kamera. Der Inputdelegator sollte alle diese Klassen kennen. Die
+Konsole kann eh jede Eingabe überschreiben. Dann sollte man noch
+zwischen dem Fahrzeug und der Kamera umschalten können.
+
+Notiz: Die Kamera und das Fahrzeug können koexistieren, wenn die
+Kamera immer neu gesetzt wird nachdem sie durch den Input geändert
+wurde.

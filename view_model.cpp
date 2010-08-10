@@ -7,6 +7,7 @@
 #include "get_option.hpp"
 #include "media_path.hpp"
 #include "stdlib/copy.hpp"
+#include "input_delegator.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
 #include <sge/image/create_texture.hpp>
@@ -151,9 +152,13 @@ try
 		sys.renderer(),
 		sys.font_system(),
 		sys.image_loader());
+
+	input_delegator input_delegator_(
+		sys.input_system(),
+		console);
 	
 	graphics::camera cam(
-		console,
+		input_delegator_,
 		sge::renderer::aspect<graphics::scalar>(
 			sys.renderer()->screen_size()),
 		fcppt::math::deg_to_rad(

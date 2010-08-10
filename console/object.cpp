@@ -61,34 +61,8 @@ insula::console::object::object(
             rend->screen_size().h() / 2)))
       .elements()),
 		static_cast<sge::console::output_line_limit>(
-			1000)),
-	c1(
-		is->register_callback(
-			std::bind(
-				&object::callback,
-				this,
-				std::placeholders::_1))),
-	c2(
-		is->register_repeat_callback(
-			std::bind(
-				&object::repeat_callback,
-				this,
-				std::placeholders::_1)))
+			1000))
 {
-}
-
-fcppt::signal::auto_connection
-insula::console::object::register_callback(
-	sge::input::callback const &c)
-{
-	return signal_.connect(c);
-}
-
-fcppt::signal::auto_connection
-insula::console::object::register_repeat_callback(
-	sge::input::repeat_callback const &c)
-{
-	return repeat_signal_.connect(c);
 }
 
 void
@@ -120,24 +94,4 @@ sge::console::gfx const &
 insula::console::object::view() const
 {
 	return gfx_;
-}
-
-void
-insula::console::object::callback(
-	sge::input::key_pair const &c)
-{
-	if (c.key().code() == sge::input::kc::key_f1 && !fcppt::math::almost_zero(c.value()))
-		gfx_.active(!gfx_.active());
-	if (!gfx_.active())
-		signal_(
-			c);
-}
-
-void
-insula::console::object::repeat_callback(
-	sge::input::key_type const &c)
-{
-	if (!gfx_.active())
-		repeat_signal_(
-			c);
 }

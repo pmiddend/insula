@@ -6,7 +6,7 @@
 #include "vec3.hpp"
 #include "vec4.hpp"
 #include "gizmo.hpp"
-#include "../console/object_fwd.hpp"
+#include "../input_delegator_fwd.hpp"
 #include <sge/input/system_ptr.hpp>
 #include <sge/input/key_pair_fwd.hpp>
 #include <fcppt/noncopyable.hpp>
@@ -23,7 +23,7 @@ FCPPT_NONCOPYABLE(camera)
 public:
 	explicit
 	camera(
-		console::object &,
+		input_delegator &,
 		scalar aspect,
 		scalar fov,
 		scalar near,
