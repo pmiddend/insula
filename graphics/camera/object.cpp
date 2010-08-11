@@ -256,19 +256,15 @@ insula::graphics::camera::object::input_callback(
 			dirs_[1] = !k.value() ? 0 : -1;
 			break;
 		default:
-			//if (k.key().char_code() == FCPPT_TEXT('w'))
 			if (k.key().code() == sge::input::kc::key_up)
 				dirs_[2] = !k.value() ? 0 : -1;
 
-			//if (k.key().char_code() == FCPPT_TEXT('s'))
 			if (k.key().code() == sge::input::kc::key_down)
 				dirs_[2] = !k.value() ? 0 : 1;
 
-			//if (k.key().char_code() == FCPPT_TEXT('a'))
 			if (k.key().code() == sge::input::kc::key_left)
 				dirs_[0] = !k.value() ? 0 : -1;
 
-			//if (k.key().char_code() == FCPPT_TEXT('d'))
 			if (k.key().code() == sge::input::kc::key_right)
 				dirs_[0] = !k.value() ? 0 : 1;
 

@@ -10,39 +10,41 @@
 			"texture" : "insula_car.png"
 		},
 
-	"mass" : 1000.0,
-	"chassis_center_of_mass_shift" : 0.0,
+	"mass" : 100.0,
+	"chassis_center_of_mass_shift" : 5.0,
 	"scaling" : 1.0,
-	"max_engine_force" : 500.0,
+	"max_engine_force" : 100.0,
 	"max_breaking_force" : 100.0,
 	"steering_clamp" : 0.5,
 
 	"default_wheel" : 
 		{
-			"offset" : [0.0,0.0,0.0]
+			"offset" : [0.0,0.0,0.0],
+			"suspension_stiffness" : 50.0,
+			"friction_slip" : 10000.0
 		},
 		
 	"wheels" : 
 		[
 			{
-				"offset" : [0.9,-1.2,1.2],
+				"offset" : [0.9,-0.6,1.2],
 				"front_wheel" : true,
 				"gets_steering" : true,
 				"gets_breaking_force" : true
 			},
 			{
-				"offset" : [-0.9,-1.2,1.2],
+				"offset" : [-0.9,-0.6,1.2],
 				"front_wheel" : true,
 				"gets_steering" : true,
 				"gets_breaking_force" : true
 			},
 			{
-				"offset" : [0.9,-1.2,-0.85],
+				"offset" : [0.9,-0.6,-0.85],
 				"gets_engine_force" : true,
 				"gets_breaking_force" : true
 			},
 			{
-				"offset" : [-0.9,-1.2,-0.85],
+				"offset" : [-0.9,-0.6,-0.85],
 				"gets_engine_force" : true,
 				"gets_breaking_force" : true
 			}

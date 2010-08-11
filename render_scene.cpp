@@ -257,7 +257,7 @@ try
 	physics::vec3 physics_vehicle_pos = 
 		fcppt::math::vector::structure_cast<physics::vec3>(
 			fcppt::math::box::center(
-				terrain->extents()) * graphics::vec3(1.0,2,1.0));
+				terrain->extents()) * graphics::vec3(1.0,1.1,1.0));
 
 	// DEBUG BEGIN
 	fcppt::io::cout << "positioning vehicle at " << physics_vehicle_pos << "\n";
