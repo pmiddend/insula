@@ -130,20 +130,9 @@ insula::water::object::render()
 
 	shader_.set_uniform(
 		FCPPT_TEXT("mvp"),
-		camera_.perspective() * camera_.rotation() * camera_.translation());
-	/*
-	shader_.set_uniform(
-		FCPPT_TEXT("perspective"),
-		camera_.perspective());
-
-	shader_.set_uniform(
-		FCPPT_TEXT("rotation"),
-		camera_.rotation());
-
-	shader_.set_uniform(
-		FCPPT_TEXT("translation"),
+		camera_.perspective() * 
+		camera_.rotation() * 
 		camera_.translation());
-*/
 
 	current_time_ += 
 		wave_timer_.reset();
