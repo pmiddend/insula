@@ -290,6 +290,19 @@ try
 	physics::vehicle_controller vehicle_controller(
 		sys.input_system(),
 		*vehicle);
+
+	bool lock_camera = true;
+	
+	fcppt::signal::scoped_connection const lock_cb(
+		console.model().insert(
+			FCPPT_TEXT("lock_camera"),
+			[&sys,&lock_camera](
+				sge::console::arg_list const &,
+				sge::console::object &)
+			{
+				lock_camera = !lock_camera;
+			},
+			FCPPT_TEXT("Toggle camera lock to vehicle on/off")));
 #endif
 	// vehicle end
 
@@ -395,13 +408,17 @@ try
 				get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
 				fcppt::math::deg_to_rad(
 					get_option<graphics::scalar>(vm,"camera-vehicle-angle"))).position());*/
-		cam->gizmo() = 
-			gizmo::lock_to(
-				gizmo::structure_cast<physics::gizmo>(
-					vehicle->gizmo()),
-				get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
-				fcppt::math::deg_to_rad(
-					get_option<graphics::scalar>(vm,"camera-vehicle-angle")));
+
+		if (lock_camera)
+		{
+			cam->gizmo() = 
+				gizmo::lock_to(
+					gizmo::structure_cast<physics::gizmo>(
+						vehicle->gizmo()),
+					get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
+					fcppt::math::deg_to_rad(
+						get_option<graphics::scalar>(vm,"camera-vehicle-angle")));
+		}
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());

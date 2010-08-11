@@ -49,7 +49,8 @@ insula::physics::world::update(
 		// have to choose the substep count so that time_delta is _just_
 		// less than the fixed time.
 		//2);
-		10);
+		100,
+		1.0/240.0);
 }
 
 void

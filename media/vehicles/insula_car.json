@@ -10,20 +10,16 @@
 			"texture" : "insula_car.png"
 		},
 
-	"mass" : 800.0,
-	"chassis_center_of_mass_shift" : -1.5,
+	"mass" : 1000.0,
+	"chassis_center_of_mass_shift" : 0.0,
 	"scaling" : 1.0,
-	"max_engine_force" : 1500.0,
+	"max_engine_force" : 500.0,
 	"max_breaking_force" : 100.0,
 	"steering_clamp" : 0.5,
 
 	"default_wheel" : 
 		{
-			"offset" : [0.0,0.0,0.0],
-			"suspension_stiffness" : 20.0,
-			"friction_slip" : 4.0,
-			"damping_compression" : 2.5
-
+			"offset" : [0.0,0.0,0.0]
 		},
 		
 	"wheels" : 

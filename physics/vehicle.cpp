@@ -19,6 +19,7 @@
 #include <fcppt/math/matrix/structure_cast.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
+#include <fcppt/math/dim/arithmetic.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
 #include <boost/foreach.hpp>
@@ -94,6 +95,8 @@ insula::physics::vehicle::vehicle(
 	chassis_box_.reset(
 		new btBoxShape(
 			dim3_to_bullet(
+				// btBoxShape gets half extents, so muliply by 0.5 here
+				static_cast<scalar>(0.5)*
 				fcppt::math::dim::structure_cast<dim3>(
 					chassis_model_->bounding_box().dimension()))));
 

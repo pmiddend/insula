@@ -2,6 +2,14 @@
 
 [[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
 
+Debuggen, Möglichkeiten:
+
+- bullet updaten
+- Debugdrawer implementieren, gucken ob die Shapes die falsche Größe
+  haben oder kollidieren wo sie es nicht sollen
+- btHeightfieldTerrainShape durch btBvhTriangleShape ersetzen
+- btRaycastVehicle genauer angucken, schauen wie es funzt
+
 * Roadmap
 ** Spielbeschreibung
 Das Spiel soll ein Multiplayerspiel werden. Netzwerkmodus
