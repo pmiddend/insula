@@ -140,7 +140,7 @@ insula::graphics::camera::object::translation() const
 {
 	return 
 		fcppt::math::matrix::translation(
-			gizmo_.position());
+			-gizmo_.position());
 	
 }
 
@@ -250,23 +250,23 @@ insula::graphics::camera::object::input_callback(
 		}
 		break;
 		case sge::input::kc::key_space:
-			dirs_[1] = !k.value() ? 0 : -1;
+			dirs_[1] = !k.value() ? 0 : 1;
 			break;
 		case sge::input::kc::key_lctrl:
-			dirs_[1] = !k.value() ? 0 : 1;
+			dirs_[1] = !k.value() ? 0 : -1;
 			break;
 		default:
 			if (k.key().char_code() == FCPPT_TEXT('w'))
-				dirs_[2] = !k.value() ? 0 : 1;
-
-			if (k.key().char_code() == FCPPT_TEXT('s'))
 				dirs_[2] = !k.value() ? 0 : -1;
 
+			if (k.key().char_code() == FCPPT_TEXT('s'))
+				dirs_[2] = !k.value() ? 0 : 1;
+
 			if (k.key().char_code() == FCPPT_TEXT('a'))
-				dirs_[0] = !k.value() ? 0 : 1;
+				dirs_[0] = !k.value() ? 0 : -1;
 
 			if (k.key().char_code() == FCPPT_TEXT('d'))
-				dirs_[0] = !k.value() ? 0 : -1;
+				dirs_[0] = !k.value() ? 0 : 1;
 
 			if (k.key().char_code() == FCPPT_TEXT('q'))
 				do_roll_ = !k.value() ? 0 : -1;

@@ -12,22 +12,14 @@
 
 	"mass" : 800.0,
 	"chassis_center_of_mass_shift" : 0.0,
+	"scaling" : 1.0,
+	"max_engine_force" : 1000.0,
+	"max_breaking_force" : 100.0,
 	"steering_clamp" : 0.5,
-	"max_engine_force" : 20000.0,
-	"max_breaking_force" : 300.0,
-	"scaling" : 30.0,
-	"suspension_stiffness" : 40.0,
-	"wheels_suspension_force" : 6000.0,
-	"wheels_damping_compression" : 0.1,
-	"wheels_damping_relaxation" : 0.2,
-	"suspension_length" : 2.4,
-	"suspension_rest_length1" : 1.2,
-	"max_suspension_travel_cm" : 120.0,
 
 	"default_wheel" : 
 		{
-			"offset" : [0.0,0.0,0.0],
-			"friction_slip" : 2.0
+			"offset" : [0.0,0.0,0.0]
 		},
 		
 	"wheels" : 

@@ -18,22 +18,34 @@ public:
 			vec3::null()),
 		is_front_wheel_(
 			false),
+		// Taken from the standard btVehicleTuning constructor
 		suspension_stiffness_(
-			static_cast<scalar>(20)),
+			static_cast<scalar>(5.88)),
+		// Taken from the standard btVehicleTuning constructor
 		suspension_compression_(
 			static_cast<scalar>(0.83)),
+		// Taken from the standard btVehicleTuning constructor
 		suspension_damping_(
 			static_cast<scalar>(0.88)),
+		// Taken from the standard btVehicleTuning constructor
+		suspension_travel_cm_(
+			static_cast<scalar>(500)),
+		// Taken from VehicleDemo
 		suspension_rest_length_(
-			static_cast<scalar>(10)),
+			static_cast<scalar>(0.6)),
+		// Taken from VehicleDemo
 		damping_relaxation_(
 			static_cast<scalar>(2.3)),
+		// Taken from VehicleDemo
 		damping_compression_(
 			static_cast<scalar>(4.4)), 
+		// Taken from the standard btVehicleTuning constructor
 		friction_slip_(
-			static_cast<scalar>(1000)),
+			static_cast<scalar>(10.5)),
+		// Taken from VehicleDemo
 		roll_influence_(
 			static_cast<scalar>(0.1)),
+		// Taken from the standard btVehicleTuning constructor
 		maximum_suspension_force_(
 			static_cast<scalar>(6000)),
 		gets_engine_force_(
@@ -59,6 +71,9 @@ public:
 
 	wheel_info &suspension_damping(scalar const s) { suspension_damping_ = s; return *this; }
 	scalar suspension_damping() const { return suspension_damping_; }
+
+	wheel_info &suspension_travel_cm(scalar const s) { suspension_travel_cm_ = s; return *this; }
+	scalar suspension_travel_cm() const { return suspension_travel_cm_; }
 
 	wheel_info &suspension_rest_length(scalar const s) { suspension_rest_length_ = s; return *this; }
 	scalar suspension_rest_length() const { return suspension_rest_length_; }
@@ -92,6 +107,7 @@ private:
 	scalar suspension_stiffness_;
 	scalar suspension_compression_;
 	scalar suspension_damping_;
+	scalar suspension_travel_cm_;
 	scalar suspension_rest_length_;
 	scalar damping_relaxation_;
 	scalar damping_compression_;

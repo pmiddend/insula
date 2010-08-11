@@ -23,12 +23,13 @@
 #include <fcppt/math/box/basic_impl.hpp>
 #include <boost/foreach.hpp>
 
-// DEBUG
+// DEBUG BEGIN
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/box/output.hpp>
 #include "bullet_to_vec3.hpp"
+// DEBUG END
 
 namespace
 {
@@ -95,6 +96,10 @@ insula::physics::vehicle::vehicle(
 			dim3_to_bullet(
 				fcppt::math::dim::structure_cast<dim3>(
 					chassis_model_->bounding_box().dimension()))));
+
+	// DEBUG BEGIN
+	fcppt::io::cout << "chassis box: " << chassis_model_->bounding_box() << "\n";
+	// DEBUG END
 	
 	compound_.reset(
 		new btCompoundShape());
@@ -108,7 +113,8 @@ insula::physics::vehicle::vehicle(
 				0)),
 		chassis_box_.get());
 
-	btVector3 local_inertia;
+	// I don't know if initializing to zero is neccessary
+	btVector3 local_inertia(0,0,0);
 	compound_->calculateLocalInertia(
 		mass,
 		local_inertia);
@@ -127,9 +133,23 @@ insula::physics::vehicle::vehicle(
 	// TODO: What happens if this is omitted?
 	car_body_->setActivationState(
 		DISABLE_DEACTIVATION);
+	// TODO END
+
+	// TODO: I don't know if this is neccessary, VehicleDemo does it:
+	//car_body_->setCenterOfMassTransform(
+	//	vec3_to_bullet());
+	car_body_->setLinearVelocity(
+		btVector3(0,0,0));
+	car_body_->setAngularVelocity(
+		btVector3(0,0,0));
+	// TODO END
 
 	graphics::box const wheel_box = 
 		wheel_model_->bounding_box();
+
+	// DEBUG BEGIN
+	fcppt::io::cout << "wheel_box is " << wheel_box << "\n";
+	// DEBUG END
 
 	scalar const 
 		wheel_halfwidth = 
@@ -158,14 +178,14 @@ insula::physics::vehicle::vehicle(
 			car_body_.get(),
 			raycaster_.get()));
 
+	world_.add(
+		*vehicle_);
+
 	// Those are just indices
 	vehicle_->setCoordinateSystem(
 		0,
 		1,
 		2);
-
-	world_.add(
-		*vehicle_);
 
 	int wheel_id = 0;
 	BOOST_FOREACH(
@@ -175,10 +195,10 @@ insula::physics::vehicle::vehicle(
 		vehicle_->addWheel(
 			vec3_to_bullet(
 				w.position()),
-			// Turning direction
+			// Ray direction in chassis space
 			btVector3(
 				0,-1,0),
-			// Axle
+			// Turning axle in chassis space (why is this negative?)
 			btVector3(
 				-1,0,0),
 			w.suspension_rest_length(),

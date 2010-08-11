@@ -3,10 +3,10 @@
 #include "graphics/vec3.hpp"
 #include "graphics/dim2.hpp"
 #include "gizmo/structure_cast.hpp"
+#include "gizmo/lock_to.hpp"
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
-#include "graphics/camera/lock_to.hpp"
 #include "graphics/frame_counter.hpp"
 #include "skydome/object.hpp"
 #include "skydome/console_proxy.hpp"
@@ -127,7 +127,7 @@ try
 	desc.add_options()
 		("help","produce help message")
 		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen")
-		("camera-vehicle-distance",boost::program_options::value<graphics::scalar>()->default_value(500),"Distance to the vehicle")
+		("camera-vehicle-distance",boost::program_options::value<graphics::scalar>()->default_value(10),"Distance to the vehicle")
 		("camera-vehicle-angle",boost::program_options::value<graphics::scalar>()->default_value(30),"Angle of the camera in degrees")
 		// vehicle begin
 		("vehicle-file",boost::program_options::value<fcppt::string>(),"The file to load the vehicle from")
@@ -215,10 +215,9 @@ try
 		console.model(),
 		sys.image_loader());
 
-	// NOTE: The - is needed here, "position" is really not well-defined.
 	cam->gizmo().position(
-		-fcppt::math::box::center(
-			terrain->extents()));
+		fcppt::math::box::center(
+			terrain->extents()) * graphics::vec3(1,1.5,1));
 
 	water::object_ptr water = 
 		water::cli_factory(
@@ -254,13 +253,15 @@ try
 		terrain->height_scaling());
 
 	// vehicle begin
-/*
+#ifndef PHYSICS_DISABLE_VEHICLE
 	physics::vec3 physics_vehicle_pos = 
 		fcppt::math::vector::structure_cast<physics::vec3>(
 			fcppt::math::box::center(
-				terrain->extents()));
+				terrain->extents()) * graphics::vec3(1.0,2,1.0));
 
-	physics_vehicle_pos[1] = terrain->extents().dimension()[1];
+	// DEBUG BEGIN
+	fcppt::io::cout << "positioning vehicle at " << physics_vehicle_pos << "\n";
+	// DEBUG END
 
 	sge::plugin::object<sge::model::loader>::ptr_type const model_plugin(
 		sys.plugin_manager().plugin<sge::model::loader>().load()); 
@@ -275,7 +276,9 @@ try
 
 	physics::vehicle_ptr const vehicle = 
 		physics::json::parse_vehicle(
-			media_path()/FCPPT_TEXT("vehicles")/get_option<fcppt::string>(vm,"vehicle-file"),
+			media_path()/
+			FCPPT_TEXT("vehicles")/
+			get_option<fcppt::string>(vm,"vehicle-file"),
 			physics_world,
 			physics_vehicle_pos,
 			sys.renderer(),
@@ -287,7 +290,7 @@ try
 	physics::vehicle_controller vehicle_controller(
 		sys.input_system(),
 		*vehicle);
-*/
+#endif
 	// vehicle end
 
 	bool running = 
@@ -385,14 +388,20 @@ try
 				sys.renderer()->screen_size()));
 
 		/*
-		graphics::camera::lock_to(
-			*cam,
-			gizmo::structure_cast<physics::gizmo>(
-				vehicle->gizmo()),
-			get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
-			fcppt::math::deg_to_rad(
-				get_option<graphics::scalar>(vm,"camera-vehicle-angle")));
-				*/
+		cam->gizmo().position(
+			gizmo::lock_to(
+				gizmo::structure_cast<physics::gizmo>(
+					vehicle->gizmo()),
+				get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
+				fcppt::math::deg_to_rad(
+					get_option<graphics::scalar>(vm,"camera-vehicle-angle"))).position());*/
+		cam->gizmo() = 
+			gizmo::lock_to(
+				gizmo::structure_cast<physics::gizmo>(
+					vehicle->gizmo()),
+				get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
+				fcppt::math::deg_to_rad(
+					get_option<graphics::scalar>(vm,"camera-vehicle-angle")));
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
@@ -406,10 +415,10 @@ try
 			time_delta);
 
 		// vehicle begin
-/*
+#ifndef PHYSICS_DISABLE_VEHICLE
 		vehicle->update();
 		vehicle->render();
-*/
+#endif
 		// vehicle end
 		
 		if (show_fps)

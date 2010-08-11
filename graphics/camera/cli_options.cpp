@@ -12,7 +12,7 @@ insula::graphics::camera::cli_options()
 		("camera-fov",boost::program_options::value<scalar>()->default_value(90),"Field of view (in degrees)")
 		("camera-near",boost::program_options::value<scalar>()->default_value(1.0),"Distance to the near plane")
 		("camera-far",boost::program_options::value<scalar>()->default_value(10000),"Distance to the far plane")
-		("camera-speed",boost::program_options::value<scalar>()->default_value(500),"Speed of the camera");
+		("camera-speed",boost::program_options::value<scalar>()->default_value(2.5),"Speed of the camera");
 	return opts;
 }
 

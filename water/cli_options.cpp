@@ -12,7 +12,7 @@ insula::water::cli_options()
 {
 	boost::program_options::options_description opts("Water options");
 	opts.add_options()
-		("water-level",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(5)),"Water level")
+		("water-level",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.125)),"Water level")
 		("water-reflection-size",boost::program_options::value<sge::renderer::dim_type>()->default_value(sge::renderer::dim_type(512,512)),"Size of the water reflection texture. If it is equivalent to the screen size")
 		("water-bump-map",boost::program_options::value<fcppt::string>()->default_value(FCPPT_TEXT("bumps.png")),"Location of the water bump map. This is a file below the media path and it has to be an rgb file.")
 		("water-bump-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"The texture scaling for the bump texture")
