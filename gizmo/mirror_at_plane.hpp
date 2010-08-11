@@ -6,6 +6,10 @@
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
 
+// DEBUG BEGIN
+//#include <iostream>
+// DEBUG END
+
 namespace insula
 {
 namespace gizmo
@@ -20,12 +24,20 @@ mirror_at_plane(
 	basic<T,3>::array_type
 	array_type;
 
+	// DEBUG BEGIN
+	//std::cout << "old camera y pos: " << g.position()[1] << "\n";
+	// DEBUG END
+
 	basic<T,3> n(
 		typename basic<T,3>::init()
 			.position(
 				mirror_point_at_plane<T>(
 					g.position(),
 					plane_height)));
+
+	// DEBUG BEGIN
+//	std::cout << "new camera y pos: " << n.position()[1] << "\n";
+	// DEBUG END
 
 	for (typename array_type::size_type i = 0; i < 3; ++i)
 	{

@@ -67,7 +67,6 @@ private:
 	scalar aspect_,fov_,near_,far_;
 	scalar speed_;
 	vec3 dirs_;
-	vec3 position_;
 	insula::graphics::gizmo gizmo_;
 	scalar do_roll_,roll_speed_;
 

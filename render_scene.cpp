@@ -254,6 +254,7 @@ try
 		terrain->height_scaling());
 
 	// vehicle begin
+/*
 	physics::vec3 physics_vehicle_pos = 
 		fcppt::math::vector::structure_cast<physics::vec3>(
 			fcppt::math::box::center(
@@ -286,6 +287,7 @@ try
 	physics::vehicle_controller vehicle_controller(
 		sys.input_system(),
 		*vehicle);
+*/
 	// vehicle end
 
 	bool running = 
@@ -382,6 +384,7 @@ try
 				sge::renderer::pixel_pos::null(),
 				sys.renderer()->screen_size()));
 
+		/*
 		graphics::camera::lock_to(
 			*cam,
 			gizmo::structure_cast<physics::gizmo>(
@@ -389,6 +392,7 @@ try
 			get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
 			fcppt::math::deg_to_rad(
 				get_option<graphics::scalar>(vm,"camera-vehicle-angle")));
+				*/
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
@@ -402,8 +406,10 @@ try
 			time_delta);
 
 		// vehicle begin
+/*
 		vehicle->update();
 		vehicle->render();
+*/
 		// vehicle end
 		
 		if (show_fps)

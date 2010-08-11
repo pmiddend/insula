@@ -101,20 +101,21 @@ insula::graphics::camera::object::update(
 
 		gizmo_ = 
 			insula::graphics::gizmo::init()
+				.position(gizmo_.position())
 				.forward(normalize(forward))
 				.up(normalize(up))
 				.right(normalize(right));
 	}
 
-	position_ = 
-		position_ + 
+	gizmo_.position( 
+		gizmo_.position() + 
 		speed_ * 
 		t * 
 		std::inner_product(
 			gizmo_.array().begin(),
 			gizmo_.array().end(),
 			dirs_.data(),
-			vec3::null());
+			vec3::null()));
 }
 
 insula::graphics::mat4 const
@@ -139,7 +140,7 @@ insula::graphics::camera::object::translation() const
 {
 	return 
 		fcppt::math::matrix::translation(
-			position_);
+			gizmo_.position());
 	
 }
 
@@ -214,6 +215,7 @@ insula::graphics::camera::object::input_callback(
 
 		gizmo_ = 
 			gizmo::init()
+				.position(gizmo_.position())
 				.forward(normalize(forward))
 				.up(normalize(up))
 				.right(normalize(right));
@@ -241,6 +243,7 @@ insula::graphics::camera::object::input_callback(
 
 			gizmo_ = 
 				gizmo::init()
+					.position(gizmo_.position())
 					.forward(normalize(forward))
 					.up(normalize(up))
 					.right(normalize(right));

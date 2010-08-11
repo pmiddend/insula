@@ -197,15 +197,6 @@ insula::water::object::update_reflection(
 		shader_.set_uniform(
 			FCPPT_TEXT("mvp_mirror"),
 			camera_.perspective() * camera_.rotation() * camera_.translation());
-			/*
-			shader_.set_uniform(
-			FCPPT_TEXT("rotation_mirror"),
-			camera_.rotation());
-
-		shader_.set_uniform(
-			FCPPT_TEXT("translation_mirror"),
-			camera_.translation());
-			*/
 	}
 
 	render_callback();
