@@ -135,18 +135,12 @@ insula::model::object::object(
 		model->vertices(
 			part);
 
-	fcppt::io::cerr << "Got our vertex list" << "\n";
-
 	FCPPT_ASSERT(
 		model->texcoords(
 			part));
 
-	fcppt::io::cerr << "Tex coords are present" << "\n";
-
 	sge::model::texcoord_sequence const texcoords = 
 		*(model->texcoords(part));
-
-	fcppt::io::cerr << "Got our texture coordinates" << "\n";
 
 	static_assert(
 		std::is_same
@@ -240,13 +234,13 @@ insula::model::object::render(
 			(sge::renderer::state::cull_mode::back)
 			(sge::renderer::state::depth_func::less));
 
-	sge::renderer::scoped_vertex_buffer const scoped_vb_(
-		renderer_,
-		vb_);
-
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
+
+	sge::renderer::scoped_vertex_buffer const scoped_vb_(
+		renderer_,
+		vb_);
 
 	shader_.set_uniform(
 		FCPPT_TEXT("mvp"),

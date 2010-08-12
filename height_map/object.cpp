@@ -210,13 +210,13 @@ insula::height_map::object::render(
 	sge::renderer::state::cull_mode::type const culling,
 	fcppt::optional<graphics::scalar> const &clip_height)
 {
-	sge::renderer::scoped_vertex_buffer const scoped_vb_(
-		renderer_,
-		vb_);
-
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
+
+	sge::renderer::scoped_vertex_buffer const scoped_vb_(
+		renderer_,
+		vb_);
 
 	shader_.set_uniform(
 		FCPPT_TEXT("do_clip"),

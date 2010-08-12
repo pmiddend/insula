@@ -2,14 +2,6 @@
 
 [[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
 
-Debuggen, Möglichkeiten:
-
-- bullet updaten
-- Debugdrawer implementieren, gucken ob die Shapes die falsche Größe
-  haben oder kollidieren wo sie es nicht sollen
-- btHeightfieldTerrainShape durch btBvhTriangleShape ersetzen
-- btRaycastVehicle genauer angucken, schauen wie es funzt
-
 * Roadmap
 ** Spielbeschreibung
 Das Spiel soll ein Multiplayerspiel werden. Netzwerkmodus
@@ -318,7 +310,27 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 
 ** TODO Terraingenerierung
 ** TODO Shadow Maps
+*** TODO Neues uniform-System aufsetzen
+*** TODO Teste orthografische Projektion aus Sicht der Sonne
+*** TODO Setze das Rendern der Shadowmap auf
+- Hierzu muss orthografisch projiziert werden aus sich der Sonne
+  (Position?)
+- Der Vertexshader sollte nur projizieren
+- Der Fragmentshader sollte nur einen float rausschreiben, die Tiefe
+  des Fragments
+- Die Szene muss in eine Textur gerendert werden
+*** TODO Per Kommandozeile die Tiefentextur in eine Datei schreiben
+*** TODO Den eigentlichen Tiefenalgorithmus implementieren
 
+- Der Heightmap-Vertexshader brauch dazu die mvp-Matrix des Lichtrenderns.
+- Für jeden Vertex v werden zwei Größen berechnet: 
+	1. vl = mvp_light * v
+	2. vp = mvp * v
+- Gib vp und vl an den Fragmentshader weiter
+- Berechne aus vl die Texturkoordinate in der Shadowmap (selbe Technik
+  wie beim Wasser)
+- Vergleiche den z-Wert von vp mit dem z-Wert in der Shadowmap, setze
+  entsprechend die Pixel
 ** TODO Physik, Fahrzeuge [1/6]
 *** TODO insula::physics::model
 Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der angibt, wie dieses Model in der Physikengine dargestellt werden soll:
@@ -334,7 +346,7 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 *** TODO wheel_info muss in cpp ausgelagert werden.
 *** TODO world muss mehr RAII kriegen
 ** TODO Sounds
-** TODO Diverses [15/20]
+** TODO Diverses [16/21]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
@@ -419,7 +431,8 @@ zwischen dem Fahrzeug und der Kamera umschalten können.
 Notiz: Die Kamera und das Fahrzeug können koexistieren, wenn die
 Kamera immer neu gesetzt wird nachdem sie durch den Input geändert
 wurde.
-*** TODO gizmo verallgemeinern und dann in vehicle nutzen?
+*** DONE gizmo verallgemeinern und dann in vehicle nutzen?
+		 CLOSED: [2010-08-12 Thu 20:59]
 
 -gizmo_to_mat4, dann in camera::object nutzen
 -Funktion, um gizmo um right/up/forward zu drehen

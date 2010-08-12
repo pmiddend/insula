@@ -11,7 +11,7 @@
 		},
 
 	"mass" : 100.0,
-	"chassis_center_of_mass_shift" : 5.0,
+	"chassis_center_of_mass_shift" : 0.0,
 	"scaling" : 1.0,
 	"max_engine_force" : 100.0,
 	"max_breaking_force" : 100.0,

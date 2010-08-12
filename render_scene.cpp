@@ -67,6 +67,7 @@
 #include "physics/json/parse_vehicle.hpp"
 #include "physics/vehicle.hpp"
 #include "physics/vehicle_controller.hpp"
+#include "physics/debug_drawer.hpp"
 #include "media_path.hpp"
 #include <sge/model/loader_ptr.hpp>
 #include <sge/model/plugin.hpp>
@@ -100,6 +101,11 @@
 #include <exception>
 #include <iostream>
 #include <ostream>
+
+// DEBUG BEGIN
+#include <fcppt/math/matrix/basic_impl.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
+// DEBUG END
 
 int main(int argc,char *argv[])
 try
@@ -375,6 +381,12 @@ try
 		sys.renderer(),
 		global_state);
 
+	// DEBUG BEGIN
+	physics::debug_drawer physics_debug(
+		physics_world,
+		sys.renderer());
+	// DEBUG END
+
 	while(running)
 	{
 		sge::mainloop::dispatch();
@@ -384,6 +396,7 @@ try
 
 		cam->update(
 			time_delta);
+
 
 		water->update_reflection(
 			[&sys,&global_state,&skydome,&terrain,&water]()
@@ -437,6 +450,16 @@ try
 		vehicle->render();
 #endif
 		// vehicle end
+
+		// DEBUG BEGIN
+		{
+		physics_debug.mvp(
+			cam->perspective() * cam->world());
+		physics_debug.setDebugMode(
+			btIDebugDraw::DBG_DrawWireframe);
+		physics_debug.render(); 
+		}
+		// DEBUG END
 		
 		if (show_fps)
 			frame_counter.update_and_render();

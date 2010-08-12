@@ -110,13 +110,13 @@ insula::water::object::render()
 		 	(sge::renderer::state::cull_mode::off)
 		 	(sge::renderer::state::depth_func::less));
 
-	sge::renderer::scoped_vertex_buffer const scoped_vb_(
-		renderer_,
-		vb_);
-
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
+
+	sge::renderer::scoped_vertex_buffer const scoped_vb_(
+		renderer_,
+		vb_);
 
 	sge::renderer::scoped_texture scoped_tex0(
 		renderer_,
