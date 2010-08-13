@@ -65,9 +65,10 @@ insula::physics::height_field::height_field(
 		new btDefaultMotionState(
 			transform_from_vec3(
 				vec3(
-					static_cast<scalar>(array_.shape()[0]/2) * grid_size,
+					// Why the - 1/2*grid size here? It's a bug in btHeightfieldTerrainShape (or an oddity at least)
+					static_cast<scalar>(array_.shape()[0]/2) * grid_size - static_cast<scalar>(0.5)*grid_size,
 					(*(minmax.first) + *(minmax.second)) / 2 * height_scaling,
-					static_cast<scalar>(array_.shape()[0]/2) * grid_size))));
+					static_cast<scalar>(array_.shape()[0]/2) * grid_size- static_cast<scalar>(0.5)*grid_size))));
 
 	body_.reset(
 		new btRigidBody(

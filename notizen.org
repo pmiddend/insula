@@ -439,5 +439,7 @@ wurde.
 -mirror_camera aus water rausziehen?
 
 *** TODO Anzeigebug fuer Skydome fixen
+*** TODO Der Inputdelegator funzt nicht, die Konsole blockiert nicht den Auto-Input
+*** TODO Library bauen statt einzelne Executables mit denselben Dateien
 Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
 detailreichen Skydome erzeugt?

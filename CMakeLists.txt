@@ -29,11 +29,8 @@ FIND_PACKAGE(
 )
 
 INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR})
-
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-
-pkg_check_modules (SGE spacegameengine)
-
+PKG_CHECK_MODULES(SGE spacegameengine)
 LINK_DIRECTORIES(${SGE_LIBRARY_DIRS})
 
 IF (${CMAKE_COMPILER_IS_GNUCXX})
@@ -73,63 +70,28 @@ FILE(GLOB_RECURSE skydome_files skydome/*)
 FILE(GLOB_RECURSE water_files water/*)
 FILE(GLOB_RECURSE physics_files physics/*)
 FILE(GLOB_RECURSE model_files model/*)
-FILE(GLOB base_files media_path.cpp)
+FILE(GLOB base_files media_path.cpp input_delegator.cpp)
 
 SET_SOURCE_FILES_PROPERTIES(
 	media_path.cpp
 	PROPERTIES
 	COMPILE_FLAGS
-	-DMEDIA_PATH="\\\"${media_path}\\\""
-)
+	-DMEDIA_PATH="\\\"${media_path}\\\"")
 
-ADD_EXECUTABLE(load_image_to_array load_image_to_array.cpp media_path.cpp input_delegator.cpp
-	${height_map_files} ${graphics_files} ${console_files})
+ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files})
 
-ADD_EXECUTABLE(view_model 
-	${graphics_files}
-	${texture_files}
-	${console_files}
-	${model_files}
-	media_path.cpp
-	input_delegator.cpp
-	view_model.cpp)
+FUNCTION(CREATE_INSULA_EXE name)
+	ADD_EXECUTABLE(${name} ${name}.cpp)
+	TARGET_LINK_LIBRARIES(${name} insula_library fcppt sgecore ${Boost_LIBRARIES} ${BULLET_LIBRARIES})
+ENDFUNCTION(CREATE_INSULA_EXE)
 
-ADD_EXECUTABLE(render_height_map media_path.cpp render_height_map.cpp input_delegator.cpp
-	${texture_files}
-	${graphics_files} 
-	${height_map_files}
-	${console_files})
-
-ADD_EXECUTABLE(render_scene media_path.cpp render_scene.cpp input_delegator.cpp
-	${texture_files}
-	${graphics_files} 
-	${height_map_files}
-	${console_files}
-	${skydome_files}
-	${water_files}
-	${physics_files}
-	${model_files}
-	)
-ADD_EXECUTABLE(generate_height_texture media_path.cpp generate_height_texture.cpp input_delegator.cpp
-	${height_map_files} ${texture_files} ${graphics_files} ${console_files})
-ADD_EXECUTABLE(render_skydome media_path.cpp render_skydome.cpp  input_delegator.cpp
-	${texture_files} ${graphics_files} ${console_files} ${skydome_files})
-
-TARGET_LINK_LIBRARIES(load_image_to_array fcppt sgecore)
-TARGET_LINK_LIBRARIES(render_height_map fcppt sgecore)
-TARGET_LINK_LIBRARIES(render_scene fcppt sgecore)
-TARGET_LINK_LIBRARIES(generate_height_texture fcppt sgecore)
-TARGET_LINK_LIBRARIES(render_skydome fcppt sgecore)
-TARGET_LINK_LIBRARIES(view_model fcppt sgecore)
-
-IF(NOT MSVC)
-	TARGET_LINK_LIBRARIES(load_image_to_array ${Boost_LIBRARIES})
-	TARGET_LINK_LIBRARIES(render_height_map ${Boost_LIBRARIES})
-	TARGET_LINK_LIBRARIES(generate_height_texture ${Boost_LIBRARIES})
-	TARGET_LINK_LIBRARIES(render_skydome ${Boost_LIBRARIES})
-	TARGET_LINK_LIBRARIES(render_scene ${Boost_LIBRARIES} ${BULLET_LIBRARIES})
-	TARGET_LINK_LIBRARIES(view_model ${Boost_LIBRARIES} ${BULLET_LIBRARIES})
-ENDIF()
+CREATE_INSULA_EXE(load_image_to_array)
+CREATE_INSULA_EXE(view_model)
+CREATE_INSULA_EXE(render_height_map)
+CREATE_INSULA_EXE(render_scene)
+CREATE_INSULA_EXE(render_skydome)
+CREATE_INSULA_EXE(generate_height_texture)
+# CREATE_INSULA_EXE(motor_sounds)
 
 ENABLE_TESTING()
 
