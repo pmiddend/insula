@@ -1,0 +1,54 @@
+{
+	"chassis" : 
+		{
+			"model" : "buggy.md3",
+			"texture" : "buggy.png"
+		},
+	"wheel" : 
+		{
+			"model" : "insula_car_wheel.md3",
+			"texture" : "tire.png"
+		},
+
+	"mass" : 600.0,
+	"chassis_center_of_mass_shift" : -0.0,
+	"scaling" : 1.0,
+	"max_engine_force" : 1200.0,
+	"max_breaking_force" : 100.0,
+	"steering_clamp" : 0.3,
+
+	"default_wheel" : 
+		{
+			"offset" : [0.0,0.0,0.0],
+			"suspension_stiffness" : 10.0,
+			"suspension_compression" : 3.0,
+			"suspension_relaxation" : 3.2,
+			"suspension_travel_cm" : 1.50,
+			"suspension_rest_length" : 0.80,
+			"friction_slip" : 4.0
+		},
+		
+	"wheels" : 
+		[
+			{
+				"offset" : [1.3,-0.0,1.7],
+				"front_wheel" : true,
+				"gets_steering" : true
+			},
+			{
+				"offset" : [-1.3,-0.0,1.7],
+				"front_wheel" : true,
+				"gets_steering" : true
+			},
+			{
+				"offset" : [1.3,-0.0,-1.90],
+				"gets_engine_force" : true,
+				"gets_breaking_force" : true
+			},
+			{
+				"offset" : [-1.3,-0.0,-1.90],
+				"gets_engine_force" : true,
+				"gets_breaking_force" : true
+			}
+		]
+}
