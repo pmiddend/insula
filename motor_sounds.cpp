@@ -4,6 +4,7 @@
 #include <sge/systems/list.hpp>
 #include <sge/systems/audio_loader.hpp>
 #include <sge/systems/parameterless.hpp>
+#include <sge/systems/audio_player_default.hpp>
 #include <sge/audio/loader.hpp>
 #include <sge/audio/player.hpp>
 #include <sge/audio/multi_loader.hpp>
@@ -110,7 +111,7 @@ try
 
 	sge::systems::instance sys(
 		sge::systems::list()
-		(sge::systems::parameterless::audio_player)
+		(sge::systems::audio_player_default())
 		(
 			sge::systems::audio_loader(
 				sge::audio::loader_capabilities_field::null(),

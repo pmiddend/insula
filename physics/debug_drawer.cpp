@@ -174,7 +174,7 @@ insula::physics::debug_drawer::drawContactPoint(
 	btVector3 const &point,
 	btVector3 const &normal,
 	btScalar const distance,
-	int const lifeTime,
+	int const /*lifeTime*/,
 	btVector3 const &color)
 {
 	drawLine(

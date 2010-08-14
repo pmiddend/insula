@@ -346,7 +346,7 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 *** TODO wheel_info muss in cpp ausgelagert werden.
 *** TODO world muss mehr RAII kriegen
 ** TODO Sounds
-** TODO Diverses [16/21]
+** TODO Diverses [17/23]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** TODO gizmo_init fixen
@@ -440,6 +440,9 @@ wurde.
 
 *** TODO Anzeigebug fuer Skydome fixen
 *** TODO Der Inputdelegator funzt nicht, die Konsole blockiert nicht den Auto-Input
-*** TODO Library bauen statt einzelne Executables mit denselben Dateien
+*** DONE Library bauen statt einzelne Executables mit denselben Dateien
+		 CLOSED: [2010-08-14 Sat 18:32]
 Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
 detailreichen Skydome erzeugt?
+*** TODO Textur tst spiegelverkehrt
+*** TODO sge::model Flag einbauen, ob y und z gedreht werden sollen

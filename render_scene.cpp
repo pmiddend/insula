@@ -263,7 +263,11 @@ try
 	physics::vec3 physics_vehicle_pos = 
 		fcppt::math::vector::structure_cast<physics::vec3>(
 			fcppt::math::box::center(
-				terrain->extents()) * graphics::vec3(1.0,1.1,1.0));
+				terrain->extents()) * 
+				graphics::vec3(
+					static_cast<graphics::scalar>(1.0),
+					static_cast<graphics::scalar>(1.1),
+					static_cast<graphics::scalar>(1.0)));
 
 	// DEBUG BEGIN
 	fcppt::io::cout << "positioning vehicle at " << physics_vehicle_pos << "\n";
@@ -352,6 +356,19 @@ try
 				(sge::renderer::state::draw_mode::line));
 	}
 
+	bool physics_debug = false;
+
+	fcppt::signal::scoped_connection physics_debug_conn(
+		console.model().insert(
+			FCPPT_TEXT("debug_physics"),
+			[&sys,&physics_debug](
+				sge::console::arg_list const &,
+				sge::console::object &)
+			{
+				physics_debug = !physics_debug;
+			},
+			FCPPT_TEXT("Toggle the physics debug drawer")));
+
 	sge::time::timer frame_timer(
 		sge::time::second(
 			1));
@@ -382,7 +399,7 @@ try
 		global_state);
 
 	// DEBUG BEGIN
-	physics::debug_drawer physics_debug(
+	physics::debug_drawer physics_debug_drawer(
 		physics_world,
 		sys.renderer());
 	// DEBUG END
@@ -451,15 +468,14 @@ try
 #endif
 		// vehicle end
 
-		// DEBUG BEGIN
+		if (physics_debug)
 		{
-		physics_debug.mvp(
-			cam->perspective() * cam->world());
-		physics_debug.setDebugMode(
-			btIDebugDraw::DBG_DrawWireframe);
-		physics_debug.render(); 
+			physics_debug_drawer.mvp(
+				cam->perspective() * cam->world());
+			physics_debug_drawer.setDebugMode(
+				btIDebugDraw::DBG_DrawWireframe);
+			physics_debug_drawer.render(); 
 		}
-		// DEBUG END
 		
 		if (show_fps)
 			frame_counter.update_and_render();

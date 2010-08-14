@@ -21,11 +21,12 @@
 		{
 			"offset" : [0.0,0.0,0.0],
 			"suspension_stiffness" : 10.0,
-			"suspension_compression" : 3.0,
-			"suspension_relaxation" : 3.2,
+			"suspension_compression" : 0.3,
+			"suspension_relaxation" : 0.2,
 			"suspension_travel_cm" : 1.50,
 			"suspension_rest_length" : 0.80,
-			"friction_slip" : 4.0
+			"friction_slip" : 100.0,
+			"roll_influence" : 0.05
 		},
 		
 	"wheels" : 
