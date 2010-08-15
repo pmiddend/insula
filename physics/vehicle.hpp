@@ -5,6 +5,7 @@
 #include "gizmo.hpp"
 #include "../graphics/mat4.hpp"
 #include "../graphics/vec3.hpp"
+#include "upright_constraint.hpp"
 #include "wheel_info_sequence.hpp"
 #include "vec3.hpp"
 #include "world_fwd.hpp"
@@ -21,6 +22,8 @@ class btCylinderShapeX;
 class btTransform;
 class btVehicleRaycaster;
 class btRaycastVehicle;
+
+//class btGeneric6DofConstraint;
 
 namespace insula
 {
@@ -91,6 +94,8 @@ private:
 	model::object_ptr wheel_model_;
 	btTransform transform_;
 	graphics::mat4 matrix_transform_;
+	std::unique_ptr<upright_constraint> constraint_;
+	//std::unique_ptr<btGeneric6DofConstraint> constraint_;
 
 	// @override
 	void

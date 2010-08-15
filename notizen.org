@@ -446,3 +446,4 @@ Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
 detailreichen Skydome erzeugt?
 *** TODO Textur tst spiegelverkehrt
 *** TODO sge::model Flag einbauen, ob y und z gedreht werden sollen
+*** TODO Max_speed einbauen

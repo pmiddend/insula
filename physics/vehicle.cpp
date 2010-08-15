@@ -130,6 +130,14 @@ insula::physics::vehicle::vehicle(
 				compound_.get(),
 				local_inertia)));
 
+	btTransform t;
+	t.setIdentity();
+	constraint_.reset(
+		new upright_constraint(
+			*car_body_,
+			//btTransform()));
+			t));
+
 	world_.add(
 		*car_body_);
 
