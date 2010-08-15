@@ -77,6 +77,9 @@ public:
 	insula::physics::gizmo const
 	gizmo() const;
 
+	bool
+	is_skidding() const;
+
 	~object();
 private:
 	sge::renderer::device_ptr const renderer_;
@@ -100,6 +103,7 @@ private:
 	btTransform transform_;
 	graphics::mat4 matrix_transform_;
 	std::unique_ptr<upright_constraint> constraint_;
+	bool is_skidding_;
 
 	// @override
 	void

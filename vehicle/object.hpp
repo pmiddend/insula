@@ -69,6 +69,8 @@ private:
 	sge::audio::player_ptr audio_player_;
 	sge::audio::buffer_ptr engine_buffer_;
 	sge::audio::sound::positional_ptr engine_source_;
+	sge::audio::buffer_ptr skid_buffer_;
+	sge::audio::sound::positional_ptr skid_source_;
 };
 }
 }

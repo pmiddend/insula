@@ -90,7 +90,9 @@ insula::physics::vehicle::object::object::object(
 	transform_(
 		btMatrix3x3::getIdentity(),
 		vec3_to_bullet(
-			_position))
+			_position)),
+	is_skidding_(
+		false)
 {
 	setWorldTransform(
 		transform_);
@@ -244,6 +246,7 @@ insula::physics::vehicle::object::update()
 		car_body_->setLinearVelocity(
 			velocity * max_speed_/speed);
 
+	is_skidding_ = false;
 	for (wheel_info_sequence::size_type i = 0; i < wheels_.size(); ++i)
 	{
 		if (wheels_[i].gets_engine_force())
@@ -271,6 +274,11 @@ insula::physics::vehicle::object::update()
 			static_cast<int>(
 				i),
 			true);
+
+		is_skidding_ = 
+			is_skidding_ ||
+			vehicle_->getWheelInfo(static_cast<int>(i)).m_skidInfo < 
+				static_cast<scalar>(0.8);
 	}
 }
 
@@ -326,6 +334,12 @@ insula::physics::vehicle::object::gizmo() const
 		bullet_to_vec3(
 			transform_.getOrigin()));
 	return g;
+}
+
+bool
+insula::physics::vehicle::object::is_skidding() const
+{
+	return is_skidding_;
 }
 
 insula::physics::vehicle::object::~object()

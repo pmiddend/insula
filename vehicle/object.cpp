@@ -2,6 +2,7 @@
 #include "input.hpp"
 #include "speed_to_pitch.hpp"
 #include "../create_path.hpp"
+#include "../media_path.hpp"
 #include "../console/object.hpp"
 #include "../gizmo/structure_cast.hpp"
 #include "../gizmo/lock_to.hpp"
@@ -101,6 +102,18 @@ insula::vehicle::object::object(
 
 	engine_source_->play(
 		sge::audio::sound::repeat::loop);
+
+	skid_buffer_ = 
+		audio_player_->create_buffer(
+			_audio_loader.load(
+				media_path()/FCPPT_TEXT("sounds")/FCPPT_TEXT("skid.wav")));
+
+	skid_source_ = 
+		skid_buffer_->create_positional(
+			sge::audio::sound::positional_parameters()
+				.position(
+					fcppt::math::vector::structure_cast<sge::audio::vector>(
+						position)));
 }
 
 void
@@ -125,6 +138,19 @@ insula::vehicle::object::update()
 	engine_source_->position(
 		fcppt::math::vector::structure_cast<sge::audio::vector>(
 			physics_->gizmo().position()));
+
+	skid_source_->position(
+		fcppt::math::vector::structure_cast<sge::audio::vector>(
+			physics_->gizmo().position()));
+
+	if (physics_->is_skidding())
+	{
+		if (skid_source_->status() != sge::audio::sound::play_status::playing)
+			skid_source_->play(
+				sge::audio::sound::repeat::loop);
+	}
+	else
+		skid_source_->stop();
 
 	audio_player_->listener().position(
 		fcppt::math::vector::structure_cast<sge::audio::vector>(
