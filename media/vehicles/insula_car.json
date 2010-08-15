@@ -14,6 +14,7 @@
 	"chassis_center_of_mass_shift" : -0.0,
 	"scaling" : 1.0,
 	"max_engine_force" : 800.0,
+	"max_speed" : 800.0,
 	"max_breaking_force" : 300.0,
 	"steering_clamp" : 0.4,
 

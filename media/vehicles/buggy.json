@@ -16,6 +16,7 @@
 	"max_engine_force" : 1200.0,
 	"max_breaking_force" : 100.0,
 	"steering_clamp" : 0.3,
+	"max_speed" : 800.0,
 
 	"default_wheel" : 
 		{

@@ -75,6 +75,10 @@ insula::physics::json::parse_vehicle(
 				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
 					json_file.members,
 					FCPPT_TEXT("max_breaking_force"))),
+			static_cast<scalar>(
+				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+					json_file.members,
+					FCPPT_TEXT("max_speed"))),
 			parse_model(
 				sge::parse::json::find_member_exn<sge::parse::json::object>(
 					json_file.members,

@@ -1,4 +1,4 @@
-#include "frame_counter.hpp"
+#include "stats.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/font/system.hpp>
 #include <sge/config/media_path.hpp>
@@ -18,7 +18,7 @@
 #include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/make_shared_ptr.hpp>
 
-insula::graphics::frame_counter::frame_counter(
+insula::graphics::stats::stats(
 	sge::renderer::device_ptr const _renderer,
 	sge::font::system_ptr const fs)
 :
@@ -36,14 +36,15 @@ insula::graphics::frame_counter::frame_counter(
 }
 
 void
-insula::graphics::frame_counter::update_and_render()
+insula::graphics::stats::update_and_render(
+	fcppt::string const &additional_stats)
 {
 	counter_.update();
 
 	sge::font::draw_text(
 		metrics_,
 		drawer_,
-		FCPPT_TEXT("FPS: ")+counter_.frames_str(),
+		FCPPT_TEXT("FPS: ")+counter_.frames_str()+FCPPT_TEXT("\n")+additional_stats,
 		sge::font::pos::null(),
 		fcppt::math::dim::structure_cast<sge::font::dim>(
 			renderer_->screen_size()),

@@ -1,7 +1,7 @@
 #include "cli_factory.hpp"
 #include "image_to_array.hpp"
 #include "object.hpp"
-#include "../media_path.hpp"
+#include "../create_path.hpp"
 #include "../get_option.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/vec3.hpp"
@@ -32,25 +32,24 @@ insula::height_map::cli_factory(
 			renderer,
 			image_to_array(
 				image_loader.load(
-					media_path()/
-					FCPPT_TEXT("heightfields")/
-					get_option<fcppt::string>(vm,"height-map"))),
+					create_path(
+						get_option<fcppt::string>(vm,"height-map"),
+						FCPPT_TEXT("heightfields")))),
 			get_option<graphics::scalar>(vm,"cell-size"),
-	//		get_option<graphics::scalar>(vm,"cell-size"),
 			get_option<graphics::scalar>(vm,"height-scaling"),
 			get_option<graphics::vec3>(vm,"sun-direction"),
 			get_option<graphics::scalar>(vm,"ambient-light"),
 			get_option<graphics::scalar>(vm,"texture-scaling"),
 			image_loader.load(
-				media_path()/
-				FCPPT_TEXT("textures")/
-				get_option<fcppt::string>(vm,"gradient-texture")),
+				create_path(
+					get_option<fcppt::string>(vm,"gradient-texture"),
+					FCPPT_TEXT("textures"))),
 			image_loader.load(
-				media_path()/
-				FCPPT_TEXT("textures")/
-				height_textures[0]),
+				create_path(
+					height_textures[0],
+					FCPPT_TEXT("textures"))),
 			image_loader.load(
-				media_path()/
-				FCPPT_TEXT("textures")/
-				height_textures[1]));
+				create_path(
+					height_textures[1],
+					FCPPT_TEXT("textures"))));
 }

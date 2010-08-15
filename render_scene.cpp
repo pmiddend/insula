@@ -7,7 +7,7 @@
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
-#include "graphics/frame_counter.hpp"
+#include "graphics/stats.hpp"
 #include "skydome/object.hpp"
 #include "skydome/console_proxy.hpp"
 #include "skydome/cli_options.hpp"
@@ -298,7 +298,7 @@ try
 			*cam);
 
 	physics::vehicle_controller vehicle_controller(
-		sys.input_system(),
+		input_delegator_,
 		*vehicle);
 
 	bool lock_camera = true;
@@ -373,19 +373,19 @@ try
 		sge::time::second(
 			1));
 
-	graphics::frame_counter frame_counter(
+	graphics::stats stats(
 		sys.renderer(),
 		sys.font_system());
 
-	bool show_fps = true;
+	bool show_stats = true;
 
 	console.model().insert(
-		FCPPT_TEXT("toggle_fps"),
-		[&show_fps](sge::console::arg_list const &,sge::console::object &) 
+		FCPPT_TEXT("toggle_stats"),
+		[&show_stats](sge::console::arg_list const &,sge::console::object &) 
 		{
-			show_fps = !show_fps;
+			show_stats = !show_stats;
 		},
-		FCPPT_TEXT("Toggle the frame rate display"));
+		FCPPT_TEXT("Toggle the frame rate display and the vehicle speed"));
 
 	sge::renderer::state::list const global_state = 
 		sge::renderer::state::list
@@ -477,8 +477,11 @@ try
 			physics_debug_drawer.render(); 
 		}
 		
-		if (show_fps)
-			frame_counter.update_and_render();
+		if (show_stats)
+			stats.update_and_render(
+				FCPPT_TEXT("Speed: ")+
+				fcppt::lexical_cast<fcppt::string>(vehicle->speed_kmh())+
+				FCPPT_TEXT("km/h"));
 		console.render();
 	}
 }

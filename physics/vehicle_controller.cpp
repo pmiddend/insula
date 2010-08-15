@@ -1,12 +1,12 @@
 #include "vehicle_controller.hpp"
+#include "../input_delegator.hpp"
 #include "vehicle.hpp"
 #include "scalar.hpp"
-#include <sge/input/system.hpp>
 #include <sge/input/key_pair.hpp>
 #include <functional>
 
 insula::physics::vehicle_controller::vehicle_controller(
-	sge::input::system_ptr is,
+	input_delegator &is,
 	vehicle &_vehicle)
 :
 	vehicle_(
@@ -14,7 +14,7 @@ insula::physics::vehicle_controller::vehicle_controller(
 	is_active_(
 		true),
 	input_connection_(
-		is->register_callback(
+		is.register_callback(
 			std::bind(
 				&vehicle_controller::callback,
 				this,

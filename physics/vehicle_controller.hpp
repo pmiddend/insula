@@ -2,7 +2,7 @@
 #define INSULA_PHYSICS_VEHICLE_CONTROLLER_HPP_INCLUDED
 
 #include "vehicle_fwd.hpp"
-#include <sge/input/system_ptr.hpp>
+#include "../input_delegator_fwd.hpp"
 #include <sge/input/key_pair_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 
@@ -18,7 +18,7 @@ public:
 
 	explicit
 	vehicle_controller(
-		sge::input::system_ptr,
+		input_delegator &,
 		vehicle &);
 
 	void

@@ -59,6 +59,7 @@ insula::physics::vehicle::vehicle(
 	vec3 const &_position,
 	scalar const _max_engine_force,
 	scalar const _max_breaking_force,
+	scalar const _max_speed,
 	model::object_ptr _wheel_model,
 	wheel_info_sequence const &_wheels)
 :
@@ -72,6 +73,8 @@ insula::physics::vehicle::vehicle(
 		_max_engine_force),
 	max_breaking_force_(
 		_max_breaking_force),
+	max_speed_(
+		_max_speed),
 	current_engine_force_(
 		0),
 	current_breaking_force_(
@@ -232,6 +235,16 @@ insula::physics::vehicle::vehicle(
 void
 insula::physics::vehicle::update()
 {
+	btVector3 const velocity = 
+		car_body_->getLinearVelocity();
+
+	btScalar const speed = 
+		velocity.length();
+
+	if (speed > max_speed_) 
+		car_body_->setLinearVelocity(
+			velocity * max_speed_/speed);
+
 	for (wheel_info_sequence::size_type i = 0; i < wheels_.size(); ++i)
 	{
 		if (wheels_[i].gets_engine_force())
@@ -295,6 +308,12 @@ insula::physics::vehicle::steering(
 	scalar const s)
 {
 	current_steering_ = s * steering_clamp_;
+}
+
+insula::physics::scalar
+insula::physics::vehicle::speed_kmh() const
+{
+	return vehicle_->getCurrentSpeedKmHour();
 }
 
 insula::physics::gizmo const

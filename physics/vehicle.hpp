@@ -48,6 +48,7 @@ public:
 		vec3 const &position,
 		scalar max_engine_force,
 		scalar max_breaking_force,
+		scalar max_speed,
 		model::object_ptr wheel,
  		wheel_info_sequence const &);
 
@@ -69,6 +70,9 @@ public:
 	steering(
 		scalar);
 
+	scalar
+	speed_kmh() const;
+
 	// The camera needs this
 	insula::physics::gizmo const
 	gizmo() const;
@@ -86,6 +90,7 @@ private:
 	wheel_info_sequence const wheels_;
 	scalar max_engine_force_;
 	scalar max_breaking_force_;
+	scalar max_speed_;
 	scalar current_engine_force_;
 	scalar current_breaking_force_;
 	scalar current_steering_;
