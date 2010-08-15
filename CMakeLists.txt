@@ -71,7 +71,7 @@ FILE(GLOB_RECURSE water_files water/*)
 FILE(GLOB_RECURSE vehicle_files vehicle/*)
 FILE(GLOB_RECURSE physics_files physics/*)
 FILE(GLOB_RECURSE model_files model/*)
-FILE(GLOB base_files media_path.cpp input_delegator.cpp create_path.cpp vehicle_input.cpp)
+FILE(GLOB base_files media_path.cpp input_delegator.cpp create_path.cpp vehicle_input.cpp music_controller.cpp)
 
 SET_SOURCE_FILES_PROPERTIES(
 	media_path.cpp

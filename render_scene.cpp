@@ -1,4 +1,5 @@
 #include "graphics/scalar.hpp"
+#include "music_controller.hpp"
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/dim2.hpp"
@@ -133,6 +134,9 @@ try
 
 	desc.add(
 		vehicle::cli_options());
+
+	desc.add(
+		music_controller::cli_options());
 	
 	desc.add_options()
 		("help","produce help message")
@@ -368,6 +372,11 @@ try
 		sys.renderer(),
 		sys.font_system());
 
+	music_controller music(
+		vm,
+		sys.audio_loader(),
+		sys.audio_player());
+
 	bool show_stats = true;
 
 	console.model().insert(
@@ -438,6 +447,8 @@ try
 		vehicle->update();
 		vehicle->render();
 		// vehicle end
+		
+		music.update();
 
 		if (physics_debug)
 		{
