@@ -1,14 +1,14 @@
-#ifndef INSULA_PHYSICS_VEHICLE_HPP_INCLUDED
-#define INSULA_PHYSICS_VEHICLE_HPP_INCLUDED
+#ifndef INSULA_PHYSICS_VEHICLE_OBJECT_HPP_INCLUDED
+#define INSULA_PHYSICS_VEHICLE_OBJECT_HPP_INCLUDED
 
-#include "../model/object_ptr.hpp"
-#include "gizmo.hpp"
-#include "../graphics/mat4.hpp"
-#include "../graphics/vec3.hpp"
-#include "upright_constraint.hpp"
+#include "../../model/object_ptr.hpp"
+#include "../gizmo.hpp"
+#include "../../graphics/mat4.hpp"
+#include "../../graphics/vec3.hpp"
+#include "../upright_constraint.hpp"
 #include "wheel_info_sequence.hpp"
-#include "vec3.hpp"
-#include "world_fwd.hpp"
+#include "../vec3.hpp"
+#include "../world_fwd.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
@@ -23,22 +23,22 @@ class btTransform;
 class btVehicleRaycaster;
 class btRaycastVehicle;
 
-//class btGeneric6DofConstraint;
-
 namespace insula
 {
 namespace physics
 {
-class vehicle
+namespace vehicle
+{
+class object
 :
 	public btMotionState
 {
 public:
-	vehicle(vehicle const &) = delete;
-	vehicle &operator=(vehicle const &) = delete;
+	object(object const &) = delete;
+	object &operator=(object const &) = delete;
 	
 	explicit
-	vehicle(
+	object(
 		world &,
 		sge::renderer::device_ptr,
 		model::object_ptr chassis,
@@ -77,7 +77,7 @@ public:
 	insula::physics::gizmo const
 	gizmo() const;
 
-	~vehicle();
+	~object();
 private:
 	sge::renderer::device_ptr const renderer_;
 	world &world_;
@@ -100,7 +100,6 @@ private:
 	btTransform transform_;
 	graphics::mat4 matrix_transform_;
 	std::unique_ptr<upright_constraint> constraint_;
-	//std::unique_ptr<btGeneric6DofConstraint> constraint_;
 
 	// @override
 	void
@@ -112,6 +111,7 @@ private:
 	setWorldTransform(
 		btTransform const &);
 };
+}
 }
 }
 

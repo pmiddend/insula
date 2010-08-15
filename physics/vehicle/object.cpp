@@ -1,14 +1,14 @@
-#include "vehicle.hpp"
-#include "dim3_to_bullet.hpp"
-#include "vec3_to_bullet.hpp"
-#include "bullet_to_vec3.hpp"
-#include "bullet_to_mat3.hpp"
-#include "transform_to_mat4.hpp"
-#include "world.hpp"
-#include "../graphics/box.hpp"
-#include "../graphics/mat3.hpp"
-#include "../gizmo/from_mat3.hpp"
-#include "../model/object.hpp"
+#include "object.hpp"
+#include "../dim3_to_bullet.hpp"
+#include "../vec3_to_bullet.hpp"
+#include "../bullet_to_vec3.hpp"
+#include "../bullet_to_mat3.hpp"
+#include "../transform_to_mat4.hpp"
+#include "../world.hpp"
+#include "../../graphics/box.hpp"
+#include "../../graphics/mat3.hpp"
+#include "../../gizmo/from_mat3.hpp"
+#include "../../model/object.hpp"
 #include <LinearMath/btMatrix3x3.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <BulletDynamics/Vehicle/btRaycastVehicle.h>
@@ -29,7 +29,7 @@
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/box/output.hpp>
-#include "bullet_to_vec3.hpp"
+#include "../bullet_to_vec3.hpp"
 // DEBUG END
 
 namespace
@@ -37,7 +37,7 @@ namespace
 // NOTE: There's also just btVehicleTuning, but I think that's a bug
 btRaycastVehicle::btVehicleTuning const
 create_tuning(
-	insula::physics::wheel_info const &w)
+	insula::physics::vehicle::wheel_info const &w)
 {
 	btRaycastVehicle::btVehicleTuning t;
 	t.m_suspensionStiffness = w.suspension_stiffness();
@@ -49,7 +49,7 @@ create_tuning(
 }
 }
 
-insula::physics::vehicle::vehicle(
+insula::physics::vehicle::object::object::object(
 	world &_world,
 	sge::renderer::device_ptr const _renderer,
 	model::object_ptr _chassis_model,
@@ -138,7 +138,6 @@ insula::physics::vehicle::vehicle(
 	constraint_.reset(
 		new upright_constraint(
 			*car_body_,
-			//btTransform()));
 			t));
 
 	world_.add(
@@ -233,7 +232,7 @@ insula::physics::vehicle::vehicle(
 }
 
 void
-insula::physics::vehicle::update()
+insula::physics::vehicle::object::update()
 {
 	btVector3 const velocity = 
 		car_body_->getLinearVelocity();
@@ -276,7 +275,7 @@ insula::physics::vehicle::update()
 }
 
 void
-insula::physics::vehicle::render()
+insula::physics::vehicle::object::render()
 {
 	for (wheel_info_sequence::size_type i = 0; i < wheels_.size(); ++i)
 	{
@@ -290,34 +289,34 @@ insula::physics::vehicle::render()
 }
 
 void
-insula::physics::vehicle::engine_force(
+insula::physics::vehicle::object::engine_force(
 	scalar const v)
 {
 	current_engine_force_ = v * max_engine_force_;
 }
 
 void
-insula::physics::vehicle::breaking_force(
+insula::physics::vehicle::object::breaking_force(
 	scalar const v)
 {
 	current_breaking_force_ = v * max_breaking_force_;
 }
 
 void
-insula::physics::vehicle::steering(
+insula::physics::vehicle::object::steering(
 	scalar const s)
 {
 	current_steering_ = s * steering_clamp_;
 }
 
 insula::physics::scalar
-insula::physics::vehicle::speed_kmh() const
+insula::physics::vehicle::object::speed_kmh() const
 {
 	return vehicle_->getCurrentSpeedKmHour();
 }
 
 insula::physics::gizmo const
-insula::physics::vehicle::gizmo() const
+insula::physics::vehicle::object::gizmo() const
 {
 	insula::physics::gizmo g = 
 		insula::gizmo::from_mat3<scalar>(
@@ -329,7 +328,7 @@ insula::physics::vehicle::gizmo() const
 	return g;
 }
 
-insula::physics::vehicle::~vehicle()
+insula::physics::vehicle::object::~object()
 {
 	world_.remove(
 		*vehicle_);
@@ -339,7 +338,7 @@ insula::physics::vehicle::~vehicle()
 }
 
 void
-insula::physics::vehicle::getWorldTransform(
+insula::physics::vehicle::object::getWorldTransform(
 	btTransform &t) const
 {
 	t = transform_;
@@ -347,7 +346,7 @@ insula::physics::vehicle::getWorldTransform(
 
 // @override
 void
-insula::physics::vehicle::setWorldTransform(
+insula::physics::vehicle::object::setWorldTransform(
 	btTransform const &t)
 {
 	transform_ = t;

@@ -331,7 +331,7 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
   wie beim Wasser)
 - Vergleiche den z-Wert von vp mit dem z-Wert in der Shadowmap, setze
   entsprechend die Pixel
-** TODO Physik, Fahrzeuge [3/6]
+** TODO Physik, Fahrzeuge [4/6]
 *** TODO insula::physics::model
 Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der angibt, wie dieses Model in der Physikengine dargestellt werden soll:
 
@@ -345,8 +345,15 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 		 CLOSED: [2010-08-10 Tue 01:34]
 *** DONE Nach weiteren Eigenschaften von Fahrzeugen gucken, die noch nicht in wheel_info sind
 		 CLOSED: [2010-08-15 Sun 13:53]
-*** TODO wheel_info muss in cpp ausgelagert werden.
+*** DONE wheel_info muss in cpp ausgelagert werden.
+		 CLOSED: [2010-08-15 Sun 15:20]
 *** TODO world muss mehr RAII kriegen
+*** TODO Max_speed einbauen
+"cap speed spaceship" bei google eingeben und das so umsetzen
+*** TODO Friction einbauen
+*** TODO wheel_info übertragen wie in stk (beide Räder aufm Boden)
+*** TODO Räder spiegeln
+*** TODO Steering-Increment einbauen
 ** TODO Sounds
 ** TODO Diverses [20/26]
 *** DONE Framecounter einbauen
@@ -451,4 +458,3 @@ Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
 detailreichen Skydome erzeugt?
 *** TODO Textur tst spiegelverkehrt
 *** TODO sge::model Flag einbauen, ob y und z gedreht werden sollen
-*** TODO Max_speed einbauen

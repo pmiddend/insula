@@ -2,7 +2,7 @@
 #include "parse_wheel.hpp"
 #include "parse_model.hpp"
 #include "parse_wheels.hpp"
-#include "../vehicle.hpp"
+#include "../vehicle/object.hpp"
 #include "../scalar.hpp"
 #include <sge/parse/json/object.hpp>
 #include <sge/parse/json/parse_file.hpp>
@@ -11,9 +11,9 @@
 #include <sge/exception.hpp>
 #include <fcppt/text.hpp>
 
-insula::physics::vehicle_ptr const
+insula::physics::vehicle::object_ptr const
 insula::physics::json::parse_vehicle(
-	fcppt::filesystem::path const &fn,
+	sge::parse::json::object const &json_file,
 	world &w,
 	vec3 const &position,
 	sge::renderer::device_ptr const rend,
@@ -22,26 +22,22 @@ insula::physics::json::parse_vehicle(
 	graphics::shader &shader,
 	graphics::camera::object &cam)
 {
-	sge::parse::json::object json_file;
-	if (!sge::parse::json::parse_file(fn,json_file))
-		throw sge::exception(FCPPT_TEXT("Error parsing file: ")+fn.string());
-
 	scalar const scaling = 
 		static_cast<scalar>(
 			sge::parse::json::find_member_exn<sge::parse::json::float_type>(
 				json_file.members,
 				FCPPT_TEXT("scaling")));
 
-	wheel_info const default_wheel = 
+	vehicle::wheel_info const default_wheel = 
 		parse_wheel(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
 				json_file.members,
 				FCPPT_TEXT("default_wheel")),
 			scaling,
-			wheel_info());
+			vehicle::wheel_info());
 
 	return 
-		std::make_shared<vehicle>(
+		std::make_shared<vehicle::object>(
 			w,
 			rend,
 			parse_model(

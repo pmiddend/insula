@@ -3,6 +3,7 @@
 #include <LinearMath/btTransformUtil.h>
 #include <LinearMath/btScalar.h>
 #include <fcppt/math/pi.hpp>
+#include <fcppt/io/cout.hpp>
 #include <cmath>
 #include <cstddef>
 
@@ -104,6 +105,7 @@ insula::physics::upright_constraint::disable_time(
 void 
 insula::physics::upright_constraint::buildJacobian()
 {
+	fcppt::io::cout << "buildJacobian\n";
 	btTransform const world_transform = 
 		m_rbA.getCenterOfMassTransform() * 
 		frame_in_a_;

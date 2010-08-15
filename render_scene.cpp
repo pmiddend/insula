@@ -2,8 +2,6 @@
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/dim2.hpp"
-#include "gizmo/structure_cast.hpp"
-#include "gizmo/lock_to.hpp"
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
@@ -26,6 +24,9 @@
 #include "input_delegator.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
+#include <sge/systems/audio_loader.hpp>
+#include <sge/systems/audio_player_default.hpp>
+#include <sge/audio/loader_capabilities_field.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/systems/parameterless.hpp>
 #include <sge/systems/image_loader.hpp>
@@ -64,22 +65,22 @@
 // vehicle begin
 #include "physics/world.hpp"
 #include "physics/height_field.hpp"
-#include "physics/json/parse_vehicle.hpp"
-#include "physics/vehicle.hpp"
-#include "physics/vehicle_controller.hpp"
+#include "vehicle/object.hpp"
+#include "vehicle/cli_options.hpp"
+#include "vehicle/cli_factory.hpp"
 #include "physics/debug_drawer.hpp"
 #include "media_path.hpp"
 #include <sge/model/loader_ptr.hpp>
 #include <sge/model/plugin.hpp>
 #include <sge/model/object_ptr.hpp>
+#include <sge/audio/loader.hpp>
 #include <sge/plugin/object.hpp>
 #include <sge/plugin/context.hpp>
 #include <sge/plugin/manager.hpp>
-// vehicle end
 #include <sge/model/loader_ptr.hpp>
+// vehicle end
 #include <fcppt/log/activate_levels.hpp>
 #include <fcppt/log/level.hpp>
-#include <fcppt/math/deg_to_rad.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/io/cerr.hpp>
@@ -91,12 +92,12 @@
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/input.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/assign/make_container.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/io/ostream.hpp>
 #include <boost/program_options.hpp>
-#include <vector>
 #include <cstdlib>
 #include <exception>
 #include <iostream>
@@ -129,14 +130,13 @@ try
 
 	desc.add(
 		skydome::cli_options());
+
+	desc.add(
+		vehicle::cli_options());
 	
 	desc.add_options()
 		("help","produce help message")
 		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen")
-		("camera-vehicle-distance",boost::program_options::value<graphics::scalar>()->default_value(10),"Distance to the vehicle")
-		("camera-vehicle-angle",boost::program_options::value<graphics::scalar>()->default_value(30),"Angle of the camera in degrees")
-		// vehicle begin
-		("vehicle-file",boost::program_options::value<fcppt::string>(),"The file to load the vehicle from")
 		("physics-gravity",boost::program_options::value<physics::vec3>()->default_value(physics::vec3(0,-10,0)),"The gravity");
 		// vehicle end
 	
@@ -162,6 +162,13 @@ try
 		(
 			sge::window::parameters(
 				FCPPT_TEXT("render scene")))
+		(
+			sge::systems::audio_loader(
+				sge::audio::loader_capabilities_field::null(),
+				fcppt::assign::make_container<sge::extension_set>
+					(FCPPT_TEXT("wav"))
+					(FCPPT_TEXT("ogg"))))
+		(sge::systems::audio_player_default())
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
@@ -259,7 +266,6 @@ try
 		terrain->height_scaling());
 
 	// vehicle begin
-#ifndef PHYSICS_DISABLE_VEHICLE
 	physics::vec3 physics_vehicle_pos = 
 		fcppt::math::vector::structure_cast<physics::vec3>(
 			fcppt::math::box::center(
@@ -284,36 +290,21 @@ try
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"));
 
-	physics::vehicle_ptr const vehicle = 
-		physics::json::parse_vehicle(
-			media_path()/
-			FCPPT_TEXT("vehicles")/
-			get_option<fcppt::string>(vm,"vehicle-file"),
+	vehicle::object_ptr vehicle = 
+		vehicle::cli_factory( 
+			vm,
 			physics_world,
 			physics_vehicle_pos,
 			sys.renderer(),
 			sys.image_loader(),
 			model_loader,
 			model_shader,
-			*cam);
+			*cam,
+			input_delegator_,
+			console,
+			sys.audio_loader(),
+			sys.audio_player());
 
-	physics::vehicle_controller vehicle_controller(
-		input_delegator_,
-		*vehicle);
-
-	bool lock_camera = true;
-	
-	fcppt::signal::scoped_connection const lock_cb(
-		console.model().insert(
-			FCPPT_TEXT("lock_camera"),
-			[&sys,&lock_camera](
-				sge::console::arg_list const &,
-				sge::console::object &)
-			{
-				lock_camera = !lock_camera;
-			},
-			FCPPT_TEXT("Toggle camera lock to vehicle on/off")));
-#endif
 	// vehicle end
 
 	bool running = 
@@ -430,25 +421,7 @@ try
 				sge::renderer::pixel_pos::null(),
 				sys.renderer()->screen_size()));
 
-		/*
-		cam->gizmo().position(
-			gizmo::lock_to(
-				gizmo::structure_cast<physics::gizmo>(
-					vehicle->gizmo()),
-				get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
-				fcppt::math::deg_to_rad(
-					get_option<graphics::scalar>(vm,"camera-vehicle-angle"))).position());*/
-
-		if (lock_camera)
-		{
-			cam->gizmo() = 
-				gizmo::lock_to(
-					gizmo::structure_cast<physics::gizmo>(
-						vehicle->gizmo()),
-					get_option<graphics::scalar>(vm,"camera-vehicle-distance"),
-					fcppt::math::deg_to_rad(
-						get_option<graphics::scalar>(vm,"camera-vehicle-angle")));
-		}
+		vehicle->update_camera();
 
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
@@ -462,10 +435,8 @@ try
 			time_delta);
 
 		// vehicle begin
-#ifndef PHYSICS_DISABLE_VEHICLE
 		vehicle->update();
 		vehicle->render();
-#endif
 		// vehicle end
 
 		if (physics_debug)

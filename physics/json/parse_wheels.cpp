@@ -5,14 +5,14 @@
 #include <sge/parse/json/get.hpp>
 #include <sge/parse/json/object.hpp>
 
-insula::physics::wheel_info_sequence const
+insula::physics::vehicle::wheel_info_sequence const
 insula::physics::json::parse_wheels(
 	sge::parse::json::array const &o,
 	scalar const scaling,
-	wheel_info const &default_wheel)
+	vehicle::wheel_info const &default_wheel)
 {
 	return 
-		insula::stdlib::map<insula::physics::wheel_info_sequence>(
+		insula::stdlib::map<insula::physics::vehicle::wheel_info_sequence>(
 			o.elements,
 			[&scaling,&default_wheel](sge::parse::json::value const &v) 
 			{

@@ -1,25 +1,25 @@
-#ifndef INSULA_PHYSICS_VEHICLE_CONTROLLER_HPP_INCLUDED
-#define INSULA_PHYSICS_VEHICLE_CONTROLLER_HPP_INCLUDED
+#ifndef INSULA_VEHICLE_INPUT_HPP_INCLUDED
+#define INSULA_VEHICLE_INPUT_HPP_INCLUDED
 
-#include "vehicle_fwd.hpp"
+#include "../physics/vehicle/object_fwd.hpp"
 #include "../input_delegator_fwd.hpp"
 #include <sge/input/key_pair_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 
 namespace insula
 {
-namespace physics
+namespace vehicle
 {
-class vehicle_controller
+class input
 {
 public:
-	vehicle_controller(vehicle_controller const &) = delete;
-	vehicle_controller &operator=(vehicle_controller const &) = delete;
+	input(input const &) = delete;
+	input &operator=(input const &) = delete;
 
 	explicit
-	vehicle_controller(
+	input(
 		input_delegator &,
-		vehicle &);
+		physics::vehicle::object &);
 
 	void
 	is_active(
@@ -28,7 +28,7 @@ public:
 	bool 
 	is_active() const;
 private:
-	vehicle &vehicle_;
+	physics::vehicle::object &vehicle_;
 	bool is_active_;
 
 	fcppt::signal::scoped_connection input_connection_;

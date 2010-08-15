@@ -12,11 +12,11 @@
 #define INSULA_PHYSICS_JSON_GENERATE_EXTRACTOR_FLOAT(name)\
 	r.name(static_cast<scalar>(safe_value(o,FCPPT_TEXT(#name),static_cast<sge::parse::json::float_type>(r.name()))))
 
-insula::physics::wheel_info const
+insula::physics::vehicle::wheel_info const
 insula::physics::json::parse_wheel(
 	sge::parse::json::object const &o,
 	scalar const scaling,
-	wheel_info r)
+	vehicle::wheel_info r)
 {
 	r.position(
 		scaling * 

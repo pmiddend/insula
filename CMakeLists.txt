@@ -68,9 +68,10 @@ FILE(GLOB_RECURSE texture_files textures/*)
 FILE(GLOB_RECURSE console_files console/*)
 FILE(GLOB_RECURSE skydome_files skydome/*)
 FILE(GLOB_RECURSE water_files water/*)
+FILE(GLOB_RECURSE vehicle_files vehicle/*)
 FILE(GLOB_RECURSE physics_files physics/*)
 FILE(GLOB_RECURSE model_files model/*)
-FILE(GLOB base_files media_path.cpp input_delegator.cpp create_path.cpp)
+FILE(GLOB base_files media_path.cpp input_delegator.cpp create_path.cpp vehicle_input.cpp)
 
 SET_SOURCE_FILES_PROPERTIES(
 	media_path.cpp
@@ -78,7 +79,7 @@ SET_SOURCE_FILES_PROPERTIES(
 	COMPILE_FLAGS
 	-DMEDIA_PATH="\\\"${media_path}\\\"")
 
-ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files})
+ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${vehicle_files})
 
 FUNCTION(CREATE_INSULA_EXE name)
 	ADD_EXECUTABLE(${name} ${name}.cpp)

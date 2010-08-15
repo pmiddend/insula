@@ -10,6 +10,7 @@
 			"texture" : "tire.png"
 		},
 
+	"engine_sound" : "motor.wav",
 	"mass" : 800.0,
 	"chassis_center_of_mass_shift" : -0.0,
 	"scaling" : 1.0,
