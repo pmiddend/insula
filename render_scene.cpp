@@ -135,8 +135,9 @@ try
 	desc.add(
 		vehicle::cli_options());
 
+	/*
 	desc.add(
-		music_controller::cli_options());
+		music_controller::cli_options());*/
 	
 	desc.add_options()
 		("help","produce help message")
@@ -372,10 +373,12 @@ try
 		sys.renderer(),
 		sys.font_system());
 
+	/*
 	music_controller music(
 		vm,
 		sys.audio_loader(),
 		sys.audio_player());
+*/
 
 	bool show_stats = true;
 
@@ -448,7 +451,7 @@ try
 		vehicle->render();
 		// vehicle end
 		
-		music.update();
+	//	music.update();
 
 		if (physics_debug)
 		{

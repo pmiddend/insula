@@ -3,9 +3,17 @@
 
 #include <sge/audio/multi_loader_fwd.hpp>
 #include <sge/audio/player_ptr.hpp>
+#include <sge/audio/file_ptr.hpp>
+#include <sge/audio/buffer_ptr.hpp>
 #include <sge/audio/sound/base_ptr.hpp>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <sge/parse/json/object_fwd.hpp>
+// Why do we need this?
+#include <sge/parse/json/array.hpp>
+#include <sge/time/timer.hpp>
+#include <fcppt/string.hpp>
+#include <random>
+#include <vector>
+#include <map>
 
 namespace insula
 {
@@ -17,17 +25,52 @@ public:
 
 	explicit
 	music_controller(
-		boost::program_options::variables_map const &,
+		sge::parse::json::object const &,
 		sge::audio::multi_loader &,
 		sge::audio::player_ptr);
 
 	void
 	update();
 
-	static boost::program_options::options_description 
-	cli_options();
+	void
+	play_event(
+		fcppt::string const &);
+
+	void
+	play_random();
+
+	void
+
+	stop();
 private:
-	sge::audio::sound::base_ptr source_;
+	typedef
+	std::map
+	<
+		fcppt::string,
+		sge::audio::file_ptr
+	>
+	file_map;
+
+	typedef
+	std::vector<sge::audio::file_ptr>
+	file_set;
+
+	file_map event_sounds_;
+	file_set random_sounds_;
+	sge::time::timer crossfade_;
+
+	sge::audio::player_ptr player_;
+	sge::audio::buffer_ptr silence_buffer_;
+	sge::audio::sound::base_ptr silence_source_;
+
+	std::uniform_int_distribution<file_set::size_type> rng_;
+	std::mt19937 rng_engine_;
+
+	sge::audio::sound::base_ptr current_source_,new_source_;
+
+	void
+	do_play(
+		sge::audio::sound::base_ptr);
 };
 }
 

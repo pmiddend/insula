@@ -93,6 +93,7 @@ CREATE_INSULA_EXE(render_scene)
 CREATE_INSULA_EXE(render_skydome)
 CREATE_INSULA_EXE(generate_height_texture)
 CREATE_INSULA_EXE(motor_sounds)
+CREATE_INSULA_EXE(music_test)
 
 ENABLE_TESTING()
 

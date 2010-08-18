@@ -1,6 +1,251 @@
+* btGhostObject in sanguis
+Man müsste ein btGhostObject anlegen und ihm eine Shape geben und dann
+das machen, was in [[file:~/projects/insula/temp/bullet-2.76/Demos/CharacterDemo/CharacterDemo.cpp::172][CharacterDemo]] steht (in jedem TickCallback).
+
 * Kurzzeitvorgehen
 
+http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
+
 [[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
+
+Erstelle die folgenden Klassen/Funktionen mit Inhalt:
+
+** height_field::height(x,z)
+	Liefert für einen beliebigen (kontinuierlichen) (x,z)-Wert die
+  dazugehörige y-Koordinate. Als Test dafür könnte man ein Model an
+  der Stelle auf das Terrain setzen und die AABB um den Punkt zentrieren.
+
+** height_field::random_flat_point()
+	Gibt einen zufälligen Punkt auf dem Terrain zurück, an dem die
+  Steigung nicht allzu groß ist und der nicht sehr nah an 0 ist (bei 0
+  soll später das Wasser sein)
+
+** height_field::random_point()
+	Gibt einen zufälligen Punkt auf dem Terrain zurück, der nicht nah
+  bei 0 ist (siehe oben). Ist für Props gedacht.
+
+** Musiklautstärke muss einstellbar sein
+** physics::object
+  Enthält nichts, enthält einen protected-Konstruktor, damit man davon
+  ableiten muss.
+
+** physics::vehicle::object muss den Userpointer auf this setzen
+Außerdem muss es von object ableiten.
+** physics::vehicle::model brauch ein "disabled"-Flag
+Dies sollte sich auf den input_controller auswirken.
+
+** physics::static_model:
+	Leitet von physics::object ab. Bekommt im Konstruktor ein
+  model::object und einen Parameter, der angibt, wie das Model von der
+  Physik angenähert werden soll. Zur Auswahl stehen:
+
+	- Box
+	- Kugel
+	- Zylinder
+	- Exakt (Trimesh)
+
+	Zusätzlich kann man einen Skalierungsfaktor angeben, sodass nicht
+  ganz die Boundingbox genommen wird, sondern etwas weniger.
+
+	Die Masse des Körpers muss 0 sein, damit er statisch ist.
+
+	Es bekommt außerdem ein Flag, was angibt, ob dieser Körper "fest"
+  ist, das übersetzt sich zu:
+	
+	=mBody->setCollisionFlags(mBody->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE));=
+
+	Der Userpointer muss auch hier auf this gesetzt werden.
+
+** music_controller
+Bekommt den "sounds"-Knoten aus der json-Konfigurationsdatei. Hier
+stehen die "Event"-Musikstücke drin. Daraus baut sich das Teil am
+besten eine =map<string,string>=, die einen Event in einen Dateinamen
+umwandelt. 
+
+Außerdem holt es sich eine zweite =map<string,string>= aus dem
+"random"-Knoten, wo die Musikstücke drin sind, die zufällig abgespielt
+werden sollen.
+
+Die Stücke sollten grundsätzlich crossfaden. Dazu sollte in der
+Konfiguration noch die Option =crossfade_time= enthalten sein.
+** physics::world: In der World wird ein neues Signal benötigt, was
+  aufgerufen wird, wenn eine Kollision passiert. Das Callback hat die
+  Signatur:
+
+	=void(vehicle&,static_model &)=
+
+	Später kann es noch weitere Callbacks geben wie vehicle <-> vehicle
+  oder dynamic_model <-> static_model und dynamic_model <-> vehicle.
+
+	Dies ist umgesetzt in einem Tickcallback (siehe [[http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Simulation_Tick_Callbacks][hier]]), wo die
+  Manifold-Liste durchgelaufen wird (siehe [[http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Collision_Callbacks_and_Triggers][hier]]). Jedes Kollisionspaar
+  (als =btCollisionObject=) wird in ein =std::set<std::pair<T*,T*>>=
+  eingefügt.  In der update-Funktion wird dieses set durchlaufen
+  gelöscht, =stepSimulation= aufgerufen und dann das set
+  durchlaufen. Der Userpointer wird von =void*= zu =object*=
+  static_casted und dann auf vehicle und static_model
+  getestet. Daraufhin wird das Signal aufgerufen.
+
+** machine:
+	Bekommt argv und argc im Konstruktor und regelt dort die
+  Kommandozeilensachen (Optionen von den Subsystemen holen und
+  parsen). Wirft für den Fall, dass --help angegeben wurde, eine
+  "help_required-Exception", die den Hilfetext enthält.
+
+	Erstellt im Konstruktor die systems-Dinger sowie die Konsole, den
+  Inputdelegator und die Kamera (ebenfalls unter Zuhilfename der
+  Kommandozeile).
+
+	Es wird eine globale json-Konfigurationsdatei aus media/ gelesen und
+  gespeichert.
+
+	Die Maschine enthält auch eine =map<string,audio::buffer_ptr>=, die
+  die Sounds aus der Konfigurationsdatei (in der json-Sektion
+  "sounds -> nonstreaming") zu Soundpuffern umsetzt. 
+
+	Die Maschine enthält auch den Soundpool. Am besten kulminiert das ganze in zwei Funktionen:
+	
+	=audio::sound::base_ptr create_nonpositional_sound(string)=
+	=audio::sound::positional_ptr create_nonpositional_sound(string,positional_parameters)=
+
+	Hier wird direkt in den Pool eingefügt und als Quelle dient die json-Datei.
+
+	Im Konstruktor wird für den Renderer auch ein vernüntiger Defaultstate gesetzt:
+	
+	- bool_::clear_zbuffer = true
+  - float_::zbuffer_clear_val = 1.f
+  - bool_::clear_backbuffer = true
+	- color::clear_color = black()
+
+	Enthält:
+	- systems
+	- console
+	- input_delegator
+	- camera
+	- escape-Inputcallback
+	- wireframe-Konsolencallback
+	- fps-Counter
+  - Funktion, um die clear-Color dauerhaft zu ändern.
+	- run-Methode, die eine Endlosschleife enthält und tick_events
+    erzeugt
+	- bool running
+	- sge::time::timer frame_timer;
+	- Getter für systems
+	- Getter für die variables_map
+	- Getter für den input_delegator
+	- Getter für die Konsole
+	- Getter für die Kamera
+	- Getter für die Konfigurationsdatei
+** states -> ingame
+	Das hier bedeutet, dass wir im Spiel sind (später könnte parallel
+  dazu ja noch ein Menüstate kommen). Im Konstruktor werden der
+  Skydome, die Landschaft, die Physiklandschaft und das Wasser
+  initialisiert.
+
+	Dann wird per Zufall ein Punkt auf der Landschaft ausgesucht, wo das
+  Vehikel platziert wird (siehe Funktion weiter oben). Es sollte ein
+  klein bisschen über dem Boden platziert werden. Welches Vehikel
+  genommen wird, ist weiterhin über die Kommandozeile
+  einstellbar. Dazu braucht man Kommandozeileneinstellungen, die für
+  das ganze Spiel gelten.
+
+	Weiterhin wird eine Liste von Punkten erzeugt (die eingesammelt
+  werden müssen). Dies geschieht ebenfalls mit der Funktion
+  =random_flat_point=. Es werden erstmal nur Positionen
+  erzeugt. Daraus werden mit der Funktion =generate_point_models= die
+  tatsächlichen Punktmodels (es sind =static_models=, die das
+  ghost-Flag haben) erzeugt.
+
+	Es werden auch Props generiert, diese sind einfach
+  =physics::static_models=. Bei der Platzierung selbiger muss man drauf
+  achten, dass sie "fest" im Boden drin sind (Funktion =random_point=)
+
+	Dieser Zustand enthält auch eine =map<player_name,optional<time>>=,
+  wobei der Typ von "time" noch ermittelt werden muss. Die
+  Spielernamen erhält dieser Zustand von der Konsole.
+
+	Enthält:
+	- Physikwelt
+	- Landschaft
+	- Physiklandschaft
+	- Skydome
+	- Wasser
+	- Props
+	- Punktliste (nur Positionen)
+	- Liste von Punktmodels
+	- Startposition des Autos
+	- Auto
+	- Einen Iterator "last-time", der auf die zuletzt eingetragene Zeit
+    zeigt
+** states -> ingame -> freelook
+	Hier sollte der Spieler sich frei auf der Landschaft umgucken
+  können. Die Punktmodels werden im Konstruktor generiert. Die
+  Simulation wird noch nicht gesteppt. Außerdem wird nicht
+  gizmo::lock_to aufgerufen, wodurch die Kamera also frei ist. Oben
+  wird in großen Buchstaben der Text 
+
+	Freelook-Mode
+	Press Enter to continue 
+
+	angezeigt. Es wird ein entsprechendes Musikstück abgespielt, was aus
+  der Spielkonfigurationsdatei eingelesen wird (siehe Maschine).
+
+	Das Auto wird im Konstruktor deaktiviert
+
+	Enthält:
+	- Eine Font entsprechender Größe, die im Konstruktor geladen wird
+    (Fontsystem ist ja in der Maschine vorhanden)
+	- Musikstück
+** states -> ingame -> camera_move
+	 Hier wird die Kamera von der aktuellen Position zur Startposition
+   (hinter dem Auto) bewegt. Fürs erste kann das aber einfach als
+   "setze Position auf die Endposition" realisiert werden.
+** states -> ingame -> pregame
+	Hier wird die Kamera über das Fahrzeug bewegt und eine Meldung
+  angezeigt mit dem Spieler, der jetzt dran ist. Auf Tastendruck wird
+  in den Zustand running übergegangen. Hier wird kein Musikstück
+  abgespielt, aber gizmo::lock_to aufgerufen.
+
+	Enthält:
+	- Eine Font entsprechender Größe
+** states -> ingame -> running
+	Das Spiel läuft, die Simulation wird getickt. Es wird ein Callback bei
+	der Welt registriert, was Kollisionen vehicle <-> model checkt. Das
+	Auto wird im Konstruktor aktiviert. 
+
+	Hier timer
+
+	Bei einer Kollision vehicle <-> model wird geguckt, ob das Model ein
+  Punkt ist (indem man den Pointer mit dem in der Punkteliste aus
+  ingame vergleicht). Falls ja, wird dieser in die "zu
+  entfernen"-Liste eingefügt und ein Soundeffekt abgespielt. Falls
+  nein, wird ein anderer Sound abgespielt. 
+	
+	In der Hauptschleife wird die "zu entfernen"-Liste abgearbeitet und
+  die entsprechenden Punkte werden aus der Punkteliste entfernt. Es
+  wird danach geguckt, ob überhaupt noch Punkte da sind. Falls nein,
+  wird die Zeit angehalten, für den aktuellen Spieler die Zeit
+  eingetragen, ein Sound abgespielt und in finished übergegangen. Die
+  ingame-Variable "lastplayer" wird geupdatet.
+
+	Enthält:
+	- Liste der zu entfernenden Punkte
+	- Music-Controller
+** states -> ingame -> finished
+	 Greift auf die lastplayer-Variable zu und zeigt die Zeit an und die
+   Aufforderung, Enter zu drücken. Hier könnte die Kamera noch um das
+   Auto rotieren. Es wird wieder ein Musikstück abgespielt.
+
+	 Beim Druck auf Enter wird geguckt, ob es noch Spieler gibt, die
+   keine Zeit eingetragen haben. Falls ja, wird in camera_move
+   übergegangen, falls nein, wird in gameover übergegangen.
+
+	 Enthält:
+	 - Musikstück
+	 - Font
+** states -> ingame -> gameover
+	Hier wird eine Tabelle angezeigt mit allen Teilnehmenden und deren
+  Zeiten. Auf Knopfdruck beendet sich das Spiel.
 
 * Roadmap
 ** Spielbeschreibung
@@ -69,7 +314,7 @@ Somit bräuchte man für das Spiel nicht allzu viel:
  weil die sich nicht um Kollision mit Wänden und Decken kümmern muss)
 -Soundkrams (wobei der in sge schon ganz gut integriert ist)
 
-** Vorgehen der Reihe nach [8/10]
+** Vorgehen der Reihe nach [9/10]
 1. [X] Gucken ob es Beispiele zu bullet mit Terrain gibt 
 2. [X] md3-Loader von sge ausprobieren, ein Model laden
 3. [X] Das Model in einem separaten Programm anzeigen lassen
@@ -81,16 +326,16 @@ Somit bräuchte man für das Spiel nicht allzu viel:
 7. [X] Die Kamera von hinten oben auf das Fahrzeug richten, darauf
    achten dass der Abstand konstant ist.
 8. [X] Das Fahrzeug mit den Pfeiltasten steuerbar machen
-9. [ ] Fahrsounds einbauen [0/3]
-   1. [ ] Soundtest erstellen, wo ein Grundton mit den Pfeiltasten langsam
+9. [X] Fahrsounds einbauen [3/3]
+   1. [X] Soundtest erstellen, wo ein Grundton mit den Pfeiltasten langsam
       verschnellert bzw. verlangsamt wird (mit AL_PITCH z.B.), als ob
       man Gas gebe
-   2. [ ] Gangschaltung simulieren: Bei kontinuierlichem Drücken sollte
+   2. [X] Gangschaltung simulieren: Bei kontinuierlichem Drücken sollte
       ein Geschwindigkeitswert stetig erhöht werden. Auf der
       Geschwindigkeitsskala werden Stützpunkte angebracht. Zwischen
       zwei Stützpunkten wird die Geschwindigkeit des Sounds von 0 bis
       1 interpoliert.
-   3. [ ] Diese Sounds in das Spiel integrieren und mit der
+   3. [X] Diese Sounds in das Spiel integrieren und mit der
       Fahrgeschwindigkeit koppeln.
 10. [ ] Spielmechanik einbauen [0/4]
 		1. [ ] Generiere zufällig Punkte auf der Landschaft. Die Punkte sollten
@@ -309,7 +554,7 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 	4. Mache dasselbe wie bei der fremden Methode.
 
 ** TODO Terraingenerierung
-** TODO Shadow Maps
+** TODO Shadow Maps [0/5]
 *** TODO Neues uniform-System aufsetzen
 *** TODO Teste orthografische Projektion aus Sicht der Sonne
 *** TODO Setze das Rendern der Shadowmap auf
@@ -354,7 +599,9 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 *** TODO wheel_info übertragen wie in stk (beide Räder aufm Boden)
 *** TODO Räder spiegeln
 *** TODO Steering-Increment einbauen
-** TODO Sounds
+** TODO Sounds [0/1]
+*** TODO Looping von Musik fixen
+Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
 ** TODO Diverses [20/26]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
@@ -458,3 +705,4 @@ Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
 detailreichen Skydome erzeugt?
 *** TODO Textur tst spiegelverkehrt
 *** TODO sge::model Flag einbauen, ob y und z gedreht werden sollen
+		

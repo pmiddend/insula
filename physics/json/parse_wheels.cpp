@@ -12,7 +12,7 @@ insula::physics::json::parse_wheels(
 	vehicle::wheel_info const &default_wheel)
 {
 	return 
-		insula::stdlib::map<insula::physics::vehicle::wheel_info_sequence>(
+		stdlib::map<vehicle::wheel_info_sequence>(
 			o.elements,
 			[&scaling,&default_wheel](sge::parse::json::value const &v) 
 			{

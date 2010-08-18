@@ -295,6 +295,6 @@ catch (fcppt::exception const &e)
 }
 catch(std::exception const &e)
 {
-	std::cerr << e.what() << FCPPT_TEXT('\n');
+	std::cerr << e.what() << '\n';
 	return EXIT_FAILURE;
 }
