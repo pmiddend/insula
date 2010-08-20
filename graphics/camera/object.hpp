@@ -12,12 +12,19 @@
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 
+#include <fcppt/io/cout.hpp>
+
 namespace insula
 {
 namespace graphics
 {
 namespace camera
 {
+/// The camera is a class which holds a gizmo (the camera position and
+/// orientation) and manipulates it via keyboard and mouse input. It
+/// also offers all of the transformation matrices to be used in the
+/// shaders, including the perspective matrix (the other ones you
+/// could derive from the gizmo).
 class object
 {
 public:

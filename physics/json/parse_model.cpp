@@ -22,8 +22,7 @@ insula::physics::json::parse_model(
 	sge::image::multi_loader &il,
 	sge::renderer::device_ptr const rend,
 	graphics::camera::object &cam,
-	graphics::shader &shader,
-	physics::scalar const scaling)
+	graphics::shader &shader)
 {
 	fcppt::io::cifstream ifs(
 		media_path()/
@@ -44,7 +43,6 @@ insula::physics::json::parse_model(
 
 	return 
 		std::make_shared<model::object>(
-			model_object->part_names().front(),
 			cam,
 			model_object,
 			rend,
@@ -59,7 +57,5 @@ insula::physics::json::parse_model(
 				rend,
 				il,
 				sge::renderer::filter::linear,
-				sge::renderer::resource_flags::none),
-			static_cast<graphics::scalar>(
-				scaling));
+				sge::renderer::resource_flags::none));
 }

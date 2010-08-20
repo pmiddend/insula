@@ -22,18 +22,11 @@ insula::physics::json::parse_vehicle(
 	graphics::shader &shader,
 	graphics::camera::object &cam)
 {
-	scalar const scaling = 
-		static_cast<scalar>(
-			sge::parse::json::find_member_exn<sge::parse::json::float_type>(
-				json_file.members,
-				FCPPT_TEXT("scaling")));
-
 	vehicle::wheel_info const default_wheel = 
 		parse_wheel(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
 				json_file.members,
 				FCPPT_TEXT("default_wheel")),
-			scaling,
 			vehicle::wheel_info());
 
 	return 
@@ -48,8 +41,7 @@ insula::physics::json::parse_vehicle(
 				il,
 				rend,
 				cam,
-				shader,
-				scaling),
+				shader),
 			static_cast<scalar>(
 				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
 					json_file.members,
@@ -83,12 +75,10 @@ insula::physics::json::parse_vehicle(
 				il,
 				rend,
 				cam,
-				shader,
-				scaling),
+				shader),
 			parse_wheels(
 				sge::parse::json::find_member_exn<sge::parse::json::array>(
 					json_file.members,
 					FCPPT_TEXT("wheels")),
-				scaling,
 				default_wheel));
 }

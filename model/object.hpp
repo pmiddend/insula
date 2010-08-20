@@ -12,6 +12,7 @@
 #include <sge/model/scalar.hpp>
 #include <sge/renderer/texture_ptr.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
+#include <fcppt/optional.hpp>
 #include <fcppt/string.hpp>
 
 namespace insula
@@ -26,14 +27,13 @@ public:
 
 	explicit 
 	object(
-		fcppt::string const &part,
 		graphics::camera::object const &,
 		sge::model::object_ptr,
 		sge::renderer::device_ptr,
 		graphics::shader &,
 		sge::renderer::texture_ptr,
-		sge::model::scalar const scaling = 
-			static_cast<sge::model::scalar>(1));
+		fcppt::optional<fcppt::string> const &part = 
+			fcppt::optional<fcppt::string>());
 
 	void
 	render(
@@ -41,7 +41,11 @@ public:
 
 	graphics::box const
 	bounding_box() const;
+
+	sge::model::object_ptr const
+	raw();
 private:
+	sge::model::object_ptr const raw_;
 	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr renderer_;
 	graphics::shader &shader_;

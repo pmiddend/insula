@@ -3,6 +3,9 @@
 
 #include "box.hpp"
 #include "vec3.hpp"
+#include "vehicle_static_callback.hpp"
+#include <fcppt/signal/auto_connection.hpp>
+#include <fcppt/signal/object.hpp>
 #include <memory>
 
 class btCollisionConfiguration;
@@ -52,9 +55,15 @@ public:
 	btDynamicsWorld &
 	handle();
 
+	fcppt::signal::auto_connection
+	register_vehicle_static_callback(
+		vehicle_static_callback const &);
+
 	// Has to be there because of the destructors of incomplete types
 	~world();
 private:
+	fcppt::signal::object<vehicle_static_callback_fn> vehicle_static_callback_;
+	
 	std::unique_ptr<btCollisionConfiguration> configuration_;
 	std::unique_ptr<btDispatcher> dispatcher_;
 	std::unique_ptr<btBroadphaseInterface> broadphase_interface_;

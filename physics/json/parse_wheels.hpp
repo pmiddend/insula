@@ -3,7 +3,6 @@
 
 #include "../vehicle/wheel_info_sequence.hpp"
 #include "../vehicle/wheel_info.hpp"
-#include "../scalar.hpp"
 #include <sge/parse/json/array.hpp>
 
 namespace insula
@@ -15,7 +14,6 @@ namespace json
 vehicle::wheel_info_sequence const
 parse_wheels(
 	sge::parse::json::array const &o,
-	scalar const scaling,
 	vehicle::wheel_info const &default_wheel);
 }
 }

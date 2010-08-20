@@ -10,31 +10,34 @@ http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
 
 Erstelle die folgenden Klassen/Funktionen mit Inhalt:
 
-** height_field::height(x,z)
+** TODO height_field::height(x,z)
 	Liefert für einen beliebigen (kontinuierlichen) (x,z)-Wert die
   dazugehörige y-Koordinate. Als Test dafür könnte man ein Model an
   der Stelle auf das Terrain setzen und die AABB um den Punkt zentrieren.
 
-** height_field::random_flat_point()
+** TODO height_field::random_flat_point()
 	Gibt einen zufälligen Punkt auf dem Terrain zurück, an dem die
   Steigung nicht allzu groß ist und der nicht sehr nah an 0 ist (bei 0
   soll später das Wasser sein)
 
-** height_field::random_point()
+** TODO height_field::random_point()
 	Gibt einen zufälligen Punkt auf dem Terrain zurück, der nicht nah
   bei 0 ist (siehe oben). Ist für Props gedacht.
 
-** Musiklautstärke muss einstellbar sein
-** physics::object
+** TODO Musiklautstärke muss einstellbar sein
+** DONE physics::object
+	 CLOSED: [2010-08-18 Wed 21:31]
   Enthält nichts, enthält einen protected-Konstruktor, damit man davon
   ableiten muss.
 
-** physics::vehicle::object muss den Userpointer auf this setzen
+** DONE physics::vehicle::object muss den Userpointer auf this setzen
+	 CLOSED: [2010-08-18 Wed 23:50]
 Außerdem muss es von object ableiten.
-** physics::vehicle::model brauch ein "disabled"-Flag
+** TODO physics::vehicle::model brauch ein "disabled"-Flag
 Dies sollte sich auf den input_controller auswirken.
 
-** physics::static_model:
+** DONE physics::static_model:
+	 CLOSED: [2010-08-18 Wed 23:51]
 	Leitet von physics::object ab. Bekommt im Konstruktor ein
   model::object und einen Parameter, der angibt, wie das Model von der
   Physik angenähert werden soll. Zur Auswahl stehen:
@@ -56,7 +59,8 @@ Dies sollte sich auf den input_controller auswirken.
 
 	Der Userpointer muss auch hier auf this gesetzt werden.
 
-** music_controller
+** DONE music_controller
+	 CLOSED: [2010-08-18 Wed 23:51]
 Bekommt den "sounds"-Knoten aus der json-Konfigurationsdatei. Hier
 stehen die "Event"-Musikstücke drin. Daraus baut sich das Teil am
 besten eine =map<string,string>=, die einen Event in einen Dateinamen
@@ -68,7 +72,7 @@ werden sollen.
 
 Die Stücke sollten grundsätzlich crossfaden. Dazu sollte in der
 Konfiguration noch die Option =crossfade_time= enthalten sein.
-** physics::world: In der World wird ein neues Signal benötigt, was
+** TODO physics::world: In der World wird ein neues Signal benötigt, was
   aufgerufen wird, wenn eine Kollision passiert. Das Callback hat die
   Signatur:
 
@@ -86,7 +90,8 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
   static_casted und dann auf vehicle und static_model
   getestet. Daraufhin wird das Signal aufgerufen.
 
-** machine:
+** DONE machine:
+	 CLOSED: [2010-08-19 Thu 19:44]
 	Bekommt argv und argc im Konstruktor und regelt dort die
   Kommandozeilensachen (Optionen von den Subsystemen holen und
   parsen). Wirft für den Fall, dass --help angegeben wurde, eine
@@ -103,7 +108,8 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
   die Sounds aus der Konfigurationsdatei (in der json-Sektion
   "sounds -> nonstreaming") zu Soundpuffern umsetzt. 
 
-	Die Maschine enthält auch den Soundpool. Am besten kulminiert das ganze in zwei Funktionen:
+	Die Maschine enthält auch den Soundpool. Am besten kulminiert das
+  ganze in zwei Funktionen:
 	
 	=audio::sound::base_ptr create_nonpositional_sound(string)=
 	=audio::sound::positional_ptr create_nonpositional_sound(string,positional_parameters)=
@@ -136,7 +142,7 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	- Getter für die Konsole
 	- Getter für die Kamera
 	- Getter für die Konfigurationsdatei
-** states -> ingame
+** TODO states -> ingame
 	Das hier bedeutet, dass wir im Spiel sind (später könnte parallel
   dazu ja noch ein Menüstate kommen). Im Konstruktor werden der
   Skydome, die Landschaft, die Physiklandschaft und das Wasser
@@ -177,7 +183,7 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	- Auto
 	- Einen Iterator "last-time", der auf die zuletzt eingetragene Zeit
     zeigt
-** states -> ingame -> freelook
+** TODO states -> ingame -> freelook
 	Hier sollte der Spieler sich frei auf der Landschaft umgucken
   können. Die Punktmodels werden im Konstruktor generiert. Die
   Simulation wird noch nicht gesteppt. Außerdem wird nicht
@@ -196,11 +202,11 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	- Eine Font entsprechender Größe, die im Konstruktor geladen wird
     (Fontsystem ist ja in der Maschine vorhanden)
 	- Musikstück
-** states -> ingame -> camera_move
+** TODO states -> ingame -> camera_move
 	 Hier wird die Kamera von der aktuellen Position zur Startposition
    (hinter dem Auto) bewegt. Fürs erste kann das aber einfach als
    "setze Position auf die Endposition" realisiert werden.
-** states -> ingame -> pregame
+** TODO states -> ingame -> pregame
 	Hier wird die Kamera über das Fahrzeug bewegt und eine Meldung
   angezeigt mit dem Spieler, der jetzt dran ist. Auf Tastendruck wird
   in den Zustand running übergegangen. Hier wird kein Musikstück
@@ -208,7 +214,7 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 
 	Enthält:
 	- Eine Font entsprechender Größe
-** states -> ingame -> running
+** TODO states -> ingame -> running
 	Das Spiel läuft, die Simulation wird getickt. Es wird ein Callback bei
 	der Welt registriert, was Kollisionen vehicle <-> model checkt. Das
 	Auto wird im Konstruktor aktiviert. 
@@ -231,7 +237,7 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	Enthält:
 	- Liste der zu entfernenden Punkte
 	- Music-Controller
-** states -> ingame -> finished
+** TODO states -> ingame -> finished
 	 Greift auf die lastplayer-Variable zu und zeigt die Zeit an und die
    Aufforderung, Enter zu drücken. Hier könnte die Kamera noch um das
    Auto rotieren. Es wird wieder ein Musikstück abgespielt.
@@ -243,7 +249,7 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	 Enthält:
 	 - Musikstück
 	 - Font
-** states -> ingame -> gameover
+** TODO states -> ingame -> gameover
 	Hier wird eine Tabelle angezeigt mit allen Teilnehmenden und deren
   Zeiten. Auf Knopfdruck beendet sich das Spiel.
 
@@ -705,4 +711,13 @@ Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
 detailreichen Skydome erzeugt?
 *** TODO Textur tst spiegelverkehrt
 *** TODO sge::model Flag einbauen, ob y und z gedreht werden sollen
-		
+*** TODO physics von model abkoppeln
+
+Erstelle eine Funktion, die eine shape aus einem sge::model::object,
+einem Skalierungsfaktor und einer model_approximation erstellt.
+
+*** TODO graphics::stats erweitern
+Man könnte die Stats verallgemeinern: Ein "stat" ist eine textuelle
+Informationseinheit (z.B. Geschwindigkeit des Vehikels), die scoped
+beim "stats"-Objekt eingetragen werden kann. Details muss man sich
+noch überlegen.

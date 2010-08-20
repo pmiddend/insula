@@ -39,7 +39,6 @@
 #include <sge/renderer/state/float.hpp>
 #include <sge/mainloop/dispatch.hpp>
 #include <sge/renderer/scoped_block.hpp>
-#include <sge/exception.hpp>
 #include <sge/image/colors.hpp>
 #include <sge/time/timer.hpp>
 #include <sge/time/second.hpp>
@@ -233,13 +232,9 @@ try
 				vm["water-level"].as<graphics::scalar>()
 			:
 				0);
+
 		console.render();
 	}
-}
-catch(sge::exception const &e)
-{
-	fcppt::io::cerr << e.string() << FCPPT_TEXT('\n');
-	return EXIT_FAILURE;
 }
 catch (fcppt::exception const &e)
 {
@@ -248,6 +243,6 @@ catch (fcppt::exception const &e)
 }
 catch(std::exception const &e)
 {
-	std::cerr << e.what() << FCPPT_TEXT('\n');
+	std::cerr << e.what() << '\n';
 	return EXIT_FAILURE;
 }

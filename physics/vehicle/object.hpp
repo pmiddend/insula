@@ -3,12 +3,15 @@
 
 #include "../../model/object_ptr.hpp"
 #include "../gizmo.hpp"
+#include "../scoped_body.hpp"
+#include "../scoped_action.hpp"
 #include "../../graphics/mat4.hpp"
 #include "../../graphics/vec3.hpp"
 #include "../upright_constraint.hpp"
 #include "wheel_info_sequence.hpp"
 #include "../vec3.hpp"
 #include "../world_fwd.hpp"
+#include "../object.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
@@ -31,7 +34,8 @@ namespace vehicle
 {
 class object
 :
-	public btMotionState
+	public btMotionState,
+	public physics::object
 {
 public:
 	object(object const &) = delete;
@@ -103,7 +107,10 @@ private:
 	btTransform transform_;
 	graphics::mat4 matrix_transform_;
 	std::unique_ptr<upright_constraint> constraint_;
+
 	bool is_skidding_;
+	scoped_body world_body_scope_;
+	scoped_action world_vehicle_scope_;
 
 	// @override
 	void

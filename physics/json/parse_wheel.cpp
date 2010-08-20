@@ -15,11 +15,9 @@
 insula::physics::vehicle::wheel_info const
 insula::physics::json::parse_wheel(
 	sge::parse::json::object const &o,
-	scalar const scaling,
 	vehicle::wheel_info r)
 {
 	r.position(
-		scaling * 
 		parse_vec3(
 			sge::parse::json::find_member_exn<sge::parse::json::array>(
 				o.members,

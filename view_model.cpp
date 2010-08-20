@@ -203,7 +203,6 @@ try
 	}
 
 	model::object model(
-		get_option<fcppt::string>(vm,"part"),
 		*cam,
 		model_object,
 		sys.renderer(),
@@ -213,7 +212,8 @@ try
 			sys.renderer(),
 			sys.image_loader(),
 			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::none));
+			sge::renderer::resource_flags::none),
+		get_option<fcppt::string>(vm,"part"));
 
 	bool running = 
 		true;

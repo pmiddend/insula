@@ -1,6 +1,7 @@
 #include "music_controller.hpp"
 #include "create_path.hpp"
 #include "media_path.hpp"
+#include "exception.hpp"
 #include "stdlib/map.hpp"
 #include <sge/audio/sound/repeat.hpp>
 #include <sge/audio/sound/base.hpp>
@@ -12,7 +13,6 @@
 #include <sge/parse/json/array.hpp>
 #include <sge/parse/json/object.hpp>
 #include <fcppt/text.hpp>
-#include <fcppt/exception.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/assert.hpp>
 #include <iterator>
@@ -111,7 +111,7 @@ insula::music_controller::play_event(
 	fcppt::string const &e)
 {
 	if (event_sounds_.find(e) == event_sounds_.end())
-		throw fcppt::exception(FCPPT_TEXT("Event \"")+e+FCPPT_TEXT("\" not found"));
+		throw exception(FCPPT_TEXT("Event \"")+e+FCPPT_TEXT("\" not found"));
 
 	do_play(
 		player_->create_nonpositional_stream(

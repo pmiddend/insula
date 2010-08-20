@@ -92,7 +92,11 @@ insula::physics::vehicle::object::object::object(
 		vec3_to_bullet(
 			_position)),
 	is_skidding_(
-		false)
+		false),
+	world_body_scope_(
+		world_),
+	world_vehicle_scope_(
+		world_)
 {
 	setWorldTransform(
 		transform_);
@@ -135,6 +139,9 @@ insula::physics::vehicle::object::object::object(
 				compound_.get(),
 				local_inertia)));
 
+	car_body_->setUserPointer(
+		this);
+
 	btTransform t;
 	t.setIdentity();
 	constraint_.reset(
@@ -142,7 +149,7 @@ insula::physics::vehicle::object::object::object(
 			*car_body_,
 			t));
 
-	world_.add(
+	world_body_scope_.set(
 		*car_body_);
 
 	// TODO: What happens if this is omitted?
@@ -193,7 +200,7 @@ insula::physics::vehicle::object::object::object(
 			car_body_.get(),
 			raycaster_.get()));
 
-	world_.add(
+	world_vehicle_scope_.set(
 		*vehicle_);
 
 	// Those are just indices
@@ -342,15 +349,6 @@ insula::physics::vehicle::object::is_skidding() const
 	return is_skidding_;
 }
 
-insula::physics::vehicle::object::~object()
-{
-	world_.remove(
-		*vehicle_);
-
-	world_.remove(
-		*car_body_);
-}
-
 void
 insula::physics::vehicle::object::getWorldTransform(
 	btTransform &t) const
@@ -369,3 +367,5 @@ insula::physics::vehicle::object::setWorldTransform(
 		transform_to_mat4(
 			t);
 }
+
+insula::physics::vehicle::object::~object() {}

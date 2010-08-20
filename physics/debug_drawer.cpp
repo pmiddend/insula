@@ -2,6 +2,7 @@
 #include "world.hpp"
 #include "bullet_to_vec3.hpp"
 #include "../graphics/vec3.hpp"
+#include "../graphics/camera/object.hpp"
 #include "../media_path.hpp"
 #include <sge/renderer/vf/format.hpp>
 #include <sge/renderer/vf/make_unspecified_tag.hpp>
@@ -34,6 +35,7 @@
 #include <boost/foreach.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/from_std_string.hpp>
@@ -93,12 +95,15 @@ vertex_view;
 
 insula::physics::debug_drawer::debug_drawer(
 	world &_world,
-	sge::renderer::device_ptr const _renderer)
+	sge::renderer::device_ptr const _renderer,
+	graphics::camera::object &_camera)
 :
 	world_(
 		_world),
 	renderer_(
 		_renderer),
+	camera_(
+		_camera),
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("debug_vertex.glsl"),
@@ -112,19 +117,6 @@ insula::physics::debug_drawer::debug_drawer(
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
-}
-
-void
-insula::physics::debug_drawer::mvp(
-	graphics::mat4 const &m)
-{
-	sge::renderer::glsl::scoped_program scoped_shader_(
-		renderer_,
-		shader_.program());
-
-	shader_.set_uniform(
-		FCPPT_TEXT("mvp"),
-		m);
 }
 
 // @override
@@ -233,6 +225,10 @@ insula::physics::debug_drawer::render()
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
+
+	shader_.set_uniform(
+		FCPPT_TEXT("mvp"),
+		camera_.perspective() * camera_.world());
 
 	vb_ = 
 		renderer_->create_vertex_buffer(

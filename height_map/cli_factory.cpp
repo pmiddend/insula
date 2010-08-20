@@ -9,7 +9,6 @@
 #include <sge/image/multi_loader.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/make_shared_ptr.hpp>
-#include <fcppt/assert_message.hpp>
 #include <fcppt/text.hpp>
 
 insula::height_map::object_ptr const
@@ -19,13 +18,6 @@ insula::height_map::cli_factory(
 	sge::renderer::device_ptr const renderer,
 	sge::image::multi_loader &image_loader)
 {
-	std::vector<fcppt::string> const height_textures = 
-		vm["height-texture"].as<std::vector<fcppt::string>>();
-
-	FCPPT_ASSERT_MESSAGE(
-		height_textures.size() == 2,
-		FCPPT_TEXT("There must be exactly two height textures"));
-
 	return 
 		std::make_shared<object>(
 			camera,
@@ -33,23 +25,23 @@ insula::height_map::cli_factory(
 			image_to_array(
 				image_loader.load(
 					create_path(
-						get_option<fcppt::string>(vm,"height-map"),
+						get_option<fcppt::string>(vm,"terrain-height-map"),
 						FCPPT_TEXT("heightfields")))),
-			get_option<graphics::scalar>(vm,"cell-size"),
-			get_option<graphics::scalar>(vm,"height-scaling"),
-			get_option<graphics::vec3>(vm,"sun-direction"),
-			get_option<graphics::scalar>(vm,"ambient-light"),
-			get_option<graphics::scalar>(vm,"texture-scaling"),
+			get_option<graphics::scalar>(vm,"terrain-cell-size"),
+			get_option<graphics::scalar>(vm,"terrain-height-scaling"),
+			get_option<graphics::vec3>(vm,"terrain-sun-direction"),
+			get_option<graphics::scalar>(vm,"terrain-ambient-light"),
+			get_option<graphics::scalar>(vm,"terrain-texture-scaling"),
 			image_loader.load(
 				create_path(
-					get_option<fcppt::string>(vm,"gradient-texture"),
+					get_option<fcppt::string>(vm,"terrain-gradient-texture"),
 					FCPPT_TEXT("textures"))),
 			image_loader.load(
 				create_path(
-					height_textures[0],
+					get_option<fcppt::string>(vm,"terrain-height-texture-1"),
 					FCPPT_TEXT("textures"))),
 			image_loader.load(
 				create_path(
-					height_textures[1],
+					get_option<fcppt::string>(vm,"terrain-height-texture-1"),
 					FCPPT_TEXT("textures"))));
 }

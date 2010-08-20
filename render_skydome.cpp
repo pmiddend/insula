@@ -39,7 +39,6 @@
 #include <sge/renderer/state/float.hpp>
 #include <sge/mainloop/dispatch.hpp>
 #include <sge/renderer/scoped_block.hpp>
-#include <sge/exception.hpp>
 #include <sge/image/colors.hpp>
 #include <sge/time/timer.hpp>
 #include <sge/time/second.hpp>
@@ -87,11 +86,7 @@ try
 	desc.add(graphics::camera::cli_options());
 
 	desc.add_options()
-		("help","produce help message")
-		("fov",boost::program_options::value<graphics::scalar>()->default_value(90),"Field of view (in degrees)")
-		("near",boost::program_options::value<graphics::scalar>()->default_value(0.1f),"Distance to the near plane")
-		("far",boost::program_options::value<graphics::scalar>()->default_value(1000),"Distance to the far plane")
-		("angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees)");
+		("help","produce help message");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -228,11 +223,6 @@ try
 		console.render();
 	}
 }
-catch(sge::exception const &e)
-{
-	fcppt::io::cerr << e.string() << FCPPT_TEXT('\n');
-	return EXIT_FAILURE;
-}
 catch (fcppt::exception const &e)
 {
 	fcppt::io::cerr << e.string() << FCPPT_TEXT('\n');
@@ -240,6 +230,6 @@ catch (fcppt::exception const &e)
 }
 catch(std::exception const &e)
 {
-	std::cerr << e.what() << FCPPT_TEXT('\n');
+	std::cerr << e.what() << '\n';
 	return EXIT_FAILURE;
 }

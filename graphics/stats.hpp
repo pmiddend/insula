@@ -12,6 +12,11 @@ namespace insula
 {
 namespace graphics
 {
+/// The stats class currently has no well-defined
+/// functionality. Originally, this was just the frame counter plus a
+/// font for it. But then I wanted to display the current vehicle
+/// speed, so I invented this class. It might get deprecated later on
+/// (or extended).
 class stats
 {
 public:

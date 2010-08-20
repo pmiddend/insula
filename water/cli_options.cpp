@@ -17,7 +17,8 @@ insula::water::cli_options()
 		("water-bump-map",boost::program_options::value<fcppt::string>()->default_value(FCPPT_TEXT("bumps.png")),"Location of the water bump map. This is a file below the media path and it has to be an rgb file.")
 		("water-bump-scaling",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(20)),"The texture scaling for the bump texture")
 		("water-wave-height",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.5)),"The amount of wave perturbation (the \"height\" of the waves)")
-		("water-wind-speed",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.125)),"The speed of the water.");
+		("water-wind-speed",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.125)),"The speed of the water.")
+		("water-stretching",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(2)),"How much to stretch the water size relative to the terrain size");
 	return opts;
 }
 

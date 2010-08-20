@@ -11,8 +11,15 @@
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/signal/object.hpp>
 
+#include <fcppt/io/cout.hpp>
+
 namespace insula
 {
+/// The input delegator is a layer between the input system and its
+/// users. One use case for this is the console: The console input -
+/// if the console is active - should always override any other input,
+/// so that typing text doesn't also drive the vehicle. Thats why the
+/// input delegator gets the console in the constructor.
 class input_delegator
 {
 public:
@@ -31,6 +38,8 @@ public:
 	fcppt::signal::auto_connection
 	register_repeat_callback(
 		sge::input::repeat_callback const &);
+
+	~input_delegator() { fcppt::io::cout << "removing input_delegator\n"; }
 private:
 	console::object &con_;
 	fcppt::signal::object<sge::input::key_pair_function> signal_;

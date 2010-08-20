@@ -93,6 +93,13 @@ insula::physics::world::handle()
 	return *world_;
 }
 
+fcppt::signal::auto_connection
+insula::physics::world::register_vehicle_static_callback(
+	vehicle_static_callback const &c)
+{
+	return vehicle_static_callback_.connect(c);
+}
+
 insula::physics::world::~world()
 {
 }

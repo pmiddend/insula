@@ -14,7 +14,6 @@ namespace json
 vehicle::wheel_info const
 parse_wheel(
 	sge::parse::json::object const &o,
-	scalar const scaling,
 	vehicle::wheel_info);
 }
 }

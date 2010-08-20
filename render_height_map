@@ -1,3 +1,3 @@
 #!/bin/bash
 
-build/render_height_map --height-map real_insula.png --gradient-texture rock_512.png --height-texture grass_512.png sand_512.png "$@"
+build/render_height_map "$@"

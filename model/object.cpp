@@ -105,14 +105,15 @@ private:
 }
 
 insula::model::object::object(
-	fcppt::string const &part,
 	graphics::camera::object const &_camera,
 	sge::model::object_ptr const model,
 	sge::renderer::device_ptr const _renderer,
 	graphics::shader &_shader,
 	sge::renderer::texture_ptr const _texture,
-	sge::model::scalar const scaling)
+	fcppt::optional<fcppt::string> const &_part)
 :
+	raw_(
+		model),
 	camera_(
 		_camera),
 	renderer_(
@@ -130,6 +131,16 @@ insula::model::object::object(
 	shader_.set_uniform(
 		FCPPT_TEXT("texture"),
 		0);
+
+	FCPPT_ASSERT(
+		!model->part_names().empty());
+
+	fcppt::string const part = 
+		_part 
+			? 
+				*_part 
+			: 
+				model->part_names().front();
 
 	sge::model::vertex_sequence const vertices = 
 		model->vertices(
@@ -174,7 +185,6 @@ insula::model::object::object(
 		vertices.size());
 
 	bounding_box_.pos(
-		scaling * 
 		transform(
 			vertices[0]));
 	bounding_box_.dimension(
@@ -186,7 +196,6 @@ insula::model::object::object(
 		++i)
 	{
 		sge::model::position real_pos = 
-			scaling * 
 			transform(
 				vertices[i]);
 

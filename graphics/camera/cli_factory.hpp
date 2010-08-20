@@ -2,11 +2,9 @@
 #define INSULA_GRAPHICS_CAMERA_CLI_FACTORY_HPP_INCLUDED
 
 #include "object_ptr.hpp"
-#include "../../input_delegator.hpp"
+#include "../../input_delegator_fwd.hpp"
 #include "../vec3.hpp"
 #include "../scalar.hpp"
-#include <sge/renderer/device_ptr.hpp>
-#include <sge/image/multi_loader_fwd.hpp>
 #include <boost/program_options/variables_map.hpp>
 
 namespace insula

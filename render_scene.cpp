@@ -65,12 +65,14 @@
 #include <sge/all_extensions.hpp>
 // vehicle begin
 #include "physics/world.hpp"
-#include "physics/height_field.hpp"
+#include "physics/static_model.hpp"
+#include "physics/height_map.hpp"
 #include "vehicle/object.hpp"
 #include "vehicle/cli_options.hpp"
 #include "vehicle/cli_factory.hpp"
 #include "physics/debug_drawer.hpp"
 #include "media_path.hpp"
+#include "model/object.hpp"
 #include <sge/model/loader_ptr.hpp>
 #include <sge/model/plugin.hpp>
 #include <sge/model/object_ptr.hpp>
@@ -78,7 +80,12 @@
 #include <sge/plugin/object.hpp>
 #include <sge/plugin/context.hpp>
 #include <sge/plugin/manager.hpp>
+#include <sge/renderer/filter/linear.hpp>
+#include <sge/renderer/resource_flags_none.hpp>
 #include <sge/model/loader_ptr.hpp>
+#include <sge/model/loader.hpp>
+#include <sge/image/create_texture.hpp>
+#include <sge/renderer/texture.hpp>
 // vehicle end
 #include <fcppt/log/activate_levels.hpp>
 #include <fcppt/log/level.hpp>
@@ -139,10 +146,6 @@ try
 	desc.add(
 		music_controller::cli_options());*/
 	
-	desc.add_options()
-		("help","produce help message")
-		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen")
-		("physics-gravity",boost::program_options::value<physics::vec3>()->default_value(physics::vec3(0,-10,0)),"The gravity");
 		// vehicle end
 	
 	boost::program_options::variables_map vm;
@@ -242,16 +245,8 @@ try
 			vm,
 			sys.renderer(),
 			*cam,
-			fcppt::math::box::stretch(
-				graphics::rect(
-					graphics::vec2(
-						terrain->extents().pos().x(),
-						terrain->extents().pos().z()),
-					graphics::dim2(
-						terrain->extents().dimension().w(),
-						terrain->extents().dimension().d())),
-					static_cast<graphics::scalar>(
-						2)),
+			fcppt::math::box::structure_cast<graphics::box>(
+				terrain->extents()),
 			sys.image_loader());
 
 	water::console_proxy water_console(
@@ -259,12 +254,11 @@ try
 		console.model());
 
 	physics::world physics_world(
-		// FIXME: structure_cast!
 		fcppt::math::box::structure_cast<physics::box>(
 			terrain->extents()),
 		get_option<physics::vec3>(vm,"physics-gravity"));
 
-	physics::height_field physics_height_field(
+	physics::height_map physics_height_field(
 		physics_world,
 		terrain->heights(),
 		terrain->cell_size(),
@@ -294,6 +288,27 @@ try
 		sys.renderer(),
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"));
+
+	physics::static_model box_model(
+		physics_world,
+		physics_vehicle_pos + physics::vec3(0,-5,0),
+		model::object_ptr(
+			new model::object(
+				*cam,
+				model_loader->load(
+					FCPPT_TEXT("/tmp/cube.md3")),
+				sys.renderer(),
+				model_shader,
+				sge::image::create_texture(
+					FCPPT_TEXT("/tmp/stripes.png"),
+					sys.renderer(),
+					sys.image_loader(),
+					sge::renderer::filter::linear,
+					sge::renderer::resource_flags::none))),
+		physics::model_approximation(
+			physics::model_approximation::sphere,
+			static_cast<physics::scalar>(1.0)),
+		physics::solidity::solid);
 
 	vehicle::object_ptr vehicle = 
 		vehicle::cli_factory( 
@@ -404,7 +419,8 @@ try
 	// DEBUG BEGIN
 	physics::debug_drawer physics_debug_drawer(
 		physics_world,
-		sys.renderer());
+		sys.renderer(),
+		*cam);
 	// DEBUG END
 
 	while(running)
@@ -449,14 +465,13 @@ try
 		// vehicle begin
 		vehicle->update();
 		vehicle->render();
+		box_model.render();
 		// vehicle end
 		
 	//	music.update();
 
 		if (physics_debug)
 		{
-			physics_debug_drawer.mvp(
-				cam->perspective() * cam->world());
 			physics_debug_drawer.setDebugMode(
 				btIDebugDraw::DBG_DrawWireframe);
 			physics_debug_drawer.render(); 
@@ -482,6 +497,6 @@ catch (fcppt::exception const &e)
 }
 catch(std::exception const &e)
 {
-	std::cerr << e.what() << FCPPT_TEXT('\n');
+	std::cerr << e.what() << '\n';
 	return EXIT_FAILURE;
 }

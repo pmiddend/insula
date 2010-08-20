@@ -1,4 +1,4 @@
-#include "height_field.hpp"
+#include "height_map.hpp"
 #include "to_bullet_type.hpp"
 #include "transform_from_vec3.hpp"
 #include "scalar.hpp"
@@ -13,11 +13,11 @@
 #include <algorithm>
 #include <type_traits>
 
-insula::physics::height_field::height_field(
+insula::physics::height_map::height_map(
 	world &_world,
-	height_map::array const &_array,
-	height_map::scalar const grid_size,
-	height_map::scalar const height_scaling)
+	insula::height_map::array const &_array,
+	insula::height_map::scalar const grid_size,
+	insula::height_map::scalar const height_scaling)
 :
 	world_(
 		_world),
@@ -25,10 +25,14 @@ insula::physics::height_field::height_field(
 		_array)
 {
 	static_assert(
-		std::is_same<height_map::scalar,scalar>::value,
+		std::is_same<insula::height_map::scalar,scalar>::value,
 		"Currently, btScalar has to be the same as height_map::scalar. This can be easily fixed.");
 
-	std::pair<height_map::scalar *,height_map::scalar *> const minmax = 
+	std::pair
+	<
+		insula::height_map::scalar *,
+		insula::height_map::scalar *
+	> const minmax = 
 		std::minmax_element(
 			array_.data(),
 			array_.data() + array_.num_elements());
@@ -87,7 +91,7 @@ insula::physics::height_field::height_field(
 		*body_);
 }
 
-insula::physics::height_field::~height_field()
+insula::physics::height_map::~height_map()
 {
 	world_.remove(
 		*body_);
