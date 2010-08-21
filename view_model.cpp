@@ -4,6 +4,7 @@
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
 #include "graphics/shader.hpp"
+#include "graphics/cli_options.hpp"
 #include "console/object.hpp"
 #include "model/object.hpp"
 #include "get_option.hpp"
@@ -98,13 +99,15 @@ try
 	desc.add(
 		graphics::camera::cli_options());
 
+	desc.add(
+		graphics::cli_options());
+
 	desc.add_options()
 		("help","produce help message")
 		("model",boost::program_options::value<fcppt::string>()->required(),"The model file to load")
 		("texture",boost::program_options::value<fcppt::string>(),"The texture")
 		("list-parts",boost::program_options::value<bool>()->zero_tokens()->default_value(false),"List all the available parts")
-		("part",boost::program_options::value<fcppt::string>(),"Which part of the model we shall load")
-		("screen-size",boost::program_options::value<sge::renderer::screen_size>()->default_value(sge::renderer::screen_size(1024,768)),"The size of the screen");
+		("part",boost::program_options::value<fcppt::string>(),"Which part of the model we shall load");
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -131,7 +134,7 @@ try
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
-					get_option<sge::renderer::screen_size>(vm,"screen-size"),
+					get_option<sge::renderer::screen_size>(vm,"graphics-screen-size"),
 					sge::renderer::bit_depth::depth32,
 					sge::renderer::refresh_rate_dont_care
 				),

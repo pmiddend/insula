@@ -7,6 +7,7 @@
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
 #include "graphics/stats.hpp"
+#include "graphics/cli_options.hpp"
 #include "skydome/object.hpp"
 #include "skydome/console_proxy.hpp"
 #include "skydome/cli_options.hpp"
@@ -65,6 +66,7 @@
 #include <sge/all_extensions.hpp>
 // vehicle begin
 #include "physics/world.hpp"
+#include "physics/cli_options.hpp"
 #include "physics/static_model.hpp"
 #include "physics/height_map.hpp"
 #include "vehicle/object.hpp"
@@ -131,6 +133,9 @@ try
 		graphics::camera::cli_options());
 
 	desc.add(
+		graphics::cli_options());
+
+	desc.add(
 		height_map::cli_options());
 
 	desc.add(
@@ -142,11 +147,8 @@ try
 	desc.add(
 		vehicle::cli_options());
 
-	/*
 	desc.add(
-		music_controller::cli_options());*/
-	
-		// vehicle end
+		physics::cli_options());
 	
 	boost::program_options::variables_map vm;
 	boost::program_options::store(
@@ -180,7 +182,7 @@ try
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
-					get_option<sge::renderer::screen_size>(vm,"screen-size"),
+					get_option<sge::renderer::screen_size>(vm,"graphics-screen-size"),
 					sge::renderer::bit_depth::depth32,
 					sge::renderer::refresh_rate_dont_care
 				),
@@ -289,6 +291,7 @@ try
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"));
 
+	/*
 	physics::static_model box_model(
 		physics_world,
 		physics_vehicle_pos + physics::vec3(0,-5,0),
@@ -308,7 +311,7 @@ try
 		physics::model_approximation(
 			physics::model_approximation::sphere,
 			static_cast<physics::scalar>(1.0)),
-		physics::solidity::solid);
+		physics::solidity::solid);*/
 
 	vehicle::object_ptr vehicle = 
 		vehicle::cli_factory( 
@@ -465,7 +468,7 @@ try
 		// vehicle begin
 		vehicle->update();
 		vehicle->render();
-		box_model.render();
+	//	box_model.render();
 		// vehicle end
 		
 	//	music.update();

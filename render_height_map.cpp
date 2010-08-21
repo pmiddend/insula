@@ -1,6 +1,7 @@
 #include "graphics/scalar.hpp"
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
+#include "graphics/cli_options.hpp"
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
@@ -10,6 +11,7 @@
 #include "height_map/console_proxy.hpp"
 #include "console/object.hpp"
 #include "input_delegator.hpp"
+#include "get_option.hpp"
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
@@ -84,6 +86,7 @@ try
 	
 	desc.add(height_map::cli_options());
 	desc.add(graphics::camera::cli_options());
+	desc.add(graphics::cli_options());
 
 	desc.add_options()
 		("help","produce help message")
@@ -115,10 +118,7 @@ try
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
-					sge::renderer::screen_size(
-						1024,
-						768
-					),
+					get_option<sge::renderer::screen_size>(vm,"graphics-screen-size"),
 					sge::renderer::bit_depth::depth32,
 					sge::renderer::refresh_rate_dont_care
 				),
