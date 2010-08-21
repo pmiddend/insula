@@ -9,7 +9,6 @@
 #include <sge/image/create_texture.hpp>
 #include <sge/renderer/filter/linear.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
-#include <fcppt/io/cifstream.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/assert_message.hpp>
 #include <memory>
@@ -24,18 +23,15 @@ insula::physics::json::parse_model(
 	graphics::camera::object &cam,
 	graphics::shader &shader)
 {
-	fcppt::io::cifstream ifs(
-		media_path()/
+	sge::model::object_ptr const model_object = 
+		loader->load(
+			media_path()/
 		FCPPT_TEXT("models")/
 		FCPPT_TEXT("vehicles")/
 		sge::parse::json::find_member_exn<sge::parse::json::string>(
 			o.members,
 			FCPPT_TEXT("model")),
-		std::ios_base::binary);
-
-	sge::model::object_ptr const model_object = 
-		loader->load(
-			ifs);
+		sge::model::load_flags::switch_yz);
 
 	FCPPT_ASSERT_MESSAGE(
 		model_object->part_names().size(),

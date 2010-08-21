@@ -179,14 +179,11 @@ try
 
 	sge::model::loader_ptr const loader(
 		model_plugin->get()()); 
-
-	fcppt::io::cifstream ifs(
-		get_option<fcppt::string>(vm,"model"),
-		std::ios_base::binary);
 	
 	sge::model::object_ptr const model_object = 
 		loader->load(
-			ifs);
+			get_option<fcppt::string>(vm,"model"),
+			sge::model::load_flags::switch_yz);
 
 	if (get_option<bool>(vm,"list-parts"))
 	{

@@ -58,14 +58,6 @@
 
 namespace
 {
-sge::model::position const
-transform(
-	sge::model::position p)
-{
-	std::swap(p[1],p[2]);
-	return p;
-}
-
 struct index_visitor
 {
 public:
@@ -185,8 +177,7 @@ insula::model::object::object(
 		vertices.size());
 
 	bounding_box_.pos(
-		transform(
-			vertices[0]));
+		vertices[0]);
 	bounding_box_.dimension(
 		graphics::dim3::null());
 
@@ -196,8 +187,7 @@ insula::model::object::object(
 		++i)
 	{
 		sge::model::position real_pos = 
-			transform(
-				vertices[i]);
+			vertices[i];
 
 		bounding_box_ = 
 			fcppt::math::box::extend_bounding_box(
