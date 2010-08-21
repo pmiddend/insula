@@ -270,3 +270,5 @@ insula::physics::debug_drawer::render()
 			vb_->size()),
 		sge::renderer::nonindexed_primitive_type::line);
 }
+
+insula::physics::debug_drawer::~debug_drawer() {}

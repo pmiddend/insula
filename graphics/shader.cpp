@@ -71,3 +71,5 @@ insula::graphics::shader::program()
 {
 	return program_;
 }
+
+insula::graphics::shader::~shader() {}

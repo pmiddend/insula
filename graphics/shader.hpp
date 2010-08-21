@@ -65,6 +65,8 @@ public:
 
 	sge::renderer::glsl::program_ptr const
 	program();
+
+	~shader();
 private:
 	typedef
 	fcppt::container::map

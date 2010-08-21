@@ -404,3 +404,5 @@ insula::skydome::object::gradient() const
 {
 	return gradient_;
 }
+
+insula::skydome::object::~object() {}

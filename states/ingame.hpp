@@ -12,10 +12,14 @@
 #include "../physics/debug_drawer.hpp"
 #include "../water/object_ptr.hpp"
 #include "../water/console_proxy.hpp"
-#include "../events/tick_fwd.hpp"
-#include "../events/render_fwd.hpp"
+// Why do these have to be completely defined? I thought forward
+// declaring them was enough o_O
+#include "../events/tick.hpp"
+#include "../events/render.hpp"
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/result.hpp>
+#include <boost/statechart/custom_reaction.hpp>
+#include <boost/mpl/list/list10.hpp>
 
 namespace insula
 {
@@ -30,6 +34,14 @@ class ingame
 	public boost::statechart::state<ingame,machine>
 {
 public:
+	typedef 
+	boost::mpl::list2
+	<
+		boost::statechart::custom_reaction<events::tick>,
+		boost::statechart::custom_reaction<events::render>
+	> 
+	reactions;
+
 	explicit
 	ingame(
 		my_context);
@@ -43,6 +55,9 @@ public:
 	boost::statechart::result
 	react(
 		events::render const &);
+
+	// We've got pointers to forward-declared objects here
+	~ingame();
 private:
 	// The heightmap has to be initialized first because it's needed for
 	// the physics world

@@ -1,5 +1,6 @@
 #include "create_variables_map.hpp"
 #include "machine.hpp"
+#include "states/ingame.hpp"
 #include "help_needed.hpp"
 #include <sge/time/timer.hpp>
 #include <sge/time/second.hpp>
@@ -15,6 +16,8 @@ try
 		insula::create_variables_map(
 			argc,
 			argv));
+
+	m.initiate();
 
 	sge::time::timer frame_timer(
 		sge::time::second(1));

@@ -46,6 +46,8 @@ public:
 
 	insula::skydome::gradient const
 	gradient() const;
+
+	~object();
 private:
 	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr const renderer_;

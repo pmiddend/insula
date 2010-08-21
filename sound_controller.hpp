@@ -58,6 +58,8 @@ public:
 	// deleted properly
 	void
 	update();
+
+	~sound_controller();
 private:
 	typedef
 	std::map

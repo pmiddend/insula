@@ -11,9 +11,12 @@
 #include "../physics/vec3.hpp"
 #include "../graphics/box.hpp"
 #include "../console/object.hpp"
+#include "../events/tick.hpp"
+#include "../events/render.hpp"
 #include <sge/console/object.hpp>
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/text.hpp>
+#include <fcppt/io/cout.hpp>
 
 insula::states::ingame::ingame(
 	my_context ctx)
@@ -104,7 +107,7 @@ insula::states::ingame::react(
 		sge::renderer::state::cull_mode::back);
 	water_->render();
 
-	if (toggle_physics_debug_)
+	if (physics_debug_)
 	{
 		physics_debug_drawer_.setDebugMode(
 			btIDebugDraw::DBG_DrawWireframe);
@@ -113,3 +116,5 @@ insula::states::ingame::react(
 
 	return discard_event();
 }
+
+insula::states::ingame::~ingame() {}

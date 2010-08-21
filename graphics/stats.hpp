@@ -31,6 +31,8 @@ public:
 	void
 	update_and_render(
 		fcppt::string const &additional_stats = FCPPT_TEXT(""));
+
+	~stats();
 private:
 	sge::time::frames_counter counter_;
 	sge::renderer::device_ptr const renderer_;

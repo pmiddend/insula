@@ -58,6 +58,8 @@ public:
 	// it's false)
 	bool 
 	running() const;
+
+	~machine();
 private:
 	bool running_;
 	sge::parse::json::object config_file_;

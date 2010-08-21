@@ -88,3 +88,5 @@ insula::sound_controller::update()
 {
 	pool_.update();
 }
+
+insula::sound_controller::~sound_controller() {}

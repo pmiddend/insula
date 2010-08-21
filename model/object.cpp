@@ -271,3 +271,5 @@ insula::model::object::bounding_box() const
 {
 	return bounding_box_;
 }
+
+insula::model::object::~object() {}

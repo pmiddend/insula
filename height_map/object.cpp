@@ -311,6 +311,8 @@ insula::height_map::object::height_scaling() const
 		height_scaling_;
 }
 
+insula::height_map::object::~object() {}
+
 void
 insula::height_map::object::regenerate(
 	graphics::scalar const &cell_size,

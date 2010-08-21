@@ -1,0 +1,18 @@
+{
+	"music" : 
+	{  
+		"events" : 
+		{
+		},
+		"random" :
+		[
+		],
+		"crossfade_seconds" : 5
+	},
+	"sounds" : 
+	{
+		"events" : 
+		{
+		}
+	}
+}

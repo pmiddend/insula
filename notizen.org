@@ -608,7 +608,7 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 ** TODO Sounds [0/1]
 *** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
-** TODO Diverses [20/26]
+** TODO Diverses [21/27]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** DONE gizmo_init fixen
@@ -710,7 +710,8 @@ wurde.
 Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
 detailreichen Skydome erzeugt?
 *** TODO Textur tst spiegelverkehrt
-*** TODO sge::model Flag einbauen, ob y und z gedreht werden sollen
+*** DONE sge::model Flag einbauen, ob y und z gedreht werden sollen
+		 CLOSED: [2010-08-21 Sat 17:06]
 *** TODO physics von model abkoppeln
 
 Erstelle eine Funktion, die eine shape aus einem sge::model::object,

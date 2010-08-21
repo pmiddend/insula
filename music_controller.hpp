@@ -40,8 +40,9 @@ public:
 	play_random();
 
 	void
-
 	stop();
+
+	~music_controller();
 private:
 	typedef
 	std::map

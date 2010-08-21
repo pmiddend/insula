@@ -248,3 +248,5 @@ insula::machine::running() const
 {
 	return running_;
 }
+
+insula::machine::~machine() {}

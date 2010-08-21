@@ -144,6 +144,8 @@ insula::music_controller::stop()
 		silence_source_);
 }
 
+insula::music_controller::~music_controller() {}
+
 void
 insula::music_controller::do_play(
 	sge::audio::sound::base_ptr b)

@@ -44,6 +44,8 @@ public:
 
 	sge::model::object_ptr const
 	raw();
+
+	~object();
 private:
 	sge::model::object_ptr const raw_;
 	graphics::camera::object const &camera_;

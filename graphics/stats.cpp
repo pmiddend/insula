@@ -52,3 +52,5 @@ insula::graphics::stats::update_and_render(
 		sge::font::align_v::top,
 		sge::font::flags::none);
 }
+
+insula::graphics::stats::~stats() {}

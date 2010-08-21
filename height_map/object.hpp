@@ -67,6 +67,8 @@ public:
 
 	graphics::scalar
 	height_scaling() const;
+
+	~object();
 private:
 	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr const renderer_;

@@ -92,6 +92,8 @@ public:
 
 	void
 	render();
+
+	~debug_drawer();
 private:
 	typedef
 	std::vector
