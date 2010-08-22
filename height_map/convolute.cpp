@@ -1,5 +1,6 @@
 #include "convolute.hpp"
 #include <fcppt/math/matrix/basic_impl.hpp>
+#include <fcppt/container/grid/object_impl.hpp>
 
 namespace
 {
@@ -23,7 +24,7 @@ convolute_cell(
 			y < static_cast<array::size_type>(cy+c.dimension()[1]); 
 			++y)
 		{
-			sum += c[static_cast<convolution_matrix::size_type>(x-cx)][static_cast<convolution_matrix::size_type>(y-cy)] * a[x][y];
+			sum += c[static_cast<convolution_matrix::size_type>(x-cx)][static_cast<convolution_matrix::size_type>(y-cy)] * a[array::dim(x,y)];
 		}
 	return sum;
 }
@@ -44,12 +45,12 @@ insula::height_map::convolute(
 
 	for(
 		array::size_type x = static_cast<array::size_type>(whalf); 
-		x < static_cast<array::size_type>(a.shape()[0]-whalf);
+		x < static_cast<array::size_type>(a.dimension().w()-whalf);
 		++x)
 	{
 		for(
 			array::size_type y = static_cast<array::size_type>(hhalf); 
-			y < static_cast<array::size_type>(a.shape()[1]-hhalf); 
+			y < static_cast<array::size_type>(a.dimension().h()-hhalf); 
 			++y)
 		{
 			array::size_type 
@@ -58,11 +59,12 @@ insula::height_map::convolute(
 				start_y =
 					static_cast<array::size_type>(y-hhalf);
 				
-			result[x][y] = 
+			result[array::dim(x,y)] = 
 				convolute_cell(
 					a,
 					c,
-					start_x,start_y);
+					start_x,
+					start_y);
 		}
 	}
 	

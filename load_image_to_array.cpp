@@ -1,6 +1,6 @@
 #include "height_map/array.hpp"
 #include "height_map/image_to_array.hpp"
-#include "display_2d_array.hpp"
+#include "display_2d_grid.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
@@ -76,7 +76,7 @@ try
 	fcppt::io::cout.setf(
 		std::ios::fixed);
 	
-	insula::display_2d_array(
+	insula::display_2d_grid(
 		fcppt::io::cout,
 		h);
 }

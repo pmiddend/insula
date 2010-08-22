@@ -1,4 +1,5 @@
 #include "generate_gradient_simple.hpp"
+#include <fcppt/container/grid/object_impl.hpp>
 #include <array>
 #include <cmath>
 #include <algorithm>
@@ -8,23 +9,23 @@ insula::height_map::generate_gradient_simple(
 	array const &a)
 {
 	array result(
-		boost::extents[a.shape()[0]][a.shape()[1]]);
+		a.dimension());
 
-	for (array::size_type y = 1; y < a.shape()[0]-1; ++y)
+	for (array::size_type y = 1; y < a.dimension().h()-1; ++y)
 	{
-		for (array::size_type x = 1; x < a.shape()[1]-1; ++x)
+		for (array::size_type x = 1; x < a.dimension().w()-1; ++x)
 		{
-			scalar const current = a[y][x];
+			scalar const current = a[array::dim(x,y)];
 
 			std::array<scalar,8> neighbors = {{
-				a[y][x-1],
-				a[y][x+1],
-				a[y-1][x],
-				a[y+1][x],
-				a[y-1][x-1],
-				a[y-1][x+1],
-				a[y+1][x-1],
-				a[y+1][x+1]
+				a[array::dim(x,y-1)],
+				a[array::dim(x,y+1)],
+				a[array::dim(x-1,y)],
+				a[array::dim(x+1,y)],
+				a[array::dim(x-1,y-1)],
+				a[array::dim(x-1,y+1)],
+				a[array::dim(x+1,y-1)],
+				a[array::dim(x+1,y+1)]
 				}};
 
 			std::transform(
@@ -33,7 +34,7 @@ insula::height_map::generate_gradient_simple(
 				neighbors.begin(),
 				[&current](scalar const s) { return std::abs(current - s); });
 
-			result[y][x] = 
+			result[array::dim(x,y)] = 
 				*std::max_element(
 					neighbors.begin(),
 					neighbors.end());

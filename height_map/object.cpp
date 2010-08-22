@@ -54,9 +54,11 @@
 #include <sge/image/file.hpp>
 #include <fcppt/math/vector/cross.hpp>
 #include <fcppt/math/vector/normalize.hpp>
+#include <fcppt/math/dim/arithmetic.hpp>
+#include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/container/assign_multi_array.hpp>
+#include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/variant/apply_unary.hpp>
@@ -80,13 +82,10 @@ public:
 
 	explicit
 	index_visitor(
-		size_type const _w,
-		size_type const _h)
+		insula::height_map::array::dim const &_dim)
 	:
-		w(
-			_w),
-		h(
-			_h)
+		dim_(
+			_dim)
 	{
 	}
 
@@ -101,8 +100,8 @@ public:
 
 		typename T::iterator it = t.begin();
 
-		for (size_type y = 0; y < static_cast<size_type>(h-1); ++y)
-			for (size_type x = 0; x < static_cast<size_type>(w-1); ++x)
+		for (size_type y = 0; y < static_cast<size_type>(dim_.h()-1); ++y)
+			for (size_type x = 0; x < static_cast<size_type>(dim_.w()-1); ++x)
 				BOOST_FOREACH(
 					value_type const i,
 					insula::height_map::calculate_index_cell<value_type>(
@@ -111,13 +110,13 @@ public:
 						static_cast<value_type>(
 							y),
 						static_cast<value_type>(
-							w),
+							dim_.w()),
 						static_cast<value_type>(
-							h)))
+							dim_.h())))
 					*it++ = i;
 	}
 private:
-	size_type w,h;
+	insula::height_map::array::dim dim_;
 };
 }
 
@@ -179,12 +178,9 @@ insula::height_map::object::object(
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("grid_size"),
-		graphics::vec2(
-			static_cast<graphics::scalar>(
-				raw.shape()[0]),
-			static_cast<graphics::scalar>(
-				raw.shape()[1])) * 
-		cell_size);
+		cell_size * 
+		fcppt::math::dim::structure_cast<graphics::vec2>(
+			raw.dimension()));
 	
 	lower_texture_ = 
 		renderer_->create_texture(
@@ -348,9 +344,9 @@ insula::height_map::object::regenerate(
 		graphics::box(
 			graphics::vec3::null(),
 			graphics::dim3(
-				cell_size * static_cast<graphics::scalar>(raw.shape()[0]),
+				cell_size * static_cast<graphics::scalar>(raw.dimension().w()),
 				height_scaling,
-				cell_size * static_cast<graphics::scalar>(raw.shape()[1])));
+				cell_size * static_cast<graphics::scalar>(raw.dimension().h())));
 
 	array stretched(
 		raw);
@@ -366,10 +362,10 @@ insula::height_map::object::regenerate(
 		gradient);
 
 	std::transform(
-		gradient.data(),
-		gradient.data() + gradient.num_elements(),
-		gradient.data(),
-		[](array::element const s) { return std::sin(s); });
+		gradient.begin(),
+		gradient.end(),
+		gradient.begin(),
+		[](array::value_type const s) { return std::sin(s); });
 	
 	regenerate_buffers(
 		cell_size,
@@ -395,9 +391,7 @@ insula::height_map::object::regenerate_buffers(
 		renderer_,
 		shader_.program());
 
-	fcppt::container::assign_multi_array(
-		heights_,
-		raw);
+	heights_ = raw;
 
 	cell_size_ = 
 		cell_size;
@@ -409,7 +403,7 @@ insula::height_map::object::regenerate_buffers(
 		renderer_->create_vertex_buffer(
 			sge::renderer::vf::dynamic::make_format<vf::format>(),
 			static_cast<sge::renderer::size_type>(
-				raw.num_elements()),
+				raw.size()),
 			sge::renderer::resource_flags::none);
 
 	FCPPT_ASSERT_MESSAGE(
@@ -425,7 +419,7 @@ insula::height_map::object::regenerate_buffers(
 			// 2*q Tris
 			// 3*2*q Indices
 			static_cast<sge::renderer::size_type>(
-				3*2*((raw.shape()[0]-1)*(raw.shape()[1]-1))),
+				3*2*((raw.dimension()[0]-1)*(raw.dimension()[1]-1))),
 			sge::renderer::resource_flags::none);
 	
 	sge::renderer::scoped_vertex_lock const vblock(
@@ -438,9 +432,9 @@ insula::height_map::object::regenerate_buffers(
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
 
-	for (array::size_type y = 0; y < raw.shape()[0]; ++y)
+	for (array::size_type y = 0; y < raw.dimension().h(); ++y)
 	{
-		for (array::size_type x = 0; x < raw.shape()[1]; ++x)
+		for (array::size_type x = 0; x < raw.dimension().w(); ++x)
 		{
 			vf::packed_position p(
 				static_cast<graphics::scalar>(
@@ -450,7 +444,7 @@ insula::height_map::object::regenerate_buffers(
 				static_cast<graphics::scalar>(
 					static_cast<scalar>(
 						height_scaling) * 
-					raw[y][x]),
+					raw[array::dim(x,y)]),
 				static_cast<graphics::scalar>(
 					static_cast<scalar>(
 						y) * 
@@ -470,8 +464,8 @@ insula::height_map::object::regenerate_buffers(
 
 			(*vb_it).set<vf::height_and_gradient>(
 				vf::packed_height_and_gradient(
-					stretched[y][x],
-					gradient[y][x]));
+					stretched[array::dim(x,y)],
+					gradient[array::dim(x,y)]));
 			
 			vb_it++;
 		}
@@ -479,8 +473,7 @@ insula::height_map::object::regenerate_buffers(
 	
 	fcppt::variant::apply_unary(
 		index_visitor(
-			raw.shape()[0],
-			raw.shape()[1]),
+			raw.dimension()),
 		sge::renderer::scoped_index_lock(
 			ib_,
 			sge::renderer::lock_mode::writeonly).value().any());

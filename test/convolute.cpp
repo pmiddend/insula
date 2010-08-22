@@ -1,5 +1,6 @@
 #include "../height_map/convolute.hpp"
 #include <fcppt/math/matrix/basic_impl.hpp>
+#include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/math/compare.hpp>
 #include <fcppt/io/cout.hpp>
 #include <boost/test/unit_test.hpp>
@@ -14,24 +15,24 @@ BOOST_AUTO_TEST_CASE(convolute_matrix)
 		9 1 2 3
 		4 5 6 7
 	 */
-	array a(boost::extents[4][4]);
+	array a(array::dim(4,4));
 
-	a[0][0] = 1;
-	a[0][1] = 5;
-	a[0][2] = 9;
-	a[0][3] = 4;
-	a[1][0] = 2;
-	a[1][1] = 6;
-	a[1][2] = 1;
-	a[1][3] = 5;
-	a[2][0] = 3;
-	a[2][1] = 7;
-	a[2][2] = 2;
-	a[2][3] = 6;
-	a[3][0] = 4;
-	a[3][1] = 8;
-	a[3][2] = 3;
-	a[3][3] = 7;
+	a[array::dim(0,0)] = 1;
+	a[array::dim(0,1)] = 5;
+	a[array::dim(0,2)] = 9;
+	a[array::dim(0,3)] = 4;
+	a[array::dim(1,0)] = 2;
+	a[array::dim(1,1)] = 6;
+	a[array::dim(1,2)] = 1;
+	a[array::dim(1,3)] = 5;
+	a[array::dim(2,0)] = 3;
+	a[array::dim(2,1)] = 7;
+	a[array::dim(2,2)] = 2;
+	a[array::dim(2,3)] = 6;
+	a[array::dim(3,0)] = 4;
+	a[array::dim(3,1)] = 8;
+	a[array::dim(3,2)] = 3;
+	a[array::dim(3,3)] = 7;
 
 	scalar const s = static_cast<scalar>(1)/static_cast<scalar>(9);
 
@@ -46,41 +47,41 @@ BOOST_AUTO_TEST_CASE(convolute_matrix)
 			conv_matrix);
 
 	for (int i = 0; i < 16; ++i)
-		fcppt::io::cout << *(c.data() + i) << ",";
+		fcppt::io::cout << (*(c.data() + i)) << ",";
 	fcppt::io::cout << std::endl;
 
 	// The border wasn't touched
 	BOOST_CHECK(
-		fcppt::math::compare(a[0][0], c[0][0]));
+		fcppt::math::compare(a[array::dim(0,0)], c[array::dim(0,0)]));
 	BOOST_CHECK( 
-		fcppt::math::compare(a[0][1], c[0][1]));
+		fcppt::math::compare(a[array::dim(0,1)], c[array::dim(0,1)]));
 	BOOST_CHECK( 
-		fcppt::math::compare(a[0][2], c[0][2])); 
+		fcppt::math::compare(a[array::dim(0,2)], c[array::dim(0,2)])); 
 	BOOST_CHECK( 
-		fcppt::math::compare(a[0][3], c[0][3])); 
+		fcppt::math::compare(a[array::dim(0,3)], c[array::dim(0,3)])); 
 	BOOST_CHECK( 
-		fcppt::math::compare(a[1][0], c[1][0])); 
+		fcppt::math::compare(a[array::dim(1,0)], c[array::dim(1,0)])); 
 	BOOST_CHECK( 
-		fcppt::math::compare(a[2][0], c[2][0])); 
+		fcppt::math::compare(a[array::dim(2,0)], c[array::dim(2,0)])); 
 	BOOST_CHECK( 
-		fcppt::math::compare(a[1][3], c[1][3])); 
+		fcppt::math::compare(a[array::dim(1,3)], c[array::dim(1,3)])); 
 	BOOST_CHECK( 
-		fcppt::math::compare(a[2][3], c[2][3])); 
+		fcppt::math::compare(a[array::dim(2,3)], c[array::dim(2,3)])); 
 	BOOST_CHECK( 
-		fcppt::math::compare(a[3][0], c[3][0])); 
+		fcppt::math::compare(a[array::dim(3,0)], c[array::dim(3,0)])); 
 	BOOST_CHECK( 
-		fcppt::math::compare(a[3][1], c[3][1])); 
+		fcppt::math::compare(a[array::dim(3,1)], c[array::dim(3,1)])); 
 	BOOST_CHECK( 
-		fcppt::math::compare(a[3][2], c[3][2])); 
+		fcppt::math::compare(a[array::dim(3,2)], c[array::dim(3,2)])); 
 	BOOST_CHECK( 
-		fcppt::math::compare(a[3][3], c[3][3]));
+		fcppt::math::compare(a[array::dim(3,3)], c[array::dim(3,3)]));
 
 	BOOST_CHECK(
-		fcppt::math::compare(c[1][1],static_cast<scalar>(4)));
+		fcppt::math::compare(c[array::dim(1,1)],static_cast<scalar>(4)));
 	BOOST_CHECK(
-		fcppt::math::compare(c[2][1],static_cast<scalar>(4)));
+		fcppt::math::compare(c[array::dim(2,1)],static_cast<scalar>(4)));
 	BOOST_CHECK(
-		fcppt::math::compare(c[1][2],static_cast<scalar>(5)));
+		fcppt::math::compare(c[array::dim(1,2)],static_cast<scalar>(5)));
 	BOOST_CHECK(
-		fcppt::math::compare(c[2][2],static_cast<scalar>(5)));
+		fcppt::math::compare(c[array::dim(2,2)],static_cast<scalar>(5)));
 }

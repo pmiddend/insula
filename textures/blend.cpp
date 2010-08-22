@@ -15,6 +15,7 @@
 #include <fcppt/exception.hpp>
 #include <fcppt/math/dim/basic_impl.hpp>
 #include <fcppt/math/dim/comparison.hpp>
+#include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/assert.hpp>
@@ -47,16 +48,16 @@ insula::textures::blend(
 	rgb_store::view_type target = 
 		m.view();
 	
-	for (rgb_store::dim_type::value_type y = 0; y < target.dim()[0]; ++y)
+	for (rgb_store::dim_type::value_type y = 0; y < target.dim()[1]; ++y)
 	{
-		for (rgb_store::dim_type::value_type x = 0; x < target.dim()[1]; ++x)
+		for (rgb_store::dim_type::value_type x = 0; x < target.dim()[0]; ++x)
 		{
 			weights const w = 
 				lerper.calculate_weights(
 					static_cast<weight>(
-						heights[y][x]),
+						heights[height_map::array::dim(x,y)]),
 					static_cast<weight>(
-						grad[y][x]));
+						grad[height_map::array::dim(x,y)]));
 
 			FCPPT_ASSERT(
 				static_cast<weights::weight_sequence::size_type>(w.sequence().size()) == 

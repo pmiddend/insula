@@ -6,6 +6,7 @@
 #include <mizuiro/color/layout/gray.hpp>
 #include <mizuiro/color/init/gray.hpp>
 #include <mizuiro/image/make_const_view.hpp>
+#include <fcppt/container/grid/object_impl.hpp>
 #include <sge/image/loader.hpp>
 #include <sge/image/file.hpp>
 
@@ -17,8 +18,9 @@ insula::height_map::array_to_image(
 {
 	gray_store m(
 		gray_store::dim_type(
-			a.shape()[0],
-			a.shape()[1]));
+			// FIXME: static_cast
+			a.dimension()[0],
+			a.dimension()[1]));
 	
 	gray_store::view_type target = 
 		m.view();
@@ -43,7 +45,8 @@ insula::height_map::array_to_image(
 				y);
 
 			target.at(cp) = 
-				gray_color((mizuiro::color::init::gray %= a[y][x]));
+				gray_color(
+					(mizuiro::color::init::gray %= a[array::dim(x,y)]));
 		}
 	}
 

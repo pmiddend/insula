@@ -8,6 +8,7 @@
 #include <mizuiro/color/channel/gray.hpp>
 #include <fcppt/variant/object.hpp>
 #include <fcppt/variant/invalid_get.hpp>
+#include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
 
@@ -22,7 +23,9 @@ try
 		im->view().get<gray_view>());
 
 	array h(
-		v.dim());
+		array::dim(
+			v.dim()[0],
+			v.dim()[1]));
 	
 	std::transform(
 		v.begin(),

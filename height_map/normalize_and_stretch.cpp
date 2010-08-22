@@ -1,4 +1,5 @@
 #include "normalize_and_stretch.hpp"
+#include <fcppt/container/grid/object_impl.hpp>
 #include <algorithm>
 #include <utility>
 
@@ -8,23 +9,23 @@ insula::height_map::normalize_and_stretch(
 {
 	std::pair
 	<
-		array::element const *,
-		array::element const *
+		array::value_type const *,
+		array::value_type const *
 	> minmax_ptr = 
 		std::minmax_element(
-			a.data(),
-			a.data() + a.num_elements());
+			a.begin(),
+			a.end());
 	
-	std::pair<array::element,array::element>
+	std::pair<array::value_type,array::value_type>
 		minmax(
 			*minmax_ptr.first,
 			*minmax_ptr.second);
 	
 	std::transform(
-		a.data(),
-		a.data() + a.num_elements(),
-		a.data(),
-		[&minmax](array::element const &e) 
+		a.begin(),
+		a.end(),
+		a.begin(),
+		[&minmax](array::value_type const &e) 
 		{ 
 			return (e - minmax.first)/(minmax.second - minmax.first);
 		});

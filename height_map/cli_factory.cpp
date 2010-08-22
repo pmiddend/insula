@@ -9,6 +9,7 @@
 #include <sge/image/multi_loader.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/make_shared_ptr.hpp>
+#include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/text.hpp>
 
 insula::height_map::object_ptr const

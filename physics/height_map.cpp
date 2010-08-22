@@ -9,6 +9,7 @@
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 #include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/io/cout.hpp>
 #include <algorithm>
 #include <type_traits>
@@ -34,15 +35,15 @@ insula::physics::height_map::height_map(
 		insula::height_map::scalar *
 	> const minmax = 
 		std::minmax_element(
-			array_.data(),
-			array_.data() + array_.num_elements());
+			array_.begin(),
+			array_.end());
 
 	shape_.reset(
 		new btHeightfieldTerrainShape(
 			static_cast<int>(
-				array_.shape()[0]),
+				array_.dimension().w()),
 			static_cast<int>(
-				array_.shape()[1]),
+				array_.dimension().h()),
 			array_.data(),
 			// heightScale is only used when the type is not float
 			static_cast<scalar>(
@@ -70,9 +71,9 @@ insula::physics::height_map::height_map(
 			transform_from_vec3(
 				vec3(
 					// Why the - 1/2*grid size here? It's a bug in btHeightfieldTerrainShape (or an oddity at least)
-					static_cast<scalar>(array_.shape()[0]/2) * grid_size - static_cast<scalar>(0.5)*grid_size,
+					static_cast<scalar>(array_.dimension()[0]/2) * grid_size - static_cast<scalar>(0.5)*grid_size,
 					(*(minmax.first) + *(minmax.second)) / 2 * height_scaling,
-					static_cast<scalar>(array_.shape()[0]/2) * grid_size- static_cast<scalar>(0.5)*grid_size))));
+					static_cast<scalar>(array_.dimension()[1]/2) * grid_size- static_cast<scalar>(0.5)*grid_size))));
 
 	body_.reset(
 		new btRigidBody(
