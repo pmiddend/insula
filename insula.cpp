@@ -1,6 +1,7 @@
 #include "create_variables_map.hpp"
 #include "machine.hpp"
-#include "states/ingame.hpp"
+// The first state to be used has to be included here
+#include "states/freelook.hpp"
 #include "help_needed.hpp"
 #include <sge/time/timer.hpp>
 #include <sge/time/second.hpp>

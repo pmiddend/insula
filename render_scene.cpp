@@ -187,6 +187,7 @@ try
 				sge::renderer::vsync::on,
 				sge::renderer::no_multi_sampling))
 		(sge::systems::parameterless::input)
+		(sge::systems::parameterless::md3_loader)
 		(sge::systems::parameterless::font)
 		(
 			sge::systems::image_loader(

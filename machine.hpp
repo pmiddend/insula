@@ -1,7 +1,7 @@
 #ifndef INSULA_MACHINE_HPP_INCLUDED
 #define INSULA_MACHINE_HPP_INCLUDED
 
-#include "states/ingame_fwd.hpp"
+#include "states/game_outer_fwd.hpp"
 #include "input_delegator.hpp"
 #include "console/object.hpp"
 #include "graphics/camera/object_ptr.hpp"
@@ -23,13 +23,23 @@ namespace insula
 /// The machine also sends out tick events, although the ticks
 /// themselves come from outside. I don't want to have an "infinite"
 /// loop inside the machine, blocking everything else.
+/// 
+/// The complete state layout looks like this:
+///
+///         machine
+///      /           |   
+///    menu      game_outer
+///                  |
+///              game_inner
+///        /         |           |          |         |         |
+///   freelook   camera_move   pregame   running  finished   gameover
 class machine
 :
 	public 
 		boost::statechart::state_machine
 		<
 			machine,
-			states::ingame
+			states::game_outer
 		>
 {
 public:

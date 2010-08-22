@@ -2,13 +2,13 @@
 #include "application_title.hpp"
 #include "get_option.hpp"
 #include "graphics/camera/cli_factory.hpp"
-// Camera has to be updatet in tick
+// Camera has to be updated in tick
 #include "graphics/camera/object.hpp"
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
 #include "events/tick.hpp"
 #include "events/render.hpp"
-#include "states/ingame.hpp"
+#include "states/game_outer.hpp"
 #include <sge/window/parameters.hpp>
 #include <sge/systems/audio_player_default.hpp>
 #include <sge/renderer/parameters.hpp>
@@ -100,6 +100,7 @@ insula::machine::machine(
 				sge::renderer::vsync::on,
 				sge::renderer::no_multi_sampling))
 		(sge::systems::parameterless::input)
+		(sge::systems::parameterless::md3_loader)
 		(sge::systems::parameterless::font)
 		(
 			sge::systems::image_loader(

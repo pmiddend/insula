@@ -19,12 +19,12 @@
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/renderer/scoped_index_lock.hpp>
 #include <sge/renderer/scoped_texture.hpp>
+#include <sge/renderer/texture.hpp>
 #include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/first_vertex.hpp>
 #include <sge/renderer/vertex_count.hpp>
 #include <sge/renderer/indexed_primitive_type.hpp>
 #include <sge/renderer/primitive_count.hpp>
-#include <sge/renderer/texture.hpp>
 #include <sge/renderer/first_index.hpp>
 #include <sge/renderer/vf/view.hpp>
 #include <sge/renderer/vf/vertex.hpp>

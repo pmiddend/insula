@@ -7,6 +7,7 @@
 #include "../graphics/scalar.hpp"
 #include "../graphics/shader.hpp"
 #include "../graphics/box.hpp"
+#include "vec2.hpp"
 #include "render_mode.hpp"
 #include "array.hpp"
 #include <sge/renderer/device_ptr.hpp>
@@ -23,6 +24,29 @@ namespace insula
 {
 namespace height_map
 {
+/*
+	This class represents a height field. It's also responsible for
+	_drawing_ the height field. So I holds a vertex and an index
+	pointer. You can customize the cell size and the height scaling and
+	you can also pass some light parameters.
+
+	It also blends the textures you pass it, currently that's hard-coded
+	for two height textures and a gradient texture.
+
+	This class might be split in the future, since it's pretty fat.
+
+	The cell layout is:
+
+	 ---
+	|\  |
+	| \ |
+	|  \|
+	 ---
+
+	The height field's lower left corner is supposed to be at the
+	origin, the class is mostly (!) suited for non-quadratic height
+	fields.
+ */
 class object
 {
 public:
@@ -67,6 +91,10 @@ public:
 
 	graphics::scalar
 	height_scaling() const;
+
+	height_map::scalar
+	height_for_point(
+		vec2 const &) const;
 
 	~object();
 private:
