@@ -1,10 +1,10 @@
-#include "generate_gradient.hpp"
+#include "generate_gradient_simple.hpp"
 #include <array>
 #include <cmath>
 #include <algorithm>
 
 insula::height_map::array const
-insula::height_map::generate_gradient(
+insula::height_map::generate_gradient_simple(
 	array const &a)
 {
 	array result(

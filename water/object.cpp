@@ -161,6 +161,8 @@ insula::water::object::water_level() const
 	return water_level_;
 }
 
+insula::water::object::~object() {}
+
 void
 insula::water::object::update_reflection(
 	std::function<void ()> const &render_callback)

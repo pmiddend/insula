@@ -75,13 +75,8 @@
 #include "physics/debug_drawer.hpp"
 #include "media_path.hpp"
 #include "model/object.hpp"
-#include <sge/model/loader_ptr.hpp>
-#include <sge/model/plugin.hpp>
 #include <sge/model/object_ptr.hpp>
 #include <sge/audio/loader.hpp>
-#include <sge/plugin/object.hpp>
-#include <sge/plugin/context.hpp>
-#include <sge/plugin/manager.hpp>
 #include <sge/renderer/filter/linear.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
 #include <sge/model/loader_ptr.hpp>
@@ -280,12 +275,6 @@ try
 	fcppt::io::cout << "positioning vehicle at " << physics_vehicle_pos << "\n";
 	// DEBUG END
 
-	sge::plugin::object<sge::model::loader>::ptr_type const model_plugin(
-		sys.plugin_manager().plugin<sge::model::loader>().load()); 
-
-	sge::model::loader_ptr const model_loader(
-		model_plugin->get()()); 
-
 	graphics::shader model_shader(
 		sys.renderer(),
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
@@ -320,7 +309,7 @@ try
 			physics_vehicle_pos,
 			sys.renderer(),
 			sys.image_loader(),
-			model_loader,
+			sys.md3_loader(),
 			model_shader,
 			*cam,
 			input_delegator_,

@@ -1,5 +1,6 @@
 #include "shader.hpp"
 #include "../stdlib/map.hpp"
+#include "../exception.hpp"
 #include <sge/renderer/glsl/program_ptr.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/glsl/program.hpp>
@@ -10,6 +11,7 @@
 #include <sge/renderer/glsl/no_program.hpp>
 #include <fcppt/optional.hpp>
 #include <fcppt/io/cifstream.hpp>
+#include <fcppt/filesystem/exists.hpp>
 #include <fcppt/math/matrix/transpose.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/text.hpp>
@@ -22,6 +24,9 @@ insula::graphics::shader::shader(
 	renderer_(
 		_renderer)
 {
+	if (!fcppt::filesystem::exists(vertex) || !fcppt::filesystem::exists(fragment))
+		throw exception(vertex.string()+FCPPT_TEXT(" or ")+fragment.string()+FCPPT_TEXT(" doesn't exist!"));
+
 	fcppt::io::cifstream 
 		vertex_stream(
 			vertex),

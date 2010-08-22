@@ -1,14 +1,16 @@
 #include "media_path.hpp"
+#include "stdlib/map.hpp"
 #include "height_map/array.hpp"
 #include "height_map/image_to_array.hpp"
 #include "height_map/normalize_and_stretch.hpp"
 #include "height_map/array_to_image.hpp"
-#include "height_map/generate_gradient.hpp"
+#include "height_map/generate_gradient_simple.hpp"
 #include "textures/interpolators/bernstein_polynomial.hpp"
 #include "textures/blend.hpp"
 #include "textures/image_sequence.hpp"
 #include "textures/rgb_view.hpp"
 #include "textures/rgb_view_sequence.hpp"
+#include "get_option.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
@@ -23,7 +25,7 @@
 #include <sge/time/default_callback.hpp>
 #include <sge/mainloop/dispatch.hpp>
 #include <sge/log/global.hpp>
-#include <sge/all_extensions.hpp>
+#include <sge/extension_set.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/assign/make_container.hpp>
@@ -36,13 +38,17 @@
 #include <boost/mpl/vector/vector10.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
+#include <boost/program_options.hpp>
 #include <mizuiro/image/make_const_view.hpp>
-#include <cstdlib>
+#include <vector>
 #include <exception>
 #include <ostream>
 #include <iterator>
 #include <algorithm>
+#include <cstdlib>
 #include <cmath>
+
+using namespace insula;
 
 int main(int const argc,char *argv[])
 try
@@ -51,34 +57,62 @@ try
 		sge::log::global(),
 		fcppt::log::level::debug);
 
-	if (argc < 4)
+	typedef
+	std::vector<fcppt::string>
+	string_vector;
+
+	boost::program_options::options_description desc("Allowed options");
+	desc.add_options()
+		("help","produce help message")
+		("height-map",boost::program_options::value<fcppt::string>(),"Height map file (has to be grayscale)")
+		("gradient-output",boost::program_options::value<fcppt::string>(),"Where to put the image gradient (path is not relative to media)")
+		("image-output",boost::program_options::value<fcppt::string>(),"Where to put the blended image (again, not relative to media_path)")
+		("image",boost::program_options::value<string_vector>()->multitoken(),"The image files")
+		("gradient-image",boost::program_options::value<fcppt::string>(),"Texture to use for the gradient part of the blending process");
+
+	boost::program_options::variables_map vm;
+
+	boost::program_options::store(
+		boost::program_options::parse_command_line(
+			argc, 
+			argv, 
+			desc), 
+			vm);
+
+	boost::program_options::notify(
+		vm);    
+
+	if (vm.count("help")) 
 	{
-		fcppt::io::cerr 
-			<< FCPPT_TEXT("usage: ") 
-			<< fcppt::from_std_string(argv[0]) 
-			<< FCPPT_TEXT("<height-map-file> <gradient-image-file> <image-file>*\n");
-		return EXIT_FAILURE;
+		fcppt::io::cout << desc << FCPPT_TEXT("\n");
+		return EXIT_SUCCESS;
 	}
 
 	fcppt::filesystem::path const 
 		heightmap_filename = 
 			fcppt::from_std_string(
-				argv[1]),
+				get_option<fcppt::string>(vm,"height-map")),
 		gradient_image_filename = 
 			fcppt::from_std_string(
-				argv[2]);
+				get_option<fcppt::string>(vm,"gradient-image"));
+
+	fcppt::io::cout << "Creating image loader\n";
 
 	sge::systems::instance sys(
 		sge::systems::list()
 		(
 			sge::systems::image_loader(
 				sge::image::capabilities_field::null(),
-				sge::all_extensions)));
+				fcppt::assign::make_container<sge::extension_set>(FCPPT_TEXT("png")))));
 
-	insula::height_map::array h = 
-		insula::height_map::image_to_array(
+	fcppt::io::cout << "Image loader created, loading height map\n";
+
+	height_map::array heights = 
+		height_map::image_to_array(
 			sys.image_loader().load(
 				heightmap_filename));
+
+	fcppt::io::cout << "Height map loaded, normalizing\n";
 	
 	// Optional postprocessing
 	/*
@@ -86,73 +120,90 @@ try
 		h.data(),
 		h.data() + h.num_elements(),
 		h.data(),
-//		[](insula::height_map::array::element const s) { return s*s; });
-		[](insula::height_map::array::element const s) { return std::sin(s); });
+//		[](height_map::array::element const s) { return s*s; });
+		[](height_map::array::element const s) { return std::sin(s); });
 		*/
 
-	insula::height_map::normalize_and_stretch(
-		h);
+	height_map::normalize_and_stretch(
+		heights);
+
+	fcppt::io::cout << "Normalized, now calculating gradient\n";
 	
-	insula::height_map::array grad = 
-		insula::height_map::generate_gradient(
-			h);
+	height_map::array grad = 
+		height_map::generate_gradient_simple(
+			heights);
+
+	fcppt::io::cout << "Gradient calculated, normalizing\n";
 	
-	insula::height_map::normalize_and_stretch(
-		grad);
+	//height_map::normalize_and_stretch(
+	//	grad);
+
+	fcppt::io::cout << "Normalized, now transforming\n";
 	
+	/*
 	std::transform(
 		grad.data(),
-		grad.data() + h.num_elements(),
+		grad.data() + heights.num_elements(),
 		grad.data(),
-		[](insula::height_map::array::element const s) { return std::sin(s); });
-	
-	insula::height_map::array_to_image(
-		grad,
-		sys.image_loader(),
-		insula::media_path()/FCPPT_TEXT("result_gradient.png"));
-	
+		[](height_map::array::element const s) { return std::sin(s); });
+*/
+
+	fcppt::io::cout << "Transformed. Now loading gradient image\n";
+
 	sge::image::file_ptr const gradient_image = 
 		sys.image_loader().load(
 			gradient_image_filename);
-	insula::textures::image_sequence images;
-	
-	std::transform(
-		argv + 3,
-		argv + argc,
-		std::back_inserter<insula::textures::image_sequence>(
-			images),
-		[&sys](char const *c) { return sys.image_loader().load(fcppt::from_std_string(c)); });
 
-	insula::textures::rgb_view const gradient_view = 
-		gradient_image->view().get<insula::textures::rgb_view>();
+	fcppt::io::cout << "Loaded. Now loading the other images\n";
+
+	textures::image_sequence images = 
+		stdlib::map<textures::image_sequence>(
+			get_option<string_vector>(
+				vm,
+				"image"),
+			[&sys](fcppt::string const &s) 
+			{
+				return sys.image_loader().load(
+					s);
+			});
+
+
+	textures::rgb_view const gradient_view = 
+		gradient_image->view().get<textures::rgb_view>();
 	
-	insula::textures::rgb_view_sequence views;
+	textures::rgb_view_sequence views;
+
+	fcppt::io::cout << "Loaded " <<  images.size() << " images. Now transforming those images to views\n";
 
 	std::transform(
 		images.begin(),
 		images.end(),
-		std::back_inserter<insula::textures::rgb_view_sequence>(
+		std::back_inserter<textures::rgb_view_sequence>(
 			views),
-		[](sge::image::file_ptr const f) { return f->view().get<insula::textures::rgb_view>(); });
+		[](sge::image::file_ptr const f) { return f->view().get<textures::rgb_view>(); });
+	fcppt::io::cout << "Transformed, now blending\n";
 	
-	insula::textures::interpolators::bernstein_polynomial bp(
+	textures::interpolators::bernstein_polynomial bp(
 		views.size());
 	
-	insula::textures::rgb_store const result = 
-		insula::textures::blend(
+	textures::rgb_store const result = 
+		textures::blend(
 			gradient_view,
 			views,
-			h,
+			heights,
 			grad,
 			bp);
 
+	fcppt::io::cout << "Blended, now storing the result\n";
+
 	sys.image_loader().loaders().at(0)->create(
 		mizuiro::image::make_const_view(
-			result.view()))->save(insula::media_path()/FCPPT_TEXT("result.png"));
-	
-	/*
-	result->save(
-		FCPPT_TEXT("media/result.png"))*/;
+			result.view()))->save(get_option<fcppt::string>(vm,"image-output"));
+
+	height_map::array_to_image(
+		grad,
+		sys.image_loader(),
+		get_option<fcppt::string>(vm,"gradient-output"));
 }
 catch (fcppt::variant::invalid_get const &)
 {

@@ -3,6 +3,7 @@
 
 // _fwd isn't enough here
 #include "../machine.hpp"
+#include "../nugget_sequence.hpp"
 #include "../skydome/object_ptr.hpp"
 #include "../skydome/console_proxy.hpp"
 #include "../height_map/object_ptr.hpp"
@@ -16,10 +17,18 @@
 // declaring them was enough o_O
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
+#include "../graphics/vec2.hpp"
+#include "../physics/static_model_fwd.hpp"
+// Nugget begin
+#include "../graphics/shader.hpp"
+#include "../model/object.hpp"
+// Nugget end
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/result.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <vector>
 
 namespace insula
 {
@@ -59,6 +68,22 @@ public:
 	// We've got pointers to forward-declared objects here
 	~ingame();
 private:
+	// And _those_ are the actual physics models (which will be deleted
+	// once the player touches them)
+	typedef
+	boost::ptr_vector<physics::static_model>
+	nugget_model_sequence;
+
+	/*
+	typedef
+	std::map
+	<
+		fcppt::string,
+		
+	>
+	*/
+	
+
 	// The heightmap has to be initialized first because it's needed for
 	// the physics world
 	height_map::object_ptr height_map_;
@@ -72,6 +97,10 @@ private:
 	skydome::console_proxy skydome_console_;
 	water::object_ptr water_;
 	water::console_proxy water_console_;
+	nugget_sequence nugget_positions_;
+	nugget_model_sequence nugget_models_;
+	graphics::shader nugget_shader_;
+	//model::object nugget_model_;
 };
 }
 }

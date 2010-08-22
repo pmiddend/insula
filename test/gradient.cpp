@@ -1,5 +1,5 @@
 #include "../display_2d_array.hpp"
-#include "../height_map/generate_gradient.hpp"
+#include "../height_map/generate_gradient_simple.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/multi_array.hpp>
 #include <fcppt/math/compare.hpp>
@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(gradient)
 			1));
 	
 	insula::height_map::array const grad =
-		insula::height_map::generate_gradient(
+		insula::height_map::generate_gradient_simple(
 			a);
 	
 	BOOST_CHECK(

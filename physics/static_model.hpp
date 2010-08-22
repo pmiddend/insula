@@ -7,7 +7,7 @@
 #include "model_approximation.hpp"
 #include "world_fwd.hpp"
 #include "scoped_body.hpp"
-#include "../model/object_ptr.hpp"
+#include "../model/object_fwd.hpp"
 #include <memory>
 
 class btRigidBody;
@@ -27,7 +27,7 @@ public:
 	static_model(
 		world &,
 		vec3 const &,
-		model::object_ptr,
+		model::object &,
 		model_approximation const &,
 		solidity::type);
 
@@ -36,7 +36,7 @@ public:
 
 	~static_model();
 private:
-	model::object_ptr const model_;
+	model::object &model_;
 	std::unique_ptr<btRigidBody> body_;
 	std::unique_ptr<btMotionState> motion_state_;
 	std::unique_ptr<btCollisionShape> shape_;

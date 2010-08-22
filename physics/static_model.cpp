@@ -21,7 +21,7 @@
 insula::physics::static_model::static_model(
 	world &w,
 	vec3 const &position,
-	model::object_ptr const _model,
+	model::object &_model,
 	model_approximation const &_approx,
 	solidity::type const _solidity)
 :
@@ -50,7 +50,7 @@ insula::physics::static_model::static_model(
 						// btBoxShape gets half extents, so muliply by 0.5 here
 						static_cast<scalar>(0.5)*
 						fcppt::math::dim::structure_cast<dim3>(
-							model_->bounding_box().dimension()))));
+							model_.bounding_box().dimension()))));
 		break;
 		case model_approximation::sphere:
 			shape_.reset(
@@ -58,7 +58,7 @@ insula::physics::static_model::static_model(
 					length(
 						static_cast<scalar>(0.5) * 
 						fcppt::math::dim::structure_cast<vec3>(
-							model_->bounding_box().dimension()))));
+							model_.bounding_box().dimension()))));
 		break;
 		case model_approximation::cylinder_x:
 
@@ -103,7 +103,7 @@ insula::physics::static_model::render()
 	btTransform t;
 	motion_state_->getWorldTransform(
 		t);
-	model_->render(
+	model_.render(
 		transform_to_mat4(
 			t));
 }

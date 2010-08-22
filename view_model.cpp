@@ -7,6 +7,7 @@
 #include "graphics/cli_options.hpp"
 #include "console/object.hpp"
 #include "model/object.hpp"
+#include "create_path.hpp"
 #include "get_option.hpp"
 #include "media_path.hpp"
 #include "stdlib/copy.hpp"
@@ -50,13 +51,10 @@
 #include <sge/input/key_code.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/extension_set.hpp>
-#include <sge/plugin/manager.hpp>
-#include <sge/plugin/object.hpp>
 #include <sge/model/loader_ptr.hpp>
 #include <sge/model/object.hpp>
 #include <sge/model/object_ptr.hpp>
 #include <sge/model/loader.hpp>
-#include <sge/model/plugin.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
 #include <sge/renderer/filter/linear.hpp>
 #include <fcppt/log/activate_levels.hpp>
@@ -144,6 +142,7 @@ try
 				sge::renderer::vsync::on,
 				sge::renderer::no_multi_sampling))
 		(sge::systems::parameterless::input)
+		(sge::systems::parameterless::md3_loader)
 		(sge::systems::parameterless::font)
 		(
 			sge::systems::image_loader(
@@ -172,17 +171,12 @@ try
 		sys.renderer(),
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"));
-
-	
-	sge::plugin::object<sge::model::loader>::ptr_type const model_plugin(
-		sys.plugin_manager().plugin<sge::model::loader>().load()); 
-
-	sge::model::loader_ptr const loader(
-		model_plugin->get()()); 
 	
 	sge::model::object_ptr const model_object = 
-		loader->load(
-			get_option<fcppt::string>(vm,"model"),
+		sys.md3_loader()->load(
+			create_path(
+				get_option<fcppt::string>(vm,"model"),
+				FCPPT_TEXT("models")),
 			sge::model::load_flags::switch_yz);
 
 	if (get_option<bool>(vm,"list-parts"))
@@ -208,7 +202,9 @@ try
 		sys.renderer(),
 		model_shader,
 		sge::image::create_texture(
-			get_option<fcppt::string>(vm,"texture"),
+			create_path(
+				get_option<fcppt::string>(vm,"texture"),
+				FCPPT_TEXT("textures")),
 			sys.renderer(),
 			sys.image_loader(),
 			sge::renderer::filter::linear,

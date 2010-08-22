@@ -57,7 +57,7 @@ public:
 	shader();
 
 	graphics::box const
-	extents();
+	extents() const;
 
 	array const &
 	heights() const;

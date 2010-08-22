@@ -17,7 +17,7 @@
 #include "array.hpp"
 #include "vec2.hpp"
 #include "normalize_and_stretch.hpp"
-#include "generate_gradient.hpp"
+#include "generate_gradient_simple.hpp"
 #include "calculate_index_cell.hpp"
 #include "calculate_normal.hpp"
 #include <sge/renderer/device.hpp>
@@ -284,7 +284,7 @@ insula::height_map::object::shader()
 }
 
 insula::graphics::box const
-insula::height_map::object::extents()
+insula::height_map::object::extents() const
 {
 	return 
 		extents_;
@@ -334,7 +334,7 @@ insula::height_map::object::regenerate(
 		stretched);
 	
 	array gradient(
-		generate_gradient(
+		generate_gradient_simple(
 			stretched));
 	
 	normalize_and_stretch(

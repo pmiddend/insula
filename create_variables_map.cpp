@@ -1,5 +1,6 @@
 #include "create_variables_map.hpp"
 #include "graphics/camera/cli_options.hpp"
+#include "game_cli_options.hpp"
 #include "graphics/cli_options.hpp"
 #include "water/cli_options.hpp"
 #include "vehicle/cli_options.hpp"
@@ -36,6 +37,9 @@ insula::create_variables_map(
 
 	desc.add_options()
 		("help","produce help message");
+
+	desc.add(
+		game_cli_options());
 
 	desc.add(
 		graphics::camera::cli_options());

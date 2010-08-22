@@ -722,3 +722,4 @@ Man könnte die Stats verallgemeinern: Ein "stat" ist eine textuelle
 Informationseinheit (z.B. Geschwindigkeit des Vehikels), die scoped
 beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
+*** TODO random_flat_point erweitern

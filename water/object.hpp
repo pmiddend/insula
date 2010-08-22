@@ -48,6 +48,8 @@ public:
 
 	graphics::scalar
 	water_level() const;
+
+	~object();
 private:
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::texture_ptr target_texture_,bump_texture_;

@@ -20,6 +20,7 @@
 #include <sge/renderer/index/dynamic/format.hpp>
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/scoped.hpp>
+#include <sge/renderer/state/color.hpp>
 #include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/state/bool.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
@@ -197,6 +198,10 @@ insula::skydome::object::object(
 	gradient_(
 		_gradient)
 {
+	renderer_->state(
+		sge::renderer::state::list
+			(sge::renderer::state::color::clear_color = std::get<0>(gradient_)));
+
 	{
 		sge::renderer::glsl::scoped_program scoped_shader_(
 			renderer_,

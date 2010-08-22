@@ -1,8 +1,10 @@
 #include "ingame.hpp"
+#include "../generate_nuggets.hpp"
 #include "../get_option.hpp"
 #include "../machine.hpp"
 #include "../height_map/cli_factory.hpp"
 #include "../height_map/object.hpp"
+#include "../height_map/scalar.hpp"
 #include "../skydome/cli_factory.hpp"
 #include "../skydome/object.hpp"
 #include "../water/cli_factory.hpp"
@@ -13,10 +15,15 @@
 #include "../console/object.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
+#include "../physics/static_model.hpp"
+// Nugget begin
+#include "../media_path.hpp"
+// Nugget end
 #include <sge/console/object.hpp>
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/io/cout.hpp>
+#include <fcppt/assert_message.hpp>
 
 insula::states::ingame::ingame(
 	my_context ctx)
@@ -78,7 +85,22 @@ insula::states::ingame::ingame(
 			context<machine>().systems().image_loader())),
 	water_console_(
 		*water_,
-		context<machine>().console().model())
+		context<machine>().console().model()),
+	nugget_positions_(
+		generate_nuggets(
+			*height_map_,
+			water_->water_level(),
+			get_option<nugget_sequence::size_type>(
+				context<machine>().cli_variables(),
+				"game-nuggets"))),
+	nugget_shader_(
+		context<machine>().systems().renderer(),
+		media_path()/FCPPT_TEXT("model_vertex.glsl"),
+		media_path()/FCPPT_TEXT("model_fragment.glsl"))
+	/*nugget_model_(
+		context<machine>().camera(),
+		
+		)*/
 {
 }
 

@@ -73,7 +73,7 @@ FILE(GLOB_RECURSE states_files states/*)
 FILE(GLOB_RECURSE vehicle_files vehicle/*)
 FILE(GLOB_RECURSE physics_files physics/*)
 FILE(GLOB_RECURSE model_files model/*)
-FILE(GLOB base_files media_path.cpp input_delegator.cpp create_path.cpp vehicle_input.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp help_needed.cpp create_variables_map.cpp)
+FILE(GLOB base_files media_path.cpp input_delegator.cpp create_path.cpp vehicle_input.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp help_needed.cpp create_variables_map.cpp generate_nuggets.cpp random_flat_point.cpp game_cli_options.cpp)
 
 SET_SOURCE_FILES_PROPERTIES(
 	media_path.cpp
