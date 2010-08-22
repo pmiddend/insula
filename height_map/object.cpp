@@ -20,6 +20,8 @@
 #include "generate_gradient_simple.hpp"
 #include "calculate_index_cell.hpp"
 #include "calculate_normal.hpp"
+#include "../stdlib/normalize.hpp"
+#include "../stdlib/grid/sobel_operator.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/vertex_buffer.hpp>
@@ -348,18 +350,16 @@ insula::height_map::object::regenerate(
 				height_scaling,
 				cell_size * static_cast<graphics::scalar>(raw.dimension().h())));
 
-	array stretched(
-		raw);
-	
-	normalize_and_stretch(
-		stretched);
+	array stretched = 
+		stdlib::normalize(
+			raw);
 	
 	array gradient(
-		generate_gradient_simple(
-			stretched));
-	
-	normalize_and_stretch(
-		gradient);
+		stdlib::normalize(
+			stdlib::grid::sobel_operator(
+				stretched)));
+		//generate_gradient_simple(
+		//	stretched));
 
 	std::transform(
 		gradient.begin(),

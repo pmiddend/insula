@@ -1,8 +1,9 @@
 #include "media_path.hpp"
 #include "stdlib/map.hpp"
+#include "stdlib/normalize.hpp"
 #include "height_map/array.hpp"
 #include "height_map/image_to_array.hpp"
-#include "height_map/normalize_and_stretch.hpp"
+//#include "height_map/normalize_and_stretch.hpp"
 #include "height_map/array_to_image.hpp"
 #include "height_map/generate_gradient_simple.hpp"
 #include "textures/interpolators/bernstein_polynomial.hpp"
@@ -11,6 +12,7 @@
 #include "textures/rgb_view.hpp"
 #include "textures/rgb_view_sequence.hpp"
 #include "get_option.hpp"
+#include "stdlib/grid/sobel_operator.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
@@ -125,14 +127,26 @@ try
 		[](height_map::array::element const s) { return std::sin(s); });
 		*/
 
-	height_map::normalize_and_stretch(
-		heights);
+	heights = 
+		stdlib::normalize(
+			heights);
+	//height_map::normalize_and_stretch(
+		//heights);
 
 	fcppt::io::cout << "Normalized, now calculating gradient\n";
 	
 	height_map::array grad = 
+		stdlib::grid::convolute_3x3_no_borders(
+			stdlib::normalize(
+				stdlib::grid::sobel_operator(
+					heights)),
+			fcppt::math::matrix::static_<height_map::scalar,3,3>::type(
+				0.0f,1.0f/5.0f,0.0f,
+				1.0f/5.0f,1.0f/5.0f,1.0f/5.0f,
+				0.0f,1.0f/5.0f,0.0f));
+		/*
 		height_map::generate_gradient_simple(
-			heights);
+			heights);*/
 
 	fcppt::io::cout << "Gradient calculated, normalizing\n";
 	
@@ -181,7 +195,10 @@ try
 		images.end(),
 		std::back_inserter<textures::rgb_view_sequence>(
 			views),
-		[](sge::image::file_ptr const f) { return f->view().get<textures::rgb_view>(); });
+		[](sge::image::file_ptr const f) 
+		{ 
+			return f->view().get<textures::rgb_view>(); 
+		});
 	fcppt::io::cout << "Transformed, now blending\n";
 	
 	textures::interpolators::bernstein_polynomial bp(

@@ -43,6 +43,6 @@ insula::height_map::cli_factory(
 					FCPPT_TEXT("textures"))),
 			image_loader.load(
 				create_path(
-					get_option<fcppt::string>(vm,"terrain-height-texture-1"),
+					get_option<fcppt::string>(vm,"terrain-height-texture-2"),
 					FCPPT_TEXT("textures"))));
 }
