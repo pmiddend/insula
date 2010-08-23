@@ -1,5 +1,7 @@
-#include "../height_map/convolute.hpp"
+#include "../height_map/array.hpp"
+#include "../stdlib/grid/convolve_3x3_no_borders.hpp"
 #include <fcppt/math/matrix/basic_impl.hpp>
+#include <fcppt/math/matrix/static.hpp>
 #include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/math/compare.hpp>
 #include <fcppt/io/cout.hpp>
@@ -36,13 +38,13 @@ BOOST_AUTO_TEST_CASE(convolute_matrix)
 
 	scalar const s = static_cast<scalar>(1)/static_cast<scalar>(9);
 
-	convolution_matrix conv_matrix(
+	fcppt::math::matrix::static_<scalar,3,3>::type conv_matrix(
 		s,s,s,
 		s,s,s,
 		s,s,s);
 
 	array const c = 
-		convolute(
+		insula::stdlib::grid::convolve_3x3_no_borders(
 			a,
 			conv_matrix);
 

@@ -13,7 +13,6 @@
 #include "../media_path.hpp"
 #include "../graphics/vec4.hpp"
 #include "scalar.hpp"
-#include "average_convolute.hpp"
 #include "array.hpp"
 #include "vec2.hpp"
 #include "normalize_and_stretch.hpp"
@@ -22,6 +21,7 @@
 #include "calculate_normal.hpp"
 #include "../stdlib/normalize.hpp"
 #include "../stdlib/grid/sobel_operator.hpp"
+#include "../stdlib/grid/average_convolve.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/vertex_buffer.hpp>
@@ -350,30 +350,33 @@ insula::height_map::object::regenerate(
 				height_scaling,
 				cell_size * static_cast<graphics::scalar>(raw.dimension().h())));
 
-	array stretched = 
+	// We need the stretched values for the texture layers
+	array const stretched = 
 		stdlib::normalize(
 			raw);
 	
+	array const smoothed = 
+		stdlib::grid::average_convolve(
+			stdlib::grid::average_convolve(
+				stdlib::grid::average_convolve(
+					raw)));
+
 	array gradient(
 		stdlib::normalize(
 			stdlib::grid::sobel_operator(
-				stretched)));
-		//generate_gradient_simple(
-		//	stretched));
+				smoothed)));
 
+	/*
 	std::transform(
 		gradient.begin(),
 		gradient.end(),
 		gradient.begin(),
-		[](array::value_type const s) { return std::sin(s); });
+		[](array::value_type const s) { return std::sin(s); });*/
 	
 	regenerate_buffers(
 		cell_size,
 		height_scaling,
-		average_convolute(
-			average_convolute(
-				average_convolute(
-					raw))),
+		smoothed,
 		stretched,
 		gradient);
 }

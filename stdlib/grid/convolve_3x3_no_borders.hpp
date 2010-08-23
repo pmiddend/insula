@@ -1,9 +1,10 @@
-#ifndef INSULA_STDLIB_GRID_CONVOLUTE_3X3_NO_BORDERS_HPP_INCLUDED
-#define INSULA_STDLIB_GRID_CONVOLUTE_3X3_NO_BORDERS_HPP_INCLUDED
+#ifndef INSULA_STDLIB_GRID_CONVOLVE_3X3_NO_BORDERS_HPP_INCLUDED
+#define INSULA_STDLIB_GRID_CONVOLVE_3X3_NO_BORDERS_HPP_INCLUDED
 
 #include <fcppt/container/grid/object.hpp>
 #include <fcppt/math/matrix/static.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
+#include <fcppt/io/cout.hpp>
 
 namespace insula
 {
@@ -15,7 +16,7 @@ namespace detail
 {
 template<typename T>
 T
-convolute_cell(
+convolve_cell(
 	fcppt::container::grid::object<T,2> const &a,
 	// FIXME: Don't use static here
 	typename fcppt::math::matrix::static_<T,3,3>::type const &c,
@@ -61,7 +62,7 @@ convolute_cell(
 
 template<typename T>
 fcppt::container::grid::object<T,2> const
-convolute_3x3_no_borders(
+convolve_3x3_no_borders(
 	fcppt::container::grid::object<T,2> const &a,
 	// FIXME: Don't use static here
 	typename fcppt::math::matrix::static_<T,3,3>::type const &c)
@@ -74,8 +75,10 @@ convolute_3x3_no_borders(
 	grid::size_type
 	size_type;
 
+	// We copy a here because the borders should stay the same in the
+	// resulting image
 	grid result(
-		a.dimension());
+		a);
 
 	size_type const 
 		whalf = c.dimension().w()/2,
@@ -98,7 +101,7 @@ convolute_3x3_no_borders(
 					static_cast<size_type>(y-hhalf);
 				
 			result[typename grid::dim(x,y)] = 
-				detail::convolute_cell(
+				detail::convolve_cell(
 					a,
 					c,
 					start_x,

@@ -13,6 +13,7 @@
 #include "textures/rgb_view_sequence.hpp"
 #include "get_option.hpp"
 #include "stdlib/grid/sobel_operator.hpp"
+#include "stdlib/grid/average_convolve.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
@@ -136,17 +137,12 @@ try
 	fcppt::io::cout << "Normalized, now calculating gradient\n";
 	
 	height_map::array grad = 
-		stdlib::grid::convolute_3x3_no_borders(
-			stdlib::normalize(
-				stdlib::grid::sobel_operator(
-					heights)),
-			fcppt::math::matrix::static_<height_map::scalar,3,3>::type(
-				0.0f,1.0f/5.0f,0.0f,
-				1.0f/5.0f,1.0f/5.0f,1.0f/5.0f,
-				0.0f,1.0f/5.0f,0.0f));
-		/*
-		height_map::generate_gradient_simple(
-			heights);*/
+		stdlib::normalize(
+			stdlib::grid::average_convolve(
+				stdlib::grid::average_convolve(
+					stdlib::normalize(
+						stdlib::grid::sobel_operator(
+							heights)))));
 
 	fcppt::io::cout << "Gradient calculated, normalizing\n";
 	

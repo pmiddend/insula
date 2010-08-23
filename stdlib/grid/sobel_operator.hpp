@@ -2,7 +2,7 @@
 #define INSULA_STDLIB_GRID_SOBEL_OPERATOR_HPP_INCLUDED
 
 #include "../transform.hpp"
-#include "convolute_3x3_no_borders.hpp"
+#include "convolve_3x3_no_borders.hpp"
 #include <fcppt/math/matrix/static.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/matrix/transpose.hpp>
@@ -35,10 +35,10 @@ sobel_operator(
 
 	return 
 		insula::stdlib::transform<grid>(
-			convolute_3x3_no_borders(
+			convolve_3x3_no_borders(
 					c,
 					sobel_horizontal),
-			convolute_3x3_no_borders(
+			convolve_3x3_no_borders(
 				c,
 				transpose(
 					sobel_horizontal)),
