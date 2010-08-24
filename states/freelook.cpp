@@ -1,4 +1,5 @@
 #include "freelook.hpp"
+#include "camera_move.hpp"
 #include "../music_controller.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
@@ -7,6 +8,8 @@
 #include <sge/font/align_h.hpp>
 #include <sge/font/align_v.hpp>
 #include <sge/font/flags_none.hpp>
+#include <sge/input/key_pair.hpp>
+#include <sge/input/key_code.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/font/pos.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
@@ -57,6 +60,16 @@ insula::states::freelook::react(
 		sge::font::align_h::center,
 		sge::font::align_v::center,
 		sge::font::flags::none);
+
+	return discard_event();
+}
+
+boost::statechart::result
+insula::states::freelook::react(
+	events::key const &r)
+{
+	if (r.pair().key().code() == sge::input::kc::key_return)
+		return transit<camera_move>();
 
 	return discard_event();
 }

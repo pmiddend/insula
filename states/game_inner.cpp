@@ -11,6 +11,8 @@
 // vehicle begin
 #include "../vehicle/cli_factory.hpp"
 #include "../vehicle/object.hpp"
+#include "../height_map/height_for_point.hpp"
+#include "../height_map/vec2.hpp"
 // vehicle end
 #include <sge/console/object.hpp>
 #include <sge/image/create_texture.hpp>
@@ -87,7 +89,14 @@ insula::states::game_inner::game_inner(
 				static_cast<physics::scalar>(
 					context<game_outer>().vehicle_position().x()),
 				static_cast<physics::scalar>(
-					0),
+					height_map::height_for_point(
+						context<game_outer>().height_map().heights(),
+						context<game_outer>().height_map().cell_size(),
+						fcppt::math::vector::structure_cast<height_map::vec2>(
+							context<game_outer>().vehicle_position())) * 
+						context<game_outer>().height_map().height_scaling() + 
+						static_cast<height_map::scalar>(
+							10)),
 				static_cast<physics::scalar>(
 					context<game_outer>().vehicle_position().y())),
 			context<machine>().systems().renderer(),
