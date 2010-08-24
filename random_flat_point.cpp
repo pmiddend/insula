@@ -5,7 +5,7 @@ insula::graphics::vec2 const
 insula::random_flat_point(
 	height_map::object const &o,
 	graphics::scalar /*water_level*/,
-	std::mt19937 &engine)
+	random_engine &engine)
 {
 	// For now, generate just some random point
 	std::uniform_real_distribution<height_map::scalar> 

@@ -3,6 +3,7 @@
 #include "media_path.hpp"
 #include "exception.hpp"
 #include "stdlib/map.hpp"
+#include "random_seed.hpp"
 #include <sge/audio/sound/repeat.hpp>
 #include <sge/audio/sound/base.hpp>
 #include <sge/audio/player.hpp>
@@ -69,7 +70,8 @@ insula::music_controller::music_controller(
 	rng_(
 		static_cast<file_set::size_type>(0),
 		static_cast<file_set::size_type>(random_sounds_.size()-1)),
-	rng_engine_(),
+	rng_engine_(
+		random_seed()),
 	current_source_(
 		silence_source_)
 {

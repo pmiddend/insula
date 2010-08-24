@@ -1,7 +1,8 @@
 #include "generate_nuggets.hpp"
 #include "random_flat_point.hpp"
+#include "random_engine.hpp"
+#include "random_seed.hpp"
 #include <algorithm>
-#include <random>
 #include <functional>
 
 insula::nugget_sequence const
@@ -13,7 +14,8 @@ insula::generate_nuggets(
 	nugget_sequence result(
 		count);
 
-	std::mt19937 engine;
+	random_engine engine(
+		random_seed());
 
 	std::generate(
 		result.begin(),

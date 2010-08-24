@@ -1,4 +1,6 @@
 #include "game_outer.hpp"
+#include "../random_seed.hpp"
+#include "../random_flat_point.hpp"
 #include "../generate_nuggets.hpp"
 #include "../create_path.hpp"
 #include "../get_option.hpp"
@@ -59,6 +61,13 @@ insula::states::game_outer::game_outer(
 			get_option<nugget_sequence::size_type>(
 				context<machine>().cli_variables(),
 				"game-nuggets"))),
+	vehicle_position_engine_(
+		random_seed()),
+	vehicle_position_(
+		random_flat_point(
+			*height_map_,
+			water_->water_level(),
+			vehicle_position_engine_)),
 	large_font_(
 		json::parse_font(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
@@ -112,6 +121,12 @@ insula::nugget_sequence const &
 insula::states::game_outer::nugget_positions() const
 {
 	return nugget_positions_;
+}
+
+insula::graphics::vec2 const &
+insula::states::game_outer::vehicle_position() const
+{
+	return vehicle_position_;
 }
 
 sge::font::metrics_ptr const 

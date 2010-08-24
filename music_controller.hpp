@@ -1,6 +1,7 @@
 #ifndef INSULA_MUSIC_CONTROLLER_HPP_INCLUDED
 #define INSULA_MUSIC_CONTROLLER_HPP_INCLUDED
 
+#include "random_engine.hpp"
 #include <sge/audio/multi_loader_fwd.hpp>
 #include <sge/audio/player_ptr.hpp>
 #include <sge/audio/file_ptr.hpp>
@@ -65,7 +66,7 @@ private:
 	sge::audio::sound::base_ptr silence_source_;
 
 	std::uniform_int_distribution<file_set::size_type> rng_;
-	std::mt19937 rng_engine_;
+	random_engine rng_engine_;
 
 	sge::audio::sound::base_ptr current_source_,new_source_;
 

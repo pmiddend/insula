@@ -20,6 +20,12 @@
 #include <sge/font/drawer_ptr.hpp>
 #include "game_inner_fwd.hpp"
 
+// vehicle position begin
+#include "../random_engine.hpp"
+#include "../graphics/vec2.hpp"
+#include <fcppt/math/vector/basic_impl.hpp>
+// vehicle position end
+
 namespace insula
 {
 namespace states
@@ -54,6 +60,9 @@ public:
 	nugget_sequence const &
 	nugget_positions() const;
 
+	graphics::vec2 const &
+	vehicle_position() const;
+
 	// The large font is used for the messages in the non-game states
 	// (like freelook)
 	sge::font::metrics_ptr const 
@@ -72,6 +81,8 @@ private:
 	insula::water::object_ptr water_;
 	insula::water::console_proxy water_console_;
 	nugget_sequence nugget_positions_;
+	random_engine vehicle_position_engine_;
+	graphics::vec2 const vehicle_position_;
 	// This could also be in the machine, it's arbitrarily placed here
 	sge::font::metrics_ptr large_font_;
 	sge::font::drawer_ptr font_drawer_;

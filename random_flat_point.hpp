@@ -4,8 +4,8 @@
 #include "graphics/vec2.hpp"
 #include "graphics/scalar.hpp"
 #include "height_map/object_fwd.hpp"
+#include "random_engine.hpp"
 #include <fcppt/math/vector/basic_impl.hpp>
-#include <random>
 
 namespace insula
 {
@@ -16,7 +16,7 @@ graphics::vec2 const
 random_flat_point(
 	height_map::object const &,
 	graphics::scalar water_level,
-	std::mt19937 &engine);
+	random_engine &engine);
 }
 
 #endif
