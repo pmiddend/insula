@@ -15,8 +15,6 @@
 #include "scalar.hpp"
 #include "array.hpp"
 #include "vec2.hpp"
-#include "normalize_and_stretch.hpp"
-#include "generate_gradient_simple.hpp"
 #include "calculate_index_cell.hpp"
 #include "calculate_normal.hpp"
 #include "../stdlib/normalize.hpp"
@@ -309,31 +307,6 @@ insula::height_map::object::height_scaling() const
 		height_scaling_;
 }
 
-insula::height_map::scalar
-insula::height_map::object::height_for_point(
-	vec2 const &p) const
-{
-	/*
-	FCPPT_ASSERT_MESSAGE(
-		p.x() >= static_cast<scalar>(0) &&
-		p.y() >= static_cast<scalar>(0) && 
-		p.x() <= static_cast<scalar>(heights_.shape()[0]) * static_cast<scalar>(cell_size) && 
-		p.y() <= static_cast<scalar>(heights_.shape()[1]) * static_cast<scalar>(cell_size),
-		FCPPT_TEXT("The point is not inside the height field"));
-
-	// Determine which cell we're talking about
-	array::size_type const
-		cell_x = 
-			static_cast<array::size_type>(
-				p.x() / static_cast<scalar>(cell_size)),
-		cell_y = 
-			static_cast<array::size_type>(
-				p.y() / static_cast<scalar>(cell_size));
-
-	// Determine which triangle we're talking about
-	*/
-}
-
 insula::height_map::object::~object() {}
 
 void
@@ -365,13 +338,6 @@ insula::height_map::object::regenerate(
 		stdlib::normalize(
 			stdlib::grid::sobel_operator(
 				smoothed)));
-
-	/*
-	std::transform(
-		gradient.begin(),
-		gradient.end(),
-		gradient.begin(),
-		[](array::value_type const s) { return std::sin(s); });*/
 	
 	regenerate_buffers(
 		cell_size,

@@ -7,6 +7,8 @@
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
 #include "events/tick.hpp"
+#include "events/key.hpp"
+#include "events/key_repeat.hpp"
 #include "events/render.hpp"
 #include "states/game_outer.hpp"
 #include <sge/window/parameters.hpp>
@@ -61,6 +63,7 @@
 #include <sge/mainloop/dispatch.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
+#include <functional>
 
 insula::machine::machine(
 	boost::program_options::variables_map const &_vm)
@@ -152,6 +155,18 @@ insula::machine::machine(
 							(sge::renderer::state::draw_mode::fill));
 			},
 			FCPPT_TEXT("Toggle wireframe mode"))),
+	input_callback_(
+		systems_.input_system()->register_callback(
+			std::bind(
+				&machine::input_callback,
+				this,
+				std::placeholders::_1))),
+	input_repeat_callback_(
+		systems_.input_system()->register_repeat_callback(
+			std::bind(
+				&machine::input_repeat_callback,
+				this,
+				std::placeholders::_1))),
 	stats_(
 		systems_.renderer(),
 		systems_.font_system()),
@@ -244,6 +259,12 @@ insula::machine::console()
 	return console_;
 }
 
+sge::parse::json::object const &
+insula::machine::config_file() const
+{
+	return config_file_;
+}
+
 bool 
 insula::machine::running() const
 {
@@ -251,3 +272,23 @@ insula::machine::running() const
 }
 
 insula::machine::~machine() {}
+
+void
+insula::machine::input_callback(
+	sge::input::key_pair const &k)
+{
+	process_event(
+		events::key(
+			k));
+}
+
+void
+insula::machine::input_repeat_callback(
+	sge::input::key_type const &k)
+{
+	/* FIXME: this is kinda broken
+	process_event(
+		events::key_repeat(
+			k));
+	*/
+}

@@ -5,7 +5,6 @@
 #include "height_map/image_to_array.hpp"
 //#include "height_map/normalize_and_stretch.hpp"
 #include "height_map/array_to_image.hpp"
-#include "height_map/generate_gradient_simple.hpp"
 #include "textures/interpolators/bernstein_polynomial.hpp"
 #include "textures/blend.hpp"
 #include "textures/image_sequence.hpp"

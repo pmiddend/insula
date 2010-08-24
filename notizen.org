@@ -4,6 +4,20 @@ das machen, was in [[file:~/projects/insula/temp/bullet-2.76/Demos/CharacterDemo
 
 * Kurzzeitvorgehen
 
+- Definiere Gerade 'f' durch Eckpunkte des Vierecks. Teste, ob 
+	y-Wert < f(x-wert), dann ist es das untere Dreieck, sonst 
+	das obere
+- Definiere durch dieses Dreieck eine Ebene (Normalform)
+- Schreibe Funktion, die einen 2D-Punkt auf eine Ebene projiziert
+  (Gleichung nach y lösen unter der Annahme, dass x und z bekannt
+  sind)
+- Musik in states::freelook setzen
+- Font in game_outer laden und bereitstellen (samt drawer)
+- Schriftzug in freelook anzeigen
+- Position des Fahrzeugs in game_outer generieren
+- Fahrzeug in game_inner generieren
+- Übergang freelook -> pregame
+
 http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
 
 [[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
@@ -724,3 +738,4 @@ beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
 *** TODO random_flat_point erweitern
 *** TODO Über eine "game"-Klasse nachdenken
+*** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern

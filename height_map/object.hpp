@@ -92,10 +92,6 @@ public:
 	graphics::scalar
 	height_scaling() const;
 
-	height_map::scalar
-	height_for_point(
-		vec2 const &) const;
-
 	~object();
 private:
 	graphics::camera::object const &camera_;

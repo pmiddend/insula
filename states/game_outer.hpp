@@ -16,6 +16,8 @@
 // events (!?)
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
+#include <sge/font/metrics_ptr.hpp>
+#include <sge/font/drawer_ptr.hpp>
 #include "game_inner_fwd.hpp"
 
 namespace insula
@@ -45,6 +47,15 @@ public:
 	react(
 		events::render const &);
 
+	nugget_sequence const &
+	nugget_positions() const;
+
+	sge::font::metrics_ptr const 
+	large_font() const;
+
+	sge::font::drawer_ptr const
+	font_drawer() const;
+
 	// Holds height_map, skydome and the water
 	~game_outer();
 private:
@@ -55,6 +66,8 @@ private:
 	insula::water::object_ptr water_;
 	insula::water::console_proxy water_console_;
 	nugget_sequence nugget_positions_;
+	sge::font::metrics_ptr large_font_;
+	sge::font::drawer_ptr font_drawer_;
 };
 }
 }

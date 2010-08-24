@@ -1,4 +1,10 @@
 {
+	"large_font" : 
+	{ 
+		"metrics" : "default.ttf",
+		"size" : 15 
+	},
+
 	"music" : 
 	{  
 		"events" : 

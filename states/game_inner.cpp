@@ -3,8 +3,11 @@
 #include "../create_path.hpp"
 #include "../media_path.hpp"
 #include "../height_map/object.hpp"
+#include "../height_map/vec2.hpp"
+#include "../height_map/height_for_point.hpp"
 #include "../physics/box.hpp"
 #include "../physics/vec3.hpp"
+#include "../graphics/vec2.hpp"
 #include <sge/console/object.hpp>
 #include <sge/image/create_texture.hpp>
 #include <sge/renderer/filter/linear.hpp>
@@ -12,8 +15,10 @@
 #include <sge/model/loader.hpp>
 #include <sge/renderer/texture.hpp>
 #include <fcppt/math/box/structure_cast.hpp>
+#include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/string.hpp>
+#include <boost/foreach.hpp>
 
 insula::states::game_inner::game_inner(
 	my_context ctx)
@@ -71,6 +76,30 @@ insula::states::game_inner::game_inner(
 				sge::renderer::filter::linear,
 				sge::renderer::resource_flags::none))
 {
+	// stdlib::map doesn't work here
+	BOOST_FOREACH(
+		graphics::vec2 const &v,
+		context<game_outer>().nugget_positions())
+	{
+		nugget_models_.push_back(
+			new physics::static_model(
+				physics_world_,
+				physics::vec3(
+					v.x(),
+					height_map::height_for_point(
+						context<game_outer>().height_map().heights(),
+						context<game_outer>().height_map().cell_size(),
+						fcppt::math::vector::structure_cast<height_map::vec2>(
+							v)) * context<game_outer>().height_map().height_scaling() + 
+					static_cast<physics::scalar>(nugget_model_.bounding_box().h())*
+					static_cast<physics::scalar>(1.5),
+					v.y()),
+				nugget_model_,
+				physics::model_approximation(
+					physics::model_approximation::box,
+					static_cast<physics::scalar>(1)),
+				physics::solidity::nonsolid));
+	}
 }
 
 void
@@ -83,6 +112,9 @@ void
 insula::states::game_inner::react(
 	events::render const &)
 {
+	BOOST_FOREACH(physics::static_model &m,nugget_models_)
+		m.render();
+	
 	if (physics_debug_)
 	{
 		physics_debug_drawer_.setDebugMode(

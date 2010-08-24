@@ -20,6 +20,8 @@ insula::states::freelook::react(
 
 	context<game_inner>().react(
 		t);
+
+	return discard_event();
 }
 
 boost::statechart::result
@@ -31,4 +33,6 @@ insula::states::freelook::react(
 
 	context<game_inner>().react(
 		r);
+
+	return discard_event();
 }
