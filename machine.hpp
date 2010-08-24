@@ -75,6 +75,10 @@ public:
 	sound_controller &
 	sounds();
 
+	// The vehicle needs this
+	insula::input_delegator &
+	input_delegator();
+
 	// This is checked for in the main program (which _might_ exit if
 	// it's false)
 	bool 
@@ -87,7 +91,7 @@ private:
 	boost::program_options::variables_map vm_;
 	sge::systems::instance systems_;
 	insula::console::object console_;
-	input_delegator input_delegator_;
+	insula::input_delegator input_delegator_;
 	// This is a ptr because the cli_factory returns a ptr
 	graphics::camera::object_ptr camera_;
 	fcppt::signal::scoped_connection exit_callback_;

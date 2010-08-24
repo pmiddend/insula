@@ -11,6 +11,7 @@
 #include "../model/object.hpp"
 #include "../events/tick_fwd.hpp"
 #include "../events/render_fwd.hpp"
+#include "../vehicle/object_ptr.hpp"
 #include <fcppt/signal/scoped_connection.hpp>
 #include <boost/statechart/state.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -52,6 +53,7 @@ private:
 	graphics::shader nugget_shader_;
 	model::object nugget_model_;
 	nugget_model_sequence nugget_models_;
+	vehicle::object_ptr vehicle_;
 };
 }
 }

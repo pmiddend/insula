@@ -8,6 +8,10 @@
 #include "../physics/box.hpp"
 #include "../physics/vec3.hpp"
 #include "../graphics/vec2.hpp"
+// vehicle begin
+#include "../vehicle/cli_factory.hpp"
+#include "../vehicle/object.hpp"
+// vehicle end
 #include <sge/console/object.hpp>
 #include <sge/image/create_texture.hpp>
 #include <sge/renderer/filter/linear.hpp>
@@ -74,7 +78,27 @@ insula::states::game_inner::game_inner(
 				context<machine>().systems().renderer(),
 				context<machine>().systems().image_loader(),
 				sge::renderer::filter::linear,
-				sge::renderer::resource_flags::none))
+				sge::renderer::resource_flags::none)),
+	vehicle_(
+		vehicle::cli_factory(
+			context<machine>().cli_variables(),
+			physics_world_,
+			physics::vec3(
+				static_cast<physics::scalar>(
+					context<game_outer>().vehicle_position().x()),
+				static_cast<physics::scalar>(
+					0),
+				static_cast<physics::scalar>(
+					context<game_outer>().vehicle_position().y())),
+			context<machine>().systems().renderer(),
+			context<machine>().systems().image_loader(),
+			context<machine>().systems().md3_loader(),
+			nugget_shader_,
+			context<machine>().camera(),
+			context<machine>().input_delegator(),
+			context<machine>().console(),
+			context<machine>().systems().audio_loader(),
+			context<machine>().systems().audio_player()))
 {
 	// stdlib::map doesn't work here
 	BOOST_FOREACH(
@@ -121,6 +145,8 @@ insula::states::game_inner::react(
 			btIDebugDraw::DBG_DrawWireframe);
 		physics_debug_drawer_.render(); 
 	}
+
+	vehicle_->render();
 }
 
 insula::states::game_inner::~game_inner()

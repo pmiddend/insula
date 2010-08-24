@@ -280,6 +280,12 @@ insula::machine::sounds()
 	return sounds_;
 }
 
+insula::input_delegator &
+insula::machine::input_delegator()
+{
+	return input_delegator_;
+}
+
 bool 
 insula::machine::running() const
 {
