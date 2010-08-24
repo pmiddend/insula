@@ -217,6 +217,9 @@ insula::machine::tick(
 		events::tick(
 			time_delta));
 
+	music_.update();
+	sounds_.update();
+
 	// FIXME: This is a hack for a bug in renderer
 	systems_.renderer()->viewport(
 		sge::renderer::viewport(
@@ -263,6 +266,18 @@ sge::parse::json::object const &
 insula::machine::config_file() const
 {
 	return config_file_;
+}
+
+insula::music_controller &
+insula::machine::music()
+{
+	return music_;
+}
+
+insula::sound_controller &
+insula::machine::sounds()
+{
+	return sounds_;
 }
 
 bool 

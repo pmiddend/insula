@@ -39,6 +39,8 @@ public:
 	insula::height_map::object const &
 	height_map() const;
 
+	// This is called "react" so it can be easily converted to an event
+	// reaction function (which it originally was)
 	void
 	react(
 		events::tick const &);
@@ -47,9 +49,13 @@ public:
 	react(
 		events::render const &);
 
+	// The nugget positions don't change in each iteration, so read-only
+	// access here
 	nugget_sequence const &
 	nugget_positions() const;
 
+	// The large font is used for the messages in the non-game states
+	// (like freelook)
 	sge::font::metrics_ptr const 
 	large_font() const;
 
@@ -66,6 +72,7 @@ private:
 	insula::water::object_ptr water_;
 	insula::water::console_proxy water_console_;
 	nugget_sequence nugget_positions_;
+	// This could also be in the machine, it's arbitrarily placed here
 	sge::font::metrics_ptr large_font_;
 	sge::font::drawer_ptr font_drawer_;
 };

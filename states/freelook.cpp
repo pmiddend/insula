@@ -1,6 +1,17 @@
 #include "freelook.hpp"
+#include "../music_controller.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
+#include <sge/font/draw_text.hpp>
+#include <sge/font/text_part.hpp>
+#include <sge/font/align_h.hpp>
+#include <sge/font/align_v.hpp>
+#include <sge/font/flags_none.hpp>
+#include <sge/renderer/device.hpp>
+#include <sge/font/pos.hpp>
+#include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/dim/structure_cast.hpp>
+#include <fcppt/text.hpp>
 
 insula::states::freelook::freelook(
 	my_context ctx)
@@ -8,7 +19,8 @@ insula::states::freelook::freelook(
 	my_base(
 		ctx)
 {
-	//context<ingame>().regenerate_nuggets();
+	context<machine>().music().play_event(
+		FCPPT_TEXT("freelook"));
 }
 
 boost::statechart::result
@@ -16,7 +28,8 @@ insula::states::freelook::react(
 	events::tick const &t)
 {
 	context<game_outer>().react(
-		t);
+
+															t);
 
 	context<game_inner>().react(
 		t);
@@ -33,6 +46,17 @@ insula::states::freelook::react(
 
 	context<game_inner>().react(
 		r);
+
+	sge::font::draw_text(
+		context<game_outer>().large_font(),
+		context<game_outer>().font_drawer(),
+		FCPPT_TEXT("Freelook Mode\nPress return to continue"),
+		sge::font::pos::null(),
+		fcppt::math::dim::structure_cast<sge::font::dim>(
+			context<machine>().systems().renderer()->screen_size()),
+		sge::font::align_h::center,
+		sge::font::align_v::center,
+		sge::font::flags::none);
 
 	return discard_event();
 }

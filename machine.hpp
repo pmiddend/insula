@@ -69,6 +69,12 @@ public:
 	sge::parse::json::object const &
 	config_file() const;
 
+	music_controller &
+	music();
+
+	sound_controller &
+	sounds();
+
 	// This is checked for in the main program (which _might_ exit if
 	// it's false)
 	bool 
