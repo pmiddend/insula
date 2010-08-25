@@ -36,6 +36,9 @@ public:
 	void
 	react(
 		events::render const &);
+
+	insula::vehicle::object &
+	vehicle();
 	
 	~game_inner();
 private:
@@ -53,7 +56,7 @@ private:
 	graphics::shader nugget_shader_;
 	model::object nugget_model_;
 	nugget_model_sequence nugget_models_;
-	vehicle::object_ptr vehicle_;
+	insula::vehicle::object_ptr vehicle_;
 };
 }
 }

@@ -1,4 +1,5 @@
 #include "create_variables_map.hpp"
+#include "scoped_machine.hpp"
 #include "machine.hpp"
 // The first state to be used has to be included here
 #include "states/freelook.hpp"
@@ -18,7 +19,8 @@ try
 			argc,
 			argv));
 
-	m.initiate();
+	insula::scoped_machine scope(
+		m);
 
 	sge::time::timer frame_timer(
 		sge::time::second(1));

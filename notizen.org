@@ -622,6 +622,41 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 ** TODO Sounds [0/1]
 *** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
+** TODO Neues Fontsystem
+Ziele:
+
+Man will Farben und Stile (fett, kursiv etc.) unterbringen sowie
+verschiedene Größen, das alles steuerbar mit einer kleinen DSEL etwa
+wie folgt:
+
+#+begin_src c++
+draw_text(
+  font_collection,
+	size(15) >> color(black) >> "foo" >> (bold >> "bar") 
+    >> italics >> size(20) >> "baz");
+#+end_src
+
+Man muss sich hier implizit auf ttf beschränken, weil andere
+Fontformate vermutlich bold/italics etc. anders modellieren. Eine
+=font_collection= muss eine Sammlung von geladenen ttf-Fonts sein
+ausgesucht nach:
+
+- Größe
+- Stil
+
+In etwa so:
+
+#+begin_src c++
+font_collection fonts(
+  // Normal
+  "default.ttf",
+	// Bold
+  optional<string>(),
+	// Italics,
+	"default_it.ttf",
+	make_container<size_container>(15)(20)(25));
+#+end_src
+
 ** TODO Diverses [21/27]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]

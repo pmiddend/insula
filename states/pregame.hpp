@@ -1,5 +1,5 @@
-#ifndef INSULA_STATES_FREELOOK_HPP_INCLUDED
-#define INSULA_STATES_FREELOOK_HPP_INCLUDED
+#ifndef INSULA_STATES_PREGAME_HPP_INCLUDED
+#define INSULA_STATES_PREGAME_HPP_INCLUDED
 
 // _fwd is not enough
 #include "game_inner.hpp"
@@ -14,9 +14,13 @@ namespace insula
 {
 namespace states
 {
-class freelook
+/**
+	In this state, the camera is locked on to the vehicle and we are
+	just waiting for the current player to press the start button
+ */
+class pregame
 :
-	public boost::statechart::state<freelook,game_inner>
+	public boost::statechart::state<pregame,game_inner>
 {
 public:
 	typedef 
@@ -29,7 +33,7 @@ public:
 	reactions;
 
 	explicit
-	freelook(
+	pregame(
 		my_context);
 
 	boost::statechart::result
@@ -43,8 +47,7 @@ public:
 	boost::statechart::result
 	react(
 		events::key const &);
-
-	~freelook();
+private:
 };
 }
 }

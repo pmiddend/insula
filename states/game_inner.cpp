@@ -82,7 +82,7 @@ insula::states::game_inner::game_inner(
 				sge::renderer::filter::linear,
 				sge::renderer::resource_flags::none)),
 	vehicle_(
-		vehicle::cli_factory(
+		insula::vehicle::cli_factory(
 			context<machine>().cli_variables(),
 			physics_world_,
 			physics::vec3(
@@ -156,6 +156,12 @@ insula::states::game_inner::react(
 	}
 
 	vehicle_->render();
+}
+
+insula::vehicle::object &
+insula::states::game_inner::vehicle()
+{
+	return *vehicle_;
 }
 
 insula::states::game_inner::~game_inner()
