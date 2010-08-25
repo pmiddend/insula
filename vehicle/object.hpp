@@ -8,6 +8,7 @@
 #include "../graphics/shader_fwd.hpp"
 #include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/scalar.hpp"
+#include "../graphics/gizmo.hpp"
 #include "input_fwd.hpp"
 #include "../input_delegator.hpp"
 #include <sge/renderer/device_ptr.hpp>
@@ -47,6 +48,10 @@ public:
 		console::object &,
 		sge::audio::multi_loader &,
 		sge::audio::player_ptr);
+
+	// The camera_move state needs this
+	graphics::gizmo const 
+	lock_to_gizmo() const;
 
 	void
 	update_camera();

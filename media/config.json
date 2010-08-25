@@ -20,6 +20,8 @@
 	{
 		"events" : 
 		{
+			"state_change" : "score.wav",
+			"camera_swoosh" : "swoosh.wav"
 		}
 	}
 }

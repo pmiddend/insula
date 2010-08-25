@@ -1,6 +1,7 @@
 #include "freelook.hpp"
 #include "camera_move.hpp"
 #include "../music_controller.hpp"
+#include "../sound_controller.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
 #include <sge/font/draw_text.hpp>
@@ -69,7 +70,11 @@ insula::states::freelook::react(
 	events::key const &r)
 {
 	if (r.pair().key().code() == sge::input::kc::key_return)
+	{
+		context<machine>().sounds().play(
+			FCPPT_TEXT("state_change"));
 		return transit<camera_move>();
+	}
 
 	return discard_event();
 }

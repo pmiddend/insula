@@ -116,6 +116,17 @@ insula::vehicle::object::object(
 						position)));
 }
 
+insula::graphics::gizmo const
+insula::vehicle::object::lock_to_gizmo() const
+{
+	return 
+		gizmo::lock_to(
+			gizmo::structure_cast<physics::gizmo>(
+				physics_->gizmo()),
+			camera_distance_,
+			camera_angle_);
+}
+
 void
 insula::vehicle::object::update_camera()
 {
@@ -123,11 +134,7 @@ insula::vehicle::object::update_camera()
 		return;
 
 	cam_.gizmo() = 
-		gizmo::lock_to(
-			gizmo::structure_cast<physics::gizmo>(
-				physics_->gizmo()),
-			camera_distance_,
-			camera_angle_);
+		lock_to_gizmo();
 }
 
 void

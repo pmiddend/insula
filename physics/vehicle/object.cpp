@@ -110,7 +110,7 @@ insula::physics::vehicle::object::object::object(
 					chassis_model_->bounding_box().dimension()))));
 
 	// DEBUG BEGIN
-	fcppt::io::cout << "chassis box: " << chassis_model_->bounding_box() << "\n";
+	//fcppt::io::cout << "chassis box: " << chassis_model_->bounding_box() << "\n";
 	// DEBUG END
 	
 	compound_.reset(
@@ -170,7 +170,7 @@ insula::physics::vehicle::object::object::object(
 		wheel_model_->bounding_box();
 
 	// DEBUG BEGIN
-	fcppt::io::cout << "wheel_box is " << wheel_box << "\n";
+	//fcppt::io::cout << "wheel_box is " << wheel_box << "\n";
 	// DEBUG END
 
 	scalar const 

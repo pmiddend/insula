@@ -16,6 +16,9 @@ namespace insula
 class scoped_machine
 {
 public:
+	scoped_machine(scoped_machine const &) = delete;
+	scoped_machine &operator=(scoped_machine &) = delete;
+
 	explicit
 	scoped_machine(
 		machine &);

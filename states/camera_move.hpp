@@ -5,6 +5,7 @@
 #include "game_inner.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
+#include "../graphics/gizmo.hpp"
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
@@ -37,6 +38,8 @@ public:
 	boost::statechart::result
 	react(
 		events::render const &);
+private:
+	graphics::gizmo target_gizmo_;
 };
 }
 }
