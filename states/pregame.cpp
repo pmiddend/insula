@@ -4,6 +4,7 @@
 #include "../events/render.hpp"
 #include "../events/key.hpp"
 #include "../vehicle/object.hpp"
+#include "../sound_controller.hpp"
 #include <sge/font/draw_text.hpp>
 #include <sge/font/text_part.hpp>
 #include <sge/font/align_h.hpp>
@@ -23,6 +24,8 @@ insula::states::pregame::pregame(
 	my_base(
 		ctx)
 {
+	context<machine>().sounds().play(
+		FCPPT_TEXT("plop"));
 }
 
 boost::statechart::result
