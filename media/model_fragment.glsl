@@ -10,7 +10,7 @@ void main()
 		texture2D(
 			texture,
 			vec2(
-				1.0-texcoord_out.s,
+				texcoord_out.s,
 				texcoord_out.t));
 }
 
