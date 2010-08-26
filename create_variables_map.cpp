@@ -3,6 +3,7 @@
 #include "game_cli_options.hpp"
 #include "graphics/cli_options.hpp"
 #include "water/cli_options.hpp"
+#include "states/camera_move.hpp"
 #include "vehicle/cli_options.hpp"
 #include "skydome/cli_options.hpp"
 #include "height_map/cli_options.hpp"
@@ -61,6 +62,9 @@ insula::create_variables_map(
 
 	desc.add(
 		physics::cli_options());
+
+	desc.add(
+		states::camera_move::cli_options());
 
 	boost::program_options::variables_map vm;
 	boost::program_options::store(

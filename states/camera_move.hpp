@@ -9,6 +9,7 @@
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
+#include <boost/program_options/options_description.hpp>
 
 namespace insula
 {
@@ -38,6 +39,9 @@ public:
 	boost::statechart::result
 	react(
 		events::render const &);
+
+	static boost::program_options::options_description const
+	cli_options();
 private:
 	graphics::camera::pan pan_;
 };

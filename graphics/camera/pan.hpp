@@ -40,7 +40,8 @@ public:
 	pan(
 		gizmo const &start,
 		gizmo const &end,
-		scalar speed);
+		scalar speed,
+		scalar threshold);
 
 	void
 	update(
@@ -55,7 +56,8 @@ public:
 	current() const;
 private:
 	gizmo start_,end_,current_;
-	scalar speed_;
+	scalar const speed_;
+	scalar const threshold_;
 };
 }
 }

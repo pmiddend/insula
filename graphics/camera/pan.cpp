@@ -10,7 +10,8 @@
 insula::graphics::camera::pan::pan(
 	gizmo const &_start,
 	gizmo const &_end,
-	scalar _speed)
+	scalar _speed,
+	scalar _threshold)
 :
 	start_(
 		_start),
@@ -19,7 +20,9 @@ insula::graphics::camera::pan::pan(
 	current_(
 		start_),
 	speed_(
-		_speed)
+		_speed),
+	threshold_(
+		_threshold)
 {
 }
 
@@ -61,7 +64,7 @@ insula::graphics::camera::pan::finished() const
 	return 
 		// We cannot use almost_zero here since it's too strict
 		length(
-			current_.position() - end_.position()) < static_cast<graphics::scalar>(0.1);
+			current_.position() - end_.position()) < threshold_;
 }
 
 insula::graphics::gizmo const
