@@ -68,8 +68,8 @@ boost::statechart::result
 insula::states::pregame::react(
 	events::key const &r)
 {
-	if (r.pair().key().code() == sge::input::kc::key_return)
-		return transit<camera_move>();
+	//if (r.pair().key().code() == sge::input::kc::key_return)
+	//	return transit<camera_move>();
 
 	return discard_event();
 }

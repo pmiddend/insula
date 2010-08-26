@@ -156,13 +156,13 @@ insula::machine::machine(
 			},
 			FCPPT_TEXT("Toggle wireframe mode"))),
 	input_callback_(
-		systems_.input_system()->register_callback(
+		input_delegator_.register_callback(
 			std::bind(
 				&machine::input_callback,
 				this,
 				std::placeholders::_1))),
 	input_repeat_callback_(
-		systems_.input_system()->register_repeat_callback(
+		input_delegator_.register_repeat_callback(
 			std::bind(
 				&machine::input_repeat_callback,
 				this,

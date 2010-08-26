@@ -1,19 +1,28 @@
 #include "camera_move.hpp"
+#include "pregame.hpp"
 #include "../sound_controller.hpp"
 #include "../events/tick.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../vehicle/object.hpp"
+#include "../gizmo/orthogonalize_simple.hpp"
+#include "../gizmo/orthogonalize_keep_axis.hpp"
 #include "../events/render.hpp"
 #include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/length.hpp>
+#include <fcppt/math/vector/dot.hpp>
+#include <fcppt/math/vector/output.hpp>
+#include <fcppt/io/cout.hpp>
 
 insula::states::camera_move::camera_move(
 	my_context ctx)
 :
 	my_base(
 		ctx),
-	target_gizmo_(
-		context<game_inner>().vehicle().lock_to_gizmo())
+	pan_(
+		context<machine>().camera().gizmo(),
+		context<game_inner>().vehicle().lock_to_gizmo(),
+		static_cast<graphics::scalar>(0.4))
 {
 	context<machine>().sounds().play(
 		FCPPT_TEXT("camera_swoosh"));
@@ -28,14 +37,17 @@ insula::states::camera_move::react(
 	context<game_inner>().react(
 		t);
 
-	graphics::scalar const cam_speed = 
-		static_cast<graphics::scalar>(0.25);
+	pan_.update(
+		t.delta());
 
-	context<machine>().camera().gizmo().position(
-		context<machine>().camera().gizmo().position() + 
-		static_cast<graphics::scalar>(t.delta()) * 
-		(target_gizmo_.position() - context<machine>().camera().gizmo().position())/
-		cam_speed);
+	context<machine>().camera().gizmo() = 
+		pan_.current();
+
+	if(pan_.finished())
+	{
+		fcppt::io::cout << "Panning is finished, now switching to pregame\n";
+		return transit<pregame>();
+	}
 
 	return discard_event();
 }
