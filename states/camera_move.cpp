@@ -77,7 +77,7 @@ insula::states::camera_move::cli_options()
 {
 	boost::program_options::options_description opts("Camera move state options");
 	opts.add_options()
-		("camera-move-inverse-speed",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.4)),"This is the _inverse_ speed of the camera. The lower the value, the faster it is (\"average\")")
-		("camera-move-threshold",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(0.1)),"If the distance from the camera to the vehicle is this small, the state is changed to pregame");
+		("camera-move-inverse-speed",boost::program_options::value<graphics::scalar>(),"This is the _inverse_ speed of the camera. The lower the value, the faster it is (\"average\")")
+		("camera-move-threshold",boost::program_options::value<graphics::scalar>(),"If the distance from the camera to the vehicle is this small, the state is changed to pregame");
 	return opts;
 }

@@ -4,6 +4,7 @@
 #include <boost/statechart/state.hpp>
 // fwd isn't enough here
 #include "../machine.hpp"
+#include "../player.hpp"
 #include "../height_map/object_ptr.hpp"
 #include "../height_map/object_fwd.hpp"
 #include "../height_map/console_proxy.hpp"
@@ -26,6 +27,12 @@
 #include <fcppt/math/vector/basic_impl.hpp>
 // vehicle position end
 
+// playermap begin
+#include <fcppt/optional.hpp>
+#include <map>
+#include <chrono>
+// playermap end
+
 namespace insula
 {
 namespace states
@@ -35,6 +42,14 @@ class game_outer
 	public boost::statechart::state<game_outer,machine,game_inner>
 {
 public:
+	typedef
+	std::map
+	<
+		player,
+		fcppt::optional<std::chrono::milliseconds>
+	>
+	player_time_map;
+
 	explicit
 	game_outer(
 		my_context);

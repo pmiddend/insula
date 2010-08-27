@@ -14,11 +14,11 @@ insula::skydome::cli_options()
 {
 	boost::program_options::options_description opts("Skydome options");
 	opts.add_options()
-		("skydome-latitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many latitude iterations")
-		("skydome-longitudes",boost::program_options::value<skydome::size_type>()->default_value(100),"How many longitude iterations")
-		("skydome-angle",boost::program_options::value<graphics::scalar>()->default_value(static_cast<graphics::scalar>(90)),"Total angle (in degrees); currently unused")
-		("skydome-color0",boost::program_options::value<graphics::vec3>()->default_value(graphics::vec3(0.765f,0.87f,1.0f)),"The skydome's base color. As its name suggests, this color will be shown at the base of the dome.")
-		("skydome-color1",boost::program_options::value<graphics::vec3>()->default_value(graphics::vec3(0.0f,0.0f,1.0f)),"The skydome's top color. This will be shown at the top of the dome.");
+		("skydome-latitudes",boost::program_options::value<skydome::size_type>(),"How many latitude iterations")
+		("skydome-longitudes",boost::program_options::value<skydome::size_type>(),"How many longitude iterations")
+		("skydome-angle",boost::program_options::value<graphics::scalar>(),"Total angle (in degrees); currently unused")
+		("skydome-color0",boost::program_options::value<graphics::vec3>(),"The skydome's base color. As its name suggests, this color will be shown at the base of the dome.")
+		("skydome-color1",boost::program_options::value<graphics::vec3>(),"The skydome's top color. This will be shown at the top of the dome.");
 	return opts;
 }
 

@@ -37,7 +37,7 @@ vehicle-camera-distance = 10
 vehicle-camera-angle = 30
 vehicle-file = buggy.json
 
-graphics-screen-size = (640,480)
+graphics-screen-size = (1024,768)
 
 physics-gravity = (0,-10,0)
 

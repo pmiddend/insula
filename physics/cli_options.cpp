@@ -10,7 +10,7 @@ insula::physics::cli_options()
 {
 	boost::program_options::options_description opts("Physics options");
 	opts.add_options()
-		("physics-gravity",boost::program_options::value<vec3>()->default_value(physics::vec3(0,-10,0)),"The gravity");
+		("physics-gravity",boost::program_options::value<vec3>(),"The gravity");
 	return opts;
 }
 

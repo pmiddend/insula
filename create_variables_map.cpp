@@ -9,10 +9,12 @@
 #include "height_map/cli_options.hpp"
 #include "physics/cli_options.hpp"
 #include "help_needed.hpp"
+#include "media_path.hpp"
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <fcppt/from_std_string.hpp>
+#include <fcppt/filesystem/exists.hpp>
 #include <sstream>
 
 namespace
@@ -67,12 +69,45 @@ insula::create_variables_map(
 		states::camera_move::cli_options());
 
 	boost::program_options::variables_map vm;
+
+	boost::program_options::store(
+		// Yes, the <char> is indented.
+		boost::program_options::parse_config_file<char>(
+			// NOTE: This is of course broken when the value_type of path
+			// is not char*
+			(media_path()/FCPPT_TEXT("config.po")).string().c_str(),
+			desc), 
+		vm);
+
+	// I don't know if that's neccessary since we do it again after
+	// parsing the command line
+	boost::program_options::notify(
+		vm);    
+
+	if (fcppt::filesystem::exists(media_path()/FCPPT_TEXT("user_config.po")))
+	{
+		boost::program_options::store(
+			// Yes, the <char> is indented.
+			boost::program_options::parse_config_file<char>(
+				// NOTE: This is of course broken when the value_type of path
+				// is not char*
+				(media_path()/FCPPT_TEXT("user_config.po")).string().c_str(),
+				desc), 
+			vm);
+
+		// I don't know if that's neccessary since we do it again after
+		// parsing the command line
+		boost::program_options::notify(
+			vm);    
+	}
+		
+
 	boost::program_options::store(
 		boost::program_options::parse_command_line(
 			argc, 
 			argv, 
 			desc), 
-			vm);
+		vm);
 
 	boost::program_options::notify(
 		vm);    

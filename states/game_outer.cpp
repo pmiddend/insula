@@ -19,6 +19,8 @@
 #include <sge/parse/json/find_member_exn.hpp>
 #include <sge/parse/json/string.hpp>
 #include <sge/image/colors.hpp>
+#include <sge/image/color/rgb8.hpp>
+#include <mizuiro/color/init.hpp>
 
 insula::states::game_outer::game_outer(
 	my_context ctx)
@@ -77,7 +79,11 @@ insula::states::game_outer::game_outer(
 	font_drawer_(
 		fcppt::make_shared_ptr<sge::font::drawer_3d>(
 			context<machine>().systems().renderer(),
-			sge::image::colors::white()))
+			sge::image::color::rgb8(
+				(mizuiro::color::init::red %= 1.0)
+				(mizuiro::color::init::green %= 1.0)
+				(mizuiro::color::init::blue %= 1.0))
+			/*sge::image::colors::white()*/))
 {
 }
 

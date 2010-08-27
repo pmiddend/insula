@@ -10,10 +10,10 @@ insula::vehicle::cli_options()
 {
 	boost::program_options::options_description opts("Vehicle options");
 	opts.add_options()
-		("vehicle-camera-distance",boost::program_options::value<graphics::scalar>()->default_value(10),"Distance to the vehicle")
-		("vehicle-camera-angle",boost::program_options::value<graphics::scalar>()->default_value(30),"Angle of the camera in degrees")
+		("vehicle-camera-distance",boost::program_options::value<graphics::scalar>(),"Distance to the vehicle")
+		("vehicle-camera-angle",boost::program_options::value<graphics::scalar>(),"Angle of the camera in degrees")
 		// vehicle begin
-		("vehicle-file",boost::program_options::value<fcppt::string>()->default_value(FCPPT_TEXT("buggy.json")),"The file to load the vehicle from");
+		("vehicle-file",boost::program_options::value<fcppt::string>(),"The file to load the vehicle from");
 	return opts;
 }
 

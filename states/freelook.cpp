@@ -4,6 +4,11 @@
 #include "../sound_controller.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
+#include "../gizmo/orthogonalize_simple.hpp"
+#include "../gizmo/orthogonalize_keep_axis.hpp"
+#include "../gizmo/lock_to.hpp"
+#include "../height_map/object.hpp"
+#include "../graphics/camera/object.hpp"
 #include <sge/font/draw_text.hpp>
 #include <sge/font/text_part.hpp>
 #include <sge/font/align_h.hpp>
@@ -15,7 +20,9 @@
 #include <sge/font/pos.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
+#include <fcppt/math/pi.hpp>
 #include <fcppt/text.hpp>
+#include <cmath>
 
 insula::states::freelook::freelook(
 	my_context ctx)
@@ -25,6 +32,52 @@ insula::states::freelook::freelook(
 {
 	context<machine>().music().play_event(
 		FCPPT_TEXT("freelook"));
+
+	graphics::box const hm_size = 
+		context<game_outer>().height_map().extents();
+
+	context<machine>().camera().gizmo() = 
+		insula::gizmo::lock_to(
+	//		insula::gizmo::orthogonalize_simple(
+			insula::gizmo::orthogonalize_keep_axis(
+				graphics::gizmo(
+					graphics::gizmo::init()
+						.position(
+							graphics::vec3(
+								hm_size.w() / 
+								static_cast<graphics::scalar>(2),
+								static_cast<graphics::scalar>(0),
+								hm_size.d() / 
+								static_cast<graphics::scalar>(2)))
+						.forward(
+							graphics::vec3(
+								std::cos(
+									fcppt::math::pi<graphics::scalar>()*
+									static_cast<graphics::scalar>(1.0/4.0)),
+								static_cast<graphics::scalar>(0),
+								std::sin(
+									fcppt::math::pi<graphics::scalar>()*
+									static_cast<graphics::scalar>(1.0/4.0))))
+						.right(
+							graphics::vec3(
+								std::cos(
+									fcppt::math::pi<graphics::scalar>()*
+									static_cast<graphics::scalar>(-1.0/4.0)),
+								static_cast<graphics::scalar>(0),
+								std::sin(
+									fcppt::math::pi<graphics::scalar>()*
+									static_cast<graphics::scalar>(-1.0/4.0))))
+						.up(
+							graphics::vec3(
+								static_cast<graphics::scalar>(0),
+								static_cast<graphics::scalar>(1),
+								static_cast<graphics::scalar>(0)))),
+					0),
+				hm_size.w()/
+				static_cast<graphics::scalar>(
+					2),
+				fcppt::math::pi<graphics::scalar>()/
+				static_cast<graphics::scalar>(4));
 }
 
 boost::statechart::result
@@ -32,9 +85,7 @@ insula::states::freelook::react(
 	events::tick const &t)
 {
 	context<game_outer>().react(
-
-															t);
-
+		t); 
 	context<game_inner>().react(
 		t);
 
