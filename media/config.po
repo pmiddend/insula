@@ -1,0 +1,45 @@
+game-nuggets = 10
+game-nugget-model = props/beacon.md3
+game-nugget-texture = props/beacon.png
+
+# I think this is pi/8 or something
+camera-roll-speed = 0.78
+camera-fov = 90
+camera-near = 1
+camera-far = 10000
+camera-speed = 250
+
+terrain-cell-size = 5
+terrain-height-scaling = 250
+terrain-height-map = test_256.png
+terrain-gradient-texture = rock_512.png
+terrain-height-texture-1 = grass_512.png
+terrain-height-texture-2 = sand_512.png
+terrain-ambient-light = 0.4
+terrain-sun-direction = (100,100,100)
+terrain-texture-scaling = 20
+
+water-level = 0.125
+water-reflection-size = (512,512)
+water-bump-map = bumps.png
+water-bump-scaling = 20
+water-wave-height = 0.5
+water-wind-speed = 0.125
+water-stretching = 2
+
+skydome-latitudes = 100
+skydome-longitudes = 100
+skydome-angle = 90
+skydome-color0 = (0.765,0.87,1)
+skydome-color1 = (0,0,1)
+
+vehicle-camera-distance = 10
+vehicle-camera-angle = 30
+vehicle-file = buggy.json
+
+graphics-screen-size = (640,480)
+
+physics-gravity = (0,-10,0)
+
+camera-move-inverse-speed = 0.4
+camera-move-threshold = 0.1
