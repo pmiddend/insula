@@ -4,6 +4,7 @@
 #include "game_outer.hpp"
 #include "freelook_fwd.hpp"
 #include "../player.hpp"
+#include "../turn_timer.hpp"
 #include "../physics/world.hpp"
 #include "../physics/height_map.hpp"
 #include "../physics/debug_drawer.hpp"
@@ -44,6 +45,12 @@ public:
 	player const &
 	current_player() const;
 
+	insula::turn_timer &
+	turn_timer();
+
+	insula::turn_timer const &
+	turn_timer() const;
+
 	~game_inner();
 private:
 	// These are the actual physics models (which will be deleted
@@ -53,6 +60,7 @@ private:
 	nugget_model_sequence;
 
 	player current_player_;
+	insula::turn_timer turn_timer_;
 	physics::world physics_world_;
 	physics::height_map physics_height_map_;
 	physics::debug_drawer physics_debug_drawer_;

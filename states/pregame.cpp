@@ -66,6 +66,18 @@ insula::states::pregame::react(
 		sge::font::align_v::center,
 		sge::font::flags::none);
 
+	sge::font::draw_text(
+		context<game_outer>().large_font(),
+		context<game_outer>().font_drawer(),
+		context<game_inner>().turn_timer().string(),
+		sge::font::pos::null(),
+		sge::font::dim(
+			context<machine>().systems().renderer()->screen_size().w(),
+			context<machine>().systems().renderer()->screen_size().w()/static_cast<sge::font::unit>(8)),
+		sge::font::align_h::center,
+		sge::font::align_v::center,
+		sge::font::flags::none);
+
 	return discard_event();
 }
 

@@ -172,6 +172,18 @@ insula::states::game_inner::current_player() const
 	return current_player_;
 }
 
+insula::turn_timer &
+insula::states::game_inner::turn_timer()
+{
+	return turn_timer_;
+}
+
+insula::turn_timer const &
+insula::states::game_inner::turn_timer() const
+{
+	return turn_timer_;
+}
+
 insula::states::game_inner::~game_inner()
 {
 }
