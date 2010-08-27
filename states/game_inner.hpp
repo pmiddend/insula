@@ -3,6 +3,7 @@
 
 #include "game_outer.hpp"
 #include "freelook_fwd.hpp"
+#include "../player.hpp"
 #include "../physics/world.hpp"
 #include "../physics/height_map.hpp"
 #include "../physics/debug_drawer.hpp"
@@ -40,6 +41,9 @@ public:
 	insula::vehicle::object &
 	vehicle();
 	
+	player const &
+	current_player() const;
+
 	~game_inner();
 private:
 	// These are the actual physics models (which will be deleted
@@ -48,6 +52,7 @@ private:
 	boost::ptr_vector<physics::static_model>
 	nugget_model_sequence;
 
+	player current_player_;
 	physics::world physics_world_;
 	physics::height_map physics_height_map_;
 	physics::debug_drawer physics_debug_drawer_;

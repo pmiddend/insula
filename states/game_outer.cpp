@@ -5,12 +5,14 @@
 #include "../create_path.hpp"
 #include "../get_option.hpp"
 #include "../height_map/cli_factory.hpp"
+#include "../stdlib/map.hpp"
 #include "../height_map/object.hpp"
 #include "../skydome/cli_factory.hpp"
 #include "../skydome/object.hpp"
 #include "../water/cli_factory.hpp"
 #include "../water/object.hpp"
 #include "../json/parse_font.hpp"
+#include "../exception.hpp"
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/make_shared_ptr.hpp>
 #include <fcppt/text.hpp>
@@ -21,6 +23,8 @@
 #include <sge/image/colors.hpp>
 #include <sge/image/color/rgb8.hpp>
 #include <mizuiro/color/init.hpp>
+#include <boost/program_options/value_semantic.hpp>
+#include <algorithm>
 
 insula::states::game_outer::game_outer(
 	my_context ctx)
@@ -83,8 +87,22 @@ insula::states::game_outer::game_outer(
 				(mizuiro::color::init::red %= 1.0)
 				(mizuiro::color::init::green %= 1.0)
 				(mizuiro::color::init::blue %= 1.0))
-			/*sge::image::colors::white()*/))
+			/*sge::image::colors::white()*/)),
+	player_times_(
+		stdlib::map<player_time_map>(
+			get_option<player_sequence>(
+				context<machine>().cli_variables(),
+				"player"),
+			[](player const &p)
+			{
+				return 
+					player_time_map::value_type(
+						p,
+						player_time_map::mapped_type());
+			}))
 {
+	if (player_times_.empty())
+		throw exception(FCPPT_TEXT("You have to specify at least one player (two would be even better!)"));
 }
 
 insula::height_map::object &
@@ -147,6 +165,41 @@ insula::states::game_outer::font_drawer() const
 	return font_drawer_;
 }
 
+insula::player const 
+insula::states::game_outer::next_player() const
+{
+	return
+		std::find_if(
+			player_times_.begin(),
+			player_times_.end(),
+			[](player_time_map::value_type const &v) -> bool
+			{
+				return !static_cast<bool>(v.second);
+			})->first;
+}
+
+bool
+insula::states::game_outer::players_left() const
+{
+	return
+		std::all_of(
+			player_times_.begin(),
+			player_times_.end(),
+			[](player_time_map::value_type const &v) -> bool
+			{
+				return v.second;
+			});
+}
+
 insula::states::game_outer::~game_outer()
 {
+}
+
+boost::program_options::options_description const
+insula::states::game_outer::cli_options()
+{
+	boost::program_options::options_description opts("Outer game options");
+	opts.add_options()
+		("player",boost::program_options::value<player_sequence>()->multitoken(),"The players (multiple occurences needed)");
+	return opts;
 }

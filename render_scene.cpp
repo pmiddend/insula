@@ -1,5 +1,6 @@
 #include "graphics/scalar.hpp"
 #include "music_controller.hpp"
+#include "create_variables_map.hpp"
 #include "graphics/vec2.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/dim2.hpp"
@@ -122,6 +123,7 @@ try
 		sge::log::global(),
 		fcppt::log::level::debug);
 
+	/*
 	boost::program_options::options_description desc("Allowed options");
 
 	desc.add(
@@ -161,6 +163,11 @@ try
 		fcppt::io::cout << desc << FCPPT_TEXT("\n");
 		return EXIT_SUCCESS;
 	}
+	*/
+	boost::program_options::variables_map const vm = 
+		create_variables_map(
+			argc,
+			argv);
 
 	sge::systems::instance sys(
 		sge::systems::list() 

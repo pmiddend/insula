@@ -30,6 +30,8 @@ insula::states::game_inner::game_inner(
 	my_context ctx)
 :
 	my_base(ctx),
+	current_player_(
+		context<game_outer>().next_player()),
 	physics_world_(
 		fcppt::math::box::structure_cast<physics::box>(
 			context<game_outer>().height_map().extents()),
@@ -162,6 +164,12 @@ insula::vehicle::object &
 insula::states::game_inner::vehicle()
 {
 	return *vehicle_;
+}
+
+insula::player const &
+insula::states::game_inner::current_player() const
+{
+	return current_player_;
 }
 
 insula::states::game_inner::~game_inner()

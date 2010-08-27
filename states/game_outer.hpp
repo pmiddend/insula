@@ -31,6 +31,7 @@
 #include <fcppt/optional.hpp>
 #include <map>
 #include <chrono>
+#include <boost/program_options/options_description.hpp>
 // playermap end
 
 namespace insula
@@ -42,14 +43,6 @@ class game_outer
 	public boost::statechart::state<game_outer,machine,game_inner>
 {
 public:
-	typedef
-	std::map
-	<
-		player,
-		fcppt::optional<std::chrono::milliseconds>
-	>
-	player_time_map;
-
 	explicit
 	game_outer(
 		my_context);
@@ -84,11 +77,38 @@ public:
 	large_font() const;
 
 	sge::font::drawer_ptr const
+
 	font_drawer() const;
+
+	// This is called by the inner game state to get the "current"
+	// player
+	player const 
+	next_player() const;
+
+	// This determines the switch finished -> gameover
+	bool 
+	players_left() const;
 
 	// Holds height_map, skydome and the water
 	~game_outer();
+
+	static
+	boost::program_options::options_description const
+	cli_options();
 private:
+	typedef
+	std::map
+	<
+		player,
+		fcppt::optional<std::chrono::milliseconds>
+	>
+	player_time_map;
+
+	// This is used for command line input
+	typedef
+	std::vector<player>
+	player_sequence;
+
 	insula::height_map::object_ptr height_map_;
 	insula::height_map::console_proxy height_map_console_;
 	skydome::object_ptr skydome_;
@@ -101,6 +121,7 @@ private:
 	// This could also be in the machine, it's arbitrarily placed here
 	sge::font::metrics_ptr large_font_;
 	sge::font::drawer_ptr font_drawer_;
+	player_time_map player_times_;
 };
 }
 }

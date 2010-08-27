@@ -56,7 +56,9 @@ insula::states::pregame::react(
 	sge::font::draw_text(
 		context<game_outer>().large_font(),
 		context<game_outer>().font_drawer(),
-		FCPPT_TEXT("Player foobar, get ready\nPress return to continue"),
+		FCPPT_TEXT("Player ")+
+		context<game_inner>().current_player()+
+		FCPPT_TEXT(", get ready\nPress return to continue"),
 		sge::font::pos::null(),
 		fcppt::math::dim::structure_cast<sge::font::dim>(
 			context<machine>().systems().renderer()->screen_size()),
