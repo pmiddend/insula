@@ -3,6 +3,7 @@
 #include "../events/render.hpp"
 #include "../events/key.hpp"
 #include "../vehicle/object.hpp"
+#include "../physics/world.hpp"
 #include "../sound_controller.hpp"
 #include <sge/font/draw_text.hpp>
 #include <sge/font/text_part.hpp>
@@ -29,6 +30,11 @@ insula::states::running::react(
 
 	context<game_inner>().react(
 		t);
+
+	context<game_inner>().physics_world().update(
+		t.delta());
+
+	context<game_inner>().vehicle().update();
 
 	context<game_inner>().vehicle().update_camera();
 

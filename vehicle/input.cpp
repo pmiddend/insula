@@ -3,6 +3,7 @@
 #include "../physics/vehicle/object.hpp"
 #include "../physics/scalar.hpp"
 #include <sge/input/key_pair.hpp>
+#include <fcppt/io/cout.hpp>
 #include <functional>
 
 insula::vehicle::input::input(

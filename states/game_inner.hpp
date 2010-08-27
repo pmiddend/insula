@@ -51,6 +51,9 @@ public:
 	insula::turn_timer const &
 	turn_timer() const;
 
+	physics::world &
+	physics_world();
+
 	~game_inner();
 private:
 	// These are the actual physics models (which will be deleted

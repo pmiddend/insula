@@ -184,6 +184,12 @@ insula::states::game_inner::turn_timer() const
 	return turn_timer_;
 }
 
+insula::physics::world &
+insula::states::game_inner::physics_world()
+{
+	return physics_world_;
+}
+
 insula::states::game_inner::~game_inner()
 {
 }
