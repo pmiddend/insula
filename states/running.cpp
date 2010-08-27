@@ -19,6 +19,8 @@ insula::states::running::running(
 {
 	context<machine>().sounds().play(
 		FCPPT_TEXT("honk"));
+
+	context<game_inner>().turn_timer().start();
 }
 
 boost::statechart::result
