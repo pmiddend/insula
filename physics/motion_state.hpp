@@ -36,6 +36,9 @@ public:
 	fcppt::signal::auto_connection
 	register_callback(
 		callback const &);
+
+	btTransform const &
+	transform() const;
 private:
 	typedef
 	fcppt::signal::object<callback_fn>

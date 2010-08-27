@@ -1,21 +1,20 @@
 #ifndef INSULA_PHYSICS_VEHICLE_OBJECT_HPP_INCLUDED
 #define INSULA_PHYSICS_VEHICLE_OBJECT_HPP_INCLUDED
 
+#include "wheel_info_sequence.hpp"
 #include "../../model/object_ptr.hpp"
 #include "../gizmo.hpp"
+#include "../motion_state_fwd.hpp"
 #include "../scoped_body.hpp"
 #include "../scoped_action.hpp"
-#include "../../graphics/mat4.hpp"
 #include "../../graphics/vec3.hpp"
 #include "../upright_constraint.hpp"
-#include "wheel_info_sequence.hpp"
 #include "../vec3.hpp"
 #include "../world_fwd.hpp"
 #include "../object.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
-#include <LinearMath/btMotionState.h>
+#include <fcppt/signal/scoped_connection.hpp>
 #include <memory>
 
 class btRigidBody;
@@ -34,7 +33,6 @@ namespace vehicle
 {
 class object
 :
-/*	public btMotionState,*/
 	public physics::object
 {
 public:
@@ -94,6 +92,7 @@ private:
 	std::unique_ptr<btCylinderShapeX> wheel_shape_;
 	std::unique_ptr<btVehicleRaycaster> raycaster_; 
 	std::unique_ptr<btRaycastVehicle> vehicle_;
+	std::unique_ptr<motion_state> motion_state_;
 	wheel_info_sequence const wheels_;
 	scalar max_engine_force_;
 	scalar max_breaking_force_;
@@ -104,23 +103,11 @@ private:
 	scalar steering_clamp_;
 	model::object_ptr chassis_model_;
 	model::object_ptr wheel_model_;
-	btTransform transform_;
-	graphics::mat4 matrix_transform_;
 	std::unique_ptr<upright_constraint> constraint_;
 
 	bool is_skidding_;
 	scoped_body world_body_scope_;
 	scoped_action world_vehicle_scope_;
-
-	// @override
-	void
-	getWorldTransform(
-		btTransform &) const;
-
-	// @override
-	void
-	setWorldTransform(
-		btTransform const &);
 };
 }
 }

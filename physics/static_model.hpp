@@ -6,6 +6,7 @@
 #include "vec3.hpp"
 #include "model_approximation.hpp"
 #include "world_fwd.hpp"
+#include "motion_state_fwd.hpp"
 #include "scoped_body.hpp"
 #include "../model/object_fwd.hpp"
 #include <memory>
@@ -38,7 +39,7 @@ public:
 private:
 	model::object &model_;
 	std::unique_ptr<btRigidBody> body_;
-	std::unique_ptr<btMotionState> motion_state_;
+	std::unique_ptr<motion_state> motion_state_;
 	std::unique_ptr<btCollisionShape> shape_;
 	scoped_body world_scope_;
 };

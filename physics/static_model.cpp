@@ -1,14 +1,13 @@
 #include "static_model.hpp"
 #include "dim3_to_bullet.hpp"
-#include "vec3_to_bullet.hpp"
 #include "transform_to_mat4.hpp"
 #include "dim3.hpp"
 #include "scalar.hpp"
+#include "motion_state.hpp"
 #include "../model/object.hpp"
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
-#include <LinearMath/btMotionState.h>
 #include <LinearMath/btMatrix3x3.h>
 #include <LinearMath/btTransform.h>
 #include <LinearMath/btDefaultMotionState.h>
@@ -29,11 +28,8 @@ insula::physics::static_model::static_model(
 		_model),
 	body_(),
 	motion_state_(
-		new btDefaultMotionState(
-			btTransform(
-				btMatrix3x3::getIdentity(),
-				vec3_to_bullet(
-					position)))),
+		new motion_state(
+			position)),
 	shape_(),
 	world_scope_(
 		w)
@@ -100,12 +96,9 @@ insula::physics::static_model::static_model(
 void
 insula::physics::static_model::render()
 {
-	btTransform t;
-	motion_state_->getWorldTransform(
-		t);
 	model_.render(
 		transform_to_mat4(
-			t));
+			motion_state_->transform()));
 }
 
 insula::physics::static_model::~static_model()

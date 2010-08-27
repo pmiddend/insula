@@ -7,8 +7,10 @@
 #include "../world.hpp"
 #include "../../graphics/box.hpp"
 #include "../../graphics/mat3.hpp"
+#include "../../graphics/mat4.hpp"
 #include "../../gizmo/from_mat3.hpp"
 #include "../../model/object.hpp"
+#include "../motion_state.hpp"
 #include <LinearMath/btMatrix3x3.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <BulletDynamics/Vehicle/btRaycastVehicle.h>
@@ -67,6 +69,9 @@ insula::physics::vehicle::object::object::object(
 		_renderer),
 	world_(
 		_world),
+	motion_state_(
+		new motion_state(
+			_position)),
 	wheels_(
 		_wheels),
 	max_engine_force_(
@@ -87,10 +92,6 @@ insula::physics::vehicle::object::object::object(
 		_chassis_model),
 	wheel_model_(
 		_wheel_model),
-	transform_(
-		btMatrix3x3::getIdentity(),
-		vec3_to_bullet(
-			_position)),
 	is_skidding_(
 		false),
 	world_body_scope_(
@@ -98,9 +99,6 @@ insula::physics::vehicle::object::object::object(
 	world_vehicle_scope_(
 		world_)
 {
-	setWorldTransform(
-		transform_);
-	
 	chassis_box_.reset(
 		new btBoxShape(
 			dim3_to_bullet(
@@ -135,7 +133,7 @@ insula::physics::vehicle::object::object::object(
 		new btRigidBody(
 			btRigidBody::btRigidBodyConstructionInfo(
 				mass,
-				this,
+				motion_state_.get(),
 				compound_.get(),
 				local_inertia)));
 
@@ -293,14 +291,13 @@ void
 insula::physics::vehicle::object::render()
 {
 	for (wheel_info_sequence::size_type i = 0; i < wheels_.size(); ++i)
-	{
 		wheel_model_->render(
 			transform_to_mat4(
 				vehicle_->getWheelInfo(static_cast<int>(i)).m_worldTransform));
-	}
 
 	chassis_model_->render(
-		matrix_transform_);
+		transform_to_mat4(
+			motion_state_->transform()));
 }
 
 void
@@ -336,10 +333,10 @@ insula::physics::vehicle::object::gizmo() const
 	insula::physics::gizmo g = 
 		insula::gizmo::from_mat3<scalar>(
 			bullet_to_mat3(
-				transform_.getBasis()));
+				motion_state_->transform().getBasis()));
 	g.position(
 		bullet_to_vec3(
-			transform_.getOrigin()));
+			motion_state_->transform().getOrigin()));
 	return g;
 }
 
@@ -347,25 +344,6 @@ bool
 insula::physics::vehicle::object::is_skidding() const
 {
 	return is_skidding_;
-}
-
-void
-insula::physics::vehicle::object::getWorldTransform(
-	btTransform &t) const
-{
-	t = transform_;
-}
-
-// @override
-void
-insula::physics::vehicle::object::setWorldTransform(
-	btTransform const &t)
-{
-	transform_ = t;
-
-	matrix_transform_ = 
-		transform_to_mat4(
-			t);
 }
 
 insula::physics::vehicle::object::~object() {}

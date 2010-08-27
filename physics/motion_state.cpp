@@ -18,6 +18,12 @@ insula::physics::motion_state::register_callback(
 	return signal_.connect(c);
 }
 
+btTransform const &
+insula::physics::motion_state::transform() const
+{
+	return transform_;
+}
+
 void
 insula::physics::motion_state::getWorldTransform(
 	btTransform &t) const
