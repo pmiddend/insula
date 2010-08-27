@@ -1,5 +1,9 @@
 #include "turn_timer.hpp"
 #include <fcppt/assert.hpp>
+#include <fcppt/format.hpp>
+#include <fcppt/text.hpp>
+#include <fcppt/math/mod.hpp>
+#include <chrono>
 
 insula::turn_timer::turn_timer()
 :
@@ -27,23 +31,34 @@ insula::turn_timer::string()
 			:
 				duration());
 
-	return fcppt::string();
-	/*
-	typedef std::chrono::rep rep;
+	typedef duration::rep rep;
+	typedef std::make_unsigned<duration::rep>::type urep;
 
 	rep const 
 		minutes = 
-			static_cast<rep>(d.count() / static_cast<rep>(1000) / static_cast<rep>(60)),
+			static_cast<rep>(
+				d.count() / static_cast<rep>(1000*60)),
+		residue =
+			static_cast<rep>(
+				fcppt::math::mod(
+					static_cast<urep>(
+						d.count()),
+					static_cast<urep>(
+						1000*60))),
 		seconds = 
-			static_cast<rep>(d.count() / static_cast<rep>(1000)),
-		millisecds = 
+			static_cast<rep>(
+				residue / static_cast<rep>(1000)),
+		milliseconds = 
+			static_cast<rep>(
+				fcppt::math::mod(
+					static_cast<urep>(residue),
+					static_cast<urep>(1000)));
 			
-
 	return 
-		(fcppt::format(FCPPT_TEXT("%1:%2:%3")) 
-			%  
-			% 
-			% );*/
+		(fcppt::format(FCPPT_TEXT("%1$u:%2$02u:%3$02u")) 
+			% minutes
+			% seconds
+			% static_cast<rep>(milliseconds/static_cast<rep>(10))).str();
 }
 
 void
@@ -59,5 +74,5 @@ insula::turn_timer::stop()
 {
 	FCPPT_ASSERT(
 		start_ && !end_);
-	start_ = clock::now();
+	end_ = clock::now();
 }

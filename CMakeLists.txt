@@ -99,6 +99,7 @@ CREATE_INSULA_EXE(motor_sounds)
 CREATE_INSULA_EXE(music_test)
 CREATE_INSULA_EXE(sound_test)
 CREATE_INSULA_EXE(insula)
+CREATE_INSULA_EXE(timer_test)
 CREATE_INSULA_EXE(slerp_test)
 
 ENABLE_TESTING()
