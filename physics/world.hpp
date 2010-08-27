@@ -3,12 +3,15 @@
 
 #include "box.hpp"
 #include "vec3.hpp"
+#include "../time_delta.hpp"
 #include "vehicle_static_callback.hpp"
 #include <fcppt/signal/auto_connection.hpp>
 #include <fcppt/signal/object.hpp>
 #include <memory>
+#include <set>
 
 class btCollisionConfiguration;
+class btCollisionObject;
 class btDispatcher;
 class btBroadphaseInterface;
 class btConstraintSolver;
@@ -33,7 +36,7 @@ public:
 
 	void
 	update(
-		scalar time_delta);
+		time_delta);
 
 	void
 	add(
@@ -62,6 +65,10 @@ public:
 	// Has to be there because of the destructors of incomplete types
 	~world();
 private:
+	typedef
+	std::set<std::pair<btCollisionObject *,btCollisionObject *>>
+	contact_set;
+
 	fcppt::signal::object<vehicle_static_callback_fn> vehicle_static_callback_;
 	
 	std::unique_ptr<btCollisionConfiguration> configuration_;
@@ -69,6 +76,17 @@ private:
 	std::unique_ptr<btBroadphaseInterface> broadphase_interface_;
 	std::unique_ptr<btConstraintSolver> constraint_solver_;
 	std::unique_ptr<btDynamicsWorld> world_;
+
+	contact_set contacts_;
+
+	static void
+	static_tick_callback(
+		btDynamicsWorld *world, 
+		btScalar timeStep);
+
+	void
+	tick_callback(
+		btScalar);
 };
 }
 }

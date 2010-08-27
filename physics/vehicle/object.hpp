@@ -34,7 +34,7 @@ namespace vehicle
 {
 class object
 :
-	public btMotionState,
+/*	public btMotionState,*/
 	public physics::object
 {
 public:

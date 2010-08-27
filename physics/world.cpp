@@ -37,20 +37,30 @@ insula::physics::world::world(
 	world_->setGravity(
 		vec3_to_bullet(
 			gravity));
+
+	world_->setInternalTickCallback(
+		&world::static_tick_callback,
+		// This is the user info, retrievable via world->getWorldUserInfo()
+		this);
 }
 
 void
 insula::physics::world::update(
-	scalar const time_delta)
+	time_delta const delta)
 {
+	contacts_.clear();
+
 	world_->stepSimulation(
-		time_delta,
+		static_cast<scalar>(
+			delta),
 		// Maximum simulation substeps: The fixed time step is 1/60. We
 		// have to choose the substep count so that time_delta is _just_
 		// less than the fixed time.
 	//	3);
 		100,
 		static_cast<btScalar>(1.0/240.0));
+
+	
 }
 
 void
@@ -102,4 +112,40 @@ insula::physics::world::register_vehicle_static_callback(
 
 insula::physics::world::~world()
 {
+}
+
+void
+insula::physics::world::static_tick_callback(
+	btDynamicsWorld *w, 
+	btScalar const time_step)
+{
+	static_cast<physics::world *>(w->getWorldUserInfo())->tick_callback(
+		time_step);
+}
+
+void
+insula::physics::world::tick_callback(
+	btScalar const time_step)
+{
+	/*
+	int numManifolds = world_->getDispatcher()->getNumManifolds();
+	for (int i=0;i<numManifolds;i++)
+	{
+		btPersistentManifold* contactManifold =  world->getDispatcher()->getManifoldByIndexInternal(i);
+		btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
+		btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+	
+		int numContacts = contactManifold->getNumContacts();
+		for (int j=0;j<numContacts;j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance()<0.f)
+			{
+				const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+				const btVector3& normalOnB = pt.m_normalWorldOnB;
+			}
+		}
+	}
+	*/
 }
