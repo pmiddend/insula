@@ -1,13 +1,20 @@
 #include "world.hpp"
 #include "vec3_to_bullet.hpp"
+#include "object.hpp"
+#include "../timed_output.hpp"
+#include "vehicle/object.hpp"
+#include "static_model.hpp"
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
 #include <BulletCollision/CollisionDispatch/btCollisionDispatcher.h>
 #include <BulletCollision/BroadphaseCollision/btAxisSweep3.h>
+#include <BulletCollision/NarrowPhaseCollision/btPersistentManifold.h>
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <fcppt/math/box/basic_impl.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/vector/dim.hpp>
+#include <boost/foreach.hpp>
+#include <boost/range/iterator_range_core.hpp>
 
 insula::physics::world::world(
 	box const &world_size,
@@ -60,7 +67,32 @@ insula::physics::world::update(
 		100,
 		static_cast<btScalar>(1.0/240.0));
 
-	
+	BOOST_FOREACH(
+		contact_set::const_reference contact,
+		contacts_)
+	{
+		vehicle::object *v = dynamic_cast<vehicle::object *>(contact.first);
+		static_model *sm = dynamic_cast<static_model *>(contact.second);
+
+		if (v && sm)
+		{
+			vehicle_static_signal_(
+				std::ref(*v),
+				std::ref(*sm));
+			continue;
+		}
+
+		v = dynamic_cast<vehicle::object *>(contact.second);
+		sm = dynamic_cast<static_model *>(contact.first);
+
+		if (v && sm)
+		{
+			vehicle_static_signal_(
+				std::ref(*v),
+				std::ref(*sm));
+			continue;
+		}
+	}
 }
 
 void
@@ -107,7 +139,7 @@ fcppt::signal::auto_connection
 insula::physics::world::register_vehicle_static_callback(
 	vehicle_static_callback const &c)
 {
-	return vehicle_static_callback_.connect(c);
+	return vehicle_static_signal_.connect(c);
 }
 
 insula::physics::world::~world()
@@ -125,16 +157,35 @@ insula::physics::world::static_tick_callback(
 
 void
 insula::physics::world::tick_callback(
-	btScalar const time_step)
+	btScalar /*time_step*/)
 {
-	/*
-	int numManifolds = world_->getDispatcher()->getNumManifolds();
-	for (int i=0;i<numManifolds;i++)
+	// Yeaaaaaah!
+	BOOST_FOREACH(
+		btPersistentManifold *manifold,
+		boost::make_iterator_range(
+			world_->getDispatcher()->getInternalManifoldPointer(),
+			world_->getDispatcher()->getInternalManifoldPointer() + 
+				world_->getDispatcher()->getNumManifolds()))
 	{
-		btPersistentManifold* contactManifold =  world->getDispatcher()->getManifoldByIndexInternal(i);
-		btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
-		btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+		// Apparently, there can be manifolds which don't have contact points
+		if (!manifold->getNumContacts())
+			continue;
+
+		object 
+			&first = 
+				*static_cast<object *>(
+					static_cast<btCollisionObject*>(
+						manifold->getBody0())->getUserPointer()),
+			&second =
+				*static_cast<object *>(
+					static_cast<btCollisionObject*>(
+						manifold->getBody1())->getUserPointer());
 	
+		contacts_.insert(
+			contact_set::value_type(
+				&first,
+				&second));
+		/*
 		int numContacts = contactManifold->getNumContacts();
 		for (int j=0;j<numContacts;j++)
 		{
@@ -146,6 +197,6 @@ insula::physics::world::tick_callback(
 				const btVector3& normalOnB = pt.m_normalWorldOnB;
 			}
 		}
+		*/
 	}
-	*/
 }

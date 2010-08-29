@@ -23,8 +23,10 @@
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/text.hpp>
+#include <fcppt/algorithm/ptr_container_erase.hpp>
 #include <fcppt/string.hpp>
 #include <boost/foreach.hpp>
+#include <functional>
 
 insula::states::game_inner::game_inner(
 	my_context ctx)
@@ -109,7 +111,14 @@ insula::states::game_inner::game_inner(
 			context<machine>().input_delegator(),
 			context<machine>().console(),
 			context<machine>().systems().audio_loader(),
-			context<machine>().systems().audio_player()))
+			context<machine>().systems().audio_player())),
+	vehicle_static_connection_(
+		context<game_inner>().physics_world().register_vehicle_static_callback(
+			std::bind(
+				&game_inner::vehicle_static_callback,
+				this,
+				std::placeholders::_1,
+				std::placeholders::_2)))
 {
 	// stdlib::map doesn't work here
 	BOOST_FOREACH(
@@ -126,8 +135,8 @@ insula::states::game_inner::game_inner(
 						context<game_outer>().height_map().cell_size(),
 						fcppt::math::vector::structure_cast<height_map::vec2>(
 							v)) * context<game_outer>().height_map().height_scaling() + 
-					static_cast<physics::scalar>(nugget_model_.bounding_box().h())*
-					static_cast<physics::scalar>(1.5),
+					static_cast<physics::scalar>(nugget_model_.bounding_box().h())/**
+					static_cast<physics::scalar>(1.5)*/,
 					v.y()),
 				nugget_model_,
 				physics::model_approximation(
@@ -141,6 +150,15 @@ void
 insula::states::game_inner::react(
 	events::tick const &)
 {
+	BOOST_FOREACH(physics::static_model *m,to_delete_)
+	{
+		fcppt::algorithm::ptr_container_erase(
+			nugget_models_,
+			m);
+		context<machine>().sounds().play(
+			FCPPT_TEXT("score"));
+	}
+	to_delete_.clear();
 }
 
 void
@@ -192,4 +210,25 @@ insula::states::game_inner::physics_world()
 
 insula::states::game_inner::~game_inner()
 {
+}
+
+void
+insula::states::game_inner::vehicle_static_callback(
+	physics::vehicle::object &,
+	physics::static_model &s)
+{
+	// First, make sure the model is really a nugget
+	if(
+		std::find_if(
+			nugget_models_.begin(),
+			nugget_models_.end(),
+			[&s](physics::static_model const &m) 
+			{
+				return &m == &s;
+			}) == nugget_models_.end())
+		return;
+
+	// If it's a nugget, schedule for deletion
+	to_delete_.insert(
+		&s);
 }

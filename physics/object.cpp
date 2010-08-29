@@ -3,3 +3,7 @@
 insula::physics::object::object()
 {
 }
+
+insula::physics::object::~object()
+{
+}

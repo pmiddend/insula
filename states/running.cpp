@@ -1,4 +1,5 @@
 #include "running.hpp"
+#include "../timed_output.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
 #include "../events/key.hpp"
@@ -11,6 +12,7 @@
 #include <sge/font/align_v.hpp>
 #include <sge/font/flags_none.hpp>
 #include <sge/renderer/device.hpp>
+#include <functional>
 
 insula::states::running::running(
 	my_context ctx)

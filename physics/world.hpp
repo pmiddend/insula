@@ -5,6 +5,7 @@
 #include "vec3.hpp"
 #include "../time_delta.hpp"
 #include "vehicle_static_callback.hpp"
+#include "object_fwd.hpp"
 #include <fcppt/signal/auto_connection.hpp>
 #include <fcppt/signal/object.hpp>
 #include <memory>
@@ -66,10 +67,10 @@ public:
 	~world();
 private:
 	typedef
-	std::set<std::pair<btCollisionObject *,btCollisionObject *>>
+	std::set<std::pair<object *,object *>>
 	contact_set;
 
-	fcppt::signal::object<vehicle_static_callback_fn> vehicle_static_callback_;
+	fcppt::signal::object<vehicle_static_callback_fn> vehicle_static_signal_;
 	
 	std::unique_ptr<btCollisionConfiguration> configuration_;
 	std::unique_ptr<btDispatcher> dispatcher_;

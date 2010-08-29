@@ -73,18 +73,14 @@ insula::create_variables_map(
 		states::game_outer::cli_options());
 
 	boost::program_options::variables_map vm;
-
+		
 	boost::program_options::store(
-		// Yes, the <char> is indented.
-		boost::program_options::parse_config_file<char>(
-			// NOTE: This is of course broken when the value_type of path
-			// is not char*
-			(media_path()/FCPPT_TEXT("config.po")).string().c_str(),
+		boost::program_options::parse_command_line(
+			argc, 
+			argv, 
 			desc), 
 		vm);
 
-	// I don't know if that's neccessary since we do it again after
-	// parsing the command line
 	boost::program_options::notify(
 		vm);    
 
@@ -104,15 +100,18 @@ insula::create_variables_map(
 		boost::program_options::notify(
 			vm);    
 	}
-		
 
 	boost::program_options::store(
-		boost::program_options::parse_command_line(
-			argc, 
-			argv, 
+		// Yes, the <char> is indented.
+		boost::program_options::parse_config_file<char>(
+			// NOTE: This is of course broken when the value_type of path
+			// is not char*
+			(media_path()/FCPPT_TEXT("config.po")).string().c_str(),
 			desc), 
 		vm);
 
+	// I don't know if that's neccessary since we do it again after
+	// parsing the command line
 	boost::program_options::notify(
 		vm);    
 
