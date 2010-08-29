@@ -1,0 +1,57 @@
+{
+	"chassis" : 
+		{
+			"model" : "van.md3",
+			"texture" : "van.png"
+		},
+	"wheel" : 
+		{
+			"model" : "van_wheel.md3",
+			"texture" : "van_wheel.png"
+		},
+
+	"engine_sound" : "motor.wav",
+	"mass" : 600.0,
+	"chassis_center_of_mass_shift" : -0.0,
+	"scaling" : 1.0,
+	"max_engine_force" : 1200.0,
+	"max_breaking_force" : 100.0,
+	"steering_clamp" : 0.3,
+	"max_speed" : 1200.0,
+
+	"default_wheel" : 
+		{
+			"offset" : [0.0,0.0,0.0],
+			"suspension_stiffness" : 20.0,
+			"suspension_compression" : 0.4,
+			"suspension_relaxation" : 0.3,
+			"suspension_travel_cm" : 0.40,
+			"suspension_rest_length" : 0.40,
+			"friction_slip" : 100.0,
+			"roll_influence" : 0.05
+		},
+		
+	"wheels" : 
+		[
+			{
+				"offset" : [0.72,-0.5,1.65],
+				"front_wheel" : true,
+				"gets_steering" : true
+			},
+			{
+				"offset" : [-0.72,-0.5,1.65],
+				"front_wheel" : true,
+				"gets_steering" : true
+			},
+			{
+				"offset" : [0.72,-0.5,-1.05],
+				"gets_engine_force" : true,
+				"gets_breaking_force" : true
+			},
+			{
+				"offset" : [-0.72,-0.5,-1.05],
+				"gets_engine_force" : true,
+				"gets_breaking_force" : true
+			}
+		]
+}
