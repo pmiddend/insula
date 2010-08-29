@@ -3,7 +3,7 @@
 #include <LinearMath/btTransformUtil.h>
 #include <LinearMath/btScalar.h>
 #include <fcppt/math/pi.hpp>
-#include <fcppt/io/cout.hpp>
+//#include <fcppt/io/cout.hpp>
 #include <cmath>
 #include <cstddef>
 
@@ -23,13 +23,13 @@ insula::physics::upright_constraint::upright_constraint(
 	bounce_(
 		static_cast<btScalar>(0)),
 	damping_(
-		static_cast<btScalar>(0)),
+		static_cast<btScalar>(1)),
 	max_limit_force_(
-	//	static_cast<btScalar>(3000)),
-		static_cast<btScalar>(30)),
+		static_cast<btScalar>(3000)),
+	//	static_cast<btScalar>(30)),
 	limit_softness_(
-	//	static_cast<btScalar>(1)),
-		static_cast<btScalar>(0)),
+		static_cast<btScalar>(1)),
+	//	static_cast<btScalar>(0)),
 	disable_time_(
 		static_cast<btScalar>(0))
 {
@@ -105,7 +105,7 @@ insula::physics::upright_constraint::disable_time(
 void 
 insula::physics::upright_constraint::buildJacobian()
 {
-	fcppt::io::cout << "buildJacobian\n";
+	//fcppt::io::cout << "buildJacobian\n";
 	btTransform const world_transform = 
 		m_rbA.getCenterOfMassTransform() * 
 		frame_in_a_;

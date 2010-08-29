@@ -319,7 +319,7 @@ insula::physics::vehicle::object::update()
 		is_skidding_ = 
 			is_skidding_ ||
 			vehicle_->getWheelInfo(static_cast<int>(i)).m_skidInfo < 
-				static_cast<scalar>(0.8);
+				static_cast<scalar>(0.5);
 	}
 }
 
