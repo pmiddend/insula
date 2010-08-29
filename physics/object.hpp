@@ -10,6 +10,9 @@ class object
 protected:
 	explicit
 	object();
+
+public:
+	virtual ~object();
 };
 }
 }

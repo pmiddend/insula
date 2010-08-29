@@ -57,10 +57,17 @@ public:
 	~game_inner();
 private:
 	// These are the actual physics models (which will be deleted
-	// once the player touches them)
+	// once the player touches them). They are kept here because they
+	// are needed from freelook on. That's why some of the game control
+	// logic like deleting this models is handled in game_inner, too
+	// (though it might be better placed in running)
 	typedef
 	boost::ptr_vector<physics::static_model>
 	nugget_model_sequence;
+
+	typedef
+	std::set<physics::static_model*>
+	deletion_set;
 
 	player current_player_;
 	insula::turn_timer turn_timer_;
@@ -73,6 +80,13 @@ private:
 	model::object nugget_model_;
 	nugget_model_sequence nugget_models_;
 	insula::vehicle::object_ptr vehicle_;
+	fcppt::signal::scoped_connection vehicle_static_connection_;
+	deletion_set to_delete_;
+
+	void
+	vehicle_static_callback(
+		physics::vehicle::object &,
+		physics::static_model &);
 };
 }
 }

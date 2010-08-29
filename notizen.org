@@ -4,19 +4,12 @@ das machen, was in [[file:~/projects/insula/temp/bullet-2.76/Demos/CharacterDemo
 
 * Kurzzeitvorgehen
 
-- Definiere Gerade 'f' durch Eckpunkte des Vierecks. Teste, ob 
-	y-Wert < f(x-wert), dann ist es das untere Dreieck, sonst 
-	das obere
-- Definiere durch dieses Dreieck eine Ebene (Normalform)
-- Schreibe Funktion, die einen 2D-Punkt auf eine Ebene projiziert
-  (Gleichung nach y lösen unter der Annahme, dass x und z bekannt
-  sind)
-- Musik in states::freelook setzen
-- Font in game_outer laden und bereitstellen (samt drawer)
-- Schriftzug in freelook anzeigen
-- Position des Fahrzeugs in game_outer generieren
-- Fahrzeug in game_inner generieren
-- Übergang freelook -> pregame
+Totes-Körper-Problem bei bullet:
+
+- Die world muss Funktionen kriegen: 
+	height_map_ptr create_height_map(height_map_params) usw.
+- Im Destruktor von object 
+- 
 
 http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
 
@@ -596,8 +589,9 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
   wie beim Wasser)
 - Vergleiche den z-Wert von vp mit dem z-Wert in der Shadowmap, setze
   entsprechend die Pixel
-** TODO Physik, Fahrzeuge [4/6]
-*** TODO insula::physics::model
+** TODO Physik, Fahrzeuge [5/11]
+*** DONE insula::physics::model
+		 CLOSED: [2010-08-29 Sun 15:28]
 Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der angibt, wie dieses Model in der Physikengine dargestellt werden soll:
 
 -Boundingbox
@@ -619,6 +613,9 @@ Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der a
 *** TODO wheel_info übertragen wie in stk (beide Räder aufm Boden)
 *** TODO Räder spiegeln
 *** TODO Steering-Increment einbauen
+*** TODO Eigener Raytest?
+Damit ist gemeint, dass man height_map::height_for_point nutzt, um den
+Raytest beim Terrain zu machen (könnte genauer sein)
 ** TODO Sounds [0/1]
 *** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig

@@ -2,6 +2,7 @@
 #define INSULA_PHYSICS_height_map_HPP_INCLUDED
 
 #include "world_fwd.hpp"
+#include "object.hpp"
 #include "../height_map/array.hpp"
 #include "../height_map/scalar.hpp"
 #include <memory>
@@ -15,6 +16,8 @@ namespace insula
 namespace physics
 {
 class height_map
+:
+	public object
 {
 public:
 	height_map(height_map const &) = delete;

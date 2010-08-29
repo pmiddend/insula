@@ -43,7 +43,6 @@ public:
 	boost::statechart::result
 	react(
 		events::key const &);
-private:
 };
 }
 }
