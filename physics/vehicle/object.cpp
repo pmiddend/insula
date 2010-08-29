@@ -34,6 +34,11 @@
 #include "../bullet_to_vec3.hpp"
 // DEBUG END
 
+// CONSTRAINT TEST BEGIN
+#include <BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h>
+#include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+// CONSTRAINT TEST END
+
 namespace
 {
 // NOTE: There's also just btVehicleTuning, but I think that's a bug
@@ -140,15 +145,46 @@ insula::physics::vehicle::object::object::object(
 	car_body_->setUserPointer(
 		this);
 
+	world_body_scope_.set(
+		*car_body_);
+
 	btTransform t;
 	t.setIdentity();
 	constraint_.reset(
 		new upright_constraint(
 			*car_body_,
 			t));
+	world_.handle().addConstraint(
+		constraint_.get());
 
-	world_body_scope_.set(
-		*car_body_);
+	// TEST FOR CONSTRAINT BEGIN
+	/*
+	   btRigidBody *_bt_balancer_body = new btRigidBody(
+        btRigidBody::btRigidBodyConstructionInfo(
+            0, 0, 0, btVector3(0,0,0) ) );
+
+    // must use X axis as Y axis because 6dof wont spin freely on Y
+    btTransform frameina( btTransform::getIdentity() );
+    btTransform frameinb( btTransform::getIdentity() );
+    frameina.getBasis().setEulerZYX( 0, 0, SIMD_HALF_PI );
+    _bt_balancer_body->getWorldTransform()
+        .getBasis().setEulerZYX( 0, 0, SIMD_HALF_PI );
+
+    btGeneric6DofConstraint * sixdof = new btGeneric6DofConstraint(
+        *car_body_, *_bt_balancer_body,
+        frameina, frameinb, true ); // use linear reference frame a
+    sixdof->setLimit( 0, -SIMD_INFINITY, SIMD_INFINITY );
+    sixdof->setLimit( 1, -SIMD_INFINITY, SIMD_INFINITY );
+    sixdof->setLimit( 2, -SIMD_INFINITY, SIMD_INFINITY );
+    sixdof->setLimit( 3, -SIMD_PI, SIMD_PI ); // only x axis can turn freely
+    sixdof->setLimit( 4, -SIMD_HALF_PI, SIMD_HALF_PI );
+    sixdof->setLimit( 5, -SIMD_HALF_PI, SIMD_HALF_PI );
+		world_.handle().addConstraint(
+			sixdof);
+	*/
+ //   _bt_balancer_constraint = sixdof;
+	// TEST FOR CONSTRAINT END
+	
 
 	// TODO: What happens if this is omitted?
 	car_body_->setActivationState(
