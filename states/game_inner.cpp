@@ -8,6 +8,7 @@
 #include "../physics/box.hpp"
 #include "../physics/vec3.hpp"
 #include "../graphics/vec2.hpp"
+#include "../events/vehicle_nugget_collision.hpp"
 // vehicle begin
 #include "../vehicle/cli_factory.hpp"
 #include "../vehicle/object.hpp"
@@ -208,27 +209,42 @@ insula::states::game_inner::physics_world()
 	return physics_world_;
 }
 
+void
+insula::states::game_inner::erase_nugget(
+	physics::static_model &m)
+{
+	// Let's hope it's really a nugget!
+	FCPPT_ASSERT(
+		std::find_if(
+			nugget_models_.begin(),
+			nugget_models_.end(),
+			[&m](physics::static_model const &m2) 
+			{
+				return &m == &m2;
+			}) != nugget_models_.end());
+
+	// If so, schedule for deletion (lazy deletion!)
+	to_delete_.insert(
+		&m);
+}
+
+std::size_t
+insula::states::game_inner::nugget_count() const
+{
+	return nugget_models_.size();
+}
+
 insula::states::game_inner::~game_inner()
 {
 }
 
 void
 insula::states::game_inner::vehicle_static_callback(
-	physics::vehicle::object &,
+	physics::vehicle::object &v,
 	physics::static_model &s)
 {
-	// First, make sure the model is really a nugget
-	if(
-		std::find_if(
-			nugget_models_.begin(),
-			nugget_models_.end(),
-			[&s](physics::static_model const &m) 
-			{
-				return &m == &s;
-			}) == nugget_models_.end())
-		return;
-
-	// If it's a nugget, schedule for deletion
-	to_delete_.insert(
-		&s);
+	post_event(
+		events::vehicle_nugget_collision(
+			v,
+			s));
 }

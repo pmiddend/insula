@@ -191,6 +191,20 @@ insula::states::game_outer::players_left() const
 			});
 }
 
+void
+insula::states::game_outer::place_time(
+	player const &p,
+	std::chrono::milliseconds const &m)
+{
+	// Time wasn't placed yet
+	FCPPT_ASSERT(!player_times_.find(p)->second);
+
+	player_times_.insert(
+		player_time_map::value_type(
+			p,
+			m));
+}
+
 insula::states::game_outer::~game_outer()
 {
 }

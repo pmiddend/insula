@@ -27,6 +27,9 @@ public:
 
 	void 
 	stop();
+
+	std::chrono::milliseconds const
+	milliseconds() const;
 private:
 	typedef 
 	std::chrono::high_resolution_clock 

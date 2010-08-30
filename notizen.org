@@ -4,6 +4,9 @@ das machen, was in [[file:~/projects/insula/temp/bullet-2.76/Demos/CharacterDemo
 
 * Kurzzeitvorgehen
 
+Zwei Fixes für raycastvehicle
+http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
+
 Totes-Körper-Problem bei bullet:
 
 - Die world muss Funktionen kriegen: 

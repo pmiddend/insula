@@ -54,6 +54,14 @@ public:
 	physics::world &
 	physics_world();
 
+	void
+	erase_nugget(
+		physics::static_model &);
+
+	// FIXME: is size_t ok here?
+	std::size_t 	
+	nugget_count() const;
+
 	~game_inner();
 private:
 	// These are the actual physics models (which will be deleted

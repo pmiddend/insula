@@ -23,7 +23,8 @@
 			"score" : "score.wav",
 			"camera_swoosh" : "swoosh.wav",
 			"plop" : "plop.wav",
-			"honk" : "honk.wav"
+			"honk" : "honk.wav",
+			"clap" : "clapping.wav"
 		}
 	}
 }

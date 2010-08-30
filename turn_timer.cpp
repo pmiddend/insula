@@ -76,3 +76,13 @@ insula::turn_timer::stop()
 		start_ && !end_);
 	end_ = clock::now();
 }
+
+std::chrono::milliseconds const
+insula::turn_timer::milliseconds() const
+{
+	FCPPT_ASSERT(
+		end_ && start_);
+	return 
+		std::chrono::duration_cast<std::chrono::milliseconds>(
+			(*end_) - (*start_));
+}

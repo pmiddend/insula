@@ -1,4 +1,5 @@
 #include "running.hpp"
+#include "finished.hpp"
 #include "../timed_output.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
@@ -12,6 +13,7 @@
 #include <sge/font/align_v.hpp>
 #include <sge/font/flags_none.hpp>
 #include <sge/renderer/device.hpp>
+#include <fcppt/io/cout.hpp>
 #include <functional>
 
 insula::states::running::running(
@@ -72,6 +74,29 @@ insula::states::running::react(
 		sge::font::align_v::center,
 		sge::font::flags::none);
 
+	return discard_event();
+}
+
+boost::statechart::result
+insula::states::running::react(
+	events::vehicle_nugget_collision const &s)
+{
+	fcppt::io::cout << "There as a nugget collision, erasing the nugget\n";
+
+	context<game_inner>().erase_nugget(
+		s.nugget());
+
+	// That was the only nugget?
+	if (context<game_inner>().nugget_count() == 1)
+	{
+		fcppt::io::cout << "No nuggets left, so switching to finished state\n";
+		context<game_inner>().turn_timer().stop();
+		context<game_outer>().place_time(
+			context<game_inner>().current_player(),
+			context<game_inner>().turn_timer().milliseconds());
+		return transit<finished>();
+	}
+	
 	return discard_event();
 }
 

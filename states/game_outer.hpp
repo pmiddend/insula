@@ -29,7 +29,7 @@
 
 // playermap begin
 #include <fcppt/optional.hpp>
-#include <map>
+#include <unordered_map>
 #include <chrono>
 #include <boost/program_options/options_description.hpp>
 // playermap end
@@ -89,6 +89,11 @@ public:
 	bool 
 	players_left() const;
 
+	void
+	place_time(
+		player const &,
+		std::chrono::milliseconds const &);
+
 	// Holds height_map, skydome and the water
 	~game_outer();
 
@@ -96,8 +101,9 @@ public:
 	boost::program_options::options_description const
 	cli_options();
 private:
+	// std::map doesn't perform very well with strings as keys
 	typedef
-	std::map
+	std::unordered_map
 	<
 		player,
 		fcppt::optional<std::chrono::milliseconds>
