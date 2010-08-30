@@ -124,7 +124,10 @@ void
 insula::music_controller::play_random()
 {
 	if (random_sounds_.empty())
+	{
+		fcppt::io::cout << "Got no random sounds to play :(\n";
 		return;
+	}
 
 	file_set::size_type const n = 
 		rng_(

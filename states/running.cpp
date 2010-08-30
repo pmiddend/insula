@@ -7,6 +7,7 @@
 #include "../vehicle/object.hpp"
 #include "../physics/world.hpp"
 #include "../sound_controller.hpp"
+#include "../music_controller.hpp"
 #include <sge/font/draw_text.hpp>
 #include <sge/font/text_part.hpp>
 #include <sge/font/align_h.hpp>
@@ -23,6 +24,8 @@ insula::states::running::running(
 {
 	context<machine>().sounds().play(
 		FCPPT_TEXT("honk"));
+
+	context<machine>().music().play_random();
 
 	context<game_inner>().turn_timer().start();
 }
