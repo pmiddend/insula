@@ -103,6 +103,8 @@ insula::states::game_outer::game_outer(
 {
 	if (player_times_.empty())
 		throw exception(FCPPT_TEXT("You have to specify at least one player (two would be even better!)"));
+
+	fcppt::io::cout << "Ok, we've got " << player_times_.size() << " players\n";
 }
 
 insula::height_map::object &
@@ -182,12 +184,12 @@ bool
 insula::states::game_outer::players_left() const
 {
 	return
-		std::all_of(
+		std::any_of(
 			player_times_.begin(),
 			player_times_.end(),
 			[](player_time_map::value_type const &v) -> bool
 			{
-				return v.second;
+				return !v.second;
 			});
 }
 
@@ -199,10 +201,8 @@ insula::states::game_outer::place_time(
 	// Time wasn't placed yet
 	FCPPT_ASSERT(!player_times_.find(p)->second);
 
-	player_times_.insert(
-		player_time_map::value_type(
-			p,
-			m));
+	player_times_.find(p)->second = 
+		m;
 }
 
 insula::states::game_outer::~game_outer()
