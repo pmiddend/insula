@@ -9,7 +9,8 @@
 	{  
 		"events" : 
 		{
-			"freelook" : "epoq.ogg"
+			"freelook" : "epoq.ogg",
+			"gameover" : "epoq.ogg"
 		},
 		"random" :
 		[

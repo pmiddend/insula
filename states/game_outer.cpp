@@ -205,6 +205,12 @@ insula::states::game_outer::place_time(
 		m;
 }
 
+insula::states::game_outer::player_time_map const &
+insula::states::game_outer::player_times() const
+{
+	return player_times_;
+}
+
 insula::states::game_outer::~game_outer()
 {
 }

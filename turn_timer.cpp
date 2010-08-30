@@ -1,8 +1,6 @@
 #include "turn_timer.hpp"
+#include "milliseconds_to_string.hpp"
 #include <fcppt/assert.hpp>
-#include <fcppt/format.hpp>
-#include <fcppt/text.hpp>
-#include <fcppt/math/mod.hpp>
 #include <chrono>
 
 insula::turn_timer::turn_timer()
@@ -31,6 +29,10 @@ insula::turn_timer::string()
 			:
 				duration());
 
+	return 
+		milliseconds_to_string(
+			d);
+	/*
 	typedef duration::rep rep;
 	typedef std::make_unsigned<duration::rep>::type urep;
 
@@ -59,6 +61,7 @@ insula::turn_timer::string()
 			% minutes
 			% seconds
 			% static_cast<rep>(milliseconds/static_cast<rep>(10))).str();
+	*/
 }
 
 void

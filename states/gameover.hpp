@@ -3,11 +3,14 @@
 
 // _fwd is not enough
 #include "game_inner.hpp"
+#include "../player.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
+#include <map>
+#include <chrono>
 
 namespace insula
 {
@@ -39,6 +42,12 @@ public:
 		events::render const &);
 
 	~gameover();
+private:
+	typedef
+	std::multimap<std::chrono::milliseconds,player>
+	time_table;
+
+	time_table times_;
 };
 }
 }

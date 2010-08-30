@@ -43,6 +43,17 @@ class game_outer
 	public boost::statechart::state<game_outer,machine,game_inner>
 {
 public:
+	// std::map doesn't perform very well with strings as keys. This has
+	// to be publicly available because states::gameover needs it to
+	// build its table.
+	typedef
+	std::unordered_map
+	<
+		player,
+		fcppt::optional<std::chrono::milliseconds>
+	>
+	player_time_map;
+
 	explicit
 	game_outer(
 		my_context);
@@ -94,6 +105,9 @@ public:
 		player const &,
 		std::chrono::milliseconds const &);
 
+	player_time_map const &
+	player_times() const;
+
 	// Holds height_map, skydome and the water
 	~game_outer();
 
@@ -101,15 +115,6 @@ public:
 	boost::program_options::options_description const
 	cli_options();
 private:
-	// std::map doesn't perform very well with strings as keys
-	typedef
-	std::unordered_map
-	<
-		player,
-		fcppt::optional<std::chrono::milliseconds>
-	>
-	player_time_map;
-
 	// This is used for command line input
 	typedef
 	std::vector<player>
