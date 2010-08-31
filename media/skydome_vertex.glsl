@@ -8,6 +8,7 @@ uniform vec3 color1;
 in vec3 position;
 out vec3 gradient_color;
 out float sun_intensity;
+out vec3 position_out;
 
 const float radius = 1.0;
 const float ypos = 0.5;
@@ -28,6 +29,8 @@ void main()
 			color0,
 			color1,
 			radius * position.y);
+
+	position_out = vec3(position);
 
 	gl_Position = result;
 }
