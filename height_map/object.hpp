@@ -7,6 +7,7 @@
 #include "../graphics/scalar.hpp"
 #include "../graphics/shader.hpp"
 #include "../graphics/box.hpp"
+#include "parameters_fwd.hpp"
 #include "vec2.hpp"
 #include "render_mode.hpp"
 #include "array.hpp"
@@ -52,17 +53,7 @@ class object
 public:
 	explicit
 	object(
-		graphics::camera::object const &,
-		sge::renderer::device_ptr,
-		height_map::array const &,
-		graphics::scalar const &cell_size,
-		graphics::scalar const height_scaling,
-		graphics::vec3 const &sun_direction,
-		graphics::scalar const ambient_light,
-		graphics::scalar const texture_scaling,
-		sge::image::file_ptr const &gradient_texture_image,
-		sge::image::file_ptr const &lower_texture_image,
-		sge::image::file_ptr const &upper_texture_image);
+		parameters const &);
 	
 	object &operator=(
 		object &) = delete;

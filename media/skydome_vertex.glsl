@@ -9,7 +9,7 @@ in vec3 position;
 out vec3 gradient_color;
 out float sun_intensity;
 
-const float radius = 1;
+const float radius = 1.0;
 const float ypos = 0.5;
 
 void main()

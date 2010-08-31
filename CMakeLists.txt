@@ -102,6 +102,7 @@ CREATE_INSULA_EXE(sound_test)
 CREATE_INSULA_EXE(insula)
 CREATE_INSULA_EXE(timer_test)
 CREATE_INSULA_EXE(slerp_test)
+CREATE_INSULA_EXE(vertex_format_test)
 
 ENABLE_TESTING()
 

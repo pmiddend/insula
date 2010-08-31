@@ -20,6 +20,7 @@
 #include "../stdlib/normalize.hpp"
 #include "../stdlib/grid/sobel_operator.hpp"
 #include "../stdlib/grid/average_convolve.hpp"
+#include "parameters.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/vertex_buffer.hpp>
@@ -121,31 +122,21 @@ private:
 }
 
 insula::height_map::object::object(
-	graphics::camera::object const &_camera,
-	sge::renderer::device_ptr const _renderer,
-	height_map::array const &raw,
-	graphics::scalar const &cell_size,
-	graphics::scalar const height_scaling,
-	graphics::vec3 const &sun_direction,
-	graphics::scalar const ambient_light,
-	graphics::scalar const texture_scaling,
-	sge::image::file_ptr const &gradient_texture_image,
-	sge::image::file_ptr const &lower_texture_image,
-	sge::image::file_ptr const &upper_texture_image)
+	parameters const &params)
 :
 	camera_(
-		_camera),
+		params.camera),
 	renderer_(
-		_renderer),
+		params.renderer),
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("height_map_vertex.glsl"),
 		media_path()/FCPPT_TEXT("height_map_fragment.glsl"))
 {
 	regenerate(
-		cell_size,
-		height_scaling,
-		raw);
+		params.cell_size,
+		params.height_scaling,
+		params.array);
 
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
@@ -166,37 +157,37 @@ insula::height_map::object::object(
 	shader_.set_uniform(
 		FCPPT_TEXT("sun_direction"),
 		normalize(
-			sun_direction));
+			params.sun_direction));
 
 	shader_.set_uniform(
 		FCPPT_TEXT("ambient_light"),
-		ambient_light);
+		params.ambient_light);
 
 	shader_.set_uniform(
 		FCPPT_TEXT("texture_scaling"),
-		texture_scaling);
+		params.texture_scaling);
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("grid_size"),
-		cell_size * 
+		params.cell_size * 
 		fcppt::math::dim::structure_cast<graphics::vec2>(
-			raw.dimension()));
+			params.array.dimension()));
 	
 	lower_texture_ = 
 		renderer_->create_texture(
-			lower_texture_image->view(),
+			params.lower_texture_image->view(),
 			sge::renderer::filter::trilinear,
 			sge::renderer::resource_flags::none);
 	
 	upper_texture_ = 
 		renderer_->create_texture(
-			upper_texture_image->view(),
+			params.upper_texture_image->view(),
 			sge::renderer::filter::trilinear,
 			sge::renderer::resource_flags::none);
 	
 	gradient_texture_ = 
 		renderer_->create_texture(
-			gradient_texture_image->view(),
+			params.gradient_texture_image->view(),
 			sge::renderer::filter::trilinear,
 			sge::renderer::resource_flags::none);
 }

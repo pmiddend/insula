@@ -2,39 +2,35 @@
 Man müsste ein btGhostObject anlegen und ihm eine Shape geben und dann
 das machen, was in [[file:~/projects/insula/temp/bullet-2.76/Demos/CharacterDemo/CharacterDemo.cpp::172][CharacterDemo]] steht (in jedem TickCallback).
 
-* Kurzzeitvorgehen
-
+* Vorgehen für 1.0
+	
 Zwei Fixes für raycastvehicle
 http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
 
-Totes-Körper-Problem bei bullet:
-
-- Die world muss Funktionen kriegen: 
-	height_map_ptr create_height_map(height_map_params) usw.
-- Im Destruktor von object 
-- 
-
+Frustum/Occlusion culling:
 http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
 
 [[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
 
 Erstelle die folgenden Klassen/Funktionen mit Inhalt:
 
-** TODO height_field::height(x,z)
+** DONE height_field::height(x,z)
+	 CLOSED: [2010-08-31 Tue 17:32]
 	Liefert für einen beliebigen (kontinuierlichen) (x,z)-Wert die
   dazugehörige y-Koordinate. Als Test dafür könnte man ein Model an
   der Stelle auf das Terrain setzen und die AABB um den Punkt zentrieren.
 
-** TODO height_field::random_flat_point()
+** DONE height_field::random_flat_point()
+	 CLOSED: [2010-08-31 Tue 17:32]
 	Gibt einen zufälligen Punkt auf dem Terrain zurück, an dem die
   Steigung nicht allzu groß ist und der nicht sehr nah an 0 ist (bei 0
   soll später das Wasser sein)
 
-** TODO height_field::random_point()
+** DONE height_field::random_point()
+	 CLOSED: [2010-08-31 Tue 17:32]
 	Gibt einen zufälligen Punkt auf dem Terrain zurück, der nicht nah
   bei 0 ist (siehe oben). Ist für Props gedacht.
 
-** TODO Musiklautstärke muss einstellbar sein
 ** DONE physics::object
 	 CLOSED: [2010-08-18 Wed 21:31]
   Enthält nichts, enthält einen protected-Konstruktor, damit man davon
@@ -43,7 +39,6 @@ Erstelle die folgenden Klassen/Funktionen mit Inhalt:
 ** DONE physics::vehicle::object muss den Userpointer auf this setzen
 	 CLOSED: [2010-08-18 Wed 23:50]
 Außerdem muss es von object ableiten.
-** TODO physics::vehicle::model brauch ein "disabled"-Flag
 Dies sollte sich auf den input_controller auswirken.
 
 ** DONE physics::static_model:
@@ -82,7 +77,8 @@ werden sollen.
 
 Die Stücke sollten grundsätzlich crossfaden. Dazu sollte in der
 Konfiguration noch die Option =crossfade_time= enthalten sein.
-** TODO physics::world: In der World wird ein neues Signal benötigt, was
+** DONE physics::world: In der World wird ein neues Signal benötigt, was
+	 CLOSED: [2010-08-31 Tue 17:31]
   aufgerufen wird, wenn eine Kollision passiert. Das Callback hat die
   Signatur:
 
@@ -152,7 +148,8 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	- Getter für die Konsole
 	- Getter für die Kamera
 	- Getter für die Konfigurationsdatei
-** TODO states -> ingame
+** DONE states -> ingame
+	 CLOSED: [2010-08-31 Tue 17:31]
 	Das hier bedeutet, dass wir im Spiel sind (später könnte parallel
   dazu ja noch ein Menüstate kommen). Im Konstruktor werden der
   Skydome, die Landschaft, die Physiklandschaft und das Wasser
@@ -193,7 +190,8 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	- Auto
 	- Einen Iterator "last-time", der auf die zuletzt eingetragene Zeit
     zeigt
-** TODO states -> ingame -> freelook
+** DONE states -> ingame -> freelook
+	 CLOSED: [2010-08-31 Tue 17:31]
 	Hier sollte der Spieler sich frei auf der Landschaft umgucken
   können. Die Punktmodels werden im Konstruktor generiert. Die
   Simulation wird noch nicht gesteppt. Außerdem wird nicht
@@ -212,11 +210,13 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	- Eine Font entsprechender Größe, die im Konstruktor geladen wird
     (Fontsystem ist ja in der Maschine vorhanden)
 	- Musikstück
-** TODO states -> ingame -> camera_move
+** DONE states -> ingame -> camera_move
+	 CLOSED: [2010-08-31 Tue 17:31]
 	 Hier wird die Kamera von der aktuellen Position zur Startposition
    (hinter dem Auto) bewegt. Fürs erste kann das aber einfach als
    "setze Position auf die Endposition" realisiert werden.
-** TODO states -> ingame -> pregame
+** DONE states -> ingame -> pregame
+	 CLOSED: [2010-08-31 Tue 17:31]
 	Hier wird die Kamera über das Fahrzeug bewegt und eine Meldung
   angezeigt mit dem Spieler, der jetzt dran ist. Auf Tastendruck wird
   in den Zustand running übergegangen. Hier wird kein Musikstück
@@ -224,7 +224,8 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 
 	Enthält:
 	- Eine Font entsprechender Größe
-** TODO states -> ingame -> running
+** DONE states -> ingame -> running
+	 CLOSED: [2010-08-31 Tue 17:31]
 	Das Spiel läuft, die Simulation wird getickt. Es wird ein Callback bei
 	der Welt registriert, was Kollisionen vehicle <-> model checkt. Das
 	Auto wird im Konstruktor aktiviert. 
@@ -247,7 +248,8 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	Enthält:
 	- Liste der zu entfernenden Punkte
 	- Music-Controller
-** TODO states -> ingame -> finished
+** DONE states -> ingame -> finished
+	 CLOSED: [2010-08-31 Tue 17:31]
 	 Greift auf die lastplayer-Variable zu und zeigt die Zeit an und die
    Aufforderung, Enter zu drücken. Hier könnte die Kamera noch um das
    Auto rotieren. Es wird wieder ein Musikstück abgespielt.
@@ -259,10 +261,10 @@ Konfiguration noch die Option =crossfade_time= enthalten sein.
 	 Enthält:
 	 - Musikstück
 	 - Font
-** TODO states -> ingame -> gameover
+** DONE states -> ingame -> gameover
+	 CLOSED: [2010-08-31 Tue 17:31]
 	Hier wird eine Tabelle angezeigt mit allen Teilnehmenden und deren
   Zeiten. Auf Knopfdruck beendet sich das Spiel.
-
 * Roadmap
 ** Spielbeschreibung
 Das Spiel soll ein Multiplayerspiel werden. Netzwerkmodus
@@ -330,7 +332,7 @@ Somit bräuchte man für das Spiel nicht allzu viel:
  weil die sich nicht um Kollision mit Wänden und Decken kümmern muss)
 -Soundkrams (wobei der in sge schon ganz gut integriert ist)
 
-** Vorgehen der Reihe nach [9/10]
+** Vorgehen der Reihe nach [10/10]
 1. [X] Gucken ob es Beispiele zu bullet mit Terrain gibt 
 2. [X] md3-Loader von sge ausprobieren, ein Model laden
 3. [X] Das Model in einem separaten Programm anzeigen lassen
@@ -353,15 +355,15 @@ Somit bräuchte man für das Spiel nicht allzu viel:
       1 interpoliert.
    3. [X] Diese Sounds in das Spiel integrieren und mit der
       Fahrgeschwindigkeit koppeln.
-10. [ ] Spielmechanik einbauen [0/4]
-		1. [ ] Generiere zufällig Punkte auf der Landschaft. Die Punkte sollten
+10. [X] Spielmechanik einbauen [4/4]
+		1. [X] Generiere zufällig Punkte auf der Landschaft. Die Punkte sollten
        als Models visualisiert sein (auf nille warten). Generiere auch
        einen Startpunkt für das Auto.
-		2. [ ] Kollision Punkt mit Fahrzeug einbauen, die den Punkt
+		2. [X] Kollision Punkt mit Fahrzeug einbauen, die den Punkt
        verschwinden lassen und einen globalen Counter erhöhen.
-		3. [ ] Timer einbauen, der bei Spielanfang beginnt und beim Einsammeln
+		3. [X] Timer einbauen, der bei Spielanfang beginnt und beim Einsammeln
        des letzten Punktes aufhört.
-		4. [ ] Spielstates einbauen: 
+		4. [X] Spielstates einbauen: 
 			 1. Freelook: Punkte sind schon generiert, die Kamera ist frei
 					und man kann sich einen Weg aussuchen.
 			 2. Pregame: Es wird der Spielername angezeigt, der jetzt dran
@@ -657,7 +659,7 @@ font_collection fonts(
 	make_container<size_container>(15)(20)(25));
 #+end_src
 
-** TODO Diverses [21/27]
+** TODO Diverses [22/30]
 *** DONE Framecounter einbauen
 		 CLOSED: [2010-07-30 Fri 18:24]
 *** DONE gizmo_init fixen
@@ -751,7 +753,8 @@ wurde.
 -Funktion, um gizmo um right/up/forward zu drehen
 -mirror_camera aus water rausziehen?
 
-*** TODO Anzeigebug fuer Skydome fixen
+*** DONE Anzeigebug fuer Skydome fixen
+		 CLOSED: [2010-08-31 Tue 19:38]
 *** DONE Der Inputdelegator funzt nicht, die Konsole blockiert nicht den Auto-Input
 		 CLOSED: [2010-08-15 Sun 13:30]
 *** DONE Library bauen statt einzelne Executables mit denselben Dateien
@@ -773,3 +776,4 @@ beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
 *** TODO random_flat_point erweitern
 *** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern
+*** TODO Musiklautstärke muss einstellbar sein

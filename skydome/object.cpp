@@ -125,8 +125,8 @@ public:
 
 		// Start at the first vertex after the top
 		value_type current = 1;
-		// Again, we have it_lat-2 ring pairs (see below)
-		for (size_type lats = 0; lats < static_cast<size_type>(it_lat-2); ++lats)
+		// Again, we have it_lat-1 ring pairs (see below)
+		for (size_type lats = 0; lats < static_cast<size_type>(it_lat-1); ++lats)
 		{
 			// Remember the beginning index of the current circle so we can wrap around later in the inner loop
 			value_type const beginning = 
@@ -306,7 +306,7 @@ insula::skydome::object::regenerate_buffer(
 				// The top
 				1 + 
 				// The inner rings minus the two tops
-				(lats - 1) * lons),
+				lats * lons),
 			sge::renderer::resource_flags::none);
 
 	FCPPT_ASSERT_MESSAGE(
@@ -324,7 +324,7 @@ insula::skydome::object::regenerate_buffer(
 			// 3 indices.
 			static_cast<sge::renderer::size_type>(
 				// the quads
-				(lats-2) * lons * 2 * 3 +
+				(lats-1) * lons * 2 * 3 +
 				// the triangles
 				lons * 3), 
 			sge::renderer::resource_flags::none);
@@ -365,13 +365,15 @@ insula::skydome::object::regenerate_buffer(
 	scalar lat = increment_lat;
 	// We make one less iteration because we don't want the top
 	// NOTE: We use size_type here FOR A REASON! floating point loops are inaccurate
-	for (size_type i = 1; i < lats; ++i)
+	for (size_type i = 0; i < lats; ++i)
 	{
 		scalar lon = 
 			static_cast<scalar>(0);
 		for (size_type j = 0; j < lons; ++j)
 		{
 			++vertex_count;
+
+	//		fcppt::io::cout << sphere_point(radius,lat,lon).y() << "\n";
 
 			vb_it->set<vf::position>(
 				sphere_point(

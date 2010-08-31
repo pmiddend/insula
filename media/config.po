@@ -27,8 +27,8 @@ water-wave-height = 0.5
 water-wind-speed = 0.125
 water-stretching = 2
 
-skydome-latitudes = 100
-skydome-longitudes = 100
+skydome-latitudes = 10
+skydome-longitudes = 10
 skydome-angle = 90
 skydome-color0 = (0.765,0.87,1)
 skydome-color1 = (0,0,1)
