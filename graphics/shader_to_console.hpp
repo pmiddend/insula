@@ -17,11 +17,11 @@ public:
 	explicit
 	shader_to_console(
 		fcppt::string const &name,
-		shader &,
+		shader_old &,
 		sge::console::object &);
 private:
-	shader &shader_;
-	fcppt::signal::scoped_connection list_con_,set_con_;
+	//shader_old &shader_;
+	//fcppt::signal::scoped_connection list_con_,set_con_;
 
 	void
 	list(

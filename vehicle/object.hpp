@@ -40,7 +40,7 @@ public:
 		sge::renderer::device_ptr const rend,
 		sge::image::multi_loader &il,
 		sge::model::loader_ptr const model_loader,
-		graphics::shader &shader,
+		graphics::shader_old &shader,
 		graphics::camera::object &cam,
 		input_delegator &,
 		graphics::scalar camera_distance,

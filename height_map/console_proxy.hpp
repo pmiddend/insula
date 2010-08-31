@@ -24,7 +24,7 @@ public:
 		sge::console::object &,
 		sge::image::multi_loader &);
 private:
-	graphics::shader_to_console shader_;
+	//graphics::shader_to_console shader_;
 	fcppt::signal::scoped_connection regenerate_connection_;
 	sge::image::multi_loader &image_loader_;
 	object &obj_;

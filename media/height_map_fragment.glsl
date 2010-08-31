@@ -1,11 +1,11 @@
 #version 140
 
-out vec4 frag_color;
-uniform vec3 sun_position;
-uniform sampler2D sand,rock,grass;
+$$$HEADER$$$
+
 in vec2 texcoord;
 in vec2 height_and_gradient_out;
 in float light_intensity;
+out vec4 frag_color;
 
 void main()
 {

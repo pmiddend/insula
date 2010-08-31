@@ -54,7 +54,7 @@ private:
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;
-	graphics::shader shader_;
+	graphics::shader_old shader_;
 	graphics::mat4 mat_transformed_;
 
 	// @override

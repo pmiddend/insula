@@ -283,7 +283,7 @@ try
 	fcppt::io::cout << "positioning vehicle at " << physics_vehicle_pos << "\n";
 	// DEBUG END
 
-	graphics::shader model_shader(
+	graphics::shader_old model_shader(
 		sys.renderer(),
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"));

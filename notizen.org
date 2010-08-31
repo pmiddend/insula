@@ -777,3 +777,4 @@ noch überlegen.
 *** TODO random_flat_point erweitern
 *** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern
 *** TODO Musiklautstärke muss einstellbar sein
+*** TODO foldl in gameover durch accumulate ersetzen

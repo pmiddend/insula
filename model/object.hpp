@@ -30,7 +30,7 @@ public:
 		graphics::camera::object const &,
 		sge::model::object_ptr,
 		sge::renderer::device_ptr,
-		graphics::shader &,
+		graphics::shader_old &,
 		sge::renderer::texture_ptr,
 		fcppt::optional<fcppt::string> const &part = 
 			fcppt::optional<fcppt::string>());
@@ -50,7 +50,7 @@ private:
 	sge::model::object_ptr const raw_;
 	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr renderer_;
-	graphics::shader &shader_;
+	graphics::shader_old &shader_;
 	sge::renderer::texture_ptr const texture_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;

@@ -1,6 +1,8 @@
 #version 140
 
 uniform vec3 sun_position;
+uniform vec3 color0;
+uniform vec3 color1;
 
 out vec4 frag_color;
 in vec3 gradient_color;
@@ -18,7 +20,6 @@ void main()
 		mix(
 			vec4(gradient_color,1.0),
 			sun_color,
-			//sun_intensity
 			sun_intensity);
 }
 

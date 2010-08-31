@@ -5,7 +5,7 @@
 #include "../graphics/vec2.hpp"
 #include "../graphics/vec3.hpp"
 #include "../graphics/scalar.hpp"
-#include "../graphics/shader.hpp"
+#include "../graphics/shader/object.hpp"
 #include "../graphics/box.hpp"
 #include "parameters_fwd.hpp"
 #include "vec2.hpp"
@@ -68,8 +68,8 @@ public:
 			fcppt::optional<graphics::scalar>());
 
 	// The console_proxy needs this
-	graphics::shader &
-	shader();
+	//graphics::shader &
+	//shader();
 
 	graphics::box const
 	extents() const;
@@ -89,7 +89,8 @@ private:
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;
-	graphics::shader shader_;
+	//graphics::shader shader_;
+	graphics::shader::object shader_;
 	sge::renderer::texture_ptr lower_texture_,upper_texture_,gradient_texture_;
 	graphics::box extents_;
 	array heights_;

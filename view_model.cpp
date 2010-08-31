@@ -167,7 +167,7 @@ try
 				sys.renderer()->screen_size()),
 			graphics::vec3::null());
 
-	graphics::shader model_shader(
+	graphics::shader_old model_shader(
 		sys.renderer(),
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"));

@@ -16,7 +16,7 @@ namespace insula
 {
 namespace graphics
 {
-class shader
+class shader_old
 {
 public:
 	typedef
@@ -27,16 +27,16 @@ public:
 	name_set;
 
 	explicit
-	shader(
+	shader_old(
 		sge::renderer::device_ptr,
 		fcppt::filesystem::path const &vertex,
 		fcppt::filesystem::path const &fragment);
 	
-	shader &operator=(
-		shader const &) = delete;
+	shader_old &operator=(
+		shader_old const &) = delete;
 
-	shader(
-		shader const&) = delete;
+	shader_old(
+		shader_old const&) = delete;
 	
 	template<typename T>
 	void
@@ -66,7 +66,7 @@ public:
 	sge::renderer::glsl::program_ptr const
 	program();
 
-	~shader();
+	~shader_old();
 private:
 	typedef
 	fcppt::container::map

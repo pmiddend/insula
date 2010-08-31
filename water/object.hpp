@@ -43,7 +43,7 @@ public:
 	void 
 	render();
 
-	graphics::shader &
+	graphics::shader_old &
 	shader();
 
 	graphics::scalar
@@ -56,7 +56,7 @@ private:
 	sge::renderer::target_ptr target_;
 	graphics::camera::object &camera_;
 	graphics::scalar const water_level_;
-	graphics::shader shader_;
+	graphics::shader_old shader_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::time::timer wave_timer_;
 	graphics::scalar current_time_;

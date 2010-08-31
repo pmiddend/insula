@@ -110,7 +110,7 @@ private:
 	sge::renderer::device_ptr const renderer_;
 	graphics::camera::object &camera_;
 	sge::renderer::vertex_buffer_ptr vb_;
-	graphics::shader shader_;
+	graphics::shader_old shader_;
 	int debug_mode_;
 	line_cache lines_;
 };

@@ -227,7 +227,7 @@ try
 		sys.input_system(),
 		console);
 
-	graphics::shader shader_(
+	graphics::shader_old shader_(
 		sys.renderer(),
 		media_path()/FCPPT_TEXT("debug_vertex.glsl"),
 		media_path()/FCPPT_TEXT("debug_fragment.glsl"));

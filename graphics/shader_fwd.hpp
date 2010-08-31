@@ -5,7 +5,7 @@ namespace insula
 {
 namespace graphics
 {
-class shader;
+class shader_old;
 }
 }
 

@@ -16,7 +16,7 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/text.hpp>
 
-insula::graphics::shader::shader(
+insula::graphics::shader_old::shader_old(
 	sge::renderer::device_ptr const _renderer,
 	fcppt::filesystem::path const &vertex,
 	fcppt::filesystem::path const &fragment)
@@ -48,8 +48,8 @@ insula::graphics::shader::shader(
 		<< FCPPT_TEXT("\n");
 }
 
-insula::graphics::shader::name_set const
-insula::graphics::shader::uniform_names() const
+insula::graphics::shader_old::name_set const
+insula::graphics::shader_old::uniform_names() const
 {
 	return 
 		stdlib::map<name_set>(
@@ -58,23 +58,23 @@ insula::graphics::shader::uniform_names() const
 }
 
 void
-insula::graphics::shader::activate()
+insula::graphics::shader_old::activate()
 {
 	renderer_->glsl_program(
 		program_);
 }
 
 void
-insula::graphics::shader::deactivate()
+insula::graphics::shader_old::deactivate()
 {
 	renderer_->glsl_program(
 		sge::renderer::glsl::no_program());
 }
 
 sge::renderer::glsl::program_ptr const
-insula::graphics::shader::program()
+insula::graphics::shader_old::program()
 {
 	return program_;
 }
 
-insula::graphics::shader::~shader() {}
+insula::graphics::shader_old::~shader_old() {}

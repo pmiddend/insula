@@ -13,11 +13,14 @@ insula::height_map::console_proxy::console_proxy(
 	object &_obj,
 	sge::console::object &console,
 	sge::image::multi_loader &_image_loader)
+#if 0
 :
 	shader_(
 		FCPPT_TEXT("terrain"),
 		obj_.shader(),
 		console),
+#endif
+:
 	/*
 	regenerate_connection_(
 		console.insert(

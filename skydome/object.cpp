@@ -400,7 +400,7 @@ insula::skydome::object::regenerate_buffer(
 			sge::renderer::lock_mode::writeonly).value().any());
 }
 
-insula::graphics::shader &
+insula::graphics::shader_old &
 insula::skydome::object::shader()
 {
 	return shader_;

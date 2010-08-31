@@ -84,7 +84,7 @@ private:
 	physics::debug_drawer physics_debug_drawer_;
 	bool physics_debug_;
 	fcppt::signal::scoped_connection toggle_physics_debug_; 
-	graphics::shader nugget_shader_;
+	graphics::shader_old nugget_shader_;
 	model::object nugget_model_;
 	nugget_model_sequence nugget_models_;
 	insula::vehicle::object_ptr vehicle_;

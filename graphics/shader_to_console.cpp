@@ -15,8 +15,9 @@
 
 insula::graphics::shader_to_console::shader_to_console(
 	fcppt::string const &name,
-	shader &_shader,
+	shader_old &_shader,
 	sge::console::object &console)
+#if 0
 :
 	shader_(
 		_shader),
@@ -39,6 +40,7 @@ insula::graphics::shader_to_console::shader_to_console(
 				std::placeholders::_2),
 			FCPPT_TEXT("Set a uniform variable for \"")+name+FCPPT_TEXT("\""),
 			FCPPT_TEXT("This function takes at least 1 and up to 4 arguments. One argument is treated as a scalar value, the other are vec2, vec3, vec4, respectively. You will get an error if:\n-you try to assign a non-numeric value\n-you try to assign a value to a non-defined variable\n-you try to assign a value of the wrong type.")))
+#endif
 {
 }
 
@@ -47,6 +49,7 @@ insula::graphics::shader_to_console::list(
 	sge::console::arg_list const &args,
 	sge::console::object &c)
 {
+#if 0
 	if (args.size() == 1)
 		c.emit_error(
 			args[0]+FCPPT_TEXT(" takes no arguments"));
@@ -54,14 +57,18 @@ insula::graphics::shader_to_console::list(
 	stdlib::for_each(
 		shader_.uniform_names(),
 		[&c](fcppt::string const &s) { c.emit_message(s); });
+#endif
 }
 
 void
 insula::graphics::shader_to_console::set(
 	sge::console::arg_list const &a,
 	sge::console::object &c)
+#if 0
 try
+#endif
 {
+#if 0
 	shader_.activate();
 
 	if (a.size() <= 2)
@@ -116,7 +123,9 @@ try
 		c.emit_error(
 			FCPPT_TEXT("invalid number of arguments"));
 	}
+#endif
 }
+#if 0
 catch (fcppt::bad_lexical_cast const &)
 {
 	c.emit_error(
@@ -127,3 +136,4 @@ catch (sge::renderer::glsl::exception const &e)
 	c.emit_error(
 		FCPPT_TEXT("glsl error while setting variable, probably wrong type: ")+e.string());
 }
+#endif

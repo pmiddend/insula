@@ -8,10 +8,13 @@
 #include "vf/vertex_view.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera/object.hpp"
+#include "../graphics/shader/vf_to_string.hpp"
+#include "../graphics/shader/scoped.hpp"
 #include "../graphics/dim3.hpp"
 #include "../graphics/rect.hpp"
 #include "../media_path.hpp"
 #include "../graphics/vec4.hpp"
+#include "../graphics/shader.hpp"
 #include "scalar.hpp"
 #include "array.hpp"
 #include "vec2.hpp"
@@ -60,6 +63,7 @@
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/container/grid/object_impl.hpp>
+#include <fcppt/assign/make_container.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/variant/apply_unary.hpp>
@@ -131,65 +135,74 @@ insula::height_map::object::object(
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("height_map_vertex.glsl"),
-		media_path()/FCPPT_TEXT("height_map_fragment.glsl"))
+		media_path()/FCPPT_TEXT("height_map_fragment.glsl"),
+		graphics::shader::vf_to_string<vf::format>(),
+		fcppt::assign::make_container<graphics::shader::object::variable_sequence>
+			(
+			graphics::shader::variable(
+				"sun_direction",
+				graphics::shader::variable_type::const_,
+				normalize(
+					params.sun_direction)))
+			(
+			graphics::shader::variable(
+				"ambient_light",
+				graphics::shader::variable_type::const_,
+				params.ambient_light))
+			(
+			graphics::shader::variable(
+				"texture_scaling",
+				graphics::shader::variable_type::const_,
+				params.texture_scaling))
+			(
+			graphics::shader::variable(
+				"grid_size",
+				graphics::shader::variable_type::const_,
+				params.cell_size * 
+				fcppt::math::dim::structure_cast<graphics::vec2>(
+					params.array.dimension())))
+			(
+			graphics::shader::variable(
+				"do_clip",
+				graphics::shader::variable_type::uniform,
+				0))
+			(
+			graphics::shader::variable(
+				"water_level",
+				graphics::shader::variable_type::uniform,
+				static_cast<graphics::scalar>(0)))
+			(
+			graphics::shader::variable(
+				"mvp",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4())),
+		fcppt::assign::make_container<graphics::shader::object::sampler_sequence>
+			(
+			graphics::shader::sampler(
+				"rock",
+				renderer_->create_texture(
+					params.gradient_texture_image->view(),
+					sge::renderer::filter::trilinear,
+					sge::renderer::resource_flags::none)))
+			(
+			graphics::shader::sampler(
+				"grass",
+				renderer_->create_texture(
+					params.upper_texture_image->view(),
+					sge::renderer::filter::trilinear,
+					sge::renderer::resource_flags::none)))
+			(
+			graphics::shader::sampler(
+				"sand",
+				renderer_->create_texture(
+					params.lower_texture_image->view(),
+					sge::renderer::filter::trilinear,
+					sge::renderer::resource_flags::none))))
 {
 	regenerate(
 		params.cell_size,
 		params.height_scaling,
 		params.array);
-
-	sge::renderer::glsl::scoped_program scoped_shader_(
-		renderer_,
-		shader_.program());
-	
-	shader_.set_uniform(
-		FCPPT_TEXT("sand"),
-		0);
-
-	shader_.set_uniform(
-		FCPPT_TEXT("rock"),
-		1);
-
-	shader_.set_uniform(
-		FCPPT_TEXT("grass"),
-		2);
-	
-	shader_.set_uniform(
-		FCPPT_TEXT("sun_direction"),
-		normalize(
-			params.sun_direction));
-
-	shader_.set_uniform(
-		FCPPT_TEXT("ambient_light"),
-		params.ambient_light);
-
-	shader_.set_uniform(
-		FCPPT_TEXT("texture_scaling"),
-		params.texture_scaling);
-	
-	shader_.set_uniform(
-		FCPPT_TEXT("grid_size"),
-		params.cell_size * 
-		fcppt::math::dim::structure_cast<graphics::vec2>(
-			params.array.dimension()));
-	
-	lower_texture_ = 
-		renderer_->create_texture(
-			params.lower_texture_image->view(),
-			sge::renderer::filter::trilinear,
-			sge::renderer::resource_flags::none);
-	
-	upper_texture_ = 
-		renderer_->create_texture(
-			params.upper_texture_image->view(),
-			sge::renderer::filter::trilinear,
-			sge::renderer::resource_flags::none);
-	
-	gradient_texture_ = 
-		renderer_->create_texture(
-			params.gradient_texture_image->view(),
-			sge::renderer::filter::trilinear,
-			sge::renderer::resource_flags::none);
 }
 
 void
@@ -197,9 +210,8 @@ insula::height_map::object::render(
 	sge::renderer::state::cull_mode::type const culling,
 	fcppt::optional<graphics::scalar> const &clip_height)
 {
-	sge::renderer::glsl::scoped_program scoped_shader_(
-		renderer_,
-		shader_.program());
+	graphics::shader::scoped scoped_shader_(
+		shader_);
 
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,
@@ -234,21 +246,6 @@ insula::height_map::object::render(
 		 	(culling)
 		 	(sge::renderer::state::depth_func::less));
 
-	sge::renderer::scoped_texture scoped_tex0(
-		renderer_,
-		lower_texture_,
-		0);
-
-	sge::renderer::scoped_texture scoped_tex1(
-		renderer_,
-		gradient_texture_,
-		1);
-
-	sge::renderer::scoped_texture scoped_tex2(
-		renderer_,
-		upper_texture_,
-		2);
-
 	renderer_->render(
 		ib_,
 		sge::renderer::first_vertex(
@@ -260,14 +257,6 @@ insula::height_map::object::render(
 			ib_->size() / 3),
 		sge::renderer::first_index(
 			0));
-}
-
-
-
-insula::graphics::shader &
-insula::height_map::object::shader()
-{
-	return shader_;
 }
 
 insula::graphics::box const

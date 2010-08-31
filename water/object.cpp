@@ -149,7 +149,7 @@ insula::water::object::render()
 		sge::renderer::nonindexed_primitive_type::triangle);
 }
 
-insula::graphics::shader &
+insula::graphics::shader_old &
 insula::water::object::shader()
 {
 	return shader_;

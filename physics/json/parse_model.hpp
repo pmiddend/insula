@@ -23,7 +23,7 @@ parse_model(
 	sge::image::multi_loader &il,
 	sge::renderer::device_ptr const rend,
 	graphics::camera::object &cam,
-	graphics::shader &shader);
+	graphics::shader_old &shader);
 }
 }
 }

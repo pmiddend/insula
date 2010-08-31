@@ -1,4 +1,8 @@
 #include "graphics/scalar.hpp"
+#include "graphics/vec2.hpp"
+#include "graphics/shader/variable.hpp"
+#include "graphics/shader/value_type_impl.hpp"
+#include <fcppt/math/vector/basic_impl.hpp>
 #include <sge/renderer/vf/make_unspecified_tag.hpp>
 #include <sge/renderer/vf/vector.hpp>
 #include <sge/renderer/vf/format.hpp>
@@ -124,13 +128,9 @@ int main()
 		<< vf_to_string<vertex_format>()
 		<< FCPPT_TEXT("\n");
 
-	/*
-	graphics::shader::object s(
-		{ 
-			graphics::shader::uniform(
-				FCPPT_TEXT("hier_name"),
-				FCPPT_TEXT("vec3"),
-				graphics::shader::uniform_type::const_) 
-		});
-	*/
+	fcppt::io::cout <<
+		insula::graphics::shader::variable(
+			FCPPT_TEXT("hier_name"),
+			insula::graphics::shader::variable_type::const_,
+			insula::graphics::vec2(1,2)).declaration() << FCPPT_TEXT("\n");
 }

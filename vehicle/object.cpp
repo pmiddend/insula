@@ -34,7 +34,7 @@ insula::vehicle::object::object(
 	sge::renderer::device_ptr const rend,
 	sge::image::multi_loader &il,
 	sge::model::loader_ptr const model_loader,
-	graphics::shader &shader,
+	graphics::shader_old &shader,
 	graphics::camera::object &_cam,
 	input_delegator &_input_delegator,
 	graphics::scalar const _camera_distance,

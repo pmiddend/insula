@@ -231,7 +231,7 @@ try
 				sys.renderer()->screen_size()),
 			graphics::vec3::null());
 
-	graphics::shader point_shader(
+	graphics::shader_old point_shader(
 		sys.renderer(),
 		media_path()/FCPPT_TEXT("point_vertex.glsl"),
 		media_path()/FCPPT_TEXT("point_fragment.glsl"));

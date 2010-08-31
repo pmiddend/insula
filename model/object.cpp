@@ -100,7 +100,7 @@ insula::model::object::object(
 	graphics::camera::object const &_camera,
 	sge::model::object_ptr const model,
 	sge::renderer::device_ptr const _renderer,
-	graphics::shader &_shader,
+	graphics::shader_old &_shader,
 	sge::renderer::texture_ptr const _texture,
 	fcppt::optional<fcppt::string> const &_part)
 :
