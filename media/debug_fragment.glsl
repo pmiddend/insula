@@ -1,5 +1,6 @@
 #version 140
 
+$$$HEADER$$$
 in vec3 color_out;
 out vec4 frag_color;
 

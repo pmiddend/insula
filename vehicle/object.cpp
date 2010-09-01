@@ -181,17 +181,17 @@ insula::vehicle::object::render()
 		camera_.world();
 
 	{
-		model::scoped scoped_model(
-			renderer_,
-			chassis_model_);
-
-		// FIRST update the texture, THEN scope the shader!
+		// FIRST update the texture, THEN scope the shader, THEN the model!
 		model_shader_.update_texture(
 			"texture",
 			chassis_texture_);
 
 		graphics::shader::scoped scoped_shader(
 			model_shader_);
+
+		model::scoped scoped_model(
+			renderer_,
+			chassis_model_);
 
 		model_shader_.set_uniform(
 			"mvp",

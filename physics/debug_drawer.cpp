@@ -3,6 +3,9 @@
 #include "bullet_to_vec3.hpp"
 #include "../graphics/vec3.hpp"
 #include "../graphics/camera/object.hpp"
+
+#include "../graphics/shader/scoped.hpp"
+#include "../graphics/shader/vf_to_string.hpp"
 #include "../media_path.hpp"
 #include <sge/renderer/vf/format.hpp>
 #include <sge/renderer/vf/make_unspecified_tag.hpp>
@@ -37,6 +40,7 @@
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/io/cerr.hpp>
+#include <fcppt/assign/make_container.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/from_std_string.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
@@ -107,16 +111,20 @@ insula::physics::debug_drawer::debug_drawer(
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("debug_vertex.glsl"),
-		media_path()/FCPPT_TEXT("debug_fragment.glsl")),
+		media_path()/FCPPT_TEXT("debug_fragment.glsl"),
+		graphics::shader::vf_to_string<vertex_format>(),
+		fcppt::assign::make_container<graphics::shader::variable_sequence>
+		(
+		graphics::shader::variable(
+			"mvp",
+			graphics::shader::variable_type::uniform,
+			graphics::mat4())),
+		graphics::shader::sampler_sequence()),
 	debug_mode_(
 		btIDebugDraw::DBG_NoDebug) // should be zero
 {
 	world_.handle().setDebugDrawer(
 		this);
-
-	sge::renderer::glsl::scoped_program scoped_shader_(
-		renderer_,
-		shader_.program());
 }
 
 // @override
@@ -222,9 +230,8 @@ insula::physics::debug_drawer::render()
 		sge::renderer::state::list
 			(sge::renderer::state::depth_func::off));
 
-	sge::renderer::glsl::scoped_program scoped_shader_(
-		renderer_,
-		shader_.program());
+	graphics::shader::scoped scoped_shader_(
+		shader_);
 
 	shader_.set_uniform(
 		FCPPT_TEXT("mvp"),
@@ -269,6 +276,8 @@ insula::physics::debug_drawer::render()
 		sge::renderer::vertex_count(
 			vb_->size()),
 		sge::renderer::nonindexed_primitive_type::line);
+
+	fcppt::io::cout << "finished\n";
 }
 
 insula::physics::debug_drawer::~debug_drawer() {}

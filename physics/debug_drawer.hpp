@@ -2,7 +2,7 @@
 #define INSULA_PHYSICS_DEBUG_DRAWER_HPP_INCLUDED
 
 #include "world_fwd.hpp"
-#include "../graphics/shader.hpp"
+#include "../graphics/shader/object.hpp"
 #include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/mat4.hpp"
 #include "../graphics/vec3.hpp"
@@ -110,7 +110,7 @@ private:
 	sge::renderer::device_ptr const renderer_;
 	graphics::camera::object &camera_;
 	sge::renderer::vertex_buffer_ptr vb_;
-	graphics::shader_old shader_;
+	graphics::shader::object shader_;
 	int debug_mode_;
 	line_cache lines_;
 };

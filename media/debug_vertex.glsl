@@ -1,9 +1,7 @@
 #version 140
 
-uniform mat4 mvp;
+$$$HEADER$$$
 
-in vec3 position;
-in vec3 tip_color;
 out vec3 color_out;
 
 void main()
