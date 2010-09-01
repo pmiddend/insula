@@ -6,6 +6,8 @@
 #include "vf/vertex_view.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera/object.hpp"
+#include "../graphics/shader/scoped.hpp"
+#include "../graphics/shader/vf_to_string.hpp"
 #include "../media_path.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
@@ -54,6 +56,7 @@
 #include <fcppt/assert.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
+#include <fcppt/assign/make_container.hpp>
 
 #include <fcppt/math/matrix/perspective.hpp>
 
@@ -188,7 +191,39 @@ insula::skydome::object::object(
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("skydome_vertex.glsl"),
-		media_path()/FCPPT_TEXT("skydome_fragment.glsl")),
+		media_path()/FCPPT_TEXT("skydome_fragment.glsl"),
+		graphics::shader::vf_to_string<vf::format>(),
+		fcppt::assign::make_container<graphics::shader::variable_sequence>
+		(
+			graphics::shader::variable(
+				"mvp",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4()))
+		(
+			graphics::shader::variable(
+				"sun_position",
+				graphics::shader::variable_type::const_,
+				sphere_point(
+					static_cast<graphics::scalar>(1),
+					fcppt::math::deg_to_rad(
+						static_cast<graphics::scalar>(20)),
+					fcppt::math::deg_to_rad(
+						static_cast<graphics::scalar>(0)))))
+		(
+			graphics::shader::variable(
+				"color0",
+				graphics::shader::variable_type::const_,
+				color_to_vec3(
+					std::get<0>(
+						_gradient))))
+		(
+			graphics::shader::variable(
+				"color1",
+				graphics::shader::variable_type::const_,
+				color_to_vec3(
+					std::get<1>(
+						_gradient)))),
+		graphics::shader::sampler_sequence()),
 	perspective_(
 		fcppt::math::matrix::perspective(
 			camera_.aspect(),
@@ -198,27 +233,12 @@ insula::skydome::object::object(
 	gradient_(
 		_gradient)
 {
+	// _Permanently_ change the renderer's clear color (this could be a
+	// scoped_state, too)
 	renderer_->state(
 		sge::renderer::state::list
 			(sge::renderer::state::color::clear_color = std::get<0>(gradient_)));
 
-	{
-		sge::renderer::glsl::scoped_program scoped_shader_(
-			renderer_,
-			shader_.program());
-
-		shader_.set_uniform(
-			FCPPT_TEXT("color0"),
-			color_to_vec3(
-				std::get<0>(
-					gradient_)));
-	
-		shader_.set_uniform(
-			FCPPT_TEXT("color1"),
-			color_to_vec3(
-				std::get<1>(
-					gradient_)));
-	}
 	regenerate_buffer(
 		angle,
 		iterations_lat,
@@ -229,15 +249,13 @@ insula::skydome::object::object(
 void
 insula::skydome::object::render()
 {
+	// FIRST the shader, THEN the vertex buffer
+	graphics::shader::scoped scoped_shader_(
+		shader_);
+
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,
 		vb_);
-	
-	sge::renderer::glsl::scoped_program scoped_shader_(
-		renderer_,
-		shader_.program());
-
-	using fcppt::math::matrix::transpose;
 
 	// We have to set our own perspective matrix here because near and far
 	// might be ill-chosen by the user (at least for the skydome)
@@ -251,14 +269,6 @@ insula::skydome::object::render()
 		 	(sge::renderer::state::cull_mode::off)
 		 	(sge::renderer::state::depth_func::off));
 
-	/*
-	renderer_->render(
-		sge::renderer::first_vertex(
-			0),
-		sge::renderer::vertex_count(
-			vb_->size()),
-		sge::renderer::nonindexed_primitive_type::point);
-*/
 	renderer_->render(
 		ib_,
 		sge::renderer::first_vertex(
@@ -289,15 +299,6 @@ insula::skydome::object::regenerate_buffer(
 	scalar const radius = 
 		static_cast<scalar>(
 			1);
-
-	shader_.set_uniform(
-		FCPPT_TEXT("sun_position"),
-		sphere_point(
-			radius,
-			fcppt::math::deg_to_rad(
-				static_cast<graphics::scalar>(20)),
-			fcppt::math::deg_to_rad(
-				static_cast<graphics::scalar>(0))));
 
 	vb_ = 
 		renderer_->create_vertex_buffer(
@@ -398,18 +399,6 @@ insula::skydome::object::regenerate_buffer(
 		sge::renderer::scoped_index_lock(
 			ib_,
 			sge::renderer::lock_mode::writeonly).value().any());
-}
-
-insula::graphics::shader_old &
-insula::skydome::object::shader()
-{
-	return shader_;
-}
-
-insula::skydome::gradient const
-insula::skydome::object::gradient() const
-{
-	return gradient_;
 }
 
 insula::skydome::object::~object() {}

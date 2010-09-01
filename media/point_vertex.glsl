@@ -1,9 +1,6 @@
 #version 140
 
-uniform mat4 mvp;
-
-in vec3 position;
-in vec4 particle_color;
+$$$HEADER$$$
 
 void main()
 {

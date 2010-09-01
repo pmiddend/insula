@@ -4,7 +4,7 @@
 #include "size_type.hpp"
 #include "gradient.hpp"
 #include "../graphics/camera/object.hpp"
-#include "../graphics/shader.hpp"
+#include "../graphics/shader/object.hpp"
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
@@ -41,19 +41,13 @@ public:
 		size_type,
 		size_type);
 
-	graphics::shader_old &
-	shader();
-
-	insula::skydome::gradient const
-	gradient() const;
-
 	~object();
 private:
 	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;
-	graphics::shader_old shader_;
+	graphics::shader::object shader_;
 	graphics::mat4 const perspective_;
 	insula::skydome::gradient gradient_;
 };

@@ -14,7 +14,6 @@
 #include "../graphics/rect.hpp"
 #include "../media_path.hpp"
 #include "../graphics/vec4.hpp"
-#include "../graphics/shader.hpp"
 #include "scalar.hpp"
 #include "array.hpp"
 #include "vec2.hpp"

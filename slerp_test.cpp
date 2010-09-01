@@ -3,7 +3,9 @@
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
-#include "graphics/shader.hpp"
+#include "graphics/shader/object.hpp"
+#include "graphics/shader/scoped.hpp"
+#include "graphics/shader/vf_to_string.hpp"
 #include "graphics/cli_options.hpp"
 #include "random_engine.hpp"
 #include "random_seed.hpp"
@@ -227,10 +229,18 @@ try
 		sys.input_system(),
 		console);
 
-	graphics::shader_old shader_(
+	graphics::shader::object shader_(
 		sys.renderer(),
 		media_path()/FCPPT_TEXT("debug_vertex.glsl"),
-		media_path()/FCPPT_TEXT("debug_fragment.glsl"));
+		media_path()/FCPPT_TEXT("debug_fragment.glsl"),
+		graphics::shader::vf_to_string<vertex_format>(),
+		fcppt::assign::make_container<graphics::shader::variable_sequence>
+		(
+		graphics::shader::variable(
+			"mvp",
+			graphics::shader::variable_type::uniform,
+			graphics::mat4())),
+		graphics::shader::sampler_sequence());
 	
 	graphics::camera::object_ptr cam = 
 		graphics::camera::cli_factory(
@@ -320,9 +330,8 @@ try
 			sge::renderer::state::list
 				(sge::renderer::state::depth_func::off));
 
-		sge::renderer::glsl::scoped_program scoped_shader_(
-			sys.renderer(),
-			shader_.program());
+		graphics::shader::scoped scoped_shader_(
+			shader_);
 
 		shader_.set_uniform(
 			FCPPT_TEXT("mvp"),

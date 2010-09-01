@@ -5,7 +5,9 @@
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
-#include "graphics/shader.hpp"
+#include "graphics/shader/object.hpp"
+#include "graphics/shader/scoped.hpp"
+#include "graphics/shader/vf_to_string.hpp"
 #include "graphics/cli_options.hpp"
 #include "console/object.hpp"
 #include "model/object.hpp"
@@ -229,26 +231,35 @@ try
 				sys.renderer()->screen_size()),
 			graphics::vec3::null());
 
-	graphics::shader_old point_shader(
-		sys.renderer(),
-		media_path()/FCPPT_TEXT("point_vertex.glsl"),
-		media_path()/FCPPT_TEXT("point_fragment.glsl"));
-
 	if (!vm.count("texture"))
 	{
 		fcppt::io::cerr << FCPPT_TEXT("You have to specify a texture!\n");
 		return EXIT_FAILURE;
 	}
 
-	sge::renderer::texture_ptr const tex = 
-		sge::image::create_texture(
-			create_path(
-				get_option<fcppt::string>(vm,"texture"),
-				FCPPT_TEXT("textures")),
-			sys.renderer(),
-			sys.image_loader(),
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::none);
+	graphics::shader::object point_shader(
+		sys.renderer(),
+		media_path()/FCPPT_TEXT("point_vertex.glsl"),
+		media_path()/FCPPT_TEXT("point_fragment.glsl"),
+		graphics::shader::vf_to_string<vertex_format>(),
+		fcppt::assign::make_container<graphics::shader::variable_sequence>
+		(
+		graphics::shader::variable(
+			"mvp",
+			graphics::shader::variable_type::uniform,
+			graphics::mat4())),
+		fcppt::assign::make_container<graphics::shader::sampler_sequence>
+		(
+		graphics::shader::sampler(
+			"texture",
+			sge::image::create_texture(
+				create_path(
+					get_option<fcppt::string>(vm,"texture"),
+					FCPPT_TEXT("textures")),
+				sys.renderer(),
+				sys.image_loader(),
+				sge::renderer::filter::linear,
+				sge::renderer::resource_flags::none))));
 
 	bool running = 
 		true;
@@ -362,21 +373,12 @@ try
 			sys.renderer());
 
 		{
-			sge::renderer::glsl::scoped_program scoped_shader_(
-				sys.renderer(),
-				point_shader.program());
-
-			sge::renderer::scoped_texture scoped_tex(
-				sys.renderer(),
-				tex);
+			graphics::shader::scoped scoped_shader_(
+				point_shader);
 
 			point_shader.set_uniform(
 				FCPPT_TEXT("mvp"),
 				cam->perspective() * cam->world());
-			
-			point_shader.set_uniform(
-				FCPPT_TEXT("texture"),
-				0);
 
 			sys.renderer()->state(
 				sge::renderer::state::list
