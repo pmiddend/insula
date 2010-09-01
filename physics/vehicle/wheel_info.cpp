@@ -7,6 +7,8 @@ insula::physics::vehicle::wheel_info::wheel_info()
 		vec3::null()),
 	is_front_wheel_(
 		false),
+	mirror_(
+		false),
 	// Taken from the standard btVehicleTuning constructor
 	suspension_stiffness_(
 		static_cast<insula::physics::scalar>(5.88)),
@@ -72,6 +74,20 @@ bool
 insula::physics::vehicle::wheel_info::is_front_wheel() const 
 { 
 	return is_front_wheel_; 
+}
+
+insula::physics::vehicle::wheel_info &
+insula::physics::vehicle::wheel_info::mirror(
+	bool const i) 
+{ 
+	mirror_ = i; 
+	return *this; 
+}
+
+bool 
+insula::physics::vehicle::wheel_info::mirror() const 
+{ 
+	return mirror_; 
 }
 
 insula::physics::vehicle::wheel_info &

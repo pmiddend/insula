@@ -72,12 +72,12 @@ insula::vehicle::json::parse_vehicle(
 				sge::parse::json::find_member_exn<sge::parse::json::string>(
 					chassis_model.members,
 					FCPPT_TEXT("texture")),
-				FCPPT_TEXT("textures")),
+				FCPPT_TEXT("textures/vehicles")),
 			create_path(
 				sge::parse::json::find_member_exn<sge::parse::json::string>(
 					wheel_model.members,
 					FCPPT_TEXT("texture")),
-				FCPPT_TEXT("textures")),
+				FCPPT_TEXT("textures/vehicles")),
 			physics_world,
 			static_cast<physics::scalar>(
 				sge::parse::json::find_member_exn<sge::parse::json::float_type>(

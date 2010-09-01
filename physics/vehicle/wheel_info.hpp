@@ -30,6 +30,12 @@ public:
 	is_front_wheel() const;
 
 	wheel_info &
+	mirror(
+		bool);
+	bool 
+	mirror() const;
+
+	wheel_info &
 	suspension_stiffness(
 		scalar);
 	scalar 
@@ -109,6 +115,7 @@ public:
 private:
 	vec3 position_;
 	bool is_front_wheel_;
+	bool mirror_;
 	scalar suspension_stiffness_;
 	scalar suspension_compression_;
 	scalar suspension_damping_;

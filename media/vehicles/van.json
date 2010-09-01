@@ -36,7 +36,8 @@
 			{
 				"offset" : [0.72,-0.0,1.65],
 				"front_wheel" : true,
-				"gets_steering" : true
+				"gets_steering" : true,
+				"mirror" : true
 			},
 			{
 				"offset" : [-0.72,-0.0,1.65],
@@ -46,7 +47,8 @@
 			{
 				"offset" : [0.72,-0.0,-1.05],
 				"gets_engine_force" : true,
-				"gets_breaking_force" : true
+				"gets_breaking_force" : true,
+				"mirror" : true
 			},
 			{
 				"offset" : [-0.72,-0.0,-1.05],

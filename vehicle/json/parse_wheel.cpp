@@ -25,6 +25,7 @@ insula::vehicle::json::parse_wheel(
 				FCPPT_TEXT("offset"))));
 
 	INSULA_VEHICLE_JSON_GENERATE_EXTRACTOR(is_front_wheel);
+	INSULA_VEHICLE_JSON_GENERATE_EXTRACTOR(mirror);
 	INSULA_VEHICLE_JSON_GENERATE_EXTRACTOR(gets_steering);
 	INSULA_VEHICLE_JSON_GENERATE_EXTRACTOR(gets_engine_force);
 	INSULA_VEHICLE_JSON_GENERATE_EXTRACTOR(gets_breaking_force);

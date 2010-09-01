@@ -20,6 +20,8 @@
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/structure_cast.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
+#include <fcppt/math/matrix/scaling.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/math/dim/arithmetic.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
@@ -285,9 +287,17 @@ insula::physics::vehicle::object::wheel_transforms() const
 {
 	mat4_sequence s;
 	for (int i = 0; i < vehicle_->getNumWheels(); ++i)
-		s.push_back(
+	{
+		mat4 const t = 
 			transform_to_mat4(
-				vehicle_->getWheelInfo(i).m_worldTransform));
+				vehicle_->getWheelInfo(i).m_worldTransform);
+		s.push_back(
+			wheels_[i].mirror()
+			?
+				(t * fcppt::math::matrix::scaling(static_cast<scalar>(-1),static_cast<scalar>(1),static_cast<scalar>(1)))
+			:
+				t);
+	}
 	return s;
 }
 
