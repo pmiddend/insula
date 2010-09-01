@@ -215,13 +215,36 @@ insula::physics::vehicle::object::object(
 			w.is_front_wheel());
 		btWheelInfo &btwheel = 
 			vehicle_->getWheelInfo(
-				wheel_id++);
+				wheel_id);
 
 		btwheel.m_suspensionStiffness = w.suspension_stiffness();
 		btwheel.m_wheelsDampingRelaxation = w.damping_relaxation();
 		btwheel.m_wheelsDampingCompression = w.damping_compression();
 		btwheel.m_frictionSlip = w.friction_slip();
 		btwheel.m_rollInfluence = w.roll_influence();
+
+		// For the correct wheel position, we need the suspension length,
+		// which is determined using raycasting. To get a half-proper
+		// initial wheel position, however, we set the suspension lenght
+		// ourselves
+		vehicle_->getWheelInfo(wheel_id).m_raycastInfo.m_suspensionLength = 
+			w.suspension_rest_length();
+		vehicle_->updateWheelTransform(wheel_id,true);
+
+		/*
+		fcppt::io::cout 
+			<< "wheel initial position: " 
+			<< bullet_to_vec3(vehicle_->getWheelInfo(wheel_id).m_worldTransform.getOrigin()) 
+			<< "\nhard point: " 
+			<< bullet_to_vec3(vehicle_->getWheelInfo(wheel_id).m_raycastInfo.m_hardPointWS) 
+			<< "\ndirection: " 
+			<< bullet_to_vec3(vehicle_->getWheelInfo(wheel_id).m_raycastInfo.m_wheelDirectionWS) 
+			<< "\nsuspension length: " 
+			<< vehicle_->getWheelInfo(wheel_id).m_raycastInfo.m_suspensionLength 
+			<< "\n";
+		*/
+
+		wheel_id++;
 	}
 }
 

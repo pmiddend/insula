@@ -205,7 +205,7 @@ insula::model::object::render()
 	sge::renderer::state::scoped const sstate(
 		renderer_,
 		sge::renderer::state::list
-			(sge::renderer::state::cull_mode::off)
+			(sge::renderer::state::cull_mode::front)
 			(sge::renderer::state::depth_func::less));
 
 	renderer_->render(

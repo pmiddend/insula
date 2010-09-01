@@ -110,11 +110,9 @@ insula::vehicle::object::object(
 			sge::audio::sound::positional_parameters()
 				.position(
 					fcppt::math::vector::structure_cast<sge::audio::vector>(
-						params.position))))
+						params.position)))),
+	active_(false)
 {
-	// Update once, so the wheel transformations are correct. That's
-	// needed in pregame when the physics loop isn't active yet.
-	update();
 }
 
 insula::graphics::gizmo const
@@ -143,6 +141,10 @@ insula::vehicle::object::update()
 {
 	physics_.update();
 
+	// Sound stuff
+	if (!active_)
+		return;
+
 	engine_source_->position(
 		fcppt::math::vector::structure_cast<sge::audio::vector>(
 			physics_.gizmo().position()));
@@ -162,7 +164,6 @@ insula::vehicle::object::update()
 
 	audio_player_->listener().position(
 		fcppt::math::vector::structure_cast<sge::audio::vector>(
-			//camera_.gizmo().position()));
 			physics_.gizmo().position()));
 
 	engine_source_->pitch(
@@ -237,6 +238,7 @@ insula::vehicle::object::speed_kmh() const
 void
 insula::vehicle::object::activate()
 {
+	active_ = true;
 	engine_source_->play(
 		sge::audio::sound::repeat::loop);
 	input_.is_active(true);
@@ -246,6 +248,7 @@ insula::vehicle::object::activate()
 void
 insula::vehicle::object::deactivate()
 {
+	active_ = false;
 	engine_source_->stop();
 	input_.is_active(false);
 	lock_camera_ = false;

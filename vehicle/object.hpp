@@ -76,6 +76,7 @@ private:
 	sge::audio::sound::positional_ptr engine_source_;
 	sge::audio::buffer_ptr skid_buffer_;
 	sge::audio::sound::positional_ptr skid_source_;
+	bool active_;
 };
 }
 }
