@@ -63,7 +63,8 @@ insula::vehicle::json::parse_vehicle(
 					sge::parse::json::find_member_exn<sge::parse::json::string>(
 						wheel_model.members,
 						FCPPT_TEXT("model")),
-					FCPPT_TEXT("models/vehicles"))),
+					FCPPT_TEXT("models/vehicles")),
+				sge::model::load_flags::switch_yz),
 			sys.renderer(),
 			sys.image_loader(),
 			camera,

@@ -218,9 +218,10 @@ insula::graphics::shader::object::update_texture(
 		{
 			r.texture(
 				newtex);
-			break;
+			return;
 		}
 	}
+	FCPPT_ASSERT(false);
 }
 
 sge::renderer::glsl::program_ptr const

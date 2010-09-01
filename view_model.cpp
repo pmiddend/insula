@@ -223,7 +223,12 @@ try
 	model::object model(
 		model_object,
 		sys.renderer(),
-		get_option<fcppt::string>(vm,"part"));
+		!vm.count("part")
+		?
+			fcppt::optional<fcppt::string>()
+		:
+			fcppt::optional<fcppt::string>(
+				get_option<fcppt::string>(vm,"part")));
 
 	bool running = 
 		true;
@@ -275,8 +280,10 @@ try
 			(sge::renderer::state::color::clear_color = sge::image::colors::white())
 			(sge::renderer::state::bool_::clear_zbuffer = true)
 		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
-			(sge::renderer::state::cull_mode::off)
-			(sge::renderer::state::depth_func::less));
+			//(sge::renderer::state::cull_mode::off)
+			//(sge::renderer::state::depth_func::less)
+			(sge::renderer::state::depth_func::off)
+			);
 
 	while(running)
 	{
@@ -289,18 +296,17 @@ try
 			sys.renderer());
 
 		{
+		graphics::shader::scoped scoped_shader(
+			model_shader);
+
 		model::scoped scoped_model(
 			sys.renderer(),
 			model);
-
-		graphics::shader::scoped scoped_shader(
-			model_shader);
 
 		model_shader.set_uniform(
 			"mvp",
 			cam->perspective() * 
 			cam->world());
-
 
 		model.render();
 		}

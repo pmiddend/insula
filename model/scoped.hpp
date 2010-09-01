@@ -3,7 +3,8 @@
 
 #include "object_fwd.hpp"
 #include <sge/renderer/device_ptr.hpp>
-#include <sge/renderer/vertex_buffer_ptr.hpp>
+#include <sge/renderer/scoped_vertex_buffer.hpp>
+#include <sge/renderer/state/scoped.hpp>
 
 namespace insula
 {
@@ -23,7 +24,8 @@ public:
 	~scoped();
 private:
 	sge::renderer::device_ptr const renderer_;
-	sge::renderer::vertex_buffer_ptr const vb_;
+	sge::renderer::scoped_vertex_buffer scoped_vb_;
+	sge::renderer::state::scoped scoped_state_;
 };
 }
 }

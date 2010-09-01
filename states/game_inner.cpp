@@ -104,7 +104,8 @@ insula::states::game_inner::game_inner(
 				get_option<fcppt::string>(
 					context<machine>().cli_variables(),
 					"game-nugget-model"),
-				FCPPT_TEXT("models"))),
+				FCPPT_TEXT("models")),
+			sge::model::load_flags::switch_yz),
 			context<machine>().systems().renderer()),
 	vehicle_(
 		insula::vehicle::cli_factory(
@@ -189,14 +190,18 @@ insula::states::game_inner::react(
 			"texture",
 			nugget_texture_);
 
+	//	fcppt::io::cout << "scoping shader\n";
 		graphics::shader::scoped scoped_shader(
 			nugget_shader_);
 
+	//	fcppt::io::cout << "scoping model\n";
 		model::scoped scoped_model(
 			context<machine>().systems().renderer(),
 			nugget_model_);
-		
-		BOOST_FOREACH(physics::static_model &m,nugget_models_)
+
+		BOOST_FOREACH(
+			physics::static_model &m,
+			nugget_models_)
 		{
 			nugget_shader_.set_uniform(
 				"mvp",
@@ -204,6 +209,7 @@ insula::states::game_inner::react(
 				context<machine>().camera().world() * 
 				fcppt::math::matrix::structure_cast<graphics::mat4>(
 					m.world_transform()));
+
 			nugget_model_.render();
 		}
 	}

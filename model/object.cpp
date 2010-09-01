@@ -202,11 +202,13 @@ insula::model::object::object(
 void
 insula::model::object::render()
 {
+	//fcppt::io::cout << "setting cull_mode to back\n";
+	/*
 	sge::renderer::state::scoped const sstate(
 		renderer_,
 		sge::renderer::state::list
-			(sge::renderer::state::cull_mode::front)
-			(sge::renderer::state::depth_func::less));
+			(sge::renderer::state::cull_mode::back)
+			(sge::renderer::state::depth_func::less));*/
 
 	renderer_->render(
 		ib_,
