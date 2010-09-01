@@ -3,7 +3,7 @@
 
 #include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/scalar.hpp"
-#include "../graphics/shader.hpp"
+#include "../graphics/shader/object.hpp"
 #include "../graphics/rect.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/target_ptr.hpp>
@@ -43,9 +43,6 @@ public:
 	void 
 	render();
 
-	graphics::shader_old &
-	shader();
-
 	graphics::scalar
 	water_level() const;
 
@@ -56,7 +53,7 @@ private:
 	sge::renderer::target_ptr target_;
 	graphics::camera::object &camera_;
 	graphics::scalar const water_level_;
-	graphics::shader_old shader_;
+	graphics::shader::object shader_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::time::timer wave_timer_;
 	graphics::scalar current_time_;

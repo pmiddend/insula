@@ -1,6 +1,13 @@
 * btGhostObject in sanguis
+
 Man müsste ein btGhostObject anlegen und ihm eine Shape geben und dann
 das machen, was in [[file:~/projects/insula/temp/bullet-2.76/Demos/CharacterDemo/CharacterDemo.cpp::172][CharacterDemo]] steht (in jedem TickCallback).
+
+* Kurzzeitvorgehen
+
+- physics::shape_from_model
+- json
+- vehicle::speed_kmh muss relativ zu forward sein
 
 * Vorgehen für 1.0
 	

@@ -137,7 +137,7 @@ insula::height_map::object::object(
 		media_path()/FCPPT_TEXT("height_map_vertex.glsl"),
 		media_path()/FCPPT_TEXT("height_map_fragment.glsl"),
 		graphics::shader::vf_to_string<vf::format>(),
-		fcppt::assign::make_container<graphics::shader::object::variable_sequence>
+		fcppt::assign::make_container<graphics::shader::variable_sequence>
 			(
 			graphics::shader::variable(
 				"sun_direction",
@@ -176,7 +176,7 @@ insula::height_map::object::object(
 				"mvp",
 				graphics::shader::variable_type::uniform,
 				graphics::mat4())),
-		fcppt::assign::make_container<graphics::shader::object::sampler_sequence>
+		fcppt::assign::make_container<graphics::shader::sampler_sequence>
 			(
 			graphics::shader::sampler(
 				"rock",

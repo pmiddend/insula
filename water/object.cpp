@@ -1,6 +1,8 @@
 #include "../graphics/camera/object.hpp"
 #include "../graphics/vec3.hpp"
 #include "../graphics/camera/scoped.hpp"
+#include "../graphics/shader/vf_to_string.hpp"
+#include "../graphics/shader/scoped.hpp"
 #include "../gizmo/mirror_at_plane.hpp"
 #include "vf/vertex_view.hpp"
 #include "vf/position.hpp"
@@ -44,6 +46,7 @@
 #include <fcppt/math/box/basic_impl.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
+#include <fcppt/assign/make_container.hpp>
 #include "../media_path.hpp"
 #include "object.hpp"
 
@@ -62,10 +65,7 @@ insula::water::object::object(
 	renderer_(
 		_renderer),
 	bump_texture_(
-		renderer_->create_texture(
-			_bump_texture->view(),
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::none)),
+		),
 	camera_(
 		_camera),
 	water_level_(
@@ -73,27 +73,50 @@ insula::water::object::object(
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("water_vertex.glsl"),
-		media_path()/FCPPT_TEXT("water_fragment.glsl")),
+		media_path()/FCPPT_TEXT("water_fragment.glsl"),
+		graphics::shader::vf_to_string<vf::format>(),
+		fcppt::assign::make_container<graphics::shader::variable_sequence>
+			(
+			graphics::shader::variable(
+				"wave_height",
+				graphics::shader::variable_type::const_,
+				wave_height))
+			(
+			graphics::shader::variable(
+				"wind_speed",
+				graphics::shader::variable_type::const_,
+				wind_speed))
+			(
+			graphics::shader::variable(
+				"mvp",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4()))
+			(
+			graphics::shader::variable(
+				"mvp_mirror",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4()))
+			(
+			graphics::shader::variable(
+				"time",
+				graphics::shader::variable_type::uniform,
+				graphics::scalar())),
+		fcppt::assign::make_container<graphics::shader::sampler_sequence>
+			(
+			graphics::shader::sampler(
+				"bump_texture",
+				renderer_->create_texture(
+					_bump_texture->view(),
+					sge::renderer::filter::linear,
+					sge::renderer::resource_flags::none)))
+			(
+			graphics::shader::sampler(
+				"reflection_texture"))),
 	wave_timer_(
 		sge::time::second(1)),
 	current_time_(
 		static_cast<graphics::scalar>(0))
 {
-	{
-		sge::renderer::glsl::scoped_program scoped_shader_(
-			renderer_,
-			shader_.program());
-
-		shader_.set_uniform(
-			FCPPT_TEXT("wave_height"),
-			wave_height);
-
-		shader_.set_uniform(
-			FCPPT_TEXT("wind_speed"),
-			wind_speed);
-	}
-	
-	
 	regenerate(
 		extents,
 		reflection_texture_size,
@@ -110,23 +133,12 @@ insula::water::object::render()
 		 	(sge::renderer::state::cull_mode::off)
 		 	(sge::renderer::state::depth_func::less));
 
-	sge::renderer::glsl::scoped_program scoped_shader_(
-		renderer_,
-		shader_.program());
+	graphics::shader::scoped scoped_shader_(
+		shader_);
 
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,
 		vb_);
-
-	sge::renderer::scoped_texture scoped_tex0(
-		renderer_,
-		target_texture_,
-		0);
-
-	sge::renderer::scoped_texture scoped_tex1(
-		renderer_,
-		bump_texture_,
-		1);
 
 	shader_.set_uniform(
 		FCPPT_TEXT("mvp"),
@@ -147,12 +159,6 @@ insula::water::object::render()
 		sge::renderer::vertex_count(
 			vb_->size()),
 		sge::renderer::nonindexed_primitive_type::triangle);
-}
-
-insula::graphics::shader_old &
-insula::water::object::shader()
-{
-	return shader_;
 }
 
 insula::graphics::scalar
@@ -205,20 +211,16 @@ insula::water::object::regenerate(
 		renderer_,
 		shader_.program());
 
-	shader_.set_uniform(
-		FCPPT_TEXT("reflection_texture"),
-		0);
-
-	shader_.set_uniform(
-		FCPPT_TEXT("bump_texture"),
-		1);
-
 	target_texture_ = 
 		renderer_->create_texture(
 			reflection_texture_size,
 			sge::image::color::format::rgb8,
 			sge::renderer::filter::linear,
 			sge::renderer::resource_flags::readable);
+
+	shader_.update_texture(
+		"reflection_texture",
+		target_texture_);
 
 	target_ = 
 		renderer_->create_target(

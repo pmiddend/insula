@@ -37,18 +37,11 @@ insula::states::game_outer::game_outer(
 			context<machine>().camera(),
 			context<machine>().systems().renderer(),
 			context<machine>().systems().image_loader())),
-	height_map_console_(
-		*height_map_,
-		context<machine>().console().model(),
-		context<machine>().systems().image_loader()),
 	skydome_(
 		skydome::cli_factory(
 			context<machine>().cli_variables(),
 			context<machine>().camera(),
 			context<machine>().systems().renderer())),
-	skydome_console_(
-		*skydome_,
-		context<machine>().console().model()),
 	water_(
 		insula::water::cli_factory(
 			context<machine>().cli_variables(),
@@ -57,9 +50,6 @@ insula::states::game_outer::game_outer(
 			fcppt::math::box::structure_cast<graphics::box>(
 				height_map_->extents()),
 			context<machine>().systems().image_loader())),
-	water_console_(
-		*water_,
-		context<machine>().console().model()),
 	nugget_positions_(
 		generate_nuggets(
 			*height_map_,

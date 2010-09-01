@@ -109,8 +109,6 @@
 #include <iterator>
 #include <ostream>
 
-#include <GL/gl.h>
-
 namespace
 {
 namespace vf_tags
@@ -383,6 +381,7 @@ try
 			sys.renderer()->state(
 				sge::renderer::state::list
 					(sge::renderer::state::bool_::enable_alpha_blending = true)
+					(sge::renderer::state::bool_::enable_point_sprites = true)
 					(sge::renderer::state::source_blend_func::src_alpha)
 					(sge::renderer::state::dest_blend_func::inv_src_alpha)
 );
@@ -390,10 +389,6 @@ try
 			sge::renderer::scoped_vertex_buffer const scoped_vb_(
 				sys.renderer(),
 				vb_);
-
-			glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-			glEnable(GL_POINT_SPRITE);
-	//		glEnable(GL_POINT_SMOOTH);
 
 			sys.renderer()->render(
 				sge::renderer::first_vertex(

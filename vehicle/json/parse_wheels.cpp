@@ -6,12 +6,12 @@
 #include <sge/parse/json/object.hpp>
 
 insula::physics::vehicle::wheel_info_sequence const
-insula::physics::json::parse_wheels(
+insula::vehicle::json::parse_wheels(
 	sge::parse::json::array const &o,
-	vehicle::wheel_info const &default_wheel)
+	physics::vehicle::wheel_info const &default_wheel)
 {
 	return 
-		stdlib::map<vehicle::wheel_info_sequence>(
+		stdlib::map<physics::vehicle::wheel_info_sequence>(
 			o.elements,
 			[&default_wheel](sge::parse::json::value const &v) 
 			{

@@ -7,6 +7,7 @@
 #include "../events/render.hpp"
 #include "../events/vehicle_nugget_collision.hpp"
 #include "../events/key.hpp"
+#include "../vehicle/scoped.hpp"
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
@@ -49,6 +50,8 @@ public:
 	boost::statechart::result
 	react(
 		events::key const &);
+private:
+	vehicle::scoped scoped_vehicle_;
 };
 }
 }

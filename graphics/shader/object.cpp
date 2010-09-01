@@ -21,6 +21,7 @@
 #include <fcppt/from_std_string.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <streambuf>
+#include <algorithm>
 
 namespace
 {
@@ -70,7 +71,7 @@ insula::graphics::shader::object::object(
 	fcppt::filesystem::path const &vertex,
 	fcppt::filesystem::path const &fragment,
 	fcppt::string const &format_declaration,
-	variable_sequence const &variables,
+	variable_sequence const &_variables,
 	sampler_sequence const &_samplers)
 :
 	renderer_(
@@ -84,19 +85,23 @@ insula::graphics::shader::object::object(
 		throw exception(
 			fragment.string()+FCPPT_TEXT(" doesn't exist!"));
 
-	sge::renderer::glsl::string 
-		vertex_content = 
-			file_to_string(
-				vertex),
-		fragment_content = 
-			file_to_string(
-				fragment);
-
-	sge::renderer::glsl::string header;
-	BOOST_FOREACH(variable const &v,variables)
-		header += v.declaration()+"\n";
-	BOOST_FOREACH(sampler const &v,_samplers)
-		header += v.declaration()+"\n";
+	sge::renderer::glsl::string const header = 
+		std::accumulate(
+			_variables.begin(),
+			_variables.end(),
+			sge::renderer::glsl::string(),
+			[](sge::renderer::glsl::string const &s,variable const &v) 
+			{ 
+				return s + v.declaration(); 
+			})+
+		std::accumulate(
+			_samplers.begin(),
+			_samplers.end(),
+			sge::renderer::glsl::string(),
+			[](sge::renderer::glsl::string const &s,sampler const &v) 
+			{ 
+				return s + v.declaration(); 
+			});
 
 	fcppt::io::cout << "Generated header: " << header << "\n";
 	fcppt::io::cout << "Got format declaration: " << format_declaration << "\n";
@@ -127,21 +132,19 @@ insula::graphics::shader::object::object(
 		program_);
 
 	fcppt::io::cout << "Iterating through variables\n";
-	BOOST_FOREACH(variable const &v,variables)
+	BOOST_FOREACH(variable const &v,_variables)
 	{
 		if (v.type() != variable_type::uniform)
 			continue;
-
-		uniforms_.insert(
-			uniform_map::value_type(
-				v.name(),
-				program_->uniform(v.name())));
 
 		fcppt::io::cout << "Setting initial value for variable " << v.name() << "\n";
 		// TODO: See above
 		fcppt::variant::apply_unary(
 			uniform_setter(
-				uniforms_[v.name()]),
+				uniforms_.insert(
+					uniform_map::value_type(
+						v.name(),
+						program_->uniform(v.name()))).first->second),
 			v.initial_value());
 	}
 	fcppt::io::cout << "Iterating through variables - DONE\n";
@@ -156,20 +159,16 @@ insula::graphics::shader::object::object(
 		samplers_.push_back(
 			v);
 
-		//sampler &c = 
-		//	samplers_[samplers_.size()-1];
-
-		uniforms_.insert(
-			uniform_map::value_type(
-				v.name(),
-				program_->uniform(v.name())));
-
 		fcppt::io::cout 
 			<< "Assigning " << v.name() << " the texture unit " << current_tu << "\n";
 
 		sge::renderer::glsl::uniform::single_value(
-			uniforms_[v.name()],
+			uniforms_.insert(
+				uniform_map::value_type(
+					v.name(),
+					program_->uniform(v.name()))).first->second,
 			current_tu);
+
 		samplers_.back().texture_unit(
 			current_tu);
 
@@ -204,6 +203,24 @@ insula::graphics::shader::object::set_uniform(
 		uniform_setter(
 			i->second),
 		v);
+}
+
+void
+insula::graphics::shader::object::update_texture(
+	sge::renderer::glsl::string const &name,
+	sge::renderer::texture_ptr const newtex)
+{
+	BOOST_FOREACH(
+		sampler_sequence::reference r,
+		samplers_)
+	{
+		if (r.name() == name)
+		{
+			r.texture(
+				newtex);
+			break;
+		}
+	}
 }
 
 sge::renderer::glsl::program_ptr const

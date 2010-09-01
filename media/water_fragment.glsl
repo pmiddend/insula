@@ -1,9 +1,7 @@
 #version 140
 
-uniform float wave_height;
-uniform float wind_speed;
-uniform sampler2D reflection_texture;
-uniform sampler2D bump_texture;
+$$$HEADER$$$
+
 in vec4 texcoord_projected;
 in vec2 texcoord_bump;
 out vec4 frag_color;

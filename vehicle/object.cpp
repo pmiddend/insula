@@ -1,20 +1,23 @@
+#include "parameters.hpp"
 #include "object.hpp"
 #include "input.hpp"
 #include "speed_to_pitch.hpp"
-#include "../create_path.hpp"
-#include "../media_path.hpp"
+#include "../model/scoped.hpp"
 #include "../console/object.hpp"
 #include "../gizmo/structure_cast.hpp"
 #include "../gizmo/lock_to.hpp"
-#include "../physics/json/parse_vehicle.hpp"
+#include "../physics/shape_from_model.hpp"
 #include "../physics/gizmo.hpp"
 #include "../physics/vehicle/object.hpp"
 #include "../graphics/camera/object.hpp"
-#include <sge/parse/json/object.hpp>
-#include <sge/parse/json/parse_file.hpp>
-#include <sge/parse/json/array.hpp>
-#include <sge/parse/json/find_member_exn.hpp>
+#include "../graphics/shader/object.hpp"
+#include "../graphics/shader/scoped.hpp"
 #include <sge/console/object.hpp>
+#include <sge/renderer/device.hpp>
+#include <sge/image/file.hpp>
+#include <sge/renderer/filter/trilinear.hpp>
+#include <sge/renderer/filter/linear.hpp>
+#include <sge/renderer/resource_flags_none.hpp>
 #include <sge/audio/sound/positional_parameters.hpp>
 #include <sge/audio/sound/positional.hpp>
 #include <sge/audio/sound/repeat.hpp>
@@ -24,31 +27,60 @@
 #include <sge/audio/buffer.hpp>
 #include <sge/exception.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/text.hpp>
 #include <cmath>
 
 insula::vehicle::object::object(
-	fcppt::filesystem::path const &json_file,
-	physics::world &physics_world,
-	physics::vec3 const &position,
-	sge::renderer::device_ptr const rend,
-	sge::image::multi_loader &il,
-	sge::model::loader_ptr const model_loader,
-	graphics::shader_old &shader,
-	graphics::camera::object &_cam,
-	input_delegator &_input_delegator,
-	graphics::scalar const _camera_distance,
-	graphics::scalar const _camera_angle,
-	console::object &_console,
-	sge::audio::multi_loader &_audio_loader,
-	sge::audio::player_ptr const _audio_player)
+	parameters const &params)
 :
-	cam_(
-		_cam),
+	renderer_(
+		params.renderer),
+	chassis_model_(
+		params.chassis_model,
+		params.renderer),
+	wheel_model_(
+		params.wheel_model,
+		params.renderer),
+	model_shader_(
+		params.model_shader),
+	chassis_texture_(
+		params.renderer->create_texture(
+			params.image_loader.load(params.chassis_texture)->view(),
+			sge::renderer::filter::trilinear,
+			sge::renderer::resource_flags::none)),
+	wheel_texture_(
+		params.renderer->create_texture(
+			params.image_loader.load(params.wheel_texture)->view(),
+			sge::renderer::filter::linear,
+			sge::renderer::resource_flags::none)),
+	physics_(
+		params.physics_world,
+		physics::shape_from_model(
+			chassis_model_,
+			physics::model_approximation(
+				physics::model_approximation::box,
+				static_cast<physics::scalar>(1))),
+		params.mass,
+		params.chassis_position,
+		params.steering_clamp,
+		params.position,
+		params.max_engine_force,
+		params.max_breaking_force,
+		params.max_speed,
+		fcppt::math::box::structure_cast<physics::box>(
+			wheel_model_.bounding_box()),
+		params.wheel_infos),
+	input_(
+		params.input_delegator_,
+		physics_),
+	camera_(
+		params.camera),
 	lock_camera_(
-		true),
+		false),
 	toggle_camera_lock_(
-		_console.model().insert(
+		params.console.model().insert(
 			FCPPT_TEXT("lock_camera"),
 			[&lock_camera_](
 				sge::console::arg_list const &,
@@ -58,62 +90,28 @@ insula::vehicle::object::object(
 			},
 			FCPPT_TEXT("Toggle camera lock to vehicle on/off"))),
 	camera_distance_(
-		_camera_distance),
+		params.camera_distance),
 	camera_angle_(
-		_camera_angle),
+		params.camera_angle),
 	audio_player_(
-		_audio_player)
-{
-	sge::parse::json::object json_object;
-	if (!sge::parse::json::parse_file(json_file,json_object))
-		throw sge::exception(FCPPT_TEXT("Error parsing file: ")+json_file.string());
-
-	physics_ = 
-		physics::json::parse_vehicle(
-			json_object,
-			physics_world,
-			position,
-			rend,
-			il,
-			model_loader,
-			shader,
-			_cam);
-
-	input_.reset(
-		new input(
-			_input_delegator,
-			*physics_));
-
-	engine_buffer_ = 
-		audio_player_->create_buffer(
-			_audio_loader.load(
-				create_path(
-					sge::parse::json::find_member_exn<sge::parse::json::string>(
-						json_object.members,
-						FCPPT_TEXT("engine_sound")),
-				FCPPT_TEXT("sounds"))));
-
-	engine_source_ = 
+		params.audio_player),
+	engine_buffer_(
+		params.engine_buffer),
+	engine_source_(
 		engine_buffer_->create_positional(
 			sge::audio::sound::positional_parameters()
 				.position(
 					fcppt::math::vector::structure_cast<sge::audio::vector>(
-						position)));
-
-	engine_source_->play(
-		sge::audio::sound::repeat::loop);
-
-	skid_buffer_ = 
-		audio_player_->create_buffer(
-			_audio_loader.load(
-				media_path()/FCPPT_TEXT("sounds")/FCPPT_TEXT("skid.wav")));
-
-	skid_source_ = 
+						params.position)))),
+	skid_buffer_(
+		params.skid_buffer),
+	skid_source_(
 		skid_buffer_->create_positional(
 			sge::audio::sound::positional_parameters()
 				.position(
 					fcppt::math::vector::structure_cast<sge::audio::vector>(
-						position)));
+						params.position))))
+{
 }
 
 insula::graphics::gizmo const
@@ -122,7 +120,7 @@ insula::vehicle::object::lock_to_gizmo() const
 	return 
 		gizmo::lock_to(
 			gizmo::structure_cast<physics::gizmo>(
-				physics_->gizmo()),
+				physics_.gizmo()),
 			camera_distance_,
 			camera_angle_);
 }
@@ -133,24 +131,24 @@ insula::vehicle::object::update_camera()
 	if (!lock_camera_)
 		return;
 
-	cam_.gizmo() = 
+	camera_.gizmo() = 
 		lock_to_gizmo();
 }
 
 void
 insula::vehicle::object::update()
 {
-	physics_->update();
+	physics_.update();
 
 	engine_source_->position(
 		fcppt::math::vector::structure_cast<sge::audio::vector>(
-			physics_->gizmo().position()));
+			physics_.gizmo().position()));
 
 	skid_source_->position(
 		fcppt::math::vector::structure_cast<sge::audio::vector>(
-			physics_->gizmo().position()));
+			physics_.gizmo().position()));
 
-	if (physics_->is_skidding())
+	if (physics_.is_skidding())
 	{
 		if (skid_source_->status() != sge::audio::sound::play_status::playing)
 			skid_source_->play(
@@ -161,20 +159,68 @@ insula::vehicle::object::update()
 
 	audio_player_->listener().position(
 		fcppt::math::vector::structure_cast<sge::audio::vector>(
-			//cam_.gizmo().position()));
-			physics_->gizmo().position()));
+			//camera_.gizmo().position()));
+			physics_.gizmo().position()));
 
 	engine_source_->pitch(
 		static_cast<sge::audio::scalar>(1) +
 		speed_to_pitch(
 			std::abs(
-				physics_->speed_kmh())));
+				physics_.speed_kmh())));
 }
 
 void
 insula::vehicle::object::render()
 {
-	physics_->render();
+	graphics::mat4 const mvp = 
+		camera_.perspective() * 
+		camera_.world();
+
+	{
+		model::scoped scoped_model(
+			renderer_,
+			chassis_model_);
+
+		// FIRST update the texture, THEN scope the shader!
+		model_shader_.update_texture(
+			"texture",
+			chassis_texture_);
+
+		graphics::shader::scoped scoped_shader(
+			model_shader_);
+
+		model_shader_.set_uniform(
+			"mvp",
+			mvp * 
+			physics_.chassis_transform());
+
+		chassis_model_.render();
+	}
+
+	{
+		model::scoped scoped_model(
+			renderer_,
+			wheel_model_);
+
+		// FIRST update the texture, THEN scope the shader!
+		model_shader_.update_texture(
+			"texture",
+			wheel_texture_);
+
+		graphics::shader::scoped scoped_shader(
+			model_shader_);
+
+		BOOST_FOREACH(
+			physics::mat4_sequence::const_reference r,
+			physics_.wheel_transforms())
+		{
+			model_shader_.set_uniform(
+				"mvp",
+				mvp * 
+				r); 
+			wheel_model_.render();
+		}
+	}
 }
 
 insula::physics::scalar
@@ -182,5 +228,22 @@ insula::vehicle::object::speed_kmh() const
 {
 	return 
 		std::abs(
-			physics_->speed_kmh());
+			physics_.speed_kmh());
 }
+
+void
+insula::vehicle::object::activate()
+{
+	engine_source_->play(
+		sge::audio::sound::repeat::loop);
+	input_.is_active(true);
+}
+
+void
+insula::vehicle::object::deactivate()
+{
+	engine_source_->stop();
+	input_.is_active(false);
+}
+
+insula::vehicle::object::~object() {}

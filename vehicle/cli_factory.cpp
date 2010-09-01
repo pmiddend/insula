@@ -1,51 +1,40 @@
 #include "cli_factory.hpp"
 #include "object.hpp"
 #include "input.hpp"
+#include "json/parse_vehicle.hpp"
 #include "../create_path.hpp"
 #include "../get_option.hpp"
 #include "../graphics/scalar.hpp"
+#include <sge/parse/json/parse_file_exn.hpp>
+#include <sge/parse/json/array.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
 #include <fcppt/text.hpp>
 
-insula::vehicle::object_ptr const
+insula::vehicle::parameters const
 insula::vehicle::cli_factory(
 	boost::program_options::variables_map const &vm,
-	physics::world &w,
+	sge::systems::instance const &sys,
+	graphics::camera::object &camera,
+	graphics::shader::object &model_shader,
+	physics::world &physics_world,
 	physics::vec3 const &position,
-	sge::renderer::device_ptr const rend,
-	sge::image::multi_loader &il,
-	sge::model::loader_ptr const model_loader,
-	graphics::shader_old &shader,
-	graphics::camera::object &cam,
-	input_delegator &_input_delegator,
-	console::object &console,
-	sge::audio::multi_loader &audio_loader,
-	sge::audio::player_ptr const audio_player)
+	input_delegator &input_delegator_,
+	console::object &console)
 {
 	return 
-		std::make_shared<object>(
-			create_path(
-				get_option<fcppt::string>(vm,"vehicle-file"),
-				FCPPT_TEXT("vehicles")),
-			std::ref(
-				w),
+		json::parse_vehicle(
+			sge::parse::json::parse_file_exn(
+				create_path(
+					get_option<fcppt::string>(vm,"vehicle-file"),
+					FCPPT_TEXT("vehicles"))),
+			sys,
+			camera,
+			model_shader,
+			physics_world,
 			position,
-			rend,
-			std::ref(
-				il),
-			model_loader,
-			std::ref(
-				shader),
-			std::ref(
-				cam),
-			std::ref(
-				_input_delegator),
+			input_delegator_,
+			console,
 			get_option<graphics::scalar>(vm,"vehicle-camera-distance"),
 			fcppt::math::deg_to_rad( 
-				get_option<graphics::scalar>(vm,"vehicle-camera-angle")),
-			std::ref(
-				console),
-			std::ref(
-				audio_loader),
-			audio_player);
+				get_option<graphics::scalar>(vm,"vehicle-camera-angle")));
 }

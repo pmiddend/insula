@@ -1,12 +1,7 @@
 #version 140
 
-uniform float wave_height;
-uniform float wind_speed;
-uniform mat4 mvp;
-uniform mat4 mvp_mirror;
-uniform float time;
-in vec3 position;
-in vec2 texture_coordinate;
+$$$HEADER$$$
+
 out vec4 texcoord_projected;
 out vec2 texcoord_bump;
 

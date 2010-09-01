@@ -56,10 +56,9 @@ create_tuning(
 }
 }
 
-insula::physics::vehicle::object::object::object(
+insula::physics::vehicle::object::object(
 	world &_world,
-	sge::renderer::device_ptr const _renderer,
-	model::object_ptr _chassis_model,
+	shape_ptr const _chassis_shape,
 	scalar const mass,
 	scalar const chassis_position,
 	scalar const _steering_clamp,
@@ -67,13 +66,13 @@ insula::physics::vehicle::object::object::object(
 	scalar const _max_engine_force,
 	scalar const _max_breaking_force,
 	scalar const _max_speed,
-	model::object_ptr _wheel_model,
+	box const &_wheel_bb,
 	wheel_info_sequence const &_wheels)
 :
-	renderer_(
-		_renderer),
 	world_(
 		_world),
+	chassis_shape_(
+		_chassis_shape),
 	motion_state_(
 		new motion_state(
 			_position)),
@@ -93,10 +92,6 @@ insula::physics::vehicle::object::object::object(
 		0),
 	steering_clamp_(
 		_steering_clamp),
-	chassis_model_(
-		_chassis_model),
-	wheel_model_(
-		_wheel_model),
 	is_skidding_(
 		false),
 	world_body_scope_(
@@ -104,18 +99,6 @@ insula::physics::vehicle::object::object::object(
 	world_vehicle_scope_(
 		world_)
 {
-	chassis_box_.reset(
-		new btBoxShape(
-			dim3_to_bullet(
-				// btBoxShape gets half extents, so muliply by 0.5 here
-				static_cast<scalar>(0.5)*
-				fcppt::math::dim::structure_cast<dim3>(
-					chassis_model_->bounding_box().dimension()))));
-
-	// DEBUG BEGIN
-	//fcppt::io::cout << "chassis box: " << chassis_model_->bounding_box() << "\n";
-	// DEBUG END
-	
 	compound_.reset(
 		new btCompoundShape());
 
@@ -126,7 +109,7 @@ insula::physics::vehicle::object::object::object(
 				0,
 				chassis_position,
 				0)),
-		chassis_box_.get());
+		chassis_shape_.get());
 
 	// I don't know if initializing to zero is neccessary
 	btVector3 local_inertia(0,0,0);
@@ -154,37 +137,10 @@ insula::physics::vehicle::object::object::object(
 		new upright_constraint(
 			*car_body_,
 			t));
-	world_.handle().addConstraint(
-		constraint_.get());
-
-	// TEST FOR CONSTRAINT BEGIN
-	/*
-	   btRigidBody *_bt_balancer_body = new btRigidBody(
-        btRigidBody::btRigidBodyConstructionInfo(
-            0, 0, 0, btVector3(0,0,0) ) );
-
-    // must use X axis as Y axis because 6dof wont spin freely on Y
-    btTransform frameina( btTransform::getIdentity() );
-    btTransform frameinb( btTransform::getIdentity() );
-    frameina.getBasis().setEulerZYX( 0, 0, SIMD_HALF_PI );
-    _bt_balancer_body->getWorldTransform()
-        .getBasis().setEulerZYX( 0, 0, SIMD_HALF_PI );
-
-    btGeneric6DofConstraint * sixdof = new btGeneric6DofConstraint(
-        *car_body_, *_bt_balancer_body,
-        frameina, frameinb, true ); // use linear reference frame a
-    sixdof->setLimit( 0, -SIMD_INFINITY, SIMD_INFINITY );
-    sixdof->setLimit( 1, -SIMD_INFINITY, SIMD_INFINITY );
-    sixdof->setLimit( 2, -SIMD_INFINITY, SIMD_INFINITY );
-    sixdof->setLimit( 3, -SIMD_PI, SIMD_PI ); // only x axis can turn freely
-    sixdof->setLimit( 4, -SIMD_HALF_PI, SIMD_HALF_PI );
-    sixdof->setLimit( 5, -SIMD_HALF_PI, SIMD_HALF_PI );
-		world_.handle().addConstraint(
-			sixdof);
-	*/
- //   _bt_balancer_constraint = sixdof;
-	// TEST FOR CONSTRAINT END
-	
+	scoped_constraint_.reset(
+		new scoped_constraint(
+			world_,
+			*constraint_));
 
 	// TODO: What happens if this is omitted?
 	car_body_->setActivationState(
@@ -200,20 +156,13 @@ insula::physics::vehicle::object::object::object(
 		btVector3(0,0,0));
 	// TODO END
 
-	graphics::box const wheel_box = 
-		wheel_model_->bounding_box();
-
-	// DEBUG BEGIN
-	//fcppt::io::cout << "wheel_box is " << wheel_box << "\n";
-	// DEBUG END
-
 	scalar const 
 		wheel_halfwidth = 
 			static_cast<scalar>(
-				wheel_box.w()/2),
+				_wheel_bb.w()/2),
 		wheel_radius = 
 			static_cast<scalar>(
-				wheel_box.h()/2);
+				_wheel_bb.h()/2);
 
 	wheel_shape_.reset(
 		new btCylinderShapeX(
@@ -323,17 +272,23 @@ insula::physics::vehicle::object::update()
 	}
 }
 
-void
-insula::physics::vehicle::object::render()
+insula::physics::mat4 const
+insula::physics::vehicle::object::chassis_transform() const
 {
-	for (wheel_info_sequence::size_type i = 0; i < wheels_.size(); ++i)
-		wheel_model_->render(
-			transform_to_mat4(
-				vehicle_->getWheelInfo(static_cast<int>(i)).m_worldTransform));
-
-	chassis_model_->render(
+	return 
 		transform_to_mat4(
-			motion_state_->transform()));
+			motion_state_->transform());
+}
+
+insula::physics::mat4_sequence const
+insula::physics::vehicle::object::wheel_transforms() const
+{
+	mat4_sequence s;
+	for (int i = 0; i < vehicle_->getNumWheels(); ++i)
+		s.push_back(
+			transform_to_mat4(
+				vehicle_->getWheelInfo(i).m_worldTransform));
+	return s;
 }
 
 void

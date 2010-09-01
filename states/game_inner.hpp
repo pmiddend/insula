@@ -9,11 +9,11 @@
 #include "../physics/height_map.hpp"
 #include "../physics/debug_drawer.hpp"
 #include "../physics/static_model.hpp"
-#include "../graphics/shader.hpp"
+#include "../graphics/shader/object.hpp"
 #include "../model/object.hpp"
 #include "../events/tick_fwd.hpp"
 #include "../events/render_fwd.hpp"
-#include "../vehicle/object_ptr.hpp"
+#include "../vehicle/object.hpp"
 #include <fcppt/signal/scoped_connection.hpp>
 #include <boost/statechart/state.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -84,10 +84,11 @@ private:
 	physics::debug_drawer physics_debug_drawer_;
 	bool physics_debug_;
 	fcppt::signal::scoped_connection toggle_physics_debug_; 
-	graphics::shader_old nugget_shader_;
+	graphics::shader::object nugget_shader_;
+	sge::renderer::texture_ptr const nugget_texture_;
 	model::object nugget_model_;
 	nugget_model_sequence nugget_models_;
-	insula::vehicle::object_ptr vehicle_;
+	insula::vehicle::object vehicle_;
 	fcppt::signal::scoped_connection vehicle_static_connection_;
 	deletion_set to_delete_;
 

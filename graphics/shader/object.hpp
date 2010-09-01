@@ -2,9 +2,12 @@
 #define INSULA_GRAPHICS_SHADER_OBJECT_HPP_INCLUDED
 
 #include "variable.hpp"
+#include "variable_sequence.hpp"
+#include "sampler_sequence.hpp"
 #include "sampler.hpp"
 #include "value_type.hpp"
 #include <sge/renderer/device_ptr.hpp>
+#include <sge/renderer/texture_ptr.hpp>
 #include <sge/renderer/glsl/program_ptr.hpp>
 #include <sge/renderer/glsl/uniform/variable_ptr.hpp>
 #include <fcppt/filesystem/path.hpp>
@@ -20,15 +23,6 @@ namespace shader
 class object
 {
 public:
-	typedef
-	std::vector<variable>
-	variable_sequence;
-
-	typedef
-	std::vector<sampler>
-	sampler_sequence;
-
-
 	object(object const &) = delete;
 	object &operator=(object const &) = delete;
 
@@ -43,8 +37,13 @@ public:
 
 	void
 	set_uniform(
-		fcppt::string const &name,
+		sge::renderer::glsl::string const &name,
 		value_type const &);
+
+	void
+	update_texture(
+		sge::renderer::glsl::string const &name,
+		sge::renderer::texture_ptr);
 
 	sge::renderer::glsl::program_ptr const
 	program();

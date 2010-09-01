@@ -17,10 +17,12 @@ public:
 	int
 	texture_unit_type;
 
+	// Initializing with an empty texture is ok, That's needed in water
 	explicit
 	sampler(
 		sge::renderer::glsl::string const &name,
-		sge::renderer::texture_ptr);
+		sge::renderer::texture_ptr = 
+			sge::renderer::texture_ptr());
 
 	sge::renderer::glsl::string const
 	name() const;
@@ -40,6 +42,12 @@ public:
 	// This is needed on shader activation
 	sge::renderer::texture_ptr const
 	texture() const;
+
+	// In water, we need to update the reflection texture, so we need
+	// this
+	void
+	texture(
+		sge::renderer::texture_ptr);
 	
 	~sampler();
 private:

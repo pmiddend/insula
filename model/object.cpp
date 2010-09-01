@@ -5,10 +5,7 @@
 #include "vf/packed_position.hpp"
 #include "vf/texcoord.hpp"
 #include "vf/packed_texcoord.hpp"
-#include "../graphics/shader.hpp"
-#include "../graphics/camera/object.hpp"
 #include "../graphics/dim3.hpp"
-#include <sge/renderer/glsl/scoped_program.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
 #include <sge/renderer/vf/dynamic/make_format.hpp>
@@ -18,8 +15,6 @@
 #include <sge/renderer/index_buffer.hpp>
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/renderer/scoped_index_lock.hpp>
-#include <sge/renderer/scoped_texture.hpp>
-#include <sge/renderer/texture.hpp>
 #include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/first_vertex.hpp>
 #include <sge/renderer/vertex_count.hpp>
@@ -97,33 +92,14 @@ private:
 }
 
 insula::model::object::object(
-	graphics::camera::object const &_camera,
 	sge::model::object_ptr const model,
 	sge::renderer::device_ptr const _renderer,
-	graphics::shader_old &_shader,
-	sge::renderer::texture_ptr const _texture,
 	fcppt::optional<fcppt::string> const &_part)
 :
-	raw_(
-		model),
-	camera_(
-		_camera),
 	renderer_(
 		_renderer),
-	shader_(
-		_shader),
-	texture_(
-		_texture),
 	bounding_box_()
 {
-	sge::renderer::glsl::scoped_program scoped_shader_(
-		renderer_,
-		shader_.program());
-
-	shader_.set_uniform(
-		FCPPT_TEXT("texture"),
-		0);
-
 	FCPPT_ASSERT(
 		!model->part_names().empty());
 
@@ -224,34 +200,13 @@ insula::model::object::object(
 }
 
 void
-insula::model::object::render(
-	graphics::mat4 const &transform)
+insula::model::object::render()
 {
 	sge::renderer::state::scoped const sstate(
 		renderer_,
 		sge::renderer::state::list
 			(sge::renderer::state::cull_mode::back)
 			(sge::renderer::state::depth_func::less));
-
-	sge::renderer::glsl::scoped_program scoped_shader_(
-		renderer_,
-		shader_.program());
-
-	sge::renderer::scoped_vertex_buffer const scoped_vb_(
-		renderer_,
-		vb_);
-
-	shader_.set_uniform(
-		FCPPT_TEXT("mvp"),
-		camera_.perspective() * 
-		camera_.rotation() * 
-		camera_.translation() * 
-		transform);
-
-	sge::renderer::scoped_texture scoped_tex(
-		renderer_,
-		texture_,
-		0);
 
 	renderer_->render(
 		ib_,
@@ -270,6 +225,12 @@ insula::graphics::box const
 insula::model::object::bounding_box() const
 {
 	return bounding_box_;
+}
+
+sge::renderer::vertex_buffer_ptr const
+insula::model::object::vb()
+{
+	return vb_;
 }
 
 insula::model::object::~object() {}

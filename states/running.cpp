@@ -20,7 +20,10 @@
 insula::states::running::running(
 	my_context ctx)
 :
-	my_base(ctx)
+	my_base(
+		ctx),
+	scoped_vehicle_(
+		context<game_inner>().vehicle())
 {
 	context<machine>().sounds().play(
 		FCPPT_TEXT("honk"));

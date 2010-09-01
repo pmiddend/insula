@@ -1,9 +1,6 @@
 #version 140
 
-uniform mat4 mvp;
-
-in vec3 position;
-in vec2 texcoord;
+$$$HEADER$$$
 out vec2 texcoord_out;
 
 void main()

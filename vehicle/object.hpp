@@ -1,20 +1,20 @@
 #ifndef INSULA_VEHICLE_OBJECT_HPP_INCLUDED
 #define INSULA_VEHICLE_OBJECT_HPP_INCLUDED
 
-#include "../physics/vehicle/object_ptr.hpp"
+#include "input.hpp"
+#include "parameters_fwd.hpp"
+#include "../model/object.hpp"
+#include "../physics/vehicle/object.hpp"
 #include "../physics/world_fwd.hpp"
 #include "../physics/vec3.hpp"
 #include "../console/object_fwd.hpp"
-#include "../graphics/shader_fwd.hpp"
+#include "../graphics/shader/object_fwd.hpp"
 #include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/gizmo.hpp"
-#include "input_fwd.hpp"
 #include "../input_delegator.hpp"
 #include <sge/renderer/device_ptr.hpp>
-#include <sge/image/multi_loader_fwd.hpp>
 #include <sge/model/loader_ptr.hpp>
-#include <sge/audio/multi_loader_fwd.hpp>
 #include <sge/audio/player_ptr.hpp>
 #include <sge/audio/sound/positional_ptr.hpp>
 #include <sge/audio/buffer_ptr.hpp>
@@ -34,22 +34,10 @@ public:
 
 	explicit 
 	object(
-		fcppt::filesystem::path const &json_file,
-		physics::world &w,
-		physics::vec3 const &position,
-		sge::renderer::device_ptr const rend,
-		sge::image::multi_loader &il,
-		sge::model::loader_ptr const model_loader,
-		graphics::shader_old &shader,
-		graphics::camera::object &cam,
-		input_delegator &,
-		graphics::scalar camera_distance,
-		graphics::scalar camera_angle,
-		console::object &,
-		sge::audio::multi_loader &,
-		sge::audio::player_ptr);
+		parameters const &);
 
-	// The camera_move state needs this
+	// The camera_move state needs this to determine the "target" gizmo,
+	// and also the update_camera function
 	graphics::gizmo const 
 	lock_to_gizmo() const;
 
@@ -64,10 +52,22 @@ public:
 
 	physics::scalar 
 	speed_kmh() const;
+
+	void
+	activate();
+
+	void
+	deactivate();
+
+	~object();
 private:
-	physics::vehicle::object_ptr physics_;
-	std::unique_ptr<input> input_;
-	graphics::camera::object &cam_;
+	sge::renderer::device_ptr renderer_;
+	model::object chassis_model_,wheel_model_;
+	graphics::shader::object &model_shader_;
+	sge::renderer::texture_ptr chassis_texture_,wheel_texture_;
+	physics::vehicle::object physics_;
+	input input_;
+	graphics::camera::object &camera_;
 	bool lock_camera_;
 	fcppt::signal::scoped_connection toggle_camera_lock_;
 	graphics::scalar camera_distance_,camera_angle_;

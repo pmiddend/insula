@@ -7,11 +7,8 @@
 #include "../player.hpp"
 #include "../height_map/object_ptr.hpp"
 #include "../height_map/object_fwd.hpp"
-#include "../height_map/console_proxy.hpp"
 #include "../skydome/object_ptr.hpp"
-#include "../skydome/console_proxy.hpp"
 #include "../water/object_ptr.hpp"
-#include "../water/console_proxy.hpp"
 #include "../nugget_sequence.hpp"
 // If this is omitted, insula.cpp complains about incomplete tick
 // events (!?)
@@ -121,11 +118,8 @@ private:
 	player_sequence;
 
 	insula::height_map::object_ptr height_map_;
-	insula::height_map::console_proxy height_map_console_;
 	skydome::object_ptr skydome_;
-	skydome::console_proxy skydome_console_;
 	insula::water::object_ptr water_;
-	insula::water::console_proxy water_console_;
 	nugget_sequence nugget_positions_;
 	random_engine vehicle_position_engine_;
 	graphics::vec2 const vehicle_position_;

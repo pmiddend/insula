@@ -50,6 +50,13 @@ insula::graphics::shader::sampler::texture() const
 	return texture_;
 }
 
+void
+insula::graphics::shader::sampler::texture(
+	sge::renderer::texture_ptr const _texture)
+{
+	texture_ = _texture;
+}
+
 insula::graphics::shader::sampler::~sampler()
 {
 }

@@ -7,7 +7,6 @@
 #include "skydome/cli_options.hpp"
 #include "skydome/object.hpp"
 #include "skydome/cli_factory.hpp"
-#include "skydome/console_proxy.hpp"
 #include "console/object.hpp"
 #include "input_delegator.hpp"
 #include <sge/log/global.hpp>
@@ -156,10 +155,6 @@ try
 			*cam,
 			sys.renderer());
 
-	skydome::console_proxy skydome_console(
-		*skydome,
-		console.model());
-		
 	bool running = 
 		true;
 

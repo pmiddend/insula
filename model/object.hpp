@@ -1,10 +1,7 @@
 #ifndef INSULA_MODEL_OBJECT_HPP_INCLUDED
 #define INSULA_MODEL_OBJECT_HPP_INCLUDED
 
-#include "../graphics/camera/object_fwd.hpp"
-#include "../graphics/shader_fwd.hpp"
 #include "../graphics/box.hpp"
-#include "../graphics/mat4.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
 #include <sge/renderer/index_buffer_ptr.hpp>
@@ -21,37 +18,44 @@ namespace model
 {
 class object
 {
+/**
+	An object takes an sge::model and transforms it into a vertex- and
+	an index buffer. 
+
+	It doesn't have a shader because you do not always have _one_ shader
+	for a model. To draw shadows, for example, you have two shaders: the
+	main shader and the stripped-down shadow shader. Because a shader
+	and a texture are somewhat intertwined, the model also doesn't have
+	a texture.
+
+	It doesn't have a position because often you want to draw the same
+	model 'n' times. So the render function gets a transformation
+	instead.
+ */
 public:
 	object(object const &) = delete;
 	object &operator=(object const &) = delete;
 
 	explicit 
 	object(
-		graphics::camera::object const &,
 		sge::model::object_ptr,
 		sge::renderer::device_ptr,
-		graphics::shader_old &,
-		sge::renderer::texture_ptr,
 		fcppt::optional<fcppt::string> const &part = 
 			fcppt::optional<fcppt::string>());
 
 	void
-	render(
-		graphics::mat4 const &transformation);
+	render();
 
 	graphics::box const
 	bounding_box() const;
 
-	sge::model::object_ptr const
-	raw();
+	// scoped needs this
+	sge::renderer::vertex_buffer_ptr const
+	vb();
 
 	~object();
 private:
-	sge::model::object_ptr const raw_;
-	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr renderer_;
-	graphics::shader_old &shader_;
-	sge::renderer::texture_ptr const texture_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;
 	graphics::box bounding_box_;

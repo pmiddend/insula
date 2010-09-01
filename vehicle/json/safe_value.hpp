@@ -1,5 +1,5 @@
-#ifndef INSULA_PHYSICS_JSON_SAFE_VALUE_HPP_INCLUDED
-#define INSULA_PHYSICS_JSON_SAFE_VALUE_HPP_INCLUDED
+#ifndef INSULA_VEHICLE_JSON_SAFE_VALUE_HPP_INCLUDED
+#define INSULA_VEHICLE_JSON_SAFE_VALUE_HPP_INCLUDED
 
 #include <sge/parse/json/object.hpp>
 #include <sge/parse/json/find_member.hpp>
@@ -7,7 +7,7 @@
 
 namespace insula
 {
-namespace physics
+namespace vehicle
 {
 namespace json
 {

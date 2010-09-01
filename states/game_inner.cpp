@@ -7,7 +7,13 @@
 #include "../height_map/height_for_point.hpp"
 #include "../physics/box.hpp"
 #include "../physics/vec3.hpp"
+#include "../physics/shape_from_model.hpp"
 #include "../graphics/vec2.hpp"
+#include "../graphics/shader/vf_to_string.hpp"
+#include "../graphics/shader/scoped.hpp"
+#include "../graphics/camera/object.hpp"
+#include "../model/scoped.hpp"
+#include "../model/vf/format.hpp"
 #include "../events/vehicle_nugget_collision.hpp"
 // vehicle begin
 #include "../vehicle/cli_factory.hpp"
@@ -23,8 +29,11 @@
 #include <sge/renderer/texture.hpp>
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/matrix/structure_cast.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/algorithm/ptr_container_erase.hpp>
+#include <fcppt/assign/make_container.hpp>
 #include <fcppt/string.hpp>
 #include <boost/foreach.hpp>
 #include <functional>
@@ -65,30 +74,44 @@ insula::states::game_inner::game_inner(
 	nugget_shader_(
 		context<machine>().systems().renderer(),
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
-		media_path()/FCPPT_TEXT("model_fragment.glsl")),
+		media_path()/FCPPT_TEXT("model_fragment.glsl"),
+		graphics::shader::vf_to_string<model::vf::format>(),
+		fcppt::assign::make_container<graphics::shader::variable_sequence>
+		(
+			graphics::shader::variable(
+				"mvp",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4())),
+		fcppt::assign::make_container<graphics::shader::sampler_sequence>
+		(
+		graphics::shader::sampler(
+			"texture",
+			sge::renderer::texture_ptr()))),
+	nugget_texture_(
+		sge::image::create_texture(
+			create_path(
+				get_option<fcppt::string>(
+					context<machine>().cli_variables(),
+					"game-nugget-texture"),
+				FCPPT_TEXT("textures")),
+			context<machine>().systems().renderer(),
+			context<machine>().systems().image_loader(),
+			sge::renderer::filter::linear,
+			sge::renderer::resource_flags::none)),
 	nugget_model_(
-		context<machine>().camera(),
 		context<machine>().systems().md3_loader()->load(
 			create_path(
 				get_option<fcppt::string>(
 					context<machine>().cli_variables(),
 					"game-nugget-model"),
 				FCPPT_TEXT("models"))),
-			context<machine>().systems().renderer(),
-			nugget_shader_,
-			sge::image::create_texture(
-				create_path(
-					get_option<fcppt::string>(
-						context<machine>().cli_variables(),
-						"game-nugget-texture"),
-					FCPPT_TEXT("textures")),
-				context<machine>().systems().renderer(),
-				context<machine>().systems().image_loader(),
-				sge::renderer::filter::linear,
-				sge::renderer::resource_flags::none)),
+			context<machine>().systems().renderer()),
 	vehicle_(
 		insula::vehicle::cli_factory(
 			context<machine>().cli_variables(),
+			context<machine>().systems(),
+			context<machine>().camera(),
+			nugget_shader_,
 			physics_world_,
 			physics::vec3(
 				static_cast<physics::scalar>(
@@ -104,15 +127,8 @@ insula::states::game_inner::game_inner(
 							10)),
 				static_cast<physics::scalar>(
 					context<game_outer>().vehicle_position().y())),
-			context<machine>().systems().renderer(),
-			context<machine>().systems().image_loader(),
-			context<machine>().systems().md3_loader(),
-			nugget_shader_,
-			context<machine>().camera(),
 			context<machine>().input_delegator(),
-			context<machine>().console(),
-			context<machine>().systems().audio_loader(),
-			context<machine>().systems().audio_player())),
+			context<machine>().console())),
 	vehicle_static_connection_(
 		context<game_inner>().physics_world().register_vehicle_static_callback(
 			std::bind(
@@ -139,10 +155,11 @@ insula::states::game_inner::game_inner(
 					static_cast<physics::scalar>(nugget_model_.bounding_box().h())/**
 					static_cast<physics::scalar>(1.5)*/,
 					v.y()),
-				nugget_model_,
-				physics::model_approximation(
-					physics::model_approximation::box,
-					static_cast<physics::scalar>(1)),
+				physics::shape_from_model(
+					nugget_model_,
+					physics::model_approximation(
+						physics::model_approximation::box,
+						static_cast<physics::scalar>(1))),
 				physics::solidity::nonsolid));
 	}
 }
@@ -166,8 +183,30 @@ void
 insula::states::game_inner::react(
 	events::render const &)
 {
-	BOOST_FOREACH(physics::static_model &m,nugget_models_)
-		m.render();
+	{
+		// FIRST update texture, THEN scope the shader!
+		nugget_shader_.update_texture(
+			"texture",
+			nugget_texture_);
+
+		graphics::shader::scoped scoped_shader(
+			nugget_shader_);
+
+		model::scoped scoped_model(
+			context<machine>().systems().renderer(),
+			nugget_model_);
+		
+		BOOST_FOREACH(physics::static_model &m,nugget_models_)
+		{
+			nugget_shader_.set_uniform(
+				"mvp",
+				context<machine>().camera().perspective() * 
+				context<machine>().camera().world() * 
+				fcppt::math::matrix::structure_cast<graphics::mat4>(
+					m.world_transform()));
+			nugget_model_.render();
+		}
+	}
 	
 	if (physics_debug_)
 	{
@@ -176,13 +215,13 @@ insula::states::game_inner::react(
 		physics_debug_drawer_.render(); 
 	}
 
-	vehicle_->render();
+	vehicle_.render();
 }
 
 insula::vehicle::object &
 insula::states::game_inner::vehicle()
 {
-	return *vehicle_;
+	return vehicle_;
 }
 
 insula::player const &

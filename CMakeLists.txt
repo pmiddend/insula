@@ -86,14 +86,14 @@ ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files
 
 FUNCTION(CREATE_INSULA_EXE name)
 	ADD_EXECUTABLE(${name} ${name}.cpp)
-	TARGET_LINK_LIBRARIES(${name} insula_library fcppt sgecore ${Boost_LIBRARIES} ${BULLET_LIBRARIES} GL)
+	TARGET_LINK_LIBRARIES(${name} insula_library fcppt sgecore ${Boost_LIBRARIES} ${BULLET_LIBRARIES})
 ENDFUNCTION(CREATE_INSULA_EXE)
 
 CREATE_INSULA_EXE(load_image_to_array)
 CREATE_INSULA_EXE(view_model)
 CREATE_INSULA_EXE(render_height_map)
 CREATE_INSULA_EXE(point_sprite_test)
-CREATE_INSULA_EXE(render_scene)
+#CREATE_INSULA_EXE(render_scene)
 CREATE_INSULA_EXE(render_skydome)
 CREATE_INSULA_EXE(generate_height_texture)
 CREATE_INSULA_EXE(motor_sounds)

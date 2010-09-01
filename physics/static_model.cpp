@@ -6,67 +6,22 @@
 #include "motion_state.hpp"
 #include "../model/object.hpp"
 #include <BulletDynamics/Dynamics/btRigidBody.h>
-#include <BulletCollision/CollisionShapes/btBoxShape.h>
-#include <BulletCollision/CollisionShapes/btSphereShape.h>
-#include <LinearMath/btMatrix3x3.h>
-#include <LinearMath/btTransform.h>
-#include <LinearMath/btDefaultMotionState.h>
-#include <fcppt/math/dim/structure_cast.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/vector/length.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/dim/arithmetic.hpp>
 
 insula::physics::static_model::static_model(
 	world &w,
 	vec3 const &position,
-	model::object &_model,
-	model_approximation const &_approx,
+	shape_ptr const _shape,
 	solidity::type const _solidity)
 :
-	model_(
-		_model),
 	body_(),
 	motion_state_(
 		new motion_state(
 			position)),
-	shape_(),
+	shape_(
+		_shape),
 	world_scope_(
 		w)
 {
-	switch (_approx.t)
-	{
-		case model_approximation::exact:
-			
-		break;
-		case model_approximation::box:
-			shape_.reset(
-				new btBoxShape(
-					dim3_to_bullet(
-						// btBoxShape gets half extents, so muliply by 0.5 here
-						static_cast<scalar>(0.5)*
-						fcppt::math::dim::structure_cast<dim3>(
-							model_.bounding_box().dimension()))));
-		break;
-		case model_approximation::sphere:
-			shape_.reset(
-				new btSphereShape(
-					length(
-						static_cast<scalar>(0.5) * 
-						fcppt::math::dim::structure_cast<vec3>(
-							model_.bounding_box().dimension()))));
-		break;
-		case model_approximation::cylinder_x:
-
-		break;
-		case model_approximation::cylinder_y:
-
-		break;
-		case model_approximation::cylinder_z:
-
-		break;
-	}
-
 	body_.reset(
 		new btRigidBody(
 			btRigidBody::btRigidBodyConstructionInfo(
@@ -93,12 +48,12 @@ insula::physics::static_model::static_model(
 		this);
 }
 
-void
-insula::physics::static_model::render()
+insula::physics::mat4 const
+insula::physics::static_model::world_transform() const
 {
-	model_.render(
+	return 
 		transform_to_mat4(
-			motion_state_->transform()));
+			motion_state_->transform());
 }
 
 insula::physics::static_model::~static_model()

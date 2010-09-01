@@ -4,11 +4,11 @@
 #include "object.hpp"
 #include "solidity.hpp"
 #include "vec3.hpp"
-#include "model_approximation.hpp"
+#include "mat4.hpp"
 #include "world_fwd.hpp"
 #include "motion_state_fwd.hpp"
 #include "scoped_body.hpp"
-#include "../model/object_fwd.hpp"
+#include "shape_ptr.hpp"
 #include <memory>
 
 class btRigidBody;
@@ -28,19 +28,17 @@ public:
 	static_model(
 		world &,
 		vec3 const &,
-		model::object &,
-		model_approximation const &,
+		shape_ptr,	
 		solidity::type);
 
-	void
-	render();
+	mat4 const
+	world_transform() const;
 
 	~static_model();
 private:
-	model::object &model_;
 	std::unique_ptr<btRigidBody> body_;
 	std::unique_ptr<motion_state> motion_state_;
-	std::unique_ptr<btCollisionShape> shape_;
+	shape_ptr shape_;
 	scoped_body world_scope_;
 };
 }

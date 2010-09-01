@@ -10,17 +10,14 @@
 #include "graphics/stats.hpp"
 #include "graphics/cli_options.hpp"
 #include "skydome/object.hpp"
-#include "skydome/console_proxy.hpp"
 #include "skydome/cli_options.hpp"
 #include "skydome/cli_factory.hpp"
 #include "height_map/object.hpp"
-#include "height_map/console_proxy.hpp"
 #include "height_map/cli_factory.hpp"
 #include "height_map/cli_options.hpp"
 #include "console/object.hpp"
 #include "console/scoped_rdbuf.hpp"
 #include "water/object.hpp"
-#include "water/console_proxy.hpp"
 #include "water/cli_options.hpp"
 #include "water/cli_factory.hpp"
 #include "get_option.hpp"
@@ -225,21 +222,12 @@ try
 			*cam,
 			sys.renderer());
 
-	skydome::console_proxy skydome_console(
-		*skydome,
-		console.model());
-
 	height_map::object_ptr const terrain = 
 		height_map::cli_factory(
 			vm,
 			*cam,
 			sys.renderer(),
 			sys.image_loader());
-
-	height_map::console_proxy terrain_console(
-		*terrain,
-		console.model(),
-		sys.image_loader());
 
 	cam->gizmo().position(
 		fcppt::math::box::center(
@@ -253,10 +241,6 @@ try
 			fcppt::math::box::structure_cast<graphics::box>(
 				terrain->extents()),
 			sys.image_loader());
-
-	water::console_proxy water_console(
-		*water,
-		console.model());
 
 	physics::world physics_world(
 		fcppt::math::box::structure_cast<physics::box>(

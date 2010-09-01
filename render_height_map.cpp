@@ -8,7 +8,6 @@
 #include "height_map/object.hpp"
 #include "height_map/cli_options.hpp"
 #include "height_map/cli_factory.hpp"
-#include "height_map/console_proxy.hpp"
 #include "console/object.hpp"
 #include "input_delegator.hpp"
 #include "get_option.hpp"
@@ -159,11 +158,6 @@ try
 			sys.renderer(),
 			sys.image_loader());
 
-	height_map::console_proxy terrain_console(
-		*terrain,
-		console.model(),
-		sys.image_loader());
-	
 	bool running = 
 		true;
 

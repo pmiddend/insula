@@ -3,10 +3,14 @@
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
-#include "graphics/shader.hpp"
+#include "graphics/shader/object.hpp"
+#include "graphics/shader/vf_to_string.hpp"
+#include "graphics/shader/scoped.hpp"
 #include "graphics/cli_options.hpp"
 #include "console/object.hpp"
 #include "model/object.hpp"
+#include "model/scoped.hpp"
+#include "model/vf/format.hpp"
 #include "create_path.hpp"
 #include "get_option.hpp"
 #include "media_path.hpp"
@@ -72,6 +76,7 @@
 #include <fcppt/text.hpp>
 #include <fcppt/math/dim/output.hpp>
 #include <fcppt/math/dim/input.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/io/cifstream.hpp>
 #include <boost/program_options.hpp>
@@ -167,11 +172,6 @@ try
 				sys.renderer()->screen_size()),
 			graphics::vec3::null());
 
-	graphics::shader_old model_shader(
-		sys.renderer(),
-		media_path()/FCPPT_TEXT("model_vertex.glsl"),
-		media_path()/FCPPT_TEXT("model_fragment.glsl"));
-	
 	sge::model::object_ptr const model_object = 
 		sys.md3_loader()->load(
 			create_path(
@@ -196,19 +196,33 @@ try
 		return EXIT_FAILURE;
 	}
 
+	graphics::shader::object model_shader(
+		sys.renderer(),
+		media_path()/FCPPT_TEXT("model_vertex.glsl"),
+		media_path()/FCPPT_TEXT("model_fragment.glsl"),
+		graphics::shader::vf_to_string<model::vf::format>(),
+		fcppt::assign::make_container<graphics::shader::variable_sequence>
+		(
+			graphics::shader::variable(
+				"mvp",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4())),
+		fcppt::assign::make_container<graphics::shader::sampler_sequence>
+		(
+			graphics::shader::sampler(
+				"texture",
+				sge::image::create_texture(
+				create_path(
+					get_option<fcppt::string>(vm,"texture"),
+					FCPPT_TEXT("textures")),
+				sys.renderer(),
+				sys.image_loader(),
+				sge::renderer::filter::linear,
+				sge::renderer::resource_flags::none))));
+
 	model::object model(
-		*cam,
 		model_object,
 		sys.renderer(),
-		model_shader,
-		sge::image::create_texture(
-			create_path(
-				get_option<fcppt::string>(vm,"texture"),
-				FCPPT_TEXT("textures")),
-			sys.renderer(),
-			sys.image_loader(),
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::none),
 		get_option<fcppt::string>(vm,"part"));
 
 	bool running = 
@@ -274,8 +288,22 @@ try
 		sge::renderer::scoped_block const block_(
 			sys.renderer());
 
-		model.render(
-			graphics::mat4::identity());
+		{
+		model::scoped scoped_model(
+			sys.renderer(),
+			model);
+
+		graphics::shader::scoped scoped_shader(
+			model_shader);
+
+		model_shader.set_uniform(
+			"mvp",
+			cam->perspective() * 
+			cam->world());
+
+
+		model.render();
+		}
 		console.render();
 	}
 }
