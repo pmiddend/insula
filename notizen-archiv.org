@@ -1,0 +1,790 @@
+* btGhostObject in sanguis
+
+Man müsste ein btGhostObject anlegen und ihm eine Shape geben und dann
+das machen, was in [[file:~/projects/insula/temp/bullet-2.76/Demos/CharacterDemo/CharacterDemo.cpp::172][CharacterDemo]] steht (in jedem TickCallback).
+
+* Kurzzeitvorgehen
+
+
+* Vorgehen für 1.0
+	
+Zwei Fixes für raycastvehicle
+http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
+
+Frustum/Occlusion culling:
+http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
+
+[[https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en][Vehicles in Bullet]]
+
+Erstelle die folgenden Klassen/Funktionen mit Inhalt:
+
+** DONE height_field::height(x,z)
+	 CLOSED: [2010-08-31 Tue 17:32]
+	Liefert für einen beliebigen (kontinuierlichen) (x,z)-Wert die
+  dazugehörige y-Koordinate. Als Test dafür könnte man ein Model an
+  der Stelle auf das Terrain setzen und die AABB um den Punkt zentrieren.
+
+** DONE height_field::random_flat_point()
+	 CLOSED: [2010-08-31 Tue 17:32]
+	Gibt einen zufälligen Punkt auf dem Terrain zurück, an dem die
+  Steigung nicht allzu groß ist und der nicht sehr nah an 0 ist (bei 0
+  soll später das Wasser sein)
+
+** DONE height_field::random_point()
+	 CLOSED: [2010-08-31 Tue 17:32]
+	Gibt einen zufälligen Punkt auf dem Terrain zurück, der nicht nah
+  bei 0 ist (siehe oben). Ist für Props gedacht.
+
+** DONE physics::object
+	 CLOSED: [2010-08-18 Wed 21:31]
+  Enthält nichts, enthält einen protected-Konstruktor, damit man davon
+  ableiten muss.
+
+** DONE physics::vehicle::object muss den Userpointer auf this setzen
+	 CLOSED: [2010-08-18 Wed 23:50]
+Außerdem muss es von object ableiten.
+Dies sollte sich auf den input_controller auswirken.
+
+** DONE physics::static_model:
+	 CLOSED: [2010-08-18 Wed 23:51]
+	Leitet von physics::object ab. Bekommt im Konstruktor ein
+  model::object und einen Parameter, der angibt, wie das Model von der
+  Physik angenähert werden soll. Zur Auswahl stehen:
+
+	- Box
+	- Kugel
+	- Zylinder
+	- Exakt (Trimesh)
+
+	Zusätzlich kann man einen Skalierungsfaktor angeben, sodass nicht
+  ganz die Boundingbox genommen wird, sondern etwas weniger.
+
+	Die Masse des Körpers muss 0 sein, damit er statisch ist.
+
+	Es bekommt außerdem ein Flag, was angibt, ob dieser Körper "fest"
+  ist, das übersetzt sich zu:
+	
+	=mBody->setCollisionFlags(mBody->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE));=
+
+	Der Userpointer muss auch hier auf this gesetzt werden.
+
+** DONE music_controller
+	 CLOSED: [2010-08-18 Wed 23:51]
+Bekommt den "sounds"-Knoten aus der json-Konfigurationsdatei. Hier
+stehen die "Event"-Musikstücke drin. Daraus baut sich das Teil am
+besten eine =map<string,string>=, die einen Event in einen Dateinamen
+umwandelt. 
+
+Außerdem holt es sich eine zweite =map<string,string>= aus dem
+"random"-Knoten, wo die Musikstücke drin sind, die zufällig abgespielt
+werden sollen.
+
+Die Stücke sollten grundsätzlich crossfaden. Dazu sollte in der
+Konfiguration noch die Option =crossfade_time= enthalten sein.
+** DONE physics::world: In der World wird ein neues Signal benötigt, was
+	 CLOSED: [2010-08-31 Tue 17:31]
+  aufgerufen wird, wenn eine Kollision passiert. Das Callback hat die
+  Signatur:
+
+	=void(vehicle&,static_model &)=
+
+	Später kann es noch weitere Callbacks geben wie vehicle <-> vehicle
+  oder dynamic_model <-> static_model und dynamic_model <-> vehicle.
+
+	Dies ist umgesetzt in einem Tickcallback (siehe [[http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Simulation_Tick_Callbacks][hier]]), wo die
+  Manifold-Liste durchgelaufen wird (siehe [[http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Collision_Callbacks_and_Triggers][hier]]). Jedes Kollisionspaar
+  (als =btCollisionObject=) wird in ein =std::set<std::pair<T*,T*>>=
+  eingefügt.  In der update-Funktion wird dieses set durchlaufen
+  gelöscht, =stepSimulation= aufgerufen und dann das set
+  durchlaufen. Der Userpointer wird von =void*= zu =object*=
+  static_casted und dann auf vehicle und static_model
+  getestet. Daraufhin wird das Signal aufgerufen.
+
+** DONE machine:
+	 CLOSED: [2010-08-19 Thu 19:44]
+	Bekommt argv und argc im Konstruktor und regelt dort die
+  Kommandozeilensachen (Optionen von den Subsystemen holen und
+  parsen). Wirft für den Fall, dass --help angegeben wurde, eine
+  "help_required-Exception", die den Hilfetext enthält.
+
+	Erstellt im Konstruktor die systems-Dinger sowie die Konsole, den
+  Inputdelegator und die Kamera (ebenfalls unter Zuhilfename der
+  Kommandozeile).
+
+	Es wird eine globale json-Konfigurationsdatei aus media/ gelesen und
+  gespeichert.
+
+	Die Maschine enthält auch eine =map<string,audio::buffer_ptr>=, die
+  die Sounds aus der Konfigurationsdatei (in der json-Sektion
+  "sounds -> nonstreaming") zu Soundpuffern umsetzt. 
+
+	Die Maschine enthält auch den Soundpool. Am besten kulminiert das
+  ganze in zwei Funktionen:
+	
+	=audio::sound::base_ptr create_nonpositional_sound(string)=
+	=audio::sound::positional_ptr create_nonpositional_sound(string,positional_parameters)=
+
+	Hier wird direkt in den Pool eingefügt und als Quelle dient die json-Datei.
+
+	Im Konstruktor wird für den Renderer auch ein vernüntiger Defaultstate gesetzt:
+	
+	- bool_::clear_zbuffer = true
+  - float_::zbuffer_clear_val = 1.f
+  - bool_::clear_backbuffer = true
+	- color::clear_color = black()
+
+	Enthält:
+	- systems
+	- console
+	- input_delegator
+	- camera
+	- escape-Inputcallback
+	- wireframe-Konsolencallback
+	- fps-Counter
+  - Funktion, um die clear-Color dauerhaft zu ändern.
+	- run-Methode, die eine Endlosschleife enthält und tick_events
+    erzeugt
+	- bool running
+	- sge::time::timer frame_timer;
+	- Getter für systems
+	- Getter für die variables_map
+	- Getter für den input_delegator
+	- Getter für die Konsole
+	- Getter für die Kamera
+	- Getter für die Konfigurationsdatei
+** DONE states -> ingame
+	 CLOSED: [2010-08-31 Tue 17:31]
+	Das hier bedeutet, dass wir im Spiel sind (später könnte parallel
+  dazu ja noch ein Menüstate kommen). Im Konstruktor werden der
+  Skydome, die Landschaft, die Physiklandschaft und das Wasser
+  initialisiert.
+
+	Dann wird per Zufall ein Punkt auf der Landschaft ausgesucht, wo das
+  Vehikel platziert wird (siehe Funktion weiter oben). Es sollte ein
+  klein bisschen über dem Boden platziert werden. Welches Vehikel
+  genommen wird, ist weiterhin über die Kommandozeile
+  einstellbar. Dazu braucht man Kommandozeileneinstellungen, die für
+  das ganze Spiel gelten.
+
+	Weiterhin wird eine Liste von Punkten erzeugt (die eingesammelt
+  werden müssen). Dies geschieht ebenfalls mit der Funktion
+  =random_flat_point=. Es werden erstmal nur Positionen
+  erzeugt. Daraus werden mit der Funktion =generate_point_models= die
+  tatsächlichen Punktmodels (es sind =static_models=, die das
+  ghost-Flag haben) erzeugt.
+
+	Es werden auch Props generiert, diese sind einfach
+  =physics::static_models=. Bei der Platzierung selbiger muss man drauf
+  achten, dass sie "fest" im Boden drin sind (Funktion =random_point=)
+
+	Dieser Zustand enthält auch eine =map<player_name,optional<time>>=,
+  wobei der Typ von "time" noch ermittelt werden muss. Die
+  Spielernamen erhält dieser Zustand von der Konsole.
+
+	Enthält:
+	- Physikwelt
+	- Landschaft
+	- Physiklandschaft
+	- Skydome
+	- Wasser
+	- Props
+	- Punktliste (nur Positionen)
+	- Liste von Punktmodels
+	- Startposition des Autos
+	- Auto
+	- Einen Iterator "last-time", der auf die zuletzt eingetragene Zeit
+    zeigt
+** DONE states -> ingame -> freelook
+	 CLOSED: [2010-08-31 Tue 17:31]
+	Hier sollte der Spieler sich frei auf der Landschaft umgucken
+  können. Die Punktmodels werden im Konstruktor generiert. Die
+  Simulation wird noch nicht gesteppt. Außerdem wird nicht
+  gizmo::lock_to aufgerufen, wodurch die Kamera also frei ist. Oben
+  wird in großen Buchstaben der Text 
+
+	Freelook-Mode
+	Press Enter to continue 
+
+	angezeigt. Es wird ein entsprechendes Musikstück abgespielt, was aus
+  der Spielkonfigurationsdatei eingelesen wird (siehe Maschine).
+
+	Das Auto wird im Konstruktor deaktiviert
+
+	Enthält:
+	- Eine Font entsprechender Größe, die im Konstruktor geladen wird
+    (Fontsystem ist ja in der Maschine vorhanden)
+	- Musikstück
+** DONE states -> ingame -> camera_move
+	 CLOSED: [2010-08-31 Tue 17:31]
+	 Hier wird die Kamera von der aktuellen Position zur Startposition
+   (hinter dem Auto) bewegt. Fürs erste kann das aber einfach als
+   "setze Position auf die Endposition" realisiert werden.
+** DONE states -> ingame -> pregame
+	 CLOSED: [2010-08-31 Tue 17:31]
+	Hier wird die Kamera über das Fahrzeug bewegt und eine Meldung
+  angezeigt mit dem Spieler, der jetzt dran ist. Auf Tastendruck wird
+  in den Zustand running übergegangen. Hier wird kein Musikstück
+  abgespielt, aber gizmo::lock_to aufgerufen.
+
+	Enthält:
+	- Eine Font entsprechender Größe
+** DONE states -> ingame -> running
+	 CLOSED: [2010-08-31 Tue 17:31]
+	Das Spiel läuft, die Simulation wird getickt. Es wird ein Callback bei
+	der Welt registriert, was Kollisionen vehicle <-> model checkt. Das
+	Auto wird im Konstruktor aktiviert. 
+
+	Hier timer
+
+	Bei einer Kollision vehicle <-> model wird geguckt, ob das Model ein
+  Punkt ist (indem man den Pointer mit dem in der Punkteliste aus
+  ingame vergleicht). Falls ja, wird dieser in die "zu
+  entfernen"-Liste eingefügt und ein Soundeffekt abgespielt. Falls
+  nein, wird ein anderer Sound abgespielt. 
+	
+	In der Hauptschleife wird die "zu entfernen"-Liste abgearbeitet und
+  die entsprechenden Punkte werden aus der Punkteliste entfernt. Es
+  wird danach geguckt, ob überhaupt noch Punkte da sind. Falls nein,
+  wird die Zeit angehalten, für den aktuellen Spieler die Zeit
+  eingetragen, ein Sound abgespielt und in finished übergegangen. Die
+  ingame-Variable "lastplayer" wird geupdatet.
+
+	Enthält:
+	- Liste der zu entfernenden Punkte
+	- Music-Controller
+** DONE states -> ingame -> finished
+	 CLOSED: [2010-08-31 Tue 17:31]
+	 Greift auf die lastplayer-Variable zu und zeigt die Zeit an und die
+   Aufforderung, Enter zu drücken. Hier könnte die Kamera noch um das
+   Auto rotieren. Es wird wieder ein Musikstück abgespielt.
+
+	 Beim Druck auf Enter wird geguckt, ob es noch Spieler gibt, die
+   keine Zeit eingetragen haben. Falls ja, wird in camera_move
+   übergegangen, falls nein, wird in gameover übergegangen.
+
+	 Enthält:
+	 - Musikstück
+	 - Font
+** DONE states -> ingame -> gameover
+	 CLOSED: [2010-08-31 Tue 17:31]
+	Hier wird eine Tabelle angezeigt mit allen Teilnehmenden und deren
+  Zeiten. Auf Knopfdruck beendet sich das Spiel.
+* Roadmap
+** Spielbeschreibung
+Das Spiel soll ein Multiplayerspiel werden. Netzwerkmodus
+möglicherweise, aber erstmal nur Hotseat. Man sitzt in einem Fahrzeug
+und muss über das Terrain fahren.
+
+Zwei denkbare Spielmodi: 
+
+1. Ziel ist es, in möglichst kurzer Zeit eine bestimmte Anzahl Punkte
+   einzusammeln, die im Level willkürlich verteilt sind (also
+   letztlich eine TSP-Abart zu lösen). Die Punkte nennen wir im
+   folgenden mal "Dots", damits nicht zu Verwechslungen kommt.
+2. Es wird zufällig ein Dot im Level generiert, den man erreichen
+   muss, ehe die Zeit abläuft. Hat man ihn erreicht, wird Zeit
+   draufaddiert und man muss zum nächsten Dot fahren. Damit alle
+   Spieler dieselben Bedingungen haben, werden die Dots
+   vorgeneriert. Hier hat man kein TSP mehr, weil die Reihenfolge
+   vorgegeben ist.
+
+Damit der erste Spieler keinen großen Nachteil hat, könnte man das
+Terrain mitsamt Dots am Anfang von oben zeigen oder mit einer freien
+Kamera.
+
+Beim Fahren behindern einen Höhenunterschiede im Terrain, Bäume und
+Steine. Außerdem könnte die Sonne blenden und im Nachtmodus (wenn es
+einen gibt) hat man natürlich eingeschränkte Sicht. Man könnte auch
+(starken) Nebel einbauen. Landminen, über die man fahren kann, wären
+auch eine Idee und im weiteren Sinne ein Schadensmodell - aber das
+ist eher was für die Zukunft.
+
+Wenn der Spieler umkippt oder sich sonst verhakt, kann man ihn per
+Tastendruck wieder aufsetzen.
+
+Das Spiel soll auch Soundeffekte enthalten für die Umgebung, das Auto
+und vielleicht sogar Musik im Hintergrund (ist aber auch erstmal nicht
+so wichtig).
+
+Zufallsgenerieren könnte man:
+
+-Das Terrain
+-Die Leveleigenschaften (Anzahl Bäume, Nebel, Sonnenstand)
+
+Da keine gute GUI zur Verfügung steht, muss man alle Spielernamen und
+alle Spieleinstellungen auf der Konsole übergeben.
+
+Eine Runde ist vorbei, wenn alle Spieler einmal gefahren sind. Dann
+wird eine Tabelle mit allen Namen und Zeiten ausgegeben. Zur
+Vereinfachung könnte man dann das Spiel danach stumpf wieder
+beenden. Ein Script wie...
+
+while true; do 
+./insula --players "$@"
+done
+
+...könnte bewerkstelligen, dass das Spiel nach dem Beenden immer
+wieder gestartet wird (mit denselben Spielern).
+
+Somit bräuchte man für das Spiel nicht allzu viel:
+
+-Fahrphysik
+-Objekte (Bäume, Steine)
+-Eine Funktion, die die Dinger zufällig verteilt
+-Zufällige Landschaftsgenerierung (wobei man auch erst Bilder nehmen könnte).
+-Eine Kamera, die dem Fahrzeug folgt (ist aber hier nicht so schwer,
+ weil die sich nicht um Kollision mit Wänden und Decken kümmern muss)
+-Soundkrams (wobei der in sge schon ganz gut integriert ist)
+
+** Vorgehen der Reihe nach [10/10]
+1. [X] Gucken ob es Beispiele zu bullet mit Terrain gibt 
+2. [X] md3-Loader von sge ausprobieren, ein Model laden
+3. [X] Das Model in einem separaten Programm anzeigen lassen
+4. [X] bullet-Beispiele zu Fahrzeugen genau studieren, dabei drauf
+   achten, wie man Models in Bullet integriert
+5. [X] Probieren, ein md2-Model mit einem bullet-Model zu verbinden,
+   sodass man z.B. einen Klotz über die Landschaft purzeln lassen kann
+6. [X] Ein Fahrzeug auf die Landschaft tun
+7. [X] Die Kamera von hinten oben auf das Fahrzeug richten, darauf
+   achten dass der Abstand konstant ist.
+8. [X] Das Fahrzeug mit den Pfeiltasten steuerbar machen
+9. [X] Fahrsounds einbauen [3/3]
+   1. [X] Soundtest erstellen, wo ein Grundton mit den Pfeiltasten langsam
+      verschnellert bzw. verlangsamt wird (mit AL_PITCH z.B.), als ob
+      man Gas gebe
+   2. [X] Gangschaltung simulieren: Bei kontinuierlichem Drücken sollte
+      ein Geschwindigkeitswert stetig erhöht werden. Auf der
+      Geschwindigkeitsskala werden Stützpunkte angebracht. Zwischen
+      zwei Stützpunkten wird die Geschwindigkeit des Sounds von 0 bis
+      1 interpoliert.
+   3. [X] Diese Sounds in das Spiel integrieren und mit der
+      Fahrgeschwindigkeit koppeln.
+10. [X] Spielmechanik einbauen [4/4]
+		1. [X] Generiere zufällig Punkte auf der Landschaft. Die Punkte sollten
+       als Models visualisiert sein (auf nille warten). Generiere auch
+       einen Startpunkt für das Auto.
+		2. [X] Kollision Punkt mit Fahrzeug einbauen, die den Punkt
+       verschwinden lassen und einen globalen Counter erhöhen.
+		3. [X] Timer einbauen, der bei Spielanfang beginnt und beim Einsammeln
+       des letzten Punktes aufhört.
+		4. [X] Spielstates einbauen: 
+			 1. Freelook: Punkte sind schon generiert, die Kamera ist frei
+					und man kann sich einen Weg aussuchen.
+			 2. Pregame: Es wird der Spielername angezeigt, der jetzt dran
+					ist und die Aufforderung, eine Taste zu drücken um
+					anzufangen. Die Kamera ist hier schon über dem Fahrzeug
+					angebracht.
+			 3. Ingame: Das Spiel läuft, Punkte können eingesammelt
+					werden. Der Timer wird im Konstruktor gestartet. Ist der
+					letzte Punkt eingesammelt, wird das Ergebnis in eine globale
+					Tabelle für den Spieler eingetragen und der nächste Spieler
+					ist dran. Es wird in Pregame gewechselt, es sei denn, alle
+					Spieler sind fertig. In dem Fall wird in Gameover gewechselt.
+			 4. Gameover: Die Kamera wird um die Landschaft rotiert, eine
+					Tabelle mit dem Sieger und den anderen wird angezeigt. Ein
+					Tastendruck beendet das Spiel.
+
+* Aktivitäten
+** DONE Kamera
+	 CLOSED: [2010-07-28 Wed 21:46]
+*** DONE Winkel-Extraktion aus [[http://www.google.com/url?sa=t&source=web&cd=3&ved=0CCUQFjAC&url=http%3A%2F%2Fwww.gregslabaugh.name%2Fpublications%2Feuler.pdf&ei=5BNPTIbkB5rQ4wax7IiCCA&usg=AFQjCNGgP_-68fHn3TvPlqwAomC3TZV4fw][diesem]] Paper umsetzen (in fcppt-Funktion packen?)
+		 CLOSED: [2010-07-28 Wed 18:53]
+*** DONE 3-Vektor-Ansatz
+		 CLOSED: [2010-07-28 Wed 21:46]
+**** DONE 
+		 CLOSED: [2010-07-28 Wed 19:24]
+
+Definiere Right:=(1,0,0) und Forward:=(0,0,1). Finde heraus, ob 
+Right x Forward = (0,1,0) ist. Ansonsten müssen alle Kreuzprodukte 
+vertauscht werden. 
+
+**** DONE Vorgehen
+		 CLOSED: [2010-07-28 Wed 21:46]
+
+Im Folgenden seien die Kreuzprodukte mit der _linken_ Hand auszuführen
+
+1. Statt 3 Rotationswinkeln speichert man 3 Vektoren, Forward, Right, Up
+2. Anfangs sind diese natürlich auf (0,0,1), (1,0,0) und (0,1,0) eingestellt
+3. Bei mouse_x_axis will man um die y-Achse rotieren.
+   1. Rotiere Forward um Up. Markiere alle Vektoren außer Forward 
+      als ungültig (idealerweise wären Forward und Up noch orthogonal, kann man
+      sich aber nicht drauf verlassen), kennzeichne mit *
+   2. Right := Up* x Forward, Right steht orthogonal auf Forward und Up*
+   3. Up := Forward x Right
+4. Bei mouse_y_axis will man um die x-Achse rotieren.
+	 1. Rotiere Forward um Right. Wieder alle Vektoren ungültig
+	 2. Up := Forward x Right*
+	 3. Right := Up x Forward
+** TODO Skydome [1/3]
+*** DONE Klassischer Ansatz
+		 CLOSED: [2010-07-28 Wed 21:47]
+**** DONE Vorgehen
+		 CLOSED: [2010-07-28 Wed 21:47]
+
+1. Erstelle Vertexbuffer für die _komplette_ Kugel
+
+2. Zeichne diesen Vertexbuffer als Punktprimitiv
+
+3. Schaue wie sich die Winkel auswirken, überlege wie man 
+   die Winkel wählen müsste um einen Dome zu bekommen
+
+4. Korrigiere eventuell den Fehler in der perspektivischen 
+   oder der Modelviewmatrix
+
+5. Erstelle korrekten Indexbuffer
+
+6. Erstelle Shader, der Anhand der y-Koordinate die Farbe als 
+   Gradient von hellblau zu blau wählt. Der Shader braucht 
+   dafür vermutlich die maximal y-Koordinate.
+
+*** TODO Icosphere-Ansatz
+**** TODO Suche bei Google nach "icosphere triangle strip"
+*** TODO Weiteres Vorgehen [5/6]
+**** DONE render_height_map mit Kamera fixen
+		 CLOSED: [2010-07-29 Thu 01:10]
+**** DONE angle-Funktion in fcppt pushen (vorher test mit FCPPT_TEXT versehen)
+		 CLOSED: [2010-07-28 Wed 23:40]
+**** DONE Sonne einfügen
+		 CLOSED: [2010-07-29 Thu 00:50]
+**** TODO Maximalwinkel für den Skydome einstellen (nicht immer 90 Grad)
+**** DONE Neues Programm render_scene machen und render_height_map aufsplitten
+		 CLOSED: [2010-07-29 Thu 00:52]
+**** DONE Skydome in render_scene einbauen
+		 CLOSED: [2010-07-29 Thu 18:05]
+
+** TODO Wasser [7/9]
+*** DONE Variable =water_height= definieren, die per Kommandozeile einstellbar ist
+		 CLOSED: [2010-07-30 Fri 00:02]
+*** DONE Funktion einbauen, um die Kamera an der Wasser-Ebene zu spiegeln
+		 CLOSED: [2010-07-30 Fri 00:02]
+Dazu muss getan werden: 
+#+BEGIN_SRC emacs-c++-mode
+vec3 new_position = cam.position
+new_position.y = -cam.position.y + 2*water_height
+vec3 target = cam.position + cam.forward
+target.y = -target.y + 2*water_height
+vec3 forward = target - new_position
+// Streng genommen müsste man hier noch forward und right
+// orthogonalisieren, kann man sich aber vermutlich 
+// sparen
+cam.new_axes(forward,cam.right,forward x right);
+#+END_SRC
+
+Vorher sollte die aktuelle Kamera (bzw. das Achsentriplet) gespeichert
+werden (oder so)
+*** DONE Rendertarget
+		 CLOSED: [2010-07-30 Fri 00:10]
+Definiere (Konsolen-)Funktion, die die Kamera an der Wasser-Ebene
+spiegelt, dann rendert und das gerenderte in einer Datei abspeichert,
+die man sich dann angucken kann.
+
+Platzhalter für Clippingplanes einbauen. Außerdem die Möglichkeit
+offen lassen, das Wasser beim Rendern auszulassen. Am besten bekommt
+die Funktion ein Rendercallback, wo man dann =skydome.render()= und
+=height_map.render()= einbauen kann.
+*** DONE Quad für Wasser einbauen (mit Wassertextur), rendern
+		 CLOSED: [2010-07-30 Fri 17:38]
+*** DONE Wassershader
+		 CLOSED: [2010-07-30 Fri 17:38]
+Dieser Shader sollte geladen werden, wenn das Wasserquad gerendert
+wird. Er bekommt zwei World-Matrizen und eine Projektionsmatrix. Bei
+der einen steht der Betrachter "normal", bei der anderen gespiegelt
+unter der Wasseroberfläche (diese Spiegelungsmatrizen kann man aus dem
+ersten Renderpass copypasten). Rausschreiben tut er einerseits
+=gl_Position = projection * world * position=, damit das Wasserquad an
+der richtigen Stelle gezeichnet wird. Andererseits leitet er
+=out vec2 texcoord = vec2(projection * mirrored_world * position)=
+weiter, die im Fragmentshader als Texturkoordinaten (für die
+vorgerenderte Textur) gelten. Alternativ könnte man auch =out vec4
+texcoord = projection * mirrored_world * position= versuchen
+und dann im Fragmentshader: 
+=vec2 texcoord_new = vec2(texcoord.x/texcoord.w,texcoord.y/texcoord.w)=
+Der Kerl im Paper macht zusätzlich noch /2 +0.5, vermutlich aus
+Normierungsgründen. Das vielleicht auch noch probieren.
+*** DONE Clipping in den Shadern machen
+		 CLOSED: [2010-08-01 Sun 17:56]
+Hierzu braucht der height_map-Shader die Wasserhöhe. Außerdem brauch
+er das boolsche Flag, ob er clippen soll. Ist dies true, berechnet er
+=position.y - wasserhöhe= und speichert dies in gl_ClipDistance[0].
+
+ACHTUNG: Man muss die 0-te Clippingplane auch noch aktivieren.
+*** DONE Ripple-Effekt auf dem Wasser
+		 CLOSED: [2010-08-03 Tue 00:56]
+
+
+1. Hierzu muss eine Bump-Textur geladen werden. Hier interessieren
+   aber nur die rg-Werte.
+2. Diese Bump-Textur wird mit einer Texturskalierung auf das
+   Wasserquad gelegt (Konsolenvariable und Kommandozeilenvariable für
+   die Skalierung, Kommandozeilenvariable für die Bumptextur, außerdem
+   Konsolenfunktion dafür?)
+3. Eine Zeitvariable wird eingeführt
+4. Es wird nicht mehr die aktuelle Texturkoordinate im Fragmentshader
+   genommen sondern die perturbierte. Im Vertexshader: 
+	 texcoord_projected = perspective * ...
+	 texcoord_bump = bump_coord + time * move_direction
+	 Die bump-Textur wird skaliert auf das Quad gelegt, dessen Ursprung
+   wird aber mit der move_direction verschoben. Man kann hier die
+   Geschwindigkeit der Zeit noch vergrößern damit es schneller gepannt
+   wird.
+	 Im Fragmentshader:
+	 vec4 bump_color = texture(bump_texture,texcoord_bump);
+	 vec2 perturbation = wave_height * (bump_color.rg – 0.5); 
+	 vec2 perturbed_coords = texcoord_projected + perturbation;
+5. Dull-Color wird eingebaut, im Fragmentshader:
+	 vec4 dull_color(0.1f, 0.1f, 0.2f, 1.0f);
+	 float dull_factor = 0.2;
+	 frag_color = mix(real_color,dull_color,dull_factor);
+*** TODO Ripple-Effekt fixen
+Um die Grenzfälle zu beheben, muss beim Rendern des Terrains Culling
+beidseitig aktiviert werden. Außerdem müssen die Texturkoordinaten der
+projizierten Textur auf [0,1] geclampt werden.
+*** TODO Nichtreflektierendes Wasser anbieten, um Performance zu sparen.
+** TODO Nebel
+
+
+
+
+1. Im Pixelshader:
+#+BEGIN_SRC emacs-c++-mode
+const float LOG2 = 1.442695;
+float z = gl_FragCoord.z / gl_FragCoord.w;
+float fogFactor = exp2( -gl_Fog.density * 
+				   gl_Fog.density * 
+				   z * 
+				   z * 
+				   LOG2 );
+fogFactor = clamp(fogFactor, 0.0, 1.0);
+
+gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
+#+END_SRC
+
+2. Oder doch lieber im Vertexshader, siehe [[http://www.ozone3d.net/tutorials/glsl_fog/p03.php][hier]]:
+
+	"Fremde" Methode:
+
+	1. Berechne gl_Position, nehme davon die Länge =n= (?)
+	2. Berechne: =faktor = exp2(-dichte^2 * n^2 *1.442695)=, clampe
+		 zwischen 0 und 1, gebe an PS weiter
+	3. Berechne =frag_color = mix(fog_color,final_color,fog_factor)=
+	
+	"Eigene" Methode:
+	
+	1. Gebe Augenpunkt als uniform mit.
+  2. Berechne Abstand Augenpunkt und aktueller Vertex
+	3. Berechne =faktor = exp2(-dichte^2 * abstand^2 *1.442695)=, gebe an PS weiter
+	4. Mache dasselbe wie bei der fremden Methode.
+
+** TODO Terraingenerierung
+** TODO Partikelsystem
+- Ein Partikel hat eine Position und eine Lebenszeit
+** TODO Shadow Maps [0/5]
+*** TODO Neues uniform-System aufsetzen
+*** TODO Teste orthografische Projektion aus Sicht der Sonne
+*** TODO Setze das Rendern der Shadowmap auf
+- Hierzu muss orthografisch projiziert werden aus sich der Sonne
+  (Position?)
+- Der Vertexshader sollte nur projizieren
+- Der Fragmentshader sollte nur einen float rausschreiben, die Tiefe
+  des Fragments
+- Die Szene muss in eine Textur gerendert werden
+*** TODO Per Kommandozeile die Tiefentextur in eine Datei schreiben
+*** TODO Den eigentlichen Tiefenalgorithmus implementieren
+
+
+- Der Heightmap-Vertexshader brauch dazu die mvp-Matrix des Lichtrenderns.
+- Für jeden Vertex v werden zwei Größen berechnet: 
+	1. vl = mvp_light * v
+	2. vp = mvp * v
+- Gib vp und vl an den Fragmentshader weiter
+- Berechne aus vl die Texturkoordinate in der Shadowmap (selbe Technik
+  wie beim Wasser)
+- Vergleiche den z-Wert von vp mit dem z-Wert in der Shadowmap, setze
+  entsprechend die Pixel
+** TODO Physik, Fahrzeuge [6/12]
+*** DONE insula::physics::model
+		 CLOSED: [2010-08-29 Sun 15:28]
+Sollte eine Klasse sein, die ein Model reinbekommt, sowie einen Parameter, der angibt, wie dieses Model in der Physikengine dargestellt werden soll:
+
+-Boundingbox
+-Boundingcylinder
+-Boundingsphere
+-Exact
+*** DONE Setter für gravity
+		 CLOSED: [2010-08-15 Sun 13:53]
+*** DONE json-Part muss in mehrere Dateien aufgeteilt werden
+		 CLOSED: [2010-08-10 Tue 01:34]
+*** DONE Nach weiteren Eigenschaften von Fahrzeugen gucken, die noch nicht in wheel_info sind
+		 CLOSED: [2010-08-15 Sun 13:53]
+*** DONE wheel_info muss in cpp ausgelagert werden.
+		 CLOSED: [2010-08-15 Sun 15:20]
+*** TODO world muss mehr RAII kriegen
+*** TODO Max_speed einbauen
+"cap speed spaceship" bei google eingeben und das so umsetzen
+*** TODO Friction einbauen
+*** TODO wheel_info übertragen wie in stk (beide Räder aufm Boden)
+*** DONE Räder spiegeln
+		 CLOSED: [2010-09-02 Thu 01:18]
+*** TODO Steering-Increment einbauen
+*** TODO Eigener Raytest?
+Damit ist gemeint, dass man height_map::height_for_point nutzt, um den
+Raytest beim Terrain zu machen (könnte genauer sein)
+** TODO Sounds [0/1]
+*** TODO Looping von Musik fixen
+Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
+** TODO Neues Fontsystem
+Ziele:
+
+Man will Farben und Stile (fett, kursiv etc.) unterbringen sowie
+verschiedene Größen, das alles steuerbar mit einer kleinen DSEL etwa
+wie folgt:
+
+#+begin_src c++
+draw_text(
+  font_collection,
+	size(15) >> color(black) >> "foo" >> (bold >> "bar") 
+    >> italics >> size(20) >> "baz");
+#+end_src
+
+Man muss sich hier implizit auf ttf beschränken, weil andere
+Fontformate vermutlich bold/italics etc. anders modellieren. Eine
+=font_collection= muss eine Sammlung von geladenen ttf-Fonts sein
+ausgesucht nach:
+
+- Größe
+- Stil
+
+In etwa so:
+
+#+begin_src c++
+font_collection fonts(
+  // Normal
+  "default.ttf",
+	// Bold
+  optional<string>(),
+	// Italics,
+	"default_it.ttf",
+	make_container<size_container>(15)(20)(25));
+#+end_src
+
+** TODO Diverses [22/30]
+*** DONE Framecounter einbauen
+		 CLOSED: [2010-07-30 Fri 18:24]
+*** DONE gizmo_init fixen
+		 CLOSED: [2010-08-15 Sun 13:23]
+*** DONE Average-Filter übers Terrain laufen lassen
+		 CLOSED: [2010-08-03 Tue 20:44]
+*** DONE Skydome-Unterfarbe weiterreichen
+		 CLOSED: [2010-07-31 Sat 01:30]
+*** DONE fov und aspect an skydome weiterreichen (near und far nicht)
+		 CLOSED: [2010-07-31 Sat 01:30]
+*** DONE z-Puffer-Artefakte minimieren
+		 CLOSED: [2010-07-31 Sat 01:31]
+*** DONE Matrixmultiplikationen durch mvp-Matrix ersetzen
+		 CLOSED: [2010-08-05 Thu 12:45]
+Hierzu folgender Test: Definiere in fcppt zwei Matrizen,
+multipliziere, gucke was der Output ist. Mache dasselbe in
+Mathematica.
+*** DONE water_height durch water_level ersetzen
+		 CLOSED: [2010-08-02 Mon 20:16]
+*** DONE water sollte ein rect bekommen statt einen Dimensionwert
+		 CLOSED: [2010-08-02 Mon 20:16]
+Dahinter steckt der Gedanke, dass das Wasser abgeschlossen sein sollte!
+*** DONE Kleiner Rewrite der Subsysteme
+		 CLOSED: [2010-08-02 Mon 20:16]
+*** DONE Wo weitermachen?
+		 CLOSED: [2010-08-02 Mon 20:15]
+
+water::object bekommt ein rect, was die Ausmaße angibt. Hier nehmen
+wir das extents()-rect von der height_map, aber "aufgepustet", dafür
+könnte man eine generische Funktion schreiben. Danach muss
+render_scene.cpp weiter angeguckt werden um Anpassungen für die neuen
+Variablen zu machen.
+Die Subsysteme sollten abgeschlossener sein und somit selber mit der
+Konsole und der Kommandozeile kommunizieren.
+
+Jedes Subsystem sollte eine Klasse haben, das einen Vermittler
+zwischen Konsole und Subsystem darstellt (es sollte also beide im
+Konstruktor bekommen). Diese Klasse registriert sich die Callbacks und
+steuert deren Ausführung.
+
+Jedes Subsystem eine Funktion bereitstellen, die eine
+options_description zurückliefert. Außerdem sollte eine
+factory-Methode bereitgestellt werden, die die options_description
+bekommt und ggf. zusätzliche Parameter und daraus ein Objekt erstellt.
+Dazu hift Nebel, sowie eine Near-Plane, die weiter weg ist und eine
+Far-Plane, die näher dran ist.
+
+*** TODO cout/cerr zu Konsole weiterleiten
+*** DONE fcppt::shared_ptr durch std::shared_ptr ersetzen
+		 CLOSED: [2010-08-03 Tue 20:44]
+*** TODO Besseres attribute/uniform-System
+1. Funktion T -> glsl-Typ Diese Funktion sollte z.B vector<float/double,N>
+   erkennen und vecN draus machen. 
+2. Funktion vf::format -> string, die z.B. ausgibt: "in vec3 position; in vec2
+   texcoord;" 
+3. Definiere Datenstruktur "uniform", die enthaelt "name, typ_string, const"
+4. Definiere Funktion "[uniform] -> string", die Zeilen der Form "uniform
+   <typ_string> <name>" oder "const <typ_string> <name>" generiert, je nachdem,
+   wie das const-Flag gesetzt ist
+5. Erweitere Shaderklasse, sodass sie "[uniform]" bekommt und im Vertex- und im
+	 Fragmentshader den String $$$uniforms$$$ durch die Liste der Uniforms
+	 ersetzt. Ausserdem muesste die Klasse das Vertexformat kennen und daraus den
+	 in 2 genannten String definieren. Der wird im Vertexshader durch
+	 $$$inputs$$$ ersetzt.
+*** DONE Die anderen Tests wieder lauffähig machen
+*** DONE height_map brauch ein Signal "heights_changed", was an die Physik weitergegeben wird
+*** DONE Das Terrain muss flipQuadEdges haben
+
+		 CLOSED: [2010-08-09 Mon 20:58]
+		 CLOSED: [2010-08-03 Tue 20:44
+		 
+*** DONE Absolute Pfade bei Dateien auf Kommandozeile
+		 CLOSED: [2010-08-15 Sun 13:30]
+Vielleicht so machen, dass man einen Pfad mit '/' prependen kann und
+der dann den absoluten Pfad nimmt. Dürfte ja einfach in eine Funktion
+packbar sein.
+*** DONE Schreibe Klasse "input_delegator", die die Eingabe delegieren kann
+		 CLOSED: [2010-08-10 Tue 15:43]
+Momentan brauchen 3 Systeme Inputs: die Konsole, das Fahrzeug, die
+Kamera. Der Inputdelegator sollte alle diese Klassen kennen. Die
+Konsole kann eh jede Eingabe überschreiben. Dann sollte man noch
+zwischen dem Fahrzeug und der Kamera umschalten können.
+
+Notiz: Die Kamera und das Fahrzeug können koexistieren, wenn die
+Kamera immer neu gesetzt wird nachdem sie durch den Input geändert
+wurde.
+*** DONE gizmo verallgemeinern und dann in vehicle nutzen?
+		 CLOSED: [2010-08-12 Thu 20:59]
+
+-gizmo_to_mat4, dann in camera::object nutzen
+-Funktion, um gizmo um right/up/forward zu drehen
+-mirror_camera aus water rausziehen?
+
+*** DONE Anzeigebug fuer Skydome fixen
+		 CLOSED: [2010-08-31 Tue 19:38]
+*** DONE Der Inputdelegator funzt nicht, die Konsole blockiert nicht den Auto-Input
+		 CLOSED: [2010-08-15 Sun 13:30]
+*** DONE Library bauen statt einzelne Executables mit denselben Dateien
+		 CLOSED: [2010-08-14 Sat 18:32]
+Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
+detailreichen Skydome erzeugt?
+*** TODO Textur tst spiegelverkehrt
+*** DONE sge::model Flag einbauen, ob y und z gedreht werden sollen
+		 CLOSED: [2010-08-21 Sat 17:06]
+*** TODO physics von model abkoppeln
+
+Erstelle eine Funktion, die eine shape aus einem sge::model::object,
+einem Skalierungsfaktor und einer model_approximation erstellt.
+
+*** TODO graphics::stats erweitern
+Man könnte die Stats verallgemeinern: Ein "stat" ist eine textuelle
+Informationseinheit (z.B. Geschwindigkeit des Vehikels), die scoped
+beim "stats"-Objekt eingetragen werden kann. Details muss man sich
+noch überlegen.
+*** TODO random_flat_point erweitern
+*** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern
+*** TODO Musiklautstärke muss einstellbar sein
+*** TODO foldl in gameover durch accumulate ersetzen
+*** TODO vehicle::speed_kmh muss relativ zu forward sein
+*** TODO shape_from_model erweitern
