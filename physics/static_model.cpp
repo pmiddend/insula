@@ -6,6 +6,8 @@
 #include "motion_state.hpp"
 #include "../model/object.hpp"
 #include <BulletDynamics/Dynamics/btRigidBody.h>
+#include <fcppt/io/cout.hpp>
+#include <iostream>
 
 insula::physics::static_model::static_model(
 	world &w,
@@ -18,9 +20,7 @@ insula::physics::static_model::static_model(
 		new motion_state(
 			position)),
 	shape_(
-		_shape),
-	world_scope_(
-		w)
+		_shape)
 {
 	body_.reset(
 		new btRigidBody(
@@ -30,8 +30,8 @@ insula::physics::static_model::static_model(
 				shape_.get(),
 				btVector3(0,0,0))));
 
-	world_scope_.set(
-		*body_);
+	world_scope_.reset(
+		new scoped_body(w,*body_));
 
 	switch (_solidity)
 	{
@@ -46,6 +46,7 @@ insula::physics::static_model::static_model(
 
 	body_->setUserPointer(
 		this);
+
 }
 
 insula::physics::mat4 const

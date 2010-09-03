@@ -1,4 +1,5 @@
 #include "game_inner.hpp"
+#include "../timed_output.hpp"
 #include "../get_option.hpp"
 #include "../create_path.hpp"
 #include "../media_path.hpp"
@@ -45,6 +46,7 @@ insula::states::game_inner::game_inner(
 	current_player_(
 		context<game_outer>().next_player()),
 	physics_world_(
+		context<machine>().camera(),
 		fcppt::math::box::structure_cast<physics::box>(
 			context<game_outer>().height_map().extents()),
 		get_option<physics::vec3>(
@@ -178,6 +180,7 @@ insula::states::game_inner::react(
 			FCPPT_TEXT("score"));
 	}
 	to_delete_.clear();
+	physics_world_.update_visibility();
 }
 
 void
@@ -199,10 +202,21 @@ insula::states::game_inner::react(
 			context<machine>().systems().renderer(),
 			nugget_model_);
 
+		unsigned ticker = 0;
+
 		BOOST_FOREACH(
 			physics::static_model &m,
 			nugget_models_)
 		{
+			if (m.last_seen() != physics_world_.current_iteration())
+				continue;
+
+			ticker++;
+
+			//if (m.last_seen() == physics_world_.current_iteration())
+				//timed_output() << ticker++ << "Seeing something!\n";
+				//fcppt::io::cout << "Saw something!\n";
+
 			nugget_shader_.set_uniform(
 				"mvp",
 				context<machine>().camera().perspective() * 
@@ -212,6 +226,8 @@ insula::states::game_inner::react(
 
 			nugget_model_.render();
 		}
+
+		timed_output() << "Drew " << ticker << " static models\n";
 	}
 	
 	if (physics_debug_)

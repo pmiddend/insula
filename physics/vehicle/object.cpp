@@ -97,8 +97,6 @@ insula::physics::vehicle::object::object(
 		_steering_clamp),
 	is_skidding_(
 		false),
-	world_body_scope_(
-		world_),
 	world_vehicle_scope_(
 		world_)
 {
@@ -131,8 +129,10 @@ insula::physics::vehicle::object::object(
 	car_body_->setUserPointer(
 		this);
 
-	world_body_scope_.set(
-		*car_body_);
+	world_body_scope_.reset(
+		new scoped_body(
+			world_,
+			*car_body_));
 
 	btTransform t;
 	t.setIdentity();

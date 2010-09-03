@@ -17,16 +17,13 @@ public:
 
 	explicit
 	scoped_body(
-		world &);
-
-	void 
-	set(
+		world &,
 		btRigidBody &);
 
 	~scoped_body();
 private:
 	world &w;
-	btRigidBody *b;
+	btRigidBody &b;
 };
 }
 }

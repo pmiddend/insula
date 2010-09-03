@@ -103,6 +103,7 @@ insula::graphics::shader::object::object(
 				return s + v.declaration(); 
 			});
 
+	/*
 	fcppt::io::cout << "Generated header: " << header << "\n";
 	fcppt::io::cout << "Got format declaration: " << format_declaration << "\n";
 	fcppt::io::cout << "Preprocessed vertex shader: " << 
@@ -111,6 +112,7 @@ insula::graphics::shader::object::object(
 						vertex),
 					std::string("$$$HEADER$$$"),
 					format_declaration+header) << "\n";
+	*/
 
 	program_ = 
 		renderer_->create_glsl_program(
@@ -131,13 +133,13 @@ insula::graphics::shader::object::object(
 		renderer_,
 		program_);
 
-	fcppt::io::cout << "Iterating through variables\n";
+	//fcppt::io::cout << "Iterating through variables\n";
 	BOOST_FOREACH(variable const &v,_variables)
 	{
 		if (v.type() != variable_type::uniform)
 			continue;
 
-		fcppt::io::cout << "Setting initial value for variable " << v.name() << "\n";
+	//	fcppt::io::cout << "Setting initial value for variable " << v.name() << "\n";
 		// TODO: See above
 		fcppt::variant::apply_unary(
 			uniform_setter(
@@ -147,9 +149,9 @@ insula::graphics::shader::object::object(
 						program_->uniform(v.name()))).first->second),
 			v.initial_value());
 	}
-	fcppt::io::cout << "Iterating through variables - DONE\n";
+	//fcppt::io::cout << "Iterating through variables - DONE\n";
 
-	fcppt::io::cout << "Now iterating though samplers\n";
+	//fcppt::io::cout << "Now iterating though samplers\n";
 	sampler::texture_unit_type current_tu = 
 		static_cast<sampler::texture_unit_type>(0);
 	BOOST_FOREACH(
@@ -159,8 +161,8 @@ insula::graphics::shader::object::object(
 		samplers_.push_back(
 			v);
 
-		fcppt::io::cout 
-			<< "Assigning " << v.name() << " the texture unit " << current_tu << "\n";
+	/*	fcppt::io::cout 
+			<< "Assigning " << v.name() << " the texture unit " << current_tu << "\n";*/
 
 		sge::renderer::glsl::uniform::single_value(
 			uniforms_.insert(

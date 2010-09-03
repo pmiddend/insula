@@ -155,6 +155,13 @@ insula::graphics::camera::object::perspective() const
 			far_);
 }
 
+insula::graphics::mat4 const
+insula::graphics::camera::object::mvp() const
+{
+	return 
+		perspective() * world();
+}
+
 insula::graphics::gizmo const &
 insula::graphics::camera::object::gizmo() const
 {

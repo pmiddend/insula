@@ -90,6 +90,8 @@ insula::physics::height_map::height_map(
 
 	world_.add(
 		*body_);
+
+	body_->setUserPointer(this);
 }
 
 insula::physics::height_map::~height_map()

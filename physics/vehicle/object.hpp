@@ -112,7 +112,7 @@ private:
 	std::unique_ptr<scoped_constraint> scoped_constraint_;
 
 	bool is_skidding_;
-	scoped_body world_body_scope_;
+	std::unique_ptr<scoped_body> world_body_scope_;
 	scoped_action world_vehicle_scope_;
 };
 }

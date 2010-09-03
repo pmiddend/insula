@@ -3,6 +3,16 @@
 - Zwei Fixes für raycastvehicle: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
 - Frustum/Occlusion culling: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
 - Vehicles in Bullet
+
+* Kurzzeitvorgehen
+
+- physics::object bekommt ein neues Attribut "visible" mit Getter und Setter
+- physics::world bekommt eine dbvtBroadphase verpasst
+- physics::world bekommt update_visibility, was zunächst die Frustum
+  Planes aus der Perspektivmatrix der Kamera extrahiert.
+- Dann wird die Schleife aus Bullet ausgeführt und vom broadphaseproxy
+  zum body zum object gegangen und dort die Visibility entsprechend
+  gesetzt
 					
 * Aktivitäten
 ** TODO Nebel
@@ -148,3 +158,4 @@ noch überlegen.
 *** TODO foldl in gameover durch accumulate ersetzen
 *** TODO vehicle::speed_kmh muss relativ zu forward sein
 *** TODO shape_from_model erweitern
+*** TODO gizmo in math verfrachten

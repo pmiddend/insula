@@ -1,4 +1,4 @@
-game-nuggets = 2
+game-nuggets = 1000
 game-nugget-model = props/beacon.md3
 game-nugget-texture = props/beacon.png
 

@@ -39,7 +39,7 @@ private:
 	std::unique_ptr<btRigidBody> body_;
 	std::unique_ptr<motion_state> motion_state_;
 	shape_ptr shape_;
-	scoped_body world_scope_;
+	std::unique_ptr<scoped_body> world_scope_;
 };
 }
 }

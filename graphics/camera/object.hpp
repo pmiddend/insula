@@ -58,6 +58,9 @@ public:
 	mat4 const
 	perspective() const;
 
+	mat4 const 
+	mvp() const;
+
 	insula::graphics::gizmo const &
 	gizmo() const;
 
