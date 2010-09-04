@@ -69,6 +69,7 @@ insula::vehicle::object::object(
 		params.max_engine_force,
 		params.max_breaking_force,
 		params.max_speed,
+		params.track_connection,
 		fcppt::math::box::structure_cast<physics::box>(
 			wheel_model_.bounding_box()),
 		params.wheel_infos),

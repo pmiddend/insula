@@ -159,3 +159,6 @@ noch überlegen.
 *** TODO vehicle::speed_kmh muss relativ zu forward sein
 *** TODO shape_from_model erweitern
 *** TODO gizmo in math verfrachten
+*** TODO config.po wegmachen
+In config.json Sektion "command-line", in der nur String-Optionen
+reinkommen, po-Parser kopieren

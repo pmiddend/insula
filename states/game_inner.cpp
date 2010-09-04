@@ -155,7 +155,7 @@ insula::states::game_inner::game_inner(
 						context<game_outer>().height_map().cell_size(),
 						fcppt::math::vector::structure_cast<height_map::vec2>(
 							v)) * context<game_outer>().height_map().height_scaling() + 
-					static_cast<physics::scalar>(nugget_model_.bounding_box().h())/**
+					static_cast<physics::scalar>(nugget_model_.bounding_box().h()/2)/**
 					static_cast<physics::scalar>(1.5)*/,
 					v.y()),
 				physics::shape_from_model(
@@ -183,11 +183,18 @@ insula::states::game_inner::react(
 	physics_world_.update_visibility();
 }
 
+#include <sge/renderer/state/scoped.hpp>
+#include <sge/renderer/state/list.hpp>
+#include <sge/renderer/state/bool.hpp>
+#include <sge/renderer/state/trampoline.hpp>
+
 void
 insula::states::game_inner::react(
 	events::render const &)
 {
 	{
+		sge::renderer::state::scoped ss(context<machine>().systems().renderer(),sge::renderer::state::list(sge::renderer::state::bool_::enable_alpha_blending = true));
+		
 		// FIRST update texture, THEN scope the shader!
 		nugget_shader_.update_texture(
 			"texture",
@@ -227,7 +234,7 @@ insula::states::game_inner::react(
 			nugget_model_.render();
 		}
 
-		timed_output() << "Drew " << ticker << " static models\n";
+	//	timed_output() << "Drew " << ticker << " static models\n";
 	}
 	
 	if (physics_debug_)

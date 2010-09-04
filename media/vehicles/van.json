@@ -17,15 +17,16 @@
 	"max_engine_force" : 1000.0,
 	"max_breaking_force" : 100.0,
 	"steering_clamp" : 0.3,
-	"max_speed" : 1200.0,
+	"max_speed" : 100.0,
+	"track_connection" : 2.0,
 
 	"default_wheel" : 
 		{
 			"offset" : [0.0,0.0,0.0],
-			"suspension_stiffness" : 10.0,
+			"suspension_stiffness" : 30.0,
 			"suspension_compression" : 0.3,
-			"suspension_relaxation" : 0.2,
-			"suspension_travel_cm" : 0.40,
+			"suspension_relaxation" : 0.5,
+			"suspension_travel_cm" : 30.0,
 			"suspension_rest_length" : 0.40,
 			"friction_slip" : 15.0,
 			"roll_influence" : 0.05

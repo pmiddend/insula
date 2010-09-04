@@ -36,6 +36,14 @@ insula::vehicle::input::is_active() const
 	return is_active_;
 }
 
+// FIXME
+/*
+void
+insula::vehicle::input::update()
+{
+}
+*/
+
 void
 insula::vehicle::input::callback(
 	sge::input::key_pair const &k)

@@ -30,8 +30,8 @@ insula::states::freelook::freelook(
 	my_base(
 		ctx)
 {
-	context<machine>().music().play_event(
-		FCPPT_TEXT("freelook"));
+	/*context<machine>().music().play_event(
+		FCPPT_TEXT("freelook"));*/
 
 	graphics::box const hm_size = 
 		context<game_outer>().height_map().extents();

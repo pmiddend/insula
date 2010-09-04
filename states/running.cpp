@@ -28,7 +28,7 @@ insula::states::running::running(
 	context<machine>().sounds().play(
 		FCPPT_TEXT("honk"));
 
-	context<machine>().music().play_random();
+	//context<machine>().music().play_random();
 
 	context<game_inner>().turn_timer().start();
 }

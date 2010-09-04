@@ -41,7 +41,8 @@ public:
 		steering_clamp,
 		max_engine_force,
 		max_breaking_force,
-		max_speed;
+		max_speed,
+		track_connection;
 	physics::vec3 position;
 	physics::vehicle::wheel_info_sequence wheel_infos;
 	input_delegator &input_delegator_;
@@ -68,6 +69,7 @@ public:
 		physics::scalar max_engine_force,
 		physics::scalar max_breaking_force,
 		physics::scalar max_speed,
+		physics::scalar track_connection,
 		physics::vec3 position,
 		physics::vehicle::wheel_info_sequence wheel_infos,
 		input_delegator &input_delegator_,
@@ -93,6 +95,7 @@ public:
 		max_engine_force(max_engine_force),
 		max_breaking_force(max_breaking_force),
 		max_speed(max_speed),
+		track_connection(track_connection),
 		position(position),
 		wheel_infos(wheel_infos),
 		input_delegator_(input_delegator_),

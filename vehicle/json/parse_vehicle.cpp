@@ -104,6 +104,10 @@ insula::vehicle::json::parse_vehicle(
 				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
 					json_file.members,
 					FCPPT_TEXT("max_speed"))),
+			static_cast<physics::scalar>(
+				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+					json_file.members,
+					FCPPT_TEXT("track_connection"))),
 			position,
 			parse_wheels(
 				sge::parse::json::find_member_exn<sge::parse::json::array>(

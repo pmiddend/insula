@@ -1,4 +1,6 @@
 #include "object.hpp"
+#include "bullet_wrapper.hpp"
+#include "../../timed_output.hpp"
 #include "../dim3_to_bullet.hpp"
 #include "../vec3_to_bullet.hpp"
 #include "../bullet_to_vec3.hpp"
@@ -13,7 +15,6 @@
 #include "../motion_state.hpp"
 #include <LinearMath/btMatrix3x3.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
-#include <BulletDynamics/Vehicle/btRaycastVehicle.h>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <BulletCollision/CollisionShapes/btCompoundShape.h>
 #include <BulletCollision/CollisionShapes/btCylinderShape.h>
@@ -69,6 +70,7 @@ insula::physics::vehicle::object::object(
 	scalar const _max_engine_force,
 	scalar const _max_breaking_force,
 	scalar const _max_speed,
+	scalar const _track_connection,
 	box const &_wheel_bb,
 	wheel_info_sequence const &_wheels)
 :
@@ -134,6 +136,7 @@ insula::physics::vehicle::object::object(
 			world_,
 			*car_body_));
 
+	/*
 	btTransform t;
 	t.setIdentity();
 	constraint_.reset(
@@ -144,6 +147,7 @@ insula::physics::vehicle::object::object(
 		new scoped_constraint(
 			world_,
 			*constraint_));
+	*/
 
 	// TODO: What happens if this is omitted?
 	car_body_->setActivationState(
@@ -179,12 +183,13 @@ insula::physics::vehicle::object::object(
 			&(world_.handle())));
 
 	vehicle_.reset(
-		new btRaycastVehicle(
+		new bullet_wrapper(
 			// bullet doesn't need this structure here, it's probably there for
 			// historical reasons
 			btRaycastVehicle::btVehicleTuning(),
 			car_body_.get(),
-			raycaster_.get()));
+			raycaster_.get(),
+			_track_connection));
 
 	world_vehicle_scope_.set(
 		*vehicle_);
@@ -257,6 +262,8 @@ insula::physics::vehicle::object::update()
 
 	btScalar const speed = 
 		velocity.length();
+
+	//timed_output() << "speed: " << speed << "\n";
 
 	if (speed > max_speed_) 
 		car_body_->setLinearVelocity(

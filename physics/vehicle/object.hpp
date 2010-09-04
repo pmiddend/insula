@@ -2,6 +2,7 @@
 #define INSULA_PHYSICS_VEHICLE_OBJECT_HPP_INCLUDED
 
 #include "wheel_info_sequence.hpp"
+#include "bullet_wrapper_fwd.hpp"
 #include "../gizmo.hpp"
 #include "../motion_state_fwd.hpp"
 #include "../scoped_body.hpp"
@@ -53,6 +54,7 @@ public:
 		scalar max_engine_force,
 		scalar max_breaking_force,
 		scalar max_speed,
+		scalar track_connection,
 		box const &wheel_bb,
  		wheel_info_sequence const &);
 
@@ -98,7 +100,7 @@ private:
 	std::unique_ptr<btRigidBody> car_body_;
 	std::unique_ptr<btCylinderShapeX> wheel_shape_;
 	std::unique_ptr<btVehicleRaycaster> raycaster_; 
-	std::unique_ptr<btRaycastVehicle> vehicle_;
+	std::unique_ptr<bullet_wrapper> vehicle_;
 	std::unique_ptr<motion_state> motion_state_;
 	wheel_info_sequence const wheels_;
 	scalar max_engine_force_;
