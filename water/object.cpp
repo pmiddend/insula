@@ -33,6 +33,7 @@
 #include <sge/renderer/state/depth_func.hpp>
 #include <sge/renderer/target.hpp>
 #include <sge/renderer/texture.hpp>
+#include <sge/renderer/no_depth_stencil_texture.hpp>
 #include <sge/image/color/rgba8.hpp>
 #include <sge/renderer/vf/view.hpp>
 #include <sge/renderer/vf/vertex.hpp>
@@ -224,7 +225,8 @@ insula::water::object::regenerate(
 
 	target_ = 
 		renderer_->create_target(
-			target_texture_);
+			target_texture_,
+			sge::renderer::no_depth_stencil_texture());
 
 	vb_ = 
 		renderer_->create_vertex_buffer(
