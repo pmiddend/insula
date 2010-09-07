@@ -21,6 +21,9 @@ public:
 	render(
 		backend &) = 0;
 
+	virtual bool
+	is_visible() const = 0;
+
 	virtual
 	~instance();
 };

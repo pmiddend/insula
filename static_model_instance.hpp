@@ -1,6 +1,7 @@
 #ifndef INSULA_STATIC_MODEL_INSTANCE_HPP_INCLUDED
 #define INSULA_STATIC_MODEL_INSTANCE_HPP_INCLUDED
 
+#include "model_instance.hpp"
 #include "scene/transparent_instance.hpp"
 #include "scene/backend_ptr.hpp"
 #include "graphics/scalar.hpp"
@@ -15,7 +16,7 @@ namespace insula
 {
 class static_model_instance
 :
-	public scene::transparent_instance
+	public model_instance
 {
 public:
 	explicit
@@ -25,14 +26,10 @@ public:
 		physics::shape_ptr,
 		physics::solidity::type);
 
-	void
-	render(
-		scene::backend &);
+	bool
+	is_visible() const;
 
-	graphics::scalar
-	distance_to(
-		graphics::vec3 const &) const { return 0; }
-
+	// We need this in the collision callbacks
 	physics::static_model const &
 	physics_model() const;
 private:

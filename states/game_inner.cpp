@@ -128,6 +128,8 @@ insula::states::game_inner::game_inner(
 	scene_manager_(
 		context<machine>().camera()),
 	nugget_backend_(
+		// no transparency
+		false,
 		context<machine>().systems().renderer(),
 		context<machine>().camera(),
 		model_shader_,

@@ -37,6 +37,12 @@ insula::scene::manager::insert_transparent(
 void
 insula::scene::manager::render()
 {
+	typedef
+	std::vector<backend_ptr>
+	erase_sequence;
+
+	erase_sequence to_erase;
+
 	// Iteration of a ptr_map is done with value_type (const_reference
 	// is something odd). The value_type _has to be const_!
 	// - first will be key_type, 
@@ -46,10 +52,14 @@ insula::scene::manager::render()
 		backend_instance_map_)
 	{
 		// This is neccesary since a backend could have been destroyed and
-		// still lingers in the map. backends do not unlink (for technical
+		// still lingers in the map. backends do not auto-unlink (for technical
 		// reasons, really; this might be fixed in the future)
 		if (r.second->empty())
+		{
+			to_erase.push_back(
+				r.first);
 			continue;
+		}
 
 		scoped_backend scoped_backend_(
 			r.first);
@@ -57,9 +67,18 @@ insula::scene::manager::render()
 		BOOST_FOREACH(
 			instance_list::reference instance_ref,
 			*r.second)
-			instance_ref.render(
-				*r.first);
+			if (instance_ref.is_visible())
+				instance_ref.render(
+					*r.first);
 	}
+
+	BOOST_FOREACH(
+		erase_sequence::const_reference r,
+		to_erase)
+		backend_instance_map_.erase(
+			r);
+
+	to_erase.clear();
 
 	render_transparent();
 }
@@ -85,8 +104,9 @@ insula::scene::manager::render_transparent()
 	BOOST_FOREACH(
 		transparent_instance_list::reference r,
 		transparent_instances_)
-		ordered_instances.insert(
-			&r);
+		if (r.is_visible())
+			ordered_instances.insert(
+				&r);
 
 	BOOST_FOREACH(
 		set_type::value_type const &v,

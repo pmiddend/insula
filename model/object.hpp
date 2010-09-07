@@ -49,7 +49,7 @@ public:
 	graphics::box const
 	bounding_box() const;
 
-	// scoped needs this
+	// model_backend and scoped need this
 	sge::renderer::vertex_buffer_ptr const
 	vb();
 
