@@ -2,6 +2,7 @@
 #include "model_backend.hpp"
 #include "graphics/shader/object.hpp"
 #include "graphics/camera/object.hpp"
+#include "model/object.hpp"
 #include "graphics/mat4.hpp"
 #include "physics/world.hpp"
 #include <fcppt/math/matrix/structure_cast.hpp>
@@ -39,4 +40,12 @@ insula::static_model_instance::render(
 		realback.camera().mvp() * 
 		fcppt::math::matrix::structure_cast<graphics::mat4>(
 			physics_.world_transform()));
+
+	realback.model().render();
+}
+
+insula::physics::static_model const &
+insula::static_model_instance::physics_model() const
+{
+	return physics_;
 }

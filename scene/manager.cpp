@@ -3,6 +3,7 @@
 #include "scoped_backend.hpp"
 #include "../graphics/camera/object.hpp"
 #include <boost/foreach.hpp>
+#include <fcppt/io/cout.hpp>
 #include <set>
 
 insula::scene::manager::manager(
@@ -97,3 +98,5 @@ insula::scene::manager::render_transparent()
 			*(v->backend()));
 	}
 }
+
+insula::scene::manager::~manager() {}

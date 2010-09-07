@@ -32,6 +32,9 @@ public:
 	graphics::scalar
 	distance_to(
 		graphics::vec3 const &) const { return 0; }
+
+	physics::static_model const &
+	physics_model() const;
 private:
 	physics::world &physics_world_;
 	physics::static_model physics_;

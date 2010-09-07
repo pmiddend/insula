@@ -39,6 +39,22 @@
 #include <boost/foreach.hpp>
 #include <functional>
 
+namespace
+{
+insula::model_backend::texture_map const
+create_texture_map(
+	sge::renderer::glsl::string const &s,
+	sge::renderer::texture_ptr const texture)
+{
+	insula::model_backend::texture_map m;
+	m.insert(
+		insula::model_backend::texture_map::value_type(
+			s,
+			texture));
+	return m;
+}
+}
+
 insula::states::game_inner::game_inner(
 	my_context ctx)
 :
@@ -73,7 +89,7 @@ insula::states::game_inner::game_inner(
 				physics_debug_ = !physics_debug_;
 			},
 			FCPPT_TEXT("Toggle the physics debug drawer"))),
-	nugget_shader_(
+	model_shader_(
 		context<machine>().systems().renderer(),
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"),
@@ -109,12 +125,22 @@ insula::states::game_inner::game_inner(
 				FCPPT_TEXT("models")),
 			sge::model::load_flags::switch_yz),
 			context<machine>().systems().renderer()),
+	scene_manager_(
+		context<machine>().camera()),
+	nugget_backend_(
+		context<machine>().systems().renderer(),
+		context<machine>().camera(),
+		model_shader_,
+		create_texture_map(
+			"texture",
+			nugget_texture_),
+		nugget_model_),
 	vehicle_(
 		insula::vehicle::cli_factory(
 			context<machine>().cli_variables(),
 			context<machine>().systems(),
 			context<machine>().camera(),
-			nugget_shader_,
+			model_shader_,
 			physics_world_,
 			physics::vec3(
 				static_cast<physics::scalar>(
@@ -146,7 +172,7 @@ insula::states::game_inner::game_inner(
 		context<game_outer>().nugget_positions())
 	{
 		nugget_models_.push_back(
-			new physics::static_model(
+			new static_model_instance(
 				physics_world_,
 				physics::vec3(
 					v.x(),
@@ -164,6 +190,9 @@ insula::states::game_inner::game_inner(
 						physics::model_approximation::box,
 						static_cast<physics::scalar>(1))),
 				physics::solidity::nonsolid));
+		scene_manager_.insert(
+			&nugget_backend_,
+			nugget_models_.back());
 	}
 }
 
@@ -171,7 +200,7 @@ void
 insula::states::game_inner::react(
 	events::tick const &)
 {
-	BOOST_FOREACH(physics::static_model *m,to_delete_)
+	BOOST_FOREACH(static_model_instance const *m,to_delete_)
 	{
 		fcppt::algorithm::ptr_container_erase(
 			nugget_models_,
@@ -192,50 +221,7 @@ void
 insula::states::game_inner::react(
 	events::render const &)
 {
-	{
-		sge::renderer::state::scoped ss(context<machine>().systems().renderer(),sge::renderer::state::list(sge::renderer::state::bool_::enable_alpha_blending = true));
-		
-		// FIRST update texture, THEN scope the shader!
-		nugget_shader_.update_texture(
-			"texture",
-			nugget_texture_);
-
-	//	fcppt::io::cout << "scoping shader\n";
-		graphics::shader::scoped scoped_shader(
-			nugget_shader_);
-
-	//	fcppt::io::cout << "scoping model\n";
-		model::scoped scoped_model(
-			context<machine>().systems().renderer(),
-			nugget_model_);
-
-		unsigned ticker = 0;
-
-		BOOST_FOREACH(
-			physics::static_model &m,
-			nugget_models_)
-		{
-			if (m.last_seen() != physics_world_.current_iteration())
-				continue;
-
-			ticker++;
-
-			//if (m.last_seen() == physics_world_.current_iteration())
-				//timed_output() << ticker++ << "Seeing something!\n";
-				//fcppt::io::cout << "Saw something!\n";
-
-			nugget_shader_.set_uniform(
-				"mvp",
-				context<machine>().camera().perspective() * 
-				context<machine>().camera().world() * 
-				fcppt::math::matrix::structure_cast<graphics::mat4>(
-					m.world_transform()));
-
-			nugget_model_.render();
-		}
-
-	//	timed_output() << "Drew " << ticker << " static models\n";
-	}
+	scene_manager_.render();
 	
 	if (physics_debug_)
 	{
@@ -281,19 +267,21 @@ void
 insula::states::game_inner::erase_nugget(
 	physics::static_model &m)
 {
-	// Let's hope it's really a nugget!
-	FCPPT_ASSERT(
+	nugget_model_sequence::const_iterator i = 
 		std::find_if(
 			nugget_models_.begin(),
 			nugget_models_.end(),
-			[&m](physics::static_model const &m2) 
+			[&m](static_model_instance const &m2) 
 			{
-				return &m == &m2;
-			}) != nugget_models_.end());
+				return &m == &(m2.physics_model());
+			});
+
+	FCPPT_ASSERT(
+		i != nugget_models_.end());
 
 	// If so, schedule for deletion (lazy deletion!)
 	to_delete_.insert(
-		&m);
+		&(*i));
 }
 
 std::size_t

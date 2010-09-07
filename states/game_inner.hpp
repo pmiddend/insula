@@ -3,12 +3,14 @@
 
 #include "game_outer.hpp"
 #include "freelook_fwd.hpp"
+#include "../static_model_instance.hpp"
+#include "../model_backend.hpp"
+#include "../scene/manager.hpp"
 #include "../player.hpp"
 #include "../turn_timer.hpp"
 #include "../physics/world.hpp"
 #include "../physics/height_map.hpp"
 #include "../physics/debug_drawer.hpp"
-#include "../physics/static_model.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../model/object.hpp"
 #include "../events/tick_fwd.hpp"
@@ -70,11 +72,11 @@ private:
 	// logic like deleting this models is handled in game_inner, too
 	// (though it might be better placed in running)
 	typedef
-	boost::ptr_vector<physics::static_model>
+	boost::ptr_vector<static_model_instance>
 	nugget_model_sequence;
 
 	typedef
-	std::set<physics::static_model*>
+	std::set<static_model_instance const *>
 	deletion_set;
 
 	player current_player_;
@@ -84,9 +86,11 @@ private:
 	physics::debug_drawer physics_debug_drawer_;
 	bool physics_debug_;
 	fcppt::signal::scoped_connection toggle_physics_debug_; 
-	graphics::shader::object nugget_shader_;
+	graphics::shader::object model_shader_;
 	sge::renderer::texture_ptr const nugget_texture_;
 	model::object nugget_model_;
+	scene::manager scene_manager_;
+	model_backend nugget_backend_;
 	nugget_model_sequence nugget_models_;
 	insula::vehicle::object vehicle_;
 	fcppt::signal::scoped_connection vehicle_static_connection_;
