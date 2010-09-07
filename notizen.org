@@ -3,16 +3,153 @@
 - Zwei Fixes für raycastvehicle: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
 - Frustum/Occlusion culling: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
 - Vehicles in Bullet
+- http://vdrift.net/Forum/viewtopic.php?p=10332&sid=ce7581e8f6c9da3b93eec41440a4d776
+- Shadow Mapping: http://www.fabiensanglard.net/shadowmapping/index.php
 
+* Fahrzeugverbesserungen
 * Kurzzeitvorgehen
 
-- physics::object bekommt ein neues Attribut "visible" mit Getter und Setter
-- physics::world bekommt eine dbvtBroadphase verpasst
-- physics::world bekommt update_visibility, was zunächst die Frustum
-  Planes aus der Perspektivmatrix der Kamera extrahiert.
-- Dann wird die Schleife aus Bullet ausgeführt und vom broadphaseproxy
-  zum body zum object gegangen und dort die Visibility entsprechend
-  gesetzt
+** Szenegraph
+
+** Props
+
+Es müssen die Props weitergemacht werden.
+
+Vorbereitungen:
+- Man muss beim Shader die Textur ändern können, auch wenn er grade
+  aktiv ist (brauch man für die verschiedenen Models, die aber einen
+  Shader haben). Dazu brauch =graphics::shader::object= einen =bool=,
+  der angibt, ob der Shader grade aktiv ist. Dann muss
+  =update_texture=, nachdem der Sampler geupdatet wurde, den Renderer
+  über die neue Textur informieren.
+- Eine Methode =approximation_to_shape= muss geschrieben werden. Diese
+  bekommt:
+	- den "approximation"-Knoten aus der json-Datei
+	- ein =sge::model::object_ptr= (der implizit schon optional ist,
+    wird dann nur bei "exact" genutzt)
+	Und gibt zurück einen =shape_ptr=.
+- Ein =static_model= muss eine komplette Transformation übergeben
+  bekommen, am besten einen =vec3= und eine =mat4= im Konstruktor
+  (muss ja getrennt behandelt werden, weil in =btTransform=
+  konvertierbar).
+- =random_flat_point= muss funktionieren. Dazu muss das Teil erstens
+  das water_level respektieren und zweitens den Gradienten noch
+  mitbekommen. Man muss außerdem noch den "Flatnessgrad" mitgeben, der
+  akzeptabel ist. Dann wird so lange zufallsgeneriert bis man einen
+  vernünftigen Punkt gefunden hat.
+- Der Nuggetshader muss aus =game_inner= rausgezogen und als
+  Modelshader in =game_outer= gepackt werden.
+- Die =prop_manager=-Klasse enthält die Liste von =prop_backend= und
+  =prop_instance=. 
+
+Details:
+- Props müssen in die config.json eingetragen werden:
+	#+begin_src json
+  "props" : 
+	[ 
+	  { 
+		  "name" : "palm",
+      "model" : "tree.md3", 
+      "texture" : "tree.png", 
+			"flat_terrain" : true, 
+			"penetration_depth" : 0.0,
+			"scale_range" : [0.5,1.5],
+			"solid" : true,
+			"rotation" : [false,true,false],
+			"approximation" : 
+			{ 
+			  "type" : "cylinder_x", 
+				"origin" : [0.0,0.0,0.0], 
+				"radius" : 1.0, 
+				"height" : 10.0 
+			},
+			"count" : 200
+		} 
+	]
+	#+end_src
+- Erstelle Datenstrukturen:
+	1. =prop_backend=, repräsentiert die Daten, die sich nur pro
+     "Prop-Gruppe" ändern, also die "gescoped" werden müssen:
+		 - =model::object=
+		 - Textur des =model::object=
+	2. =prop_instance=, enthält alle Daten bis auf den Body (der muss
+     pro Iteration neu erstellt werden, also in =game_inner=)
+		 - Position
+		 - Scaling
+		 - Rotation
+		 - Solidity
+		 - Shape
+	3. =prop=, enthält alles, was pro Iteration neu erstellt werden muss
+		 - =physics::static_model=
+		 - Transformation des =model::object=
+- Nachdem das Höhenfeld erstellt wurde, wird der =prop_counts=-Eintrag
+  herangezogen und die einzelnen Props werden erstellt nach folgendem
+  Algorithmus:
+	1. Lese ein Prop aus der Liste =props= aus, wenn vorhanden
+	2. Gucke in die =prop_counts=-Liste, ob Props von diesem Typ erstellt werden sollen
+  3. Falls nein, gehe zu Schritt 1
+  4. Ansonsten erstelle ein =model::object= namens /m/ aus den gegebenen
+     Daten, sowie eine Textur (die ist in =model::object= nicht
+     enthalten). Der Shader zu dem Model ist global (=model_shader=)
+     und in =game_outer= gespeichert.
+  5. Speichere /m/ in dem Array =prop_models=, der Index sei /i/. Sei
+     /n/ die Anzahl der zu erstellenden Models
+  6. Jetzt werden die Daten für =prop_instance= gesucht. Mache /n/
+     mal:
+		 1. Wenn =flat_terrain= true ist, rufe =random_flat_point= auf um
+        den $(x,z)$-Wert des Models zu bestimmen. Wenn =flat_terrain=
+        false ist, rufe =random_point= auf.
+		 2. Bestimme mit =height_for_point= den y-Wert an der Stelle $(x,z)$.
+		 3. Setze als _Position_ des =model::object= (in der =prop=-Klasse):
+				\[
+				(x,y - \textrm{bounding\_box}(\textrm{model}).\textrm{bottom}() - \textrm{penetration\_depth},z)
+				\]
+				Hier wird natürlich angenommen, dass bottom() negativ ist,
+        weil das Model ja im Ursprung sein soll.
+		 4. Bestimme zufällig einen _Skalierungswert_ in der angegebenen Range.
+		 5. Bestimme zufällig 3 _Rotationswinkel_ unter Benutzung der Booleans.
+		 6. Extrahiere _Solidity_ aus dem json.
+		 7. Rufe zum Erstellen der _Shape_ eine separate Methode
+        auf. Diese sollte es auch ermöglichen, eine exakte
+        Approximation zu benutzen. Dazu muss evtl. =sge::model=
+        benutzt werden.
+		 8. Erstelle aus dem bisher gesagten ein vollständiges
+        =prop_instance=-Objekt und füge es in die Liste der Props bei
+        Index /i/ ein (diese Liste ist ein
+        =vector<vector<prop_instance>>=, sodass die Indizes aus den
+        =prop_prototypes= übereinstimmen).
+- Beim Eintritt in =game_inner= wird nach der Physikwelt eine Liste von
+  =prop=-Objekten erzeugt. Dies ist auch ein =vector<vector<prop>>=
+  und wird direkt aus der =prop_instance=-Liste erzeugt. Beim
+  Erstellen eines Props müssen die Transformationen berechnet
+  werden. Die Transformation des Models ist einfach, es ist:
+
+	\[
+	\textrm{translation} \cdot \textrm{rotation} \cdot \textrm{scaling}
+	\]
+
+	Die Transformation des Bodys muss leicht anders lauten:
+
+	\[
+	\textrm{translation} \cdot \textrm{translation}_{\textrm{offset}} \cdot \textrm{rotation}
+	\]
+
+	Ein bullet-Körper muss nicht skaliert werden, die Shape hat schon
+  die richtige Größe.
+- Zum Zeichnen:
+	- Es wird jetzt der Model-Shader gescoped (den kriegt man aus =game_outer=)
+	- Dann die Liste der =prop_backend=-Objekte durchlaufen, nach Index
+    (der Index dient als quasi-Iterator). Für jedes =prop_backend= mit
+    Index /i/ wird gemacht:
+		- Die Textur wird geändert
+		- Der vb des Models gescoped
+		- Es wird die Liste von =props= mit Index /i/ durchlaufen und für
+      jedes =prop= gemacht:
+			- Test auf Sichtbarkeit
+			- Rendern: Dieser Schritt könnte später durch ein "füge in
+        =std::set<objects>= ein" ersetzt werden. Dieses =set= sortiert
+        sich dann automatisch nach Entfernung zum Betrachter (depth
+        sorting)
 					
 * Aktivitäten
 ** TODO Nebel
@@ -48,9 +185,9 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
 
 ** TODO Terraingenerierung
 ** TODO Partikelsystem
-- Ein Partikel hat eine Position und eine Lebenszeit
-** TODO Shadow Maps [0/5]
-*** TODO Neues uniform-System aufsetzen
+** TODO Shadow Maps [1/5]
+*** DONE Neues uniform-System aufsetzen
+		 CLOSED: [2010-09-05 Sun 14:44]
 *** TODO Teste orthografische Projektion aus Sicht der Sonne
 *** TODO Setze das Rendern der Shadowmap auf
 - Hierzu muss orthografisch projiziert werden aus sich der Sonne
@@ -120,45 +257,21 @@ font_collection fonts(
 	make_container<size_container>(15)(20)(25));
 #+end_src
 
-** TODO Diverses [22/30]
+** TODO Diverses [1/13]
 *** TODO cout/cerr zu Konsole weiterleiten
 		 CLOSED: [2010-08-03 Tue 20:44]
-*** TODO Besseres attribute/uniform-System
-1. Funktion T -> glsl-Typ Diese Funktion sollte z.B vector<float/double,N>
-   erkennen und vecN draus machen. 
-2. Funktion vf::format -> string, die z.B. ausgibt: "in vec3 position; in vec2
-   texcoord;" 
-3. Definiere Datenstruktur "uniform", die enthaelt "name, typ_string, const"
-4. Definiere Funktion "[uniform] -> string", die Zeilen der Form "uniform
-   <typ_string> <name>" oder "const <typ_string> <name>" generiert, je nachdem,
-   wie das const-Flag gesetzt ist
-5. Erweitere Shaderklasse, sodass sie "[uniform]" bekommt und im Vertex- und im
-	 Fragmentshader den String $$$uniforms$$$ durch die Liste der Uniforms
-	 ersetzt. Ausserdem muesste die Klasse das Vertexformat kennen und daraus den
-	 in 2 genannten String definieren. Der wird im Vertexshader durch
-	 $$$inputs$$$ ersetzt.
-		 CLOSED: [2010-08-14 Sat 18:32]
-Wieso ist die Farbe ganz unten nicht korrekt, wenn man einen weniger
-detailreichen Skydome erzeugt?
 *** TODO Textur tst spiegelverkehrt
-		 CLOSED: [2010-08-21 Sat 17:06]
-*** TODO physics von model abkoppeln
-
-Erstelle eine Funktion, die eine shape aus einem sge::model::object,
-einem Skalierungsfaktor und einer model_approximation erstellt.
-
 *** TODO graphics::stats erweitern
 Man könnte die Stats verallgemeinern: Ein "stat" ist eine textuelle
 Informationseinheit (z.B. Geschwindigkeit des Vehikels), die scoped
 beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
-*** TODO random_flat_point erweitern
 *** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern
 *** TODO Musiklautstärke muss einstellbar sein
 *** TODO foldl in gameover durch accumulate ersetzen
 *** TODO vehicle::speed_kmh muss relativ zu forward sein
-*** TODO shape_from_model erweitern
 *** TODO gizmo in math verfrachten
+*** TODO orthonormalize_gram_schmidt hinzufügen und gucken wie's läuft
 *** TODO config.po wegmachen
 In config.json Sektion "command-line", in der nur String-Optionen
 reinkommen, po-Parser kopieren

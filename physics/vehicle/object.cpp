@@ -1,5 +1,6 @@
 #include "object.hpp"
 #include "bullet_wrapper.hpp"
+#include "friction_constraint.hpp"
 #include "../../timed_output.hpp"
 #include "../dim3_to_bullet.hpp"
 #include "../vec3_to_bullet.hpp"
@@ -136,7 +137,6 @@ insula::physics::vehicle::object::object(
 			world_,
 			*car_body_));
 
-	/*
 	btTransform t;
 	t.setIdentity();
 	constraint_.reset(
@@ -147,7 +147,6 @@ insula::physics::vehicle::object::object(
 		new scoped_constraint(
 			world_,
 			*constraint_));
-	*/
 
 	// TODO: What happens if this is omitted?
 	car_body_->setActivationState(
@@ -252,6 +251,16 @@ insula::physics::vehicle::object::object(
 
 		wheel_id++;
 	}
+
+	/*
+	friction_constraint_.reset(
+		new friction_constraint(
+			*vehicle_));
+	scoped_friction_constraint_.reset(
+		new scoped_constraint(
+			world_,
+			*friction_constraint_));
+	*/
 }
 
 void

@@ -150,6 +150,16 @@ insula::physics::vehicle::bullet_wrapper::updateVehicle(
 
 }
 
+/*
+void
+insula::physics::vehicle::bullet_wrapper::updateFriction(
+	btScalar deltaTime)
+{
+	
+}
+*/
+
+
 void
 insula::physics::vehicle::bullet_wrapper::updateSuspension(
 	btScalar deltaTime)

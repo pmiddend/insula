@@ -37,6 +37,12 @@ public:
 	updateVehicle(
 		btScalar step);
 
+	/*
+	void
+	updateFriction(
+		btScalar step);
+	*/
+
 	// This is a non-virtual function in btRaycastVehicle, it's ok,
 	// however, because it is only called by updateVehicle, which we
 	// have overidden.
