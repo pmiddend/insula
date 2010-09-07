@@ -14,6 +14,7 @@ class backend
 public:
 	backend(backend const &) = delete;
 	backend &operator=(backend const &) = delete;
+	backend() = default;
 
 	virtual void
 	begin() = 0;

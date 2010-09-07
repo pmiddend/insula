@@ -44,14 +44,23 @@ insula::scene::manager::render()
 		backend_instance_map::value_type const &r,
 		backend_instance_map_)
 	{
+		// This is neccesary since a backend could have been destroyed and
+		// still lingers in the map. backends do not unlink (for technical
+		// reasons, really; this might be fixed in the future)
+		if (r.second->empty())
+			continue;
+
 		scoped_backend scoped_backend_(
 			r.first);
 
 		BOOST_FOREACH(
 			instance_list::reference instance_ref,
 			*r.second)
-			instance_ref.render();
+			instance_ref.render(
+				*r.first);
 	}
+
+	render_transparent();
 }
 
 void
@@ -84,6 +93,7 @@ insula::scene::manager::render_transparent()
 	{
 		scoped_backend scoped_backend_(
 			v->backend());
-		v->render();
+		v->render(
+			*(v->backend()));
 	}
 }
