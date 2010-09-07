@@ -3,18 +3,27 @@
 #include "../random_flat_point.hpp"
 #include "../generate_nuggets.hpp"
 #include "../create_path.hpp"
+#include "../media_path.hpp"
 #include "../get_option.hpp"
 #include "../height_map/cli_factory.hpp"
 #include "../stdlib/map.hpp"
 #include "../height_map/object.hpp"
 #include "../skydome/cli_factory.hpp"
 #include "../skydome/object.hpp"
+#include "../graphics/shader/variable_sequence.hpp"
+#include "../graphics/shader/variable.hpp"
+#include "../graphics/shader/variable_type.hpp"
+#include "../graphics/shader/sampler.hpp"
+#include "../graphics/shader/sampler_sequence.hpp"
+#include "../graphics/shader/vf_to_string.hpp"
+#include "../model/vf/format.hpp"
 #include "../water/cli_factory.hpp"
 #include "../water/object.hpp"
 #include "../json/parse_font.hpp"
 #include "../exception.hpp"
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/make_shared_ptr.hpp>
+#include <fcppt/assign/make_container.hpp>
 #include <fcppt/text.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
 #include <sge/font/drawer_3d.hpp>
@@ -22,6 +31,8 @@
 #include <sge/parse/json/string.hpp>
 #include <sge/image/colors.hpp>
 #include <sge/image/color/rgb8.hpp>
+#include <sge/renderer/texture_ptr.hpp>
+#include <sge/renderer/texture.hpp>
 #include <mizuiro/color/init.hpp>
 #include <boost/program_options/value_semantic.hpp>
 #include <algorithm>
@@ -31,6 +42,24 @@ insula::states::game_outer::game_outer(
 :
 	my_base(
 		ctx),
+	model_shader_(
+		context<machine>().systems().renderer(),
+		media_path()/FCPPT_TEXT("model_vertex.glsl"),
+		media_path()/FCPPT_TEXT("model_fragment.glsl"),
+		graphics::shader::vf_to_string<model::vf::format>(),
+		fcppt::assign::make_container<graphics::shader::variable_sequence>
+		(
+			graphics::shader::variable(
+				"mvp",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4())),
+		fcppt::assign::make_container<graphics::shader::sampler_sequence>
+		(
+		graphics::shader::sampler(
+			"texture",
+			sge::renderer::texture_ptr()))),
+	scene_manager_(
+		context<machine>().camera()),
 	height_map_(
 		insula::height_map::cli_factory(
 			context<machine>().cli_variables(),
@@ -199,6 +228,18 @@ insula::states::game_outer::player_time_map const &
 insula::states::game_outer::player_times() const
 {
 	return player_times_;
+}
+
+insula::graphics::shader::object &
+insula::states::game_outer::model_shader()
+{
+	return model_shader_;
+}
+
+insula::scene::manager &
+insula::states::game_outer::scene_manager()
+{
+	return scene_manager_;
 }
 
 insula::states::game_outer::~game_outer()

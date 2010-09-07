@@ -69,7 +69,11 @@ insula::model_backend::begin()
 	state_scope_.reset(
 		new sge::renderer::state::scoped(
 			renderer_,
-			is_transparent_ ? transparent_list : nontransparent_list));
+			is_transparent_ 
+			? 
+				transparent_list 
+			: 
+				nontransparent_list));
 }
 
 void 

@@ -5,13 +5,11 @@
 #include "freelook_fwd.hpp"
 #include "../static_model_instance.hpp"
 #include "../model_backend.hpp"
-#include "../scene/manager.hpp"
 #include "../player.hpp"
 #include "../turn_timer.hpp"
 #include "../physics/world.hpp"
 #include "../physics/height_map.hpp"
 #include "../physics/debug_drawer.hpp"
-#include "../graphics/shader/object.hpp"
 #include "../model/object.hpp"
 #include "../events/tick_fwd.hpp"
 #include "../events/render_fwd.hpp"
@@ -86,10 +84,7 @@ private:
 	physics::debug_drawer physics_debug_drawer_;
 	bool physics_debug_;
 	fcppt::signal::scoped_connection toggle_physics_debug_; 
-	graphics::shader::object model_shader_;
-	sge::renderer::texture_ptr const nugget_texture_;
 	model::object nugget_model_;
-	scene::manager scene_manager_;
 	model_backend nugget_backend_;
 	nugget_model_sequence nugget_models_;
 	insula::vehicle::object vehicle_;

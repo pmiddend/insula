@@ -89,33 +89,6 @@ insula::states::game_inner::game_inner(
 				physics_debug_ = !physics_debug_;
 			},
 			FCPPT_TEXT("Toggle the physics debug drawer"))),
-	model_shader_(
-		context<machine>().systems().renderer(),
-		media_path()/FCPPT_TEXT("model_vertex.glsl"),
-		media_path()/FCPPT_TEXT("model_fragment.glsl"),
-		graphics::shader::vf_to_string<model::vf::format>(),
-		fcppt::assign::make_container<graphics::shader::variable_sequence>
-		(
-			graphics::shader::variable(
-				"mvp",
-				graphics::shader::variable_type::uniform,
-				graphics::mat4())),
-		fcppt::assign::make_container<graphics::shader::sampler_sequence>
-		(
-		graphics::shader::sampler(
-			"texture",
-			sge::renderer::texture_ptr()))),
-	nugget_texture_(
-		sge::image::create_texture(
-			create_path(
-				get_option<fcppt::string>(
-					context<machine>().cli_variables(),
-					"game-nugget-texture"),
-				FCPPT_TEXT("textures")),
-			context<machine>().systems().renderer(),
-			context<machine>().systems().image_loader(),
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::none)),
 	nugget_model_(
 		context<machine>().systems().md3_loader()->load(
 			create_path(
@@ -125,24 +98,32 @@ insula::states::game_inner::game_inner(
 				FCPPT_TEXT("models")),
 			sge::model::load_flags::switch_yz),
 			context<machine>().systems().renderer()),
-	scene_manager_(
-		context<machine>().camera()),
 	nugget_backend_(
 		// no transparency
 		false,
 		context<machine>().systems().renderer(),
 		context<machine>().camera(),
-		model_shader_,
-		create_texture_map(
-			"texture",
-			nugget_texture_),
+		context<game_outer>().model_shader(),
+		fcppt::assign::make_container<model_backend::texture_map>(
+			model_backend::texture_map::value_type(
+				sge::renderer::glsl::string("texture"),
+				sge::image::create_texture(
+					create_path(
+						get_option<fcppt::string>(
+							context<machine>().cli_variables(),
+							"game-nugget-texture"),
+						FCPPT_TEXT("textures")),
+					context<machine>().systems().renderer(),
+					context<machine>().systems().image_loader(),
+					sge::renderer::filter::linear,
+					sge::renderer::resource_flags::none))),
 		nugget_model_),
 	vehicle_(
 		insula::vehicle::cli_factory(
 			context<machine>().cli_variables(),
 			context<machine>().systems(),
 			context<machine>().camera(),
-			model_shader_,
+			context<game_outer>().model_shader(),
 			physics_world_,
 			physics::vec3(
 				static_cast<physics::scalar>(
@@ -192,7 +173,7 @@ insula::states::game_inner::game_inner(
 						physics::model_approximation::box,
 						static_cast<physics::scalar>(1))),
 				physics::solidity::nonsolid));
-		scene_manager_.insert(
+		context<game_outer>().scene_manager().insert(
 			&nugget_backend_,
 			nugget_models_.back());
 	}
@@ -223,7 +204,7 @@ void
 insula::states::game_inner::react(
 	events::render const &)
 {
-	scene_manager_.render();
+	context<game_outer>().scene_manager().render();
 	
 	if (physics_debug_)
 	{

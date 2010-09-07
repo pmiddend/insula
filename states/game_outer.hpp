@@ -9,6 +9,8 @@
 #include "../height_map/object_fwd.hpp"
 #include "../skydome/object_ptr.hpp"
 #include "../water/object_ptr.hpp"
+#include "../scene/manager.hpp"
+#include "../graphics/shader/object.hpp"
 #include "../nugget_sequence.hpp"
 // If this is omitted, insula.cpp complains about incomplete tick
 // events (!?)
@@ -105,6 +107,12 @@ public:
 	player_time_map const &
 	player_times() const;
 
+	graphics::shader::object &
+	model_shader();
+
+	scene::manager &
+	scene_manager();
+
 	// Holds height_map, skydome and the water
 	~game_outer();
 
@@ -117,6 +125,8 @@ private:
 	std::vector<player>
 	player_sequence;
 
+	graphics::shader::object model_shader_;
+	scene::manager scene_manager_;
 	insula::height_map::object_ptr height_map_;
 	skydome::object_ptr skydome_;
 	insula::water::object_ptr water_;
