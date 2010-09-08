@@ -2,6 +2,7 @@
 #define INSULA_PHYSICS_MOTION_STATE_HPP_INCLUDED
 
 #include "vec3.hpp"
+#include "mat3.hpp"
 #include <fcppt/signal/object.hpp>
 #include <fcppt/signal/auto_connection.hpp>
 #include <LinearMath/btMotionState.h>
@@ -31,7 +32,8 @@ public:
 
 	explicit
 	motion_state(
-		vec3 const &);
+		vec3 const &,
+		mat3 const &);
 
 	fcppt::signal::auto_connection
 	register_callback(

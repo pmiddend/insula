@@ -9,6 +9,7 @@
 #include "physics/world_fwd.hpp"
 #include "physics/static_model.hpp"
 #include "physics/vec3.hpp"
+#include "physics/mat3.hpp"
 #include "physics/solidity.hpp"
 #include "physics/shared_shape_ptr.hpp"
 
@@ -21,8 +22,10 @@ class static_model_instance
 public:
 	explicit
 	static_model_instance(
+		graphics::mat4 const &,
 		physics::world &,
 		physics::vec3 const&,
+		physics::mat3 const&,
 		physics::shared_shape_ptr,
 		physics::solidity::type);
 

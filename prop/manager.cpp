@@ -11,6 +11,7 @@
 #include "../height_map/vec2.hpp"
 #include "../height_map/height_for_point.hpp"
 #include "../model/object.hpp"
+#include "../scene/manager.hpp"
 #include <boost/foreach.hpp>
 #include <sge/parse/json/value.hpp>
 #include <sge/parse/json/array.hpp>
@@ -29,10 +30,15 @@
 #include <fcppt/math/vector/static.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/narrow_cast.hpp>
+#include <fcppt/math/vector/construct.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/matrix/scaling.hpp>
 #include <fcppt/math/matrix/rotation_axis.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/matrix/translation.hpp>
+#include <fcppt/math/matrix/vector.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/math/twopi.hpp>
 #include <boost/foreach.hpp>
@@ -43,6 +49,19 @@
 
 namespace
 {
+template<typename T>
+typename
+fcppt::math::matrix::static_<T,3,3>::type const
+matrix_to_3x3(
+	typename fcppt::math::matrix::static_<T,4,4>::type const &a)
+{
+	return 
+		typename fcppt::math::matrix::static_<T,3,3>::type(
+			a[0][0],a[0][1],a[0][2],
+			a[1][0],a[1][1],a[1][2],
+			a[2][0],a[2][1],a[2][2]);
+}
+
 template<typename Target,typename Source>
 std::pair<Target,Target> const
 parse_range(
@@ -101,6 +120,11 @@ parse_vector(
 
 insula::prop::manager::manager(
 	parameters const &params)
+:
+	scene_manager_(
+		params.scene_manager),
+	physics_world_(
+		params.physics_world)
 {
 	stdlib::for_each(
 		sge::parse::json::find_member_exn<sge::parse::json::array>(
@@ -238,13 +262,11 @@ insula::prop::manager::parse_single_prop(
 			new blueprint(
 				backends_.back(),
 				shape,
-				fcppt::math::matrix::rotation_axis(
-					twopi_rng(
-						rng_engine),
-					rotation_axis) * 
-				uniform_scaling_matrix(
-					scale_rng(
-						rng_engine)),
+				rotation_axis,
+				twopi_rng(
+					rng_engine),
+				scale_rng(
+					rng_engine),
 				physics::vec3(
 					static_cast<physics::scalar>(
 						point2.x()),
@@ -272,6 +294,55 @@ insula::prop::manager::parse_shape(
 				10,
 				10,
 				10));
+}
+
+void
+insula::prop::manager::instantiate(
+	instance_sequence &instances)
+{
+	BOOST_FOREACH(
+		blueprint_sequence::const_reference r,
+		blueprints_)
+	{
+		graphics::mat4 const model_matrix = 
+			fcppt::math::matrix::translation(
+					fcppt::math::vector::structure_cast<graphics::vec3>(
+						r.origin)) *
+				fcppt::math::matrix::rotation_axis(
+					r.rotation_angle,
+					r.rotation_axis) *
+				uniform_scaling_matrix(
+					r.scaling);
+
+
+		instances.push_back(
+			new static_model_instance(
+				model_matrix,
+				physics_world_,
+				// Let's find out what the origin of the "child" shape is in
+				// relation to the model. We translate the offset with the same
+				// translation matrices as the model and add a translation to the
+				// model origin
+				r.origin + 
+				fcppt::math::vector::narrow_cast<physics::vec3>(
+					model_matrix * 
+					fcppt::math::vector::structure_cast<graphics::vec4>(
+						fcppt::math::vector::construct(
+							r.offset,
+							static_cast<physics::scalar>(
+								0)))),
+				// We cannot scale a static model and we cannot translate it
+				// with the matrix, so all that's left is the rotation
+				matrix_to_3x3<physics::scalar>(
+					fcppt::math::matrix::rotation_axis(
+						r.rotation_angle,
+						r.rotation_axis)),
+				r.shape,
+				r.solidity));
+		scene_manager_.insert(
+			&r.backend,
+			instances.back());
+	}
 }
 
 insula::prop::manager::~manager()

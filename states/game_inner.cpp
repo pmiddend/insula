@@ -32,6 +32,7 @@
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/matrix/structure_cast.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/algorithm/ptr_container_erase.hpp>
 #include <fcppt/assign/make_container.hpp>
@@ -139,19 +140,24 @@ insula::states::game_inner::game_inner(
 		graphics::vec2 const &v,
 		context<game_outer>().nugget_positions())
 	{
+		physics::vec3 pos(
+			v.x(),
+			height_map::height_for_point(
+				context<game_outer>().height_map().heights(),
+				context<game_outer>().height_map().cell_size(),
+				fcppt::math::vector::structure_cast<height_map::vec2>(
+					v)) * context<game_outer>().height_map().height_scaling() + 
+			static_cast<physics::scalar>(nugget_model_->bounding_box().h()/2)/**
+			static_cast<physics::scalar>(1.5)*/,
+			v.y());
 		nugget_models_.push_back(
 			new static_model_instance(
+				fcppt::math::matrix::translation(
+					fcppt::math::vector::structure_cast<graphics::vec3>(
+						pos)),
 				physics_world_,
-				physics::vec3(
-					v.x(),
-					height_map::height_for_point(
-						context<game_outer>().height_map().heights(),
-						context<game_outer>().height_map().cell_size(),
-						fcppt::math::vector::structure_cast<height_map::vec2>(
-							v)) * context<game_outer>().height_map().height_scaling() + 
-					static_cast<physics::scalar>(nugget_model_->bounding_box().h()/2)/**
-					static_cast<physics::scalar>(1.5)*/,
-					v.y()),
+				pos,
+				physics::mat3::identity(),
 				physics::shape_from_model(
 					*nugget_model_,
 					physics::model_approximation(

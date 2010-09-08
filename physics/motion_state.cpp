@@ -1,11 +1,14 @@
 #include "motion_state.hpp"
 #include "vec3_to_bullet.hpp"
+#include "mat3_to_bullet.hpp"
 
 insula::physics::motion_state::motion_state(
-	vec3 const &p)
+	vec3 const &p,
+	mat3 const &m)
 :
 	transform_(
-		btMatrix3x3::getIdentity(),
+		mat3_to_bullet(
+			m),
 		vec3_to_bullet(
 			p))
 {

@@ -12,13 +12,15 @@
 insula::physics::static_model::static_model(
 	world &w,
 	vec3 const &position,
+	mat3 const &transformation,
 	shared_shape_ptr const _shape,
 	solidity::type const _solidity)
 :
 	body_(),
 	motion_state_(
 		new motion_state(
-			position)),
+			position,
+			transformation)),
 	shape_(
 		_shape)
 {

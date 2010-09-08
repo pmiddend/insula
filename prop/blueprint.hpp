@@ -18,7 +18,9 @@ class blueprint
 public:
 	model_backend &backend;
 	physics::shared_shape_ptr shape;
-	physics::mat4 basis;
+	physics::vec3 rotation_axis;
+	physics::scalar rotation_angle;
+	physics::scalar scaling;
 	physics::vec3 origin;
 	physics::vec3 offset;
 	physics::solidity::type solidity;
@@ -27,14 +29,18 @@ public:
 	blueprint(
 		model_backend &backend,
 		physics::shared_shape_ptr shape,
-		physics::mat4 basis,
+		physics::vec3 rotation_axis,
+		physics::scalar rotation_angle,
+		physics::scalar scaling,
 		physics::vec3 origin,
 		physics::vec3 offset,
 		physics::solidity::type solidity)
 	:
 		backend(backend),
 		shape(shape),
-		basis(basis),
+		rotation_axis(rotation_axis),
+		rotation_angle(rotation_angle),
+		scaling(scaling),
 		origin(origin),
 		offset(offset),
 		solidity(solidity)

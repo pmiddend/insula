@@ -4,6 +4,7 @@
 #include "object.hpp"
 #include "solidity.hpp"
 #include "vec3.hpp"
+#include "mat3.hpp"
 #include "mat4.hpp"
 #include "world_fwd.hpp"
 #include "motion_state_fwd.hpp"
@@ -28,6 +29,7 @@ public:
 	static_model(
 		world &,
 		vec3 const &,
+		mat3 const &,
 		shared_shape_ptr,	
 		solidity::type);
 

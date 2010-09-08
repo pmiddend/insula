@@ -81,7 +81,8 @@ insula::physics::vehicle::object::object(
 		_chassis_shape),
 	motion_state_(
 		new motion_state(
-			_position)),
+			_position,
+			mat3::identity())),
 	wheels_(
 		_wheels),
 	max_engine_force_(
