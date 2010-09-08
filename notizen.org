@@ -48,18 +48,18 @@ Details:
   "props" : 
 	[ 
 	  { 
-		  "name" : "palm",
       "model" : "tree.md3", 
       "texture" : "tree.png", 
 			"flat_terrain" : true, 
+			"has_transparency" : true,
 			"penetration_depth" : 0.0,
 			"scale_range" : [0.5,1.5],
 			"solid" : true,
-			"rotation" : [false,true,false],
+			"rotation_axis" : [0.0,1.0,0.0],
+			"physics_offset" : [0.0,0.0,0.0], 
 			"approximation" : 
 			{ 
 			  "type" : "cylinder_x", 
-				"origin" : [0.0,0.0,0.0], 
 				"radius" : 1.0, 
 				"height" : 10.0 
 			},

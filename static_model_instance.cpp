@@ -14,7 +14,7 @@
 insula::static_model_instance::static_model_instance(
 	physics::world &_physics_world,
 	physics::vec3 const &_position,
-	physics::shape_ptr _shape,
+	physics::shared_shape_ptr _shape,
 	physics::solidity::type const _solidity)
 :
 	model_instance(

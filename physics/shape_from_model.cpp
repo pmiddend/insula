@@ -13,7 +13,7 @@
 #include <fcppt/math/dim/arithmetic.hpp>
 #include <fcppt/assert.hpp>
 
-insula::physics::shape_ptr const
+insula::physics::shared_shape_ptr const
 insula::physics::shape_from_model(
 	model::object &m,
 	model_approximation const &a)
@@ -25,7 +25,7 @@ insula::physics::shape_from_model(
 		break;
 		case model_approximation::box:
 			return 
-				insula::physics::shape_ptr(
+				insula::physics::shared_shape_ptr(
 					new btBoxShape(
 						dim3_to_bullet(
 							// btBoxShape gets half extents, so muliply by 0.5 here
@@ -34,7 +34,7 @@ insula::physics::shape_from_model(
 								m.bounding_box().dimension()))));
 		case model_approximation::sphere:
 			return 
-				insula::physics::shape_ptr(
+				insula::physics::shared_shape_ptr(
 					new btSphereShape(
 						length(
 							static_cast<scalar>(0.5) * 

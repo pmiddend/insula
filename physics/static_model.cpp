@@ -12,7 +12,7 @@
 insula::physics::static_model::static_model(
 	world &w,
 	vec3 const &position,
-	shape_ptr const _shape,
+	shared_shape_ptr const _shape,
 	solidity::type const _solidity)
 :
 	body_(),

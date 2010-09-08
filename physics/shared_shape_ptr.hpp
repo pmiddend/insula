@@ -1,5 +1,5 @@
-#ifndef INSULA_PHYSICS_SHAPE_PTR_HPP_INCLUDED
-#define INSULA_PHYSICS_SHAPE_PTR_HPP_INCLUDED
+#ifndef INSULA_PHYSICS_SHARED_SHAPE_PTR_HPP_INCLUDED
+#define INSULA_PHYSICS_SHARED_SHAPE_PTR_HPP_INCLUDED
 
 #include <memory>
 
@@ -11,7 +11,7 @@ namespace physics
 {
 typedef
 std::shared_ptr<btCollisionShape>
-shape_ptr;
+shared_shape_ptr;
 }
 }
 

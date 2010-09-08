@@ -4,7 +4,7 @@
 #include "scene/backend.hpp"
 #include "graphics/shader/object_fwd.hpp"
 #include "graphics/camera/object_fwd.hpp"
-#include "model/scoped.hpp"
+#include "model/shared_object_ptr.hpp"
 #include <sge/renderer/glsl/string.hpp>
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/state/scoped.hpp>
@@ -34,7 +34,7 @@ public:
 		graphics::camera::object &,
 		graphics::shader::object &,
 		texture_map const &,
-		model::object &);
+		model::shared_object_ptr);
 
 	void
 	begin();
@@ -62,7 +62,7 @@ private:
 	/// Usually we want the same shader for multiple backends, but with
 	/// different textures
 	texture_map textures_;
-	model::object &model_;
+	model::shared_object_ptr model_;
 	std::unique_ptr<sge::renderer::state::scoped> state_scope_;
 };
 }

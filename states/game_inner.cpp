@@ -39,22 +39,6 @@
 #include <boost/foreach.hpp>
 #include <functional>
 
-namespace
-{
-insula::model_backend::texture_map const
-create_texture_map(
-	sge::renderer::glsl::string const &s,
-	sge::renderer::texture_ptr const texture)
-{
-	insula::model_backend::texture_map m;
-	m.insert(
-		insula::model_backend::texture_map::value_type(
-			s,
-			texture));
-	return m;
-}
-}
-
 insula::states::game_inner::game_inner(
 	my_context ctx)
 :
@@ -90,14 +74,15 @@ insula::states::game_inner::game_inner(
 			},
 			FCPPT_TEXT("Toggle the physics debug drawer"))),
 	nugget_model_(
-		context<machine>().systems().md3_loader()->load(
-			create_path(
-				get_option<fcppt::string>(
-					context<machine>().cli_variables(),
-					"game-nugget-model"),
-				FCPPT_TEXT("models")),
-			sge::model::load_flags::switch_yz),
-			context<machine>().systems().renderer()),
+		new model::object(
+			context<machine>().systems().md3_loader()->load(
+				create_path(
+					get_option<fcppt::string>(
+						context<machine>().cli_variables(),
+						"game-nugget-model"),
+					FCPPT_TEXT("models")),
+				sge::model::load_flags::switch_yz),
+				context<machine>().systems().renderer())),
 	nugget_backend_(
 		// no transparency
 		false,
@@ -164,11 +149,11 @@ insula::states::game_inner::game_inner(
 						context<game_outer>().height_map().cell_size(),
 						fcppt::math::vector::structure_cast<height_map::vec2>(
 							v)) * context<game_outer>().height_map().height_scaling() + 
-					static_cast<physics::scalar>(nugget_model_.bounding_box().h()/2)/**
+					static_cast<physics::scalar>(nugget_model_->bounding_box().h()/2)/**
 					static_cast<physics::scalar>(1.5)*/,
 					v.y()),
 				physics::shape_from_model(
-					nugget_model_,
+					*nugget_model_,
 					physics::model_approximation(
 						physics::model_approximation::box,
 						static_cast<physics::scalar>(1))),

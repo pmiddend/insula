@@ -8,7 +8,7 @@
 #include "world_fwd.hpp"
 #include "motion_state_fwd.hpp"
 #include "scoped_body.hpp"
-#include "shape_ptr.hpp"
+#include "shared_shape_ptr.hpp"
 #include <memory>
 
 class btRigidBody;
@@ -28,7 +28,7 @@ public:
 	static_model(
 		world &,
 		vec3 const &,
-		shape_ptr,	
+		shared_shape_ptr,	
 		solidity::type);
 
 	mat4 const
@@ -38,7 +38,7 @@ public:
 private:
 	std::unique_ptr<btRigidBody> body_;
 	std::unique_ptr<motion_state> motion_state_;
-	shape_ptr shape_;
+	shared_shape_ptr shape_;
 	std::unique_ptr<scoped_body> world_scope_;
 };
 }

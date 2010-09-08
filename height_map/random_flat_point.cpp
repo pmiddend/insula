@@ -1,10 +1,10 @@
 #include "random_flat_point.hpp"
-#include "height_map/object.hpp"
+#include "object.hpp"
 
-insula::graphics::vec2 const
-insula::random_flat_point(
-	height_map::object const &o,
-	graphics::scalar /*water_level*/,
+insula::height_map::vec2 const
+insula::height_map::random_flat_point(
+	object const &o,
+	scalar /*water_level*/,
 	random_engine &engine)
 {
 	// For now, generate just some random point
@@ -17,7 +17,7 @@ insula::random_flat_point(
 			o.extents().back());
 
 	return 
-		graphics::vec2(
+		vec2(
 			xdist(
 				engine),
 			ydist(

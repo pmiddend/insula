@@ -10,7 +10,7 @@
 #include "physics/static_model.hpp"
 #include "physics/vec3.hpp"
 #include "physics/solidity.hpp"
-#include "physics/shape_ptr.hpp"
+#include "physics/shared_shape_ptr.hpp"
 
 namespace insula
 {
@@ -23,7 +23,7 @@ public:
 	static_model_instance(
 		physics::world &,
 		physics::vec3 const&,
-		physics::shape_ptr,
+		physics::shared_shape_ptr,
 		physics::solidity::type);
 
 	bool

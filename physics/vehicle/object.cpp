@@ -63,7 +63,7 @@ create_tuning(
 
 insula::physics::vehicle::object::object(
 	world &_world,
-	shape_ptr const _chassis_shape,
+	shared_shape_ptr const _chassis_shape,
 	scalar const mass,
 	scalar const chassis_position,
 	scalar const _steering_clamp,

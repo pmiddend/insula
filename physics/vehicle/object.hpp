@@ -17,7 +17,7 @@
 #include "../mat4_sequence.hpp"
 #include "../world_fwd.hpp"
 #include "../object.hpp"
-#include "../shape_ptr.hpp"
+#include "../shared_shape_ptr.hpp"
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <memory>
@@ -47,7 +47,7 @@ public:
 	explicit
 	object(
 		world &,
-		shape_ptr chassis_shape,
+		shared_shape_ptr chassis_shape,
 		scalar mass,
 		scalar chassis_position,
 		scalar steering_clamp,
@@ -96,7 +96,7 @@ public:
 	~object();
 private:
 	world &world_;
-	shape_ptr chassis_shape_;
+	shared_shape_ptr chassis_shape_;
 	std::unique_ptr<btCompoundShape> compound_;
 	std::unique_ptr<btRigidBody> car_body_;
 	std::unique_ptr<btCylinderShapeX> wheel_shape_;

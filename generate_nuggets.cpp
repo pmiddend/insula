@@ -1,5 +1,5 @@
 #include "generate_nuggets.hpp"
-#include "random_flat_point.hpp"
+#include "height_map/random_flat_point.hpp"
 #include "random_engine.hpp"
 #include "random_seed.hpp"
 #include <algorithm>
@@ -21,7 +21,7 @@ insula::generate_nuggets(
 		result.begin(),
 		result.end(),
 		std::bind(
-			&random_flat_point,
+			&height_map::random_flat_point,
 			// This is a case for cref because terrain is incomplete
 			std::cref(
 				terrain),

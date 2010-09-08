@@ -67,10 +67,6 @@ public:
 		fcppt::optional<graphics::scalar> const &clip_height = 
 			fcppt::optional<graphics::scalar>());
 
-	// The console_proxy needs this
-	//graphics::shader &
-	//shader();
-
 	graphics::box const
 	extents() const;
 

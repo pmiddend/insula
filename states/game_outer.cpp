@@ -1,6 +1,6 @@
 #include "game_outer.hpp"
 #include "../random_seed.hpp"
-#include "../random_flat_point.hpp"
+#include "../height_map/random_flat_point.hpp"
 #include "../generate_nuggets.hpp"
 #include "../create_path.hpp"
 #include "../media_path.hpp"
@@ -89,7 +89,7 @@ insula::states::game_outer::game_outer(
 	vehicle_position_engine_(
 		random_seed()),
 	vehicle_position_(
-		random_flat_point(
+		height_map::random_flat_point(
 			*height_map_,
 			water_->water_level(),
 			vehicle_position_engine_)),

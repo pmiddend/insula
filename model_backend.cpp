@@ -19,7 +19,7 @@ insula::model_backend::model_backend(
 	graphics::camera::object &_camera,
 	graphics::shader::object &_shader,
 	texture_map const &_textures,
-	model::object &_model)
+	model::shared_object_ptr _model)
 :
 	is_transparent_(
 		_is_transparent),
@@ -49,7 +49,7 @@ insula::model_backend::begin()
 
 	shader_.activate();
 	renderer_->set_vertex_buffer(
-		model_.vb());
+		model_->vb());
 
 	sge::renderer::state::list const 
 		nontransparent_list = 
@@ -82,7 +82,7 @@ insula::model_backend::end()
 	// Deactivate everything in reverse order of activation
 	state_scope_.reset();
 	renderer_->unset_vertex_buffer(
-		model_.vb());
+		model_->vb());
 	shader_.deactivate();
 }
 
@@ -101,5 +101,5 @@ insula::model_backend::shader() const
 insula::model::object &
 insula::model_backend::model() const
 {
-	return model_;
+	return *model_;
 }

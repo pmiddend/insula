@@ -84,7 +84,7 @@ private:
 	physics::debug_drawer physics_debug_drawer_;
 	bool physics_debug_;
 	fcppt::signal::scoped_connection toggle_physics_debug_; 
-	model::object nugget_model_;
+	model::shared_object_ptr nugget_model_;
 	model_backend nugget_backend_;
 	nugget_model_sequence nugget_models_;
 	insula::vehicle::object vehicle_;
