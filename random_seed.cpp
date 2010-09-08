@@ -1,11 +1,10 @@
 #include "random_seed.hpp"
-#include <ctime>
+#include <chrono>
 
 insula::random_engine::result_type
 insula::random_seed()
 {
 	return 
-		static_cast<random_engine::result_type>(
-			std::time(
-				0));
+		static_cast<insula::random_engine::result_type>(
+			std::chrono::high_resolution_clock::now().time_since_epoch().count());
 }

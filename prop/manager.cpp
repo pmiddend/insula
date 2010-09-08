@@ -40,6 +40,7 @@
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/vector.hpp>
 #include <fcppt/assign/make_container.hpp>
+#include <fcppt/io/cout.hpp>
 #include <fcppt/math/twopi.hpp>
 #include <boost/foreach.hpp>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
@@ -122,9 +123,7 @@ insula::prop::manager::manager(
 	parameters const &params)
 :
 	scene_manager_(
-		params.scene_manager),
-	physics_world_(
-		params.physics_world)
+		params.scene_manager)
 {
 	stdlib::for_each(
 		sge::parse::json::find_member_exn<sge::parse::json::array>(
@@ -227,8 +226,8 @@ insula::prop::manager::parse_single_prop(
 	std::size_t const count = 
 		static_cast<std::size_t>(
 			sge::parse::json::find_member_exn<sge::parse::json::int_type>(
-					p.members,
-					FCPPT_TEXT("approximation")));
+				p.members,
+				FCPPT_TEXT("count")));
 
 	// Beginning of the actual algorithm
 
@@ -257,6 +256,21 @@ insula::prop::manager::parse_single_prop(
 					params.height_map,
 					params.water_level,
 					rng_engine);
+
+		/*
+		fcppt::io::cout 
+			<< "y value for terrain " 
+			<< height_map::height_for_point(
+					params.height_map.heights(),
+					static_cast<height_map::scalar>(
+						params.height_map.cell_size()),
+					point2) * 
+			<< " bottom of bounding box is "
+			<< model->bounding_box().bottom() 
+			<< " and finally, the penetration depth is " 
+			<< penetration_depth
+			<< "\n";
+			*/
 			
 		blueprints_.push_back(
 			new blueprint(
@@ -274,7 +288,7 @@ insula::prop::manager::parse_single_prop(
 						params.height_map.heights(),
 						static_cast<height_map::scalar>(
 							params.height_map.cell_size()),
-						point2) -
+						point2) * params.height_map.height_scaling() -
 					model->bounding_box().bottom() - 
 					penetration_depth,
 					static_cast<physics::scalar>(
@@ -298,7 +312,8 @@ insula::prop::manager::parse_shape(
 
 void
 insula::prop::manager::instantiate(
-	instance_sequence &instances)
+	instance_sequence &instances,
+	physics::world &physics_world)
 {
 	BOOST_FOREACH(
 		blueprint_sequence::const_reference r,
@@ -308,17 +323,16 @@ insula::prop::manager::instantiate(
 			fcppt::math::matrix::translation(
 					fcppt::math::vector::structure_cast<graphics::vec3>(
 						r.origin)) *
-				fcppt::math::matrix::rotation_axis(
-					r.rotation_angle,
-					r.rotation_axis) *
-				uniform_scaling_matrix(
-					r.scaling);
-
+			fcppt::math::matrix::rotation_axis(
+				r.rotation_angle,
+				r.rotation_axis) *
+			uniform_scaling_matrix(
+				r.scaling);
 
 		instances.push_back(
 			new static_model_instance(
 				model_matrix,
-				physics_world_,
+				physics_world,
 				// Let's find out what the origin of the "child" shape is in
 				// relation to the model. We translate the offset with the same
 				// translation matrices as the model and add a translation to the

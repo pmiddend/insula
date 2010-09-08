@@ -7,6 +7,7 @@
 #include "../model_backend.hpp"
 #include "../player.hpp"
 #include "../turn_timer.hpp"
+#include "../prop/instance_sequence.hpp"
 #include "../physics/world.hpp"
 #include "../physics/height_map.hpp"
 #include "../physics/debug_drawer.hpp"
@@ -90,6 +91,7 @@ private:
 	insula::vehicle::object vehicle_;
 	fcppt::signal::scoped_connection vehicle_static_connection_;
 	deletion_set to_delete_;
+	prop::instance_sequence props_;
 
 	void
 	vehicle_static_callback(

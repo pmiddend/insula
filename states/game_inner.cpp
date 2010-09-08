@@ -168,6 +168,10 @@ insula::states::game_inner::game_inner(
 			&nugget_backend_,
 			nugget_models_.back());
 	}
+
+	context<game_outer>().prop_manager().instantiate(
+		props_,
+		physics_world_);
 }
 
 void
@@ -273,6 +277,19 @@ insula::states::game_inner::vehicle_static_callback(
 	physics::vehicle::object &v,
 	physics::static_model &s)
 {
+	nugget_model_sequence::const_iterator i = 
+		std::find_if(
+			nugget_models_.begin(),
+			nugget_models_.end(),
+			[&s](static_model_instance const &m) 
+			{
+				return &m.physics_model() == &s;
+			});
+
+	// It's not a nugget model
+	if (i == nugget_models_.end())
+		return;
+
 	post_event(
 		events::vehicle_nugget_collision(
 			v,

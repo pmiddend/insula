@@ -17,6 +17,7 @@
 #include "../graphics/shader/sampler_sequence.hpp"
 #include "../graphics/shader/vf_to_string.hpp"
 #include "../model/vf/format.hpp"
+#include "../prop/parameters.hpp"
 #include "../water/cli_factory.hpp"
 #include "../water/object.hpp"
 #include "../json/parse_font.hpp"
@@ -118,7 +119,16 @@ insula::states::game_outer::game_outer(
 					player_time_map::value_type(
 						p,
 						player_time_map::mapped_type());
-			}))
+			})),
+	prop_manager_(
+		prop::parameters(
+			context<machine>().config_file(),
+			context<machine>().systems(),
+			context<machine>().camera(),
+			model_shader_,
+			*height_map_,
+			water_->water_level(),
+			scene_manager_))
 {
 	if (player_times_.empty())
 		throw exception(FCPPT_TEXT("You have to specify at least one player (two would be even better!)"));
@@ -240,6 +250,12 @@ insula::scene::manager &
 insula::states::game_outer::scene_manager()
 {
 	return scene_manager_;
+}
+
+insula::prop::manager &
+insula::states::game_outer::prop_manager()
+{
+	return prop_manager_;
 }
 
 insula::states::game_outer::~game_outer()

@@ -276,8 +276,6 @@ insula::physics::debug_drawer::render()
 		sge::renderer::vertex_count(
 			vb_->size()),
 		sge::renderer::nonindexed_primitive_type::line);
-
-	fcppt::io::cout << "finished\n";
 }
 
 insula::physics::debug_drawer::~debug_drawer() {}

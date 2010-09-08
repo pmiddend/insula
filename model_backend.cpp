@@ -54,11 +54,15 @@ insula::model_backend::begin()
 	sge::renderer::state::list const 
 		nontransparent_list = 
 			sge::renderer::state::list
-				(sge::renderer::state::cull_mode::back)
+				// for now, cull both
+				//(sge::renderer::state::cull_mode::back)
+				(sge::renderer::state::cull_mode::off)
 				(sge::renderer::state::depth_func::less),
 		transparent_list = 
 			sge::renderer::state::list
-				(sge::renderer::state::cull_mode::back)
+				// for now, cull both
+				//(sge::renderer::state::cull_mode::back)
+				(sge::renderer::state::cull_mode::off)
 				(sge::renderer::state::depth_func::off)
 				(sge::renderer::state::bool_::enable_alpha_blending = true)
 				(sge::renderer::state::source_blend_func::src_alpha)

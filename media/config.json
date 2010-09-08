@@ -1,4 +1,21 @@
 {
+	"props" :
+	[
+		{
+			"model" : "rock1.md3",
+			"texture" : "rocks.png",
+			"flat_terrain" : false,
+			"has_transparency" : false,
+			"penetration_depth" : 0.0,
+			"scale_range" : [0.5,10.0],
+			"solid" : true,
+			"rotation_axis" : [0.0,1.0,0.0],
+			"physics_offset" : [0.0,0.0,0.0],
+			"approximation" : {},
+			"count" : 10
+		}
+	],
+	
 	"large_font" : 
 	{ 
 		"metrics" : "default.ttf",

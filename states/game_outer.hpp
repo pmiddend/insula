@@ -19,6 +19,7 @@
 #include <sge/font/metrics_ptr.hpp>
 #include <sge/font/drawer_ptr.hpp>
 #include "game_inner_fwd.hpp"
+#include "../prop/manager.hpp"
 
 // vehicle position begin
 #include "../random_engine.hpp"
@@ -113,6 +114,9 @@ public:
 	scene::manager &
 	scene_manager();
 
+	prop::manager &
+	prop_manager();
+
 	// Holds height_map, skydome and the water
 	~game_outer();
 
@@ -136,7 +140,8 @@ private:
 	// This could also be in the machine, it's arbitrarily placed here
 	sge::font::metrics_ptr large_font_;
 	sge::font::drawer_ptr font_drawer_;
-	player_time_map player_times_;
+	player_time_map player_times_; 
+	prop::manager prop_manager_;
 };
 }
 }

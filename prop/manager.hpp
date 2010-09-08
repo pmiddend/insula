@@ -7,7 +7,6 @@
 #include "../scene/manager_fwd.hpp"
 #include "../model_backend.hpp"
 #include "../physics/shared_shape_ptr.hpp"
-#include "../physics/world_fwd.hpp"
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <sge/parse/json/object.hpp>
 
@@ -24,7 +23,8 @@ public:
 
 	void
 	instantiate(
-		instance_sequence &);
+		instance_sequence &,
+		physics::world &);
 
 	~manager();
 private:
@@ -37,7 +37,6 @@ private:
 	blueprint_sequence;
 
 	scene::manager &scene_manager_;
-	physics::world &physics_world_;
 	backend_sequence backends_;
 	blueprint_sequence blueprints_;
 
