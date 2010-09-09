@@ -59,9 +59,7 @@ insula::vehicle::object::object(
 		params.physics_world,
 		physics::shape_from_model(
 			chassis_model_,
-			physics::model_approximation(
-				physics::model_approximation::box,
-				static_cast<physics::scalar>(1))),
+			physics::approximation::numeric_value::box),
 		params.mass,
 		params.chassis_position,
 		params.steering_clamp,

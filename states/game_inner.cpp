@@ -160,9 +160,7 @@ insula::states::game_inner::game_inner(
 				physics::mat3::identity(),
 				physics::shape_from_model(
 					*nugget_model_,
-					physics::model_approximation(
-						physics::model_approximation::box,
-						static_cast<physics::scalar>(1))),
+					physics::approximation::numeric_value::box),
 				physics::solidity::nonsolid));
 		context<game_outer>().scene_manager().insert(
 			&nugget_backend_,

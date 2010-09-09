@@ -16,14 +16,11 @@
 insula::physics::shared_shape_ptr const
 insula::physics::shape_from_model(
 	model::object &m,
-	model_approximation const &a)
+	approximation::numeric_value::type const type)
 {
-	switch (a.t)
+	switch (type)
 	{
-		case model_approximation::exact:
-			
-		break;
-		case model_approximation::box:
+		case approximation::numeric_value::box:
 			return 
 				insula::physics::shared_shape_ptr(
 					new btBoxShape(
@@ -32,7 +29,7 @@ insula::physics::shape_from_model(
 							static_cast<scalar>(0.5)*
 							fcppt::math::dim::structure_cast<dim3>(
 								m.bounding_box().dimension()))));
-		case model_approximation::sphere:
+		case approximation::numeric_value::sphere:
 			return 
 				insula::physics::shared_shape_ptr(
 					new btSphereShape(
@@ -40,15 +37,6 @@ insula::physics::shape_from_model(
 							static_cast<scalar>(0.5) * 
 							fcppt::math::dim::structure_cast<vec3>(
 								m.bounding_box().dimension()))));
-		break;
-		case model_approximation::cylinder_x:
-
-		break;
-		case model_approximation::cylinder_y:
-
-		break;
-		case model_approximation::cylinder_z:
-
 		break;
 	}
 	FCPPT_ASSERT(false);

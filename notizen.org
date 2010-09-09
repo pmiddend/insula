@@ -275,3 +275,6 @@ noch überlegen.
 *** TODO config.po wegmachen
 In config.json Sektion "command-line", in der nur String-Optionen
 reinkommen, po-Parser kopieren
+*** TODO Approximationen erweitern
+Es kommt noch approximation::exact hinzu, sowie cylinder_x, cylinder_y
+und cylinder_z. exact bekommt ein model::object_ptr

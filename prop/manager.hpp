@@ -7,8 +7,12 @@
 #include "../scene/manager_fwd.hpp"
 #include "../model_backend.hpp"
 #include "../physics/shared_shape_ptr.hpp"
+#include "../physics/approximation/variant.hpp"
+#include "../physics/scalar.hpp"
+#include "../model/object_fwd.hpp"
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <sge/parse/json/object.hpp>
+#include <sge/model/object_ptr.hpp>
 
 namespace insula
 {
@@ -45,9 +49,11 @@ private:
 		parameters const &,
 		sge::parse::json::object const &);
 
-	physics::shared_shape_ptr const
-	parse_shape(
-		sge::parse::json::object const &);
+	physics::approximation::variant const
+	parse_approximation(
+		sge::parse::json::object const &,
+		physics::scalar const scaling,
+		model::object const &);
 };
 }
 }

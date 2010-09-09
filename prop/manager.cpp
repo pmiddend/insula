@@ -10,6 +10,7 @@
 #include "../height_map/object.hpp"
 #include "../height_map/vec2.hpp"
 #include "../height_map/height_for_point.hpp"
+#include "../physics/shape_from_approximation.hpp"
 #include "../model/object.hpp"
 #include "../scene/manager.hpp"
 #include <boost/foreach.hpp>
@@ -39,6 +40,8 @@
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/vector.hpp>
+#include <fcppt/math/box/basic_impl.hpp>
+#include <fcppt/math/dim/arithmetic.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/twopi.hpp>
@@ -144,14 +147,17 @@ insula::prop::manager::parse_single_prop(
 	parameters const &params,
 	sge::parse::json::object const &p)
 {
+	sge::model::object_ptr const model_raw = 
+		params.systems.md3_loader()->load(
+			create_path(
+				sge::parse::json::find_member_exn<sge::parse::json::string>(
+					p.members,
+					FCPPT_TEXT("model")),
+				FCPPT_TEXT("models/props")));
+
 	model::shared_object_ptr model = 
 		std::make_shared<model::object>(
-			params.systems.md3_loader()->load(
-				create_path(
-					sge::parse::json::find_member_exn<sge::parse::json::string>(
-						p.members,
-						FCPPT_TEXT("model")),
-					FCPPT_TEXT("models/props"))),
+			model_raw,
 			params.systems.renderer());
 
 	backends_.push_back(
@@ -217,12 +223,6 @@ insula::prop::manager::parse_single_prop(
 				p.members,
 				FCPPT_TEXT("physics_offset")));
 
-	physics::shared_shape_ptr const shape = 
-		parse_shape(
-			sge::parse::json::find_member_exn<sge::parse::json::object>(
-				p.members,
-				FCPPT_TEXT("approximation")));
-
 	std::size_t const count = 
 		static_cast<std::size_t>(
 			sge::parse::json::find_member_exn<sge::parse::json::int_type>(
@@ -257,30 +257,24 @@ insula::prop::manager::parse_single_prop(
 					params.water_level,
 					rng_engine);
 
-		/*
-		fcppt::io::cout 
-			<< "y value for terrain " 
-			<< height_map::height_for_point(
-					params.height_map.heights(),
-					static_cast<height_map::scalar>(
-						params.height_map.cell_size()),
-					point2) * 
-			<< " bottom of bounding box is "
-			<< model->bounding_box().bottom() 
-			<< " and finally, the penetration depth is " 
-			<< penetration_depth
-			<< "\n";
-			*/
-			
+		physics::scalar const scaling = 
+			scale_rng(
+				rng_engine);
+
 		blueprints_.push_back(
 			new blueprint(
 				backends_.back(),
-				shape,
+				physics::shape_from_approximation(
+					parse_approximation(
+						sge::parse::json::find_member_exn<sge::parse::json::object>(
+							p.members,
+							FCPPT_TEXT("approximation")),
+						scaling,
+						*model)),
 				rotation_axis,
 				twopi_rng(
 					rng_engine),
-				scale_rng(
-					rng_engine),
+				scaling,
 				physics::vec3(
 					static_cast<physics::scalar>(
 						point2.x()),
@@ -288,26 +282,14 @@ insula::prop::manager::parse_single_prop(
 						params.height_map.heights(),
 						static_cast<height_map::scalar>(
 							params.height_map.cell_size()),
-						point2) * params.height_map.height_scaling() -
-					model->bounding_box().bottom() - 
-					penetration_depth,
+						point2) * params.height_map.height_scaling() +
+					model->bounding_box().bottom() * scaling - 
+					penetration_depth * scaling,
 					static_cast<physics::scalar>(
 						point2.y())),
 				physics_offset,
 				solid));
 	}
-}
-
-insula::physics::shared_shape_ptr const
-insula::prop::manager::parse_shape(
-	sge::parse::json::object const &o)
-{
-	return 
-		std::make_shared<btBoxShape>(
-			btVector3(
-				10,
-				10,
-				10));
 }
 
 void
@@ -357,6 +339,17 @@ insula::prop::manager::instantiate(
 			&r.backend,
 			instances.back());
 	}
+}
+
+insula::physics::approximation::variant const
+insula::prop::manager::parse_approximation(
+	sge::parse::json::object const &,
+	physics::scalar const scaling,
+	model::object const &m)
+{
+	return 
+		physics::approximation::box(
+			scaling * m.bounding_box().dimension());
 }
 
 insula::prop::manager::~manager()
