@@ -9,6 +9,7 @@
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/state/scoped.hpp>
 #include <sge/renderer/texture_ptr.hpp>
+#include <sge/renderer/state/cull_mode.hpp>
 #include <unordered_map>
 #include <memory>
 
@@ -29,12 +30,15 @@ public:
 
 	explicit
 	model_backend(
-		bool is_transparent,
+		bool has_transparency,
 		sge::renderer::device_ptr,
 		graphics::camera::object &,
 		graphics::shader::object &,
 		texture_map const &,
 		model::shared_object_ptr);
+
+	bool 
+	has_transparency() const;
 
 	void
 	begin();
@@ -53,8 +57,8 @@ public:
 private:
 	/// If this flag is true, we activate the neccessary states in the
 	/// renderer in begin
-	bool const is_transparent_;
-	/// See is_transparent_ for the reason that's here
+	bool const has_transparency_;
+	/// See has_transparency_ for the reason that's here
 	sge::renderer::device_ptr renderer_;
 	/// This is here so the model_instances can get the mvp matrix
 	graphics::camera::object &camera_;

@@ -14,15 +14,15 @@
 #include <boost/foreach.hpp>
 
 insula::model_backend::model_backend(
-	bool _is_transparent,
+	bool _has_transparency,
 	sge::renderer::device_ptr _renderer,
 	graphics::camera::object &_camera,
 	graphics::shader::object &_shader,
 	texture_map const &_textures,
 	model::shared_object_ptr _model)
 :
-	is_transparent_(
-		_is_transparent),
+	has_transparency_(
+		_has_transparency),
 	renderer_(
 		_renderer),
 	camera_(
@@ -34,6 +34,12 @@ insula::model_backend::model_backend(
 	model_(
 		_model)
 {
+}
+
+bool
+insula::model_backend::has_transparency() const
+{
+	return has_transparency_;
 }
 
 void
@@ -55,15 +61,14 @@ insula::model_backend::begin()
 		nontransparent_list = 
 			sge::renderer::state::list
 				// for now, cull both
-				//(sge::renderer::state::cull_mode::back)
 				(sge::renderer::state::cull_mode::off)
+				(sge::renderer::state::bool_::enable_alpha_blending = false)
 				(sge::renderer::state::depth_func::less),
 		transparent_list = 
 			sge::renderer::state::list
 				// for now, cull both
-				//(sge::renderer::state::cull_mode::back)
 				(sge::renderer::state::cull_mode::off)
-				(sge::renderer::state::depth_func::off)
+				(sge::renderer::state::depth_func::less)
 				(sge::renderer::state::bool_::enable_alpha_blending = true)
 				(sge::renderer::state::source_blend_func::src_alpha)
 				(sge::renderer::state::dest_blend_func::inv_src_alpha);
@@ -73,7 +78,7 @@ insula::model_backend::begin()
 	state_scope_.reset(
 		new sge::renderer::state::scoped(
 			renderer_,
-			is_transparent_ 
+			has_transparency_ 
 			? 
 				transparent_list 
 			: 

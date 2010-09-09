@@ -336,9 +336,17 @@ insula::prop::manager::instantiate(
 						r.rotation_axis)),
 				r.shape,
 				r.solidity));
-		scene_manager_.insert(
-			&r.backend,
-			instances.back());
+
+		/*
+		if (r.backend.has_transparency())
+			scene_manager_.insert_transparent(
+				&r.backend,
+				instances.back());
+		else
+		*/
+			scene_manager_.insert(
+				&r.backend,
+				instances.back());
 	}
 }
 
