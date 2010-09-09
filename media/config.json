@@ -13,6 +13,19 @@
 			"physics_offset" : [0.0,0.0,0.0],
 			"approximation" : {},
 			"count" : 100
+		},
+		{
+			"model" : "palmtree.md3",
+			"texture" : "palmtree.png",
+			"flat_terrain" : true,
+			"has_transparency" : true,
+			"penetration_depth" : 0.0,
+			"scale_range" : [0.5,10.0],
+			"solid" : true,
+			"rotation_axis" : [0.0,1.0,0.0],
+			"physics_offset" : [0.0,0.0,0.0],
+			"approximation" : {},
+			"count" : 100
 		}
 	],
 	

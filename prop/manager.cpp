@@ -153,7 +153,8 @@ insula::prop::manager::parse_single_prop(
 				sge::parse::json::find_member_exn<sge::parse::json::string>(
 					p.members,
 					FCPPT_TEXT("model")),
-				FCPPT_TEXT("models/props")));
+				FCPPT_TEXT("models/props")),
+			sge::model::load_flags::switch_yz);
 
 	model::shared_object_ptr model = 
 		std::make_shared<model::object>(

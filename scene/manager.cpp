@@ -2,6 +2,7 @@
 #include "transparency_comparator.hpp"
 #include "scoped_backend.hpp"
 #include "../graphics/camera/object.hpp"
+#include "../timed_output.hpp"
 #include <boost/foreach.hpp>
 #include <fcppt/io/cout.hpp>
 #include <set>
@@ -107,6 +108,8 @@ insula::scene::manager::render_transparent()
 		if (r.is_visible())
 			ordered_instances.insert(
 				&r);
+
+	timed_output() << "There are " << ordered_instances.size() << " transparent props\n";
 
 	BOOST_FOREACH(
 		set_type::value_type const &v,
