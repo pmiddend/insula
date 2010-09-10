@@ -35,7 +35,12 @@ public:
 	// We need this in the collision callbacks
 	physics::static_model const &
 	physics_model() const;
+
+	graphics::scalar
+	distance_to(
+		graphics::vec3 const &) const;
 private:
+	physics::shared_shape_ptr shape_;
 	physics::world &physics_world_;
 	physics::static_model physics_;
 };

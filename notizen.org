@@ -1,190 +1,19 @@
-* Wichtige Links
-
+* Links
 - Zwei Fixes für raycastvehicle: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
 - Frustum/Occlusion culling: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
 - Vehicles in Bullet
 - http://vdrift.net/Forum/viewtopic.php?p=10332&sid=ce7581e8f6c9da3b93eec41440a4d776
 - Shadow Mapping: http://www.fabiensanglard.net/shadowmapping/index.php
-
-* Fahrzeugverbesserungen
-* Kurzzeitvorgehen
-
-** Szenegraph
-
-** Props
-
-Es müssen die Props weitergemacht werden.
-
-Vorbereitungen:
-- Man muss beim Shader die Textur ändern können, auch wenn er grade
-  aktiv ist (brauch man für die verschiedenen Models, die aber einen
-  Shader haben). Dazu brauch =graphics::shader::object= einen =bool=,
-  der angibt, ob der Shader grade aktiv ist. Dann muss
-  =update_texture=, nachdem der Sampler geupdatet wurde, den Renderer
-  über die neue Textur informieren.
-- Eine Methode =approximation_to_shape= muss geschrieben werden. Diese
-  bekommt:
-	- den "approximation"-Knoten aus der json-Datei
-	- ein =sge::model::object_ptr= (der implizit schon optional ist,
-    wird dann nur bei "exact" genutzt)
-	Und gibt zurück einen =shape_ptr=.
-- Ein =static_model= muss eine komplette Transformation übergeben
-  bekommen, am besten einen =vec3= und eine =mat4= im Konstruktor
-  (muss ja getrennt behandelt werden, weil in =btTransform=
-  konvertierbar).
-- =random_flat_point= muss funktionieren. Dazu muss das Teil erstens
-  das water_level respektieren und zweitens den Gradienten noch
-  mitbekommen. Man muss außerdem noch den "Flatnessgrad" mitgeben, der
-  akzeptabel ist. Dann wird so lange zufallsgeneriert bis man einen
-  vernünftigen Punkt gefunden hat.
-- Der Nuggetshader muss aus =game_inner= rausgezogen und als
-  Modelshader in =game_outer= gepackt werden.
-- Die =prop_manager=-Klasse enthält die Liste von =prop_backend= und
-  =prop_instance=. 
-
-Details:
-- Props müssen in die config.json eingetragen werden:
-	#+begin_src json
-  "props" : 
-	[ 
-	  { 
-      "model" : "tree.md3", 
-      "texture" : "tree.png", 
-			"flat_terrain" : true, 
-			"has_transparency" : true,
-			"penetration_depth" : 0.0,
-			"scale_range" : [0.5,1.5],
-			"solid" : true,
-			"rotation_axis" : [0.0,1.0,0.0],
-			"physics_offset" : [0.0,0.0,0.0], 
-			"approximation" : 
-			{ 
-			  "type" : "cylinder_x", 
-				"radius" : 1.0, 
-				"height" : 10.0 
-			},
-			"count" : 200
-		} 
-	]
-	#+end_src
-- Erstelle Datenstrukturen:
-	1. =prop_backend=, repräsentiert die Daten, die sich nur pro
-     "Prop-Gruppe" ändern, also die "gescoped" werden müssen:
-		 - =model::object=
-		 - Textur des =model::object=
-	2. =prop_instance=, enthält alle Daten bis auf den Body (der muss
-     pro Iteration neu erstellt werden, also in =game_inner=)
-		 - Position
-		 - Scaling
-		 - Rotation
-		 - Solidity
-		 - Shape
-	3. =prop=, enthält alles, was pro Iteration neu erstellt werden muss
-		 - =physics::static_model=
-		 - Transformation des =model::object=
-- Nachdem das Höhenfeld erstellt wurde, wird der =prop_counts=-Eintrag
-  herangezogen und die einzelnen Props werden erstellt nach folgendem
-  Algorithmus:
-	1. Lese ein Prop aus der Liste =props= aus, wenn vorhanden
-	2. Gucke in die =prop_counts=-Liste, ob Props von diesem Typ erstellt werden sollen
-  3. Falls nein, gehe zu Schritt 1
-  4. Ansonsten erstelle ein =model::object= namens /m/ aus den gegebenen
-     Daten, sowie eine Textur (die ist in =model::object= nicht
-     enthalten). Der Shader zu dem Model ist global (=model_shader=)
-     und in =game_outer= gespeichert.
-  5. Speichere /m/ in dem Array =prop_models=, der Index sei /i/. Sei
-     /n/ die Anzahl der zu erstellenden Models
-  6. Jetzt werden die Daten für =prop_instance= gesucht. Mache /n/
-     mal:
-		 1. Wenn =flat_terrain= true ist, rufe =random_flat_point= auf um
-        den $(x,z)$-Wert des Models zu bestimmen. Wenn =flat_terrain=
-        false ist, rufe =random_point= auf.
-		 2. Bestimme mit =height_for_point= den y-Wert an der Stelle $(x,z)$.
-		 3. Setze als _Position_ des =model::object= (in der =prop=-Klasse):
-				\[
-				(x,y - \textrm{bounding\_box}(\textrm{model}).\textrm{bottom}() - \textrm{penetration\_depth},z)
-				\]
-				Hier wird natürlich angenommen, dass bottom() negativ ist,
-        weil das Model ja im Ursprung sein soll.
-		 4. Bestimme zufällig einen _Skalierungswert_ in der angegebenen Range.
-		 5. Bestimme zufällig 3 _Rotationswinkel_ unter Benutzung der Booleans.
-		 6. Extrahiere _Solidity_ aus dem json.
-		 7. Rufe zum Erstellen der _Shape_ eine separate Methode
-        auf. Diese sollte es auch ermöglichen, eine exakte
-        Approximation zu benutzen. Dazu muss evtl. =sge::model=
-        benutzt werden.
-		 8. Erstelle aus dem bisher gesagten ein vollständiges
-        =prop_instance=-Objekt und füge es in die Liste der Props bei
-        Index /i/ ein (diese Liste ist ein
-        =vector<vector<prop_instance>>=, sodass die Indizes aus den
-        =prop_prototypes= übereinstimmen).
-- Beim Eintritt in =game_inner= wird nach der Physikwelt eine Liste von
-  =prop=-Objekten erzeugt. Dies ist auch ein =vector<vector<prop>>=
-  und wird direkt aus der =prop_instance=-Liste erzeugt. Beim
-  Erstellen eines Props müssen die Transformationen berechnet
-  werden. Die Transformation des Models ist einfach, es ist:
-
-	\[
-	\textrm{translation} \cdot \textrm{rotation} \cdot \textrm{scaling}
-	\]
-
-	Die Transformation des Bodys muss leicht anders lauten:
-
-	\[
-	\textrm{translation} \cdot \textrm{translation}_{\textrm{offset}} \cdot \textrm{rotation}
-	\]
-
-	Ein bullet-Körper muss nicht skaliert werden, die Shape hat schon
-  die richtige Größe.
-- Zum Zeichnen:
-	- Es wird jetzt der Model-Shader gescoped (den kriegt man aus =game_outer=)
-	- Dann die Liste der =prop_backend=-Objekte durchlaufen, nach Index
-    (der Index dient als quasi-Iterator). Für jedes =prop_backend= mit
-    Index /i/ wird gemacht:
-		- Die Textur wird geändert
-		- Der vb des Models gescoped
-		- Es wird die Liste von =props= mit Index /i/ durchlaufen und für
-      jedes =prop= gemacht:
-			- Test auf Sichtbarkeit
-			- Rendern: Dieser Schritt könnte später durch ein "füge in
-        =std::set<objects>= ein" ersetzt werden. Dieses =set= sortiert
-        sich dann automatisch nach Entfernung zum Betrachter (depth
-        sorting)
-					
+* Ideen für später
+** TODO Terrain zufallsgenerieren
+** TODO Farben statt Texturen bei Höhenfeld verwenden
+* Kleinere Sachen
+** TODO cout/cerr zu Konsole weiterleiten
+** TODO foldl in gameover durch accumulate ersetzen
+** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern
+** TODO gizmo in math verfrachten
+** TODO orthonormalize_gram_schmidt hinzufügen und gucken wie's läuft
 * Aktivitäten
-** TODO Nebel
-1. Im Pixelshader:
-#+BEGIN_SRC emacs-c++-mode
-const float LOG2 = 1.442695;
-float z = gl_FragCoord.z / gl_FragCoord.w;
-float fogFactor = exp2( -gl_Fog.density * 
-				   gl_Fog.density * 
-				   z * 
-				   z * 
-				   LOG2 );
-fogFactor = clamp(fogFactor, 0.0, 1.0);
-
-gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
-#+END_SRC
-
-2. Oder doch lieber im Vertexshader, siehe [[http://www.ozone3d.net/tutorials/glsl_fog/p03.php][hier]]:
-
-	"Fremde" Methode:
-
-	1. Berechne gl_Position, nehme davon die Länge =n= (?)
-	2. Berechne: =faktor = exp2(-dichte^2 * n^2 *1.442695)=, clampe
-		 zwischen 0 und 1, gebe an PS weiter
-	3. Berechne =frag_color = mix(fog_color,final_color,fog_factor)=
-	
-	"Eigene" Methode:
-	
-	1. Gebe Augenpunkt als uniform mit.
-  2. Berechne Abstand Augenpunkt und aktueller Vertex
-	3. Berechne =faktor = exp2(-dichte^2 * abstand^2 *1.442695)=, gebe an PS weiter
-	4. Mache dasselbe wie bei der fremden Methode.
-
-** TODO Terraingenerierung
-** TODO Partikelsystem
 ** TODO Shadow Maps [1/5]
 *** DONE Neues uniform-System aufsetzen
 		 CLOSED: [2010-09-05 Sun 14:44]
@@ -209,19 +38,6 @@ gl_FragColor = mix(gl_Fog.color, finalColor, fogFactor );
   wie beim Wasser)
 - Vergleiche den z-Wert von vp mit dem z-Wert in der Shadowmap, setze
   entsprechend die Pixel
-** TODO Physik, Fahrzeuge [6/12]
-*** TODO world muss mehr RAII kriegen
-*** TODO Max_speed einbauen
-"cap speed spaceship" bei google eingeben und das so umsetzen
-*** TODO Friction einbauen
-*** TODO wheel_info übertragen wie in stk (beide Räder aufm Boden)
-*** TODO Steering-Increment einbauen
-*** TODO Eigener Raytest?
-Damit ist gemeint, dass man height_map::height_for_point nutzt, um den
-Raytest beim Terrain zu machen (könnte genauer sein)
-** TODO Sounds [0/1]
-*** TODO Looping von Musik fixen
-Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
 ** TODO Neues Fontsystem
 Ziele:
 
@@ -256,25 +72,39 @@ font_collection fonts(
 	"default_it.ttf",
 	make_container<size_container>(15)(20)(25));
 #+end_src
-
-** TODO Diverses [1/13]
-*** TODO cout/cerr zu Konsole weiterleiten
-		 CLOSED: [2010-08-03 Tue 20:44]
-*** TODO Textur tst spiegelverkehrt
-*** TODO graphics::stats erweitern
+** TODO graphics::stats erweitern
 Man könnte die Stats verallgemeinern: Ein "stat" ist eine textuelle
 Informationseinheit (z.B. Geschwindigkeit des Vehikels), die scoped
 beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
-*** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern
-*** TODO Musiklautstärke muss einstellbar sein
-*** TODO foldl in gameover durch accumulate ersetzen
-*** TODO vehicle::speed_kmh muss relativ zu forward sein
-*** TODO gizmo in math verfrachten
-*** TODO orthonormalize_gram_schmidt hinzufügen und gucken wie's läuft
-*** TODO config.po wegmachen
+** TODO Musiklautstärke muss einstellbar sein
+** TODO vehicle::speed_kmh muss relativ zu forward sein
+** TODO config.po wegmachen
 In config.json Sektion "command-line", in der nur String-Optionen
 reinkommen, po-Parser kopieren
-*** TODO Approximationen erweitern
+** TODO Approximationen erweitern
 Es kommt noch approximation::exact hinzu, sowie cylinder_x, cylinder_y
 und cylinder_z. exact bekommt ein model::object_ptr
+** TODO Alpha-Blending
+- Bisheriges Alphablending fixen, damit klar ist, wie man
+  Alphablending prinzipiell umsetzt.
+- Auf binäres Alphablending umsteigen.
+** TODO Autoculling fixen
+** TODO Auto in scene::manager integrieren
+** TODO Autosound wird nicht moduliert
+** TODO Mehr Musik
+** TODO Konkretes Level bauen, was man auch ausliefern kann
+** TODO Nuggets aus game_inner rausziehen
+** TODO "Nugget-Indikatoren" einbauen
+** TODO Persistente Konsolenhistory
+** TODO Partikelsystem
+** TODO random_point erweitern
+Die Funktion sollte eine =steepness_range= bekommen (also ein
+Intervall in $[0,1]$) und generiert dann mit Hilfe des normalisierten
+Gradienten einen Punkt mit dieser Steilheit. Dei Funktion brauch dazu
+den normalisierten Gradienten, d.h. =height_map= muss den zur
+Verfügung stellen)
+** TODO Looping von Musik fixen
+Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
+** DONE Textur tst spiegelverkehrt
+		 CLOSED: [2010-09-09 Thu 23:18]

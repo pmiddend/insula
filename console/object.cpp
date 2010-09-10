@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include "scoped_rdbuf.hpp"
 #include "../media_path.hpp"
 #include <sge/input/system.hpp>
 #include <sge/image/colors.hpp>
@@ -18,6 +19,11 @@
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/almost_zero.hpp>
 #include <fcppt/math/dim/basic_impl.hpp>
+/*
+#include <fcppt/io/cout.hpp>
+#include <fcppt/io/cerr.hpp>
+#include <fcppt/io/clog.hpp>
+*/
 #include <fcppt/text.hpp>
 #include <functional>
 
@@ -25,7 +31,8 @@ insula::console::object::object(
 	sge::input::system_ptr const is,
 	sge::renderer::device_ptr const rend,
 	sge::font::system_ptr const fs,
-	sge::image::multi_loader &il)
+	sge::image::multi_loader &il,
+	redirect_mode::type const redirect)
 :
 	object_(
 		FCPPT_TEXT('/')),
@@ -61,7 +68,25 @@ insula::console::object::object(
             rend->screen_size().h() / 2)))
       .elements()),
 		static_cast<sge::console::output_line_limit>(
-			1000))
+			1000))/*,
+	cout_(
+		redirect == redirect_mode::all 
+		? 
+			unique_scoped_rdbuf(new scoped_rdbuf(fcppt::io::cout,gfx_))
+		:
+			unique_scoped_rdbuf()),
+	clog_(
+		redirect == redirect_mode::all 
+		? 
+			unique_scoped_rdbuf(new scoped_rdbuf(fcppt::io::clog,gfx_))
+		:
+			unique_scoped_rdbuf()),
+	cerr_(
+		redirect == redirect_mode::all 
+		? 
+			unique_scoped_rdbuf(new scoped_rdbuf(fcppt::io::cerr,gfx_))
+		:
+			unique_scoped_rdbuf())*/
 {
 }
 
@@ -95,3 +120,6 @@ insula::console::object::view() const
 {
 	return gfx_;
 }
+
+//insula::console::object::~object() {}
+

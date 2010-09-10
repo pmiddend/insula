@@ -113,7 +113,8 @@ insula::machine::machine(
 		systems_.input_system(),
 		systems_.renderer(),
 		systems_.font_system(),
-		systems_.image_loader()),
+		systems_.image_loader(),
+		console::redirect_mode::all),
 	input_delegator_(
 		systems_.input_system(),
 		console_),

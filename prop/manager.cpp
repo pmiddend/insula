@@ -337,13 +337,11 @@ insula::prop::manager::instantiate(
 				r.shape,
 				r.solidity));
 
-		/*
 		if (r.backend.has_transparency())
 			scene_manager_.insert_transparent(
 				&r.backend,
 				instances.back());
 		else
-		*/
 			scene_manager_.insert(
 				&r.backend,
 				instances.back());

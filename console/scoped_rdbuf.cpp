@@ -9,8 +9,8 @@ insula::console::scoped_rdbuf::scoped_rdbuf(
 	sink_(
 		con),
 	tee_(
-		stream_,
-		sink_),
+		sink_,
+		*stream_.rdbuf()),
 	stream_buffer_(
 		tee_),
 	old_buffer_(

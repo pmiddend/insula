@@ -1,6 +1,8 @@
 #ifndef INSULA_CONSOLE_OBJECT_HPP_INCLUDED
 #define INSULA_CONSOLE_OBJECT_HPP_INCLUDED
 
+#include "redirect_mode.hpp"
+#include "scoped_rdbuf_fwd.hpp"
 #include <sge/input/system_ptr.hpp>
 #include <sge/console/object.hpp>
 #include <sge/console/gfx.hpp>
@@ -10,11 +12,16 @@
 #include <fcppt/signal/auto_connection.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/signal/object.hpp>
+#include <memory>
 
 namespace insula
 {
 namespace console
 {
+/// This is just a container for the console "model" (so
+/// sge::console::object) and the "view" (sge::console::gfx). Because
+/// that's a little boring, it also provides cout/cerr/clog
+/// redirection to the console
 class object
 {
 public:
@@ -22,14 +29,14 @@ public:
 		object const &) = delete;
 	object(
 		object const &) = delete;
-
 	
 	explicit
 	object(
 		sge::input::system_ptr,
 		sge::renderer::device_ptr,
 		sge::font::system_ptr,
-		sge::image::multi_loader &);
+		sge::image::multi_loader &,
+		redirect_mode::type);
 	
 	void
 	render();
@@ -45,9 +52,18 @@ public:
 
 	sge::console::gfx const &
 	view() const;
+
+	//~object();
 private:
+	/*
+	typedef
+	std::unique_ptr<scoped_rdbuf>
+	unique_scoped_rdbuf;
+	*/
+
 	sge::console::object object_;
 	sge::console::gfx gfx_;
+	//unique_scoped_rdbuf cout_,clog_,cerr_;
 };
 }
 }

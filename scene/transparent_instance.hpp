@@ -15,6 +15,9 @@ class transparent_instance
 	public instance
 {
 public:
+	explicit
+	transparent_instance();
+
 	virtual graphics::scalar
 	distance_to(
 		graphics::vec3 const &) const = 0;

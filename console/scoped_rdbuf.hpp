@@ -6,6 +6,7 @@
 #include <fcppt/io/ostream.hpp>
 #include <boost/iostreams/tee.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
+#include <streambuf>
 
 namespace insula
 {
@@ -27,8 +28,8 @@ private:
 	typedef
 	boost::iostreams::tee_device
 	<
-		fcppt::io::ostream,
-		sink
+		sink,
+		std::basic_streambuf<fcppt::char_type>
 	>
 	tee_device;
 
@@ -40,8 +41,7 @@ private:
 	sink sink_;
 	tee_device tee_;
 	stream_buffer stream_buffer_;
-	
-	std::streambuf *old_buffer_;
+	std::basic_streambuf<fcppt::char_type> *old_buffer_;
 };
 }
 }

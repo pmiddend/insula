@@ -29,7 +29,6 @@ public:
 		std::streamsize);
 private:
 	sge::console::gfx &gfx_;
-	fcppt::io::ofstream *file_;
 	fcppt::string buffer_;
 };
 }

@@ -34,7 +34,7 @@ public:
 		transparent_instance const *a,
 		transparent_instance const *b) const
 	{
-		return a->distance_to(cam_pos) < b->distance_to(cam_pos);
+		return a->distance_to(cam_pos) > b->distance_to(cam_pos);
 	}
 private:
 	graphics::vec3 const cam_pos;
