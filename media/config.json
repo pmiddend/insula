@@ -18,7 +18,7 @@
 			"model" : "palmtree.md3",
 			"texture" : "palmtree.png",
 			"flat_terrain" : true,
-			"has_transparency" : true,
+			"has_transparency" : false,
 			"penetration_depth" : 0.0,
 			"scale_range" : [0.5,10.0],
 			"solid" : true,

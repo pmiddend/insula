@@ -25,6 +25,7 @@
 #include <sge/systems/instance.hpp>
 #include <sge/model/loader.hpp>
 #include <sge/renderer/filter/trilinear.hpp>
+#include <sge/renderer/filter/linear.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
 #include <sge/image/create_texture.hpp>
 #include <fcppt/text.hpp>
@@ -180,7 +181,7 @@ insula::prop::manager::parse_single_prop(
 							FCPPT_TEXT("textures/props")),
 						params.systems.renderer(),
 						params.systems.image_loader(),
-						sge::renderer::filter::trilinear,
+						sge::renderer::filter::linear,
 						sge::renderer::resource_flags::none))),
 			model));
 
