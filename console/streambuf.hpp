@@ -1,7 +1,7 @@
 #ifndef INSULA_CONSOLE_STREAMBUF_HPP_INCLUDED
 #define INSULA_CONSOLE_STREAMBUF_HPP_INCLUDED
 
-#include "object_fwd.hpp"
+#include <sge/console/object_fwd.hpp>
 #include <fcppt/char_type.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/io/ostream.hpp>
@@ -19,11 +19,11 @@ public:
 	explicit
 	streambuf(
 		fcppt::io::ostream &,
-		insula::console::object &);
+		sge::console::object &);
 
 	~streambuf();
 private:
-	object &object_;
+	sge::console::object &object_;
 	fcppt::io::ostream &stream_;
 	std::basic_streambuf<fcppt::char_type> *old_streambuf_;
 	fcppt::string buffer_;

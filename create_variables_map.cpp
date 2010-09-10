@@ -40,6 +40,7 @@ insula::create_variables_map(
 	boost::program_options::options_description desc("Allowed options");
 
 	desc.add_options()
+		("console-redirect",boost::program_options::value<bool>(),"Redirect stdout and stderr to console")
 		("help","produce help message");
 
 	desc.add(

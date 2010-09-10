@@ -114,7 +114,13 @@ insula::machine::machine(
 		systems_.renderer(),
 		systems_.font_system(),
 		systems_.image_loader(),
-		console::redirect_mode::all),
+		get_option<bool>(
+			vm_,
+			"console-redirect") 
+			? 
+				console::redirect_mode::all
+			: 
+				console::redirect_mode::none),
 	input_delegator_(
 		systems_.input_system(),
 		console_),

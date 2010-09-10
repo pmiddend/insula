@@ -1,3 +1,5 @@
+console-redirect = true
+
 game-nuggets = 100
 game-nugget-model = props/beacon.md3
 game-nugget-texture = props/beacon.png

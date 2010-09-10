@@ -67,28 +67,23 @@ insula::console::object::object(
 		static_cast<sge::console::output_line_limit>(
 			1000)),
 	cout_(
-		fcppt::io::cout,
-		*this)
-	/*
-	cout_(
 		redirect == redirect_mode::all 
 		? 
-			unique_scoped_rdbuf(new scoped_rdbuf(fcppt::io::cout,gfx_))
+			unique_scoped_streambuf(new streambuf(fcppt::io::cout,object_))
 		:
-			unique_scoped_rdbuf()),
+			unique_scoped_streambuf()),
 	clog_(
 		redirect == redirect_mode::all 
 		? 
-			unique_scoped_rdbuf(new scoped_rdbuf(fcppt::io::clog,gfx_))
+			unique_scoped_streambuf(new streambuf(fcppt::io::clog,object_))
 		:
-			unique_scoped_rdbuf()),
+			unique_scoped_streambuf()),
 	cerr_(
 		redirect == redirect_mode::all 
 		? 
-			unique_scoped_rdbuf(new scoped_rdbuf(fcppt::io::cerr,gfx_))
+			unique_scoped_streambuf(new streambuf(fcppt::io::cerr,object_))
 		:
-			unique_scoped_rdbuf())
-	*/
+			unique_scoped_streambuf())
 {
 }
 

@@ -55,16 +55,13 @@ public:
 
 	~object();
 private:
-	/*
 	typedef
-	std::unique_ptr<scoped_rdbuf>
-	unique_scoped_rdbuf;
-	*/
+	std::unique_ptr<streambuf>
+	unique_scoped_streambuf;
 
 	sge::console::object object_;
 	sge::console::gfx gfx_;
-	//unique_scoped_rdbuf cout_,clog_,cerr_;
-	streambuf cout_;
+	unique_scoped_streambuf cout_,clog_,cerr_;
 };
 }
 }

@@ -4,7 +4,7 @@
 
 insula::console::streambuf::streambuf(
 	fcppt::io::ostream &_stream,
-	object &_object)
+	sge::console::object &_object)
 :
 	object_(
 		_object),
@@ -31,7 +31,7 @@ insula::console::streambuf::overflow(
 	{
 		if (c == FCPPT_TEXT('\n'))
 		{
-			object_.model().emit_message(buffer_);
+			object_.emit_message(buffer_);
 			buffer_.clear();
 		}
 		else
