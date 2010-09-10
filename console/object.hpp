@@ -2,7 +2,7 @@
 #define INSULA_CONSOLE_OBJECT_HPP_INCLUDED
 
 #include "redirect_mode.hpp"
-#include "scoped_rdbuf_fwd.hpp"
+#include "streambuf.hpp"
 #include <sge/input/system_ptr.hpp>
 #include <sge/console/object.hpp>
 #include <sge/console/gfx.hpp>
@@ -53,7 +53,7 @@ public:
 	sge::console::gfx const &
 	view() const;
 
-	//~object();
+	~object();
 private:
 	/*
 	typedef
@@ -64,6 +64,7 @@ private:
 	sge::console::object object_;
 	sge::console::gfx gfx_;
 	//unique_scoped_rdbuf cout_,clog_,cerr_;
+	streambuf cout_;
 };
 }
 }

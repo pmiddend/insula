@@ -135,7 +135,8 @@ try
 		sys.input_system(),
 		sys.renderer(),
 		sys.font_system(),
-		sys.image_loader());
+		sys.image_loader(),
+		console::redirect_mode::all);
 
 	input_delegator input_delegator_(
 		sys.input_system(),

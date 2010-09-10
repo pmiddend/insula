@@ -109,7 +109,7 @@ insula::scene::manager::render_transparent()
 			ordered_instances.insert(
 				&r);
 
-	//timed_output() << "There are " << ordered_instances.size() << " transparent props\n";
+	timed_output() << "There are " << ordered_instances.size() << " transparent props\n";
 
 	BOOST_FOREACH(
 		set_type::value_type const &v,

@@ -8,7 +8,8 @@
 ** TODO Terrain zufallsgenerieren
 ** TODO Farben statt Texturen bei Höhenfeld verwenden
 * Kleinere Sachen
-** TODO cout/cerr zu Konsole weiterleiten
+** DONE cout/cerr zu Konsole weiterleiten
+	 CLOSED: [2010-09-11 Sat 01:01]
 ** TODO foldl in gameover durch accumulate ersetzen
 ** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern
 ** TODO gizmo in math verfrachten
