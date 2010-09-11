@@ -23,6 +23,7 @@ public:
 
 	~streambuf();
 private:
+	bool in_progress_;
 	sge::console::object &object_;
 	fcppt::io::ostream &stream_;
 	std::basic_streambuf<fcppt::char_type> *old_streambuf_;

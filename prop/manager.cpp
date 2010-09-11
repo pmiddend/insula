@@ -181,7 +181,7 @@ insula::prop::manager::parse_single_prop(
 							FCPPT_TEXT("textures/props")),
 						params.systems.renderer(),
 						params.systems.image_loader(),
-						sge::renderer::filter::linear,
+						sge::renderer::filter::trilinear,
 						sge::renderer::resource_flags::none))),
 			model));
 

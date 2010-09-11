@@ -6,6 +6,8 @@ insula::console::streambuf::streambuf(
 	fcppt::io::ostream &_stream,
 	sge::console::object &_object)
 :
+	in_progress_(
+		false),
 	object_(
 		_object),
 	stream_(
@@ -25,7 +27,15 @@ insula::console::streambuf::int_type
 insula::console::streambuf::overflow(
 	int_type const c)
 {
-	old_streambuf_->sputc(static_cast<fcppt::char_type>(c));
+	if (in_progress_)
+		return traits_type::not_eof(c);
+
+	// FIXME: What happens if something throws here?
+	in_progress_ = true;
+
+	old_streambuf_->sputc(
+		traits_type::to_char_type(
+			c));
 
 	if (c != traits_type::eof())
 	{
@@ -36,9 +46,11 @@ insula::console::streambuf::overflow(
 		}
 		else
 		{
-			buffer_ += static_cast<fcppt::char_type>(c);
+			buffer_ += traits_type::to_char_type(c);
 		}
 	}
+
+	in_progress_ = false;
 
 	return traits_type::not_eof(c);
 }
