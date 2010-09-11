@@ -77,7 +77,7 @@
 			"scale_range" : [0.5,10.0],
 			"solid" : true,
 			"rotation_axis" : [0.0,1.0,0.0],
-			"physics_offset" : [0.0,-2.0,0.0],
+			"physics_offset" : [-3.73,-3.48,-0.36],
 			"approximation" : 
 			{
 				"type" : "cylinder",
