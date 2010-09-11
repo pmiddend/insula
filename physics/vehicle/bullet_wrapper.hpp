@@ -50,8 +50,11 @@ public:
 	updateSuspension(
 		btScalar step);
 
+	scalar
+	getCurrentSpeedKmHour() const;
 private:
 	scalar track_connect_accel_;
+	scalar current_speed_kmh_;
 };
 }
 }

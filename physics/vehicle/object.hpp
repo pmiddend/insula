@@ -84,6 +84,7 @@ public:
 		scalar);
 
 	scalar
+
 	speed_kmh() const;
 
 	// The camera needs this

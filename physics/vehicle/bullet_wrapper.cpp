@@ -13,7 +13,9 @@ insula::physics::vehicle::bullet_wrapper::bullet_wrapper(
 		chassis,
 		raycaster),
 	track_connect_accel_(
-		_track_connect_accel)
+		_track_connect_accel),
+	current_speed_kmh_(
+		static_cast<scalar>(0))
 {
 }
 
@@ -30,10 +32,13 @@ insula::physics::vehicle::bullet_wrapper::updateVehicle(
 
 	// DIFF BEGIN
 	// The vehicle speed is private
+	current_speed_kmh_ = 
+		btScalar(3.6) * 
+		getRigidBody()->getLinearVelocity().dot(getForwardVector());
 	//m_currentVehicleSpeedKmHour = btScalar(3.6) * getRigidBody()->getLinearVelocity().length();
 	// DIFF END
 	
-	const btTransform& chassisTrans = getChassisWorldTransform();
+	//const btTransform& chassisTrans = getChassisWorldTransform();
 
 	// DIFF BEGIN
 	// m_indexForwardAxis is private
@@ -48,10 +53,11 @@ insula::physics::vehicle::bullet_wrapper::updateVehicle(
 
 	// DIFF BEGIN
 	// The vehicle speed is private
-	//if (forwardW.dot(getRigidBody()->getLinearVelocity()) < btScalar(0.))
-	//{
-	//	m_currentVehicleSpeedKmHour *= btScalar(-1.);
-	//}
+	if (forwardW.dot(getRigidBody()->getLinearVelocity()) < btScalar(0.))
+	{
+		current_speed_kmh_ *= btScalar(-1);
+//		m_currentVehicleSpeedKmHour *= btScalar(-1.);
+	}
 	// DIFF END
 
 	//
@@ -116,7 +122,7 @@ insula::physics::vehicle::bullet_wrapper::updateVehicle(
 
 		if (wheel.m_raycastInfo.m_isInContact)
 		{
-			const btTransform&	chassisWorldTransform = getChassisWorldTransform();
+	//		const btTransform&	chassisWorldTransform = getChassisWorldTransform();
 
 			// DIFF BEGIN
 			// m_indexForwardAxis is private
@@ -230,4 +236,10 @@ insula::physics::vehicle::bullet_wrapper::updateSuspension(
 		}
 	}
 
+}
+
+insula::physics::scalar
+insula::physics::vehicle::bullet_wrapper::getCurrentSpeedKmHour() const
+{
+	return current_speed_kmh_;
 }

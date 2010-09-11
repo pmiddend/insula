@@ -43,6 +43,7 @@ Hierzu z.B. cgal
   wie beim Wasser)
 - Vergleiche den z-Wert von vp mit dem z-Wert in der Shadowmap, setze
   entsprechend die Pixel
+** TODO Diffuses Modelshading
 ** TODO Neues Fontsystem
 Ziele:
 
@@ -84,9 +85,6 @@ beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
 ** TODO Musiklautstärke muss einstellbar sein
 ** TODO vehicle::speed_kmh muss relativ zu forward sein
-** TODO config.po wegmachen
-In config.json Sektion "command-line", in der nur String-Optionen
-reinkommen, po-Parser kopieren
 ** TODO Approximationen erweitern
 Es kommt noch approximation::exact hinzu, sowie cylinder_x, cylinder_y
 und cylinder_z. exact bekommt ein model::object_ptr
@@ -94,7 +92,7 @@ und cylinder_z. exact bekommt ein model::object_ptr
 - Bisheriges Alphablending fixen, damit klar ist, wie man
   Alphablending prinzipiell umsetzt.
 - Auf binäres Alphablending umsteigen.
-** TODO Autoculling fixen
+** TODO Auto-Culling fixen
 ** TODO Auto in scene::manager integrieren
 ** TODO Autosound wird nicht moduliert
 ** TODO Mehr Musik
@@ -111,5 +109,9 @@ den normalisierten Gradienten, d.h. =height_map= muss den zur
 Verfügung stellen)
 ** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
+** DONE config.po wegmachen
+	 CLOSED: [2010-09-11 Sat 20:52]
+In config.json Sektion "command-line", in der nur String-Optionen
+reinkommen, po-Parser kopieren
 ** DONE Textur tst spiegelverkehrt
 		 CLOSED: [2010-09-09 Thu 23:18]
