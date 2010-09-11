@@ -19,7 +19,7 @@ get_option(
 {
 	if (!vm.count(s))
 		throw fcppt::exception(
-			FCPPT_TEXT("Option \"")+fcppt::from_std_string(s)+FCPPT_TEXT("\" not found!"));
+			FCPPT_TEXT("Option \"")+fcppt::from_std_string(s)+FCPPT_TEXT("\" not found! Restart with \"--")+fcppt::from_std_string(s)+FCPPT_TEXT(" value\""));
 
 	try
 	{

@@ -1,10 +1,17 @@
 #include "speed_to_pitch.hpp"
+#include "../math/sawtooth.hpp"
 #include <algorithm>
 
 sge::audio::scalar
 insula::vehicle::speed_to_pitch(
 	physics::scalar const s)
 {
+	return 
+		math::sawtooth(
+			s,
+			static_cast<physics::scalar>(
+				100));
+	/*
 	if (s <= static_cast<physics::scalar>(60))
 		return 
 			static_cast<sge::audio::scalar>(s) / 
@@ -26,4 +33,5 @@ insula::vehicle::speed_to_pitch(
 			static_cast<sge::audio::scalar>(s - static_cast<sge::audio::scalar>(400)) / 
 			static_cast<sge::audio::scalar>(50),
 			static_cast<sge::audio::scalar>(1.0));
+*/
 }
