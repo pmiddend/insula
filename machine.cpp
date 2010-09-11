@@ -66,13 +66,13 @@
 #include <functional>
 
 insula::machine::machine(
+	sge::parse::json::object const &_config_file,
 	boost::program_options::variables_map const &_vm)
 :
 	// Has to be initialized early because the exit callback needs it
 	running_(true),
 	config_file_(
-		sge::parse::json::parse_file_exn(
-			media_path()/FCPPT_TEXT("config.json"))),
+		_config_file),
 	vm_(
 		_vm),
 	systems_(

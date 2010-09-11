@@ -47,6 +47,7 @@ class machine
 public:
 	explicit
 	machine(
+		sge::parse::json::object const &config_file,
 		boost::program_options::variables_map const &);
 
 	// Sends events::tick, events::input and then events::render

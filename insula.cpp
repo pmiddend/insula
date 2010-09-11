@@ -4,20 +4,30 @@
 // The first state to be used has to be included here
 #include "states/freelook.hpp"
 #include "help_needed.hpp"
+#include "media_path.hpp"
 #include <sge/time/timer.hpp>
 #include <sge/time/second.hpp>
+#include <sge/parse/json/object.hpp>
+#include <sge/parse/json/parse_file_exn.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/io/cerr.hpp>
+#include <fcppt/text.hpp>
 #include <iostream>
 #include <cstddef>
 
 int main(int argc,char *argv[])
 try
 {
+	sge::parse::json::object const config_file =
+		sge::parse::json::parse_file_exn(
+			insula::media_path()/FCPPT_TEXT("config.json"));
+
 	insula::machine m(
+		config_file,
 		insula::create_variables_map(
 			argc,
-			argv));
+			argv,
+			config_file));
 
 	insula::scoped_machine scope(
 		m);

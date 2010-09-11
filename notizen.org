@@ -7,6 +7,10 @@
 * Ideen für später
 ** TODO Terrain zufallsgenerieren
 ** TODO Farben statt Texturen bei Höhenfeld verwenden
+Motivation hierzu: [[http://simblob.blogspot.com/2010/09/polygon-map-generation-part-1.html][von hier]]
+** TODO LOD für Models
+** TODO Terrainvereinfachung
+Hierzu z.B. cgal
 * Kleinere Sachen
 ** DONE cout/cerr zu Konsole weiterleiten
 	 CLOSED: [2010-09-11 Sat 01:01]

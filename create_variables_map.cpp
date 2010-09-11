@@ -10,10 +10,12 @@
 #include "height_map/cli_options.hpp"
 #include "physics/cli_options.hpp"
 #include "help_needed.hpp"
+#include "parse_json_config.hpp"
 #include "media_path.hpp"
+#include <sge/parse/json/parse_file_exn.hpp>
+#include <sge/parse/json/find_member_exn.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include <boost/program_options/parsers.hpp>
 #include <fcppt/from_std_string.hpp>
 #include <fcppt/filesystem/exists.hpp>
 #include <sstream>
@@ -35,7 +37,8 @@ options_to_string(
 boost::program_options::variables_map const
 insula::create_variables_map(
 	int argc,
-	char **argv)
+	char **argv,
+ sge::parse::json::object const &config_file)
 {
 	boost::program_options::options_description desc("Allowed options");
 
@@ -85,15 +88,13 @@ insula::create_variables_map(
 	boost::program_options::notify(
 		vm);    
 
-	if (fcppt::filesystem::exists(media_path()/FCPPT_TEXT("user_config.po")))
+	if (fcppt::filesystem::exists(media_path()/FCPPT_TEXT("user_config.json")))
 	{
 		boost::program_options::store(
-			// Yes, the <char> is indented.
-			boost::program_options::parse_config_file<char>(
-				// NOTE: This is of course broken when the value_type of path
-				// is not char*
-				(media_path()/FCPPT_TEXT("user_config.po")).string().c_str(),
-				desc), 
+			parse_json_config(
+				sge::parse::json::parse_file_exn(
+					media_path()/FCPPT_TEXT("user_config.json")),
+				desc),
 			vm);
 
 		// I don't know if that's neccessary since we do it again after
@@ -103,12 +104,11 @@ insula::create_variables_map(
 	}
 
 	boost::program_options::store(
-		// Yes, the <char> is indented.
-		boost::program_options::parse_config_file<char>(
-			// NOTE: This is of course broken when the value_type of path
-			// is not char*
-			(media_path()/FCPPT_TEXT("config.po")).string().c_str(),
-			desc), 
+		parse_json_config(
+			sge::parse::json::find_member_exn<sge::parse::json::object>(
+				config_file.members,
+				FCPPT_TEXT("cli")),
+			desc),
 		vm);
 
 	// I don't know if that's neccessary since we do it again after
