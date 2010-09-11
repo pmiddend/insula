@@ -1,5 +1,6 @@
 #include "parse_json_config.hpp"
 #include "stdlib/map.hpp"
+#include "stdlib/shortest_levenshtein.hpp"
 #include "exception.hpp"
 #include <sge/parse/json/object.hpp>
 #include <sge/parse/json/get.hpp>
@@ -53,7 +54,11 @@ insula::parse_json_config(
 				throw exception(
 					FCPPT_TEXT("The option \"")+
 					name+
-					FCPPT_TEXT("\" is unknown"));
+					FCPPT_TEXT("\" is unknown. Did you mean: ")+
+					stdlib::shortest_levenshtein(
+						allowed_options,
+						name)+
+					FCPPT_TEXT("?"));
 
 			// option has no constructor which inits all values
 			boost::program_options::option newopt;

@@ -9,10 +9,8 @@
 #include "../physics/shared_shape_ptr.hpp"
 #include "../physics/approximation/variant.hpp"
 #include "../physics/scalar.hpp"
-#include "../model/object_fwd.hpp"
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <sge/parse/json/object.hpp>
-#include <sge/model/object_ptr.hpp>
 
 namespace insula
 {
@@ -52,8 +50,7 @@ private:
 	physics::approximation::variant const
 	parse_approximation(
 		sge::parse::json::object const &,
-		physics::scalar const scaling,
-		model::object const &);
+		physics::scalar const scaling);
 };
 }
 }

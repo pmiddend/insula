@@ -1,6 +1,7 @@
 #include "manager.hpp"
 #include "parameters.hpp"
 #include "../create_path.hpp"
+#include "../exception.hpp"
 #include "../random_engine.hpp"
 #include "../stdlib/for_each.hpp"
 #include "../random_seed.hpp"
@@ -11,8 +12,10 @@
 #include "../height_map/vec2.hpp"
 #include "../height_map/height_for_point.hpp"
 #include "../physics/shape_from_approximation.hpp"
+#include "../physics/approximation/string_to_cylinder_orientation.hpp"
 #include "../model/object.hpp"
 #include "../scene/manager.hpp"
+#include "../stdlib/shortest_levenshtein.hpp"
 #include <boost/foreach.hpp>
 #include <sge/parse/json/value.hpp>
 #include <sge/parse/json/array.hpp>
@@ -43,6 +46,7 @@
 #include <fcppt/math/matrix/vector.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
 #include <fcppt/math/dim/arithmetic.hpp>
+#include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/twopi.hpp>
@@ -50,6 +54,7 @@
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <LinearMath/btVector3.h>
 #include <utility>
+#include <vector>
 #include <random>
 
 namespace
@@ -271,8 +276,7 @@ insula::prop::manager::parse_single_prop(
 						sge::parse::json::find_member_exn<sge::parse::json::object>(
 							p.members,
 							FCPPT_TEXT("approximation")),
-						scaling,
-						*model)),
+						scaling)),
 				rotation_axis,
 				twopi_rng(
 					rng_engine),
@@ -351,13 +355,63 @@ insula::prop::manager::instantiate(
 
 insula::physics::approximation::variant const
 insula::prop::manager::parse_approximation(
-	sge::parse::json::object const &,
-	physics::scalar const scaling,
-	model::object const &m)
+	sge::parse::json::object const &o,
+	physics::scalar const scaling)
 {
-	return 
-		physics::approximation::box(
-			scaling * m.bounding_box().dimension());
+	fcppt::string const type = 
+		sge::parse::json::find_member_exn<sge::parse::json::string>(
+			o.members,
+			FCPPT_TEXT("type"));
+
+	if (type == FCPPT_TEXT("box"))
+		return physics::approximation::box(
+			scaling * 
+			fcppt::math::vector::structure_cast<physics::dim3>(
+				parse_vector<physics::scalar,3,sge::parse::json::float_type>(
+					sge::parse::json::find_member_exn<sge::parse::json::array>(
+						o.members,
+						FCPPT_TEXT("size")))));
+
+	if (type == FCPPT_TEXT("sphere"))
+		return physics::approximation::sphere(
+			scaling * 
+			static_cast<physics::scalar>(
+				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+					o.members,
+					FCPPT_TEXT("radius"))));
+
+	if (type == FCPPT_TEXT("cylinder"))
+		return physics::approximation::cylinder(
+			physics::approximation::string_to_cylinder_orientation(
+				sge::parse::json::find_member_exn<sge::parse::json::string>(
+					o.members,
+					FCPPT_TEXT("orientation"))),
+			scaling * 
+			static_cast<physics::scalar>(
+				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+					o.members,
+					FCPPT_TEXT("height"))),
+			scaling * 
+			static_cast<physics::scalar>(
+				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+					o.members,
+					FCPPT_TEXT("radius"))));
+
+	std::vector<fcppt::string> const allowed_types = 
+		fcppt::assign::make_container<std::vector<fcppt::string>>
+			(FCPPT_TEXT("sphere"))
+			(FCPPT_TEXT("box"))
+			(FCPPT_TEXT("cylinder"));
+
+	throw 
+		exception(
+			FCPPT_TEXT("Invalid approximation \"")+
+			type+
+			FCPPT_TEXT("\", did you mean \"")+
+			stdlib::shortest_levenshtein(
+				allowed_types,
+				type)+
+			FCPPT_TEXT("\"?"));
 }
 
 insula::prop::manager::~manager()

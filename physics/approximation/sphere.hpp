@@ -12,6 +12,13 @@ namespace approximation
 struct sphere
 {
 	scalar radius;
+	
+	explicit
+	sphere(
+		scalar const radius)
+	:
+		radius(radius) 
+	{}
 };
 }
 }

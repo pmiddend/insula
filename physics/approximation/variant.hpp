@@ -3,6 +3,7 @@
 
 #include "sphere.hpp"
 #include "box.hpp"
+#include "cylinder.hpp"
 #include <fcppt/variant/object.hpp>
 #include <boost/mpl/vector/vector10.hpp>
 
@@ -15,10 +16,11 @@ namespace approximation
 typedef
 fcppt::variant::object
 <
-	boost::mpl::vector2
+	boost::mpl::vector3
 	<
 		sphere,
-		box
+		box,
+		cylinder
 	>
 >
 variant;

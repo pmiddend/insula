@@ -61,7 +61,11 @@
 			"solid" : true,
 			"rotation_axis" : [0.0,1.0,0.0],
 			"physics_offset" : [0.0,0.0,0.0],
-			"approximation" : {},
+			"approximation" : 
+			{
+				"type" : "sphere",
+				"radius" : 1.0
+			},
 			"count" : 100
 		},
 		{
@@ -73,8 +77,14 @@
 			"scale_range" : [0.5,10.0],
 			"solid" : true,
 			"rotation_axis" : [0.0,1.0,0.0],
-			"physics_offset" : [0.0,0.0,0.0],
-			"approximation" : {},
+			"physics_offset" : [0.0,-2.0,0.0],
+			"approximation" : 
+			{
+				"type" : "cylinder",
+				"orientation" : "y",
+				"height" : 5.0,
+				"radius" : 1.0
+			},
 			"count" : 100
 		}
 	],
