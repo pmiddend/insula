@@ -1,0 +1,13 @@
+All sounds and pieces of music released under the Creative Commons Attribution 3.0 Unported License by Niels Meyering, except:
+
+* skid.wav
+    Released under Creative Commons Attribution - Share Alike License 3.0
+    by Atheal Washington and Stephen Dunn (stevo14)
+
+* clapping.wav
+		Released under Creative Commons Attribution 3.0
+		by Mike Koenig (http://soundbible.com/989-10-Second-Applause.html)
+
+*	epoq.ogg
+		Released under Creative Commons Attribution 1.0 Generic
+		by Epoq (http://www.archive.org/details/kahvi037)
