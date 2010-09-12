@@ -16,21 +16,21 @@ insula::scene::manager::manager(
 
 void
 insula::scene::manager::insert(
-	backend_ptr const b,
+	backend &b,
 	instance &inst)
 {
 	// This uses the default-ctor of the intrusive list to construct it
-	backend_instance_map_[b].push_back(
+	backend_instance_map_[&b].push_back(
 		inst);
 }
 
 void
 insula::scene::manager::insert_transparent(
-	backend_ptr const b,
+	backend &b,
 	transparent_instance &inst)
 {
 	inst.backend(
-		b);
+		&b);
 	transparent_instances_.push_back(
 		inst);
 }

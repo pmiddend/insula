@@ -4,7 +4,7 @@
 #include "game_outer.hpp"
 #include "freelook_fwd.hpp"
 #include "../static_model_instance.hpp"
-#include "../model_backend.hpp"
+#include "../model/backend.hpp"
 #include "../player.hpp"
 #include "../turn_timer.hpp"
 #include "../prop/instance_sequence.hpp"
@@ -86,7 +86,7 @@ private:
 	bool physics_debug_;
 	fcppt::signal::scoped_connection toggle_physics_debug_; 
 	model::shared_object_ptr nugget_model_;
-	model_backend nugget_backend_;
+	model::backend nugget_backend_;
 	nugget_model_sequence nugget_models_;
 	insula::vehicle::object vehicle_;
 	fcppt::signal::scoped_connection vehicle_static_connection_;

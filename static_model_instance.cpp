@@ -14,7 +14,7 @@ insula::static_model_instance::static_model_instance(
 	physics::shared_shape_ptr _shape,
 	physics::solidity::type const _solidity)
 :
-	model_instance(
+	model::instance(
 		_model_trafo),
 	shape_(
 		_shape),

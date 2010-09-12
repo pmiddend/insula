@@ -5,7 +5,7 @@
 #include "instance_sequence.hpp"
 #include "parameters_fwd.hpp"
 #include "../scene/manager_fwd.hpp"
-#include "../model_backend.hpp"
+#include "../model/backend.hpp"
 #include "../physics/shared_shape_ptr.hpp"
 #include "../physics/approximation/variant.hpp"
 #include "../physics/scalar.hpp"
@@ -31,7 +31,7 @@ public:
 	~manager();
 private:
 	typedef
-	boost::ptr_vector<model_backend>
+	boost::ptr_vector<model::backend>
 	backend_sequence;
 
 	typedef

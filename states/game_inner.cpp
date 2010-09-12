@@ -1,5 +1,4 @@
 #include "game_inner.hpp"
-#include "../timed_output.hpp"
 #include "../get_option.hpp"
 #include "../create_path.hpp"
 #include "../media_path.hpp"
@@ -90,8 +89,8 @@ insula::states::game_inner::game_inner(
 		context<machine>().systems().renderer(),
 		context<machine>().camera(),
 		context<game_outer>().model_shader(),
-		fcppt::assign::make_container<model_backend::texture_map>(
-			model_backend::texture_map::value_type(
+		fcppt::assign::make_container<model::backend::texture_map>(
+			model::backend::texture_map::value_type(
 				sge::renderer::glsl::string("texture"),
 				sge::image::create_texture(
 					create_path(
@@ -107,6 +106,7 @@ insula::states::game_inner::game_inner(
 	vehicle_(
 		insula::vehicle::cli_factory(
 			context<machine>().cli_variables(),
+			context<game_outer>().scene_manager(),
 			context<machine>().systems(),
 			context<machine>().camera(),
 			context<game_outer>().model_shader(),
@@ -163,7 +163,7 @@ insula::states::game_inner::game_inner(
 					physics::approximation::numeric_value::box),
 				physics::solidity::nonsolid));
 		context<game_outer>().scene_manager().insert(
-			&nugget_backend_,
+			nugget_backend_,
 			nugget_models_.back());
 	}
 
@@ -205,8 +205,6 @@ insula::states::game_inner::react(
 			btIDebugDraw::DBG_DrawWireframe);
 		physics_debug_drawer_.render(); 
 	}
-
-	vehicle_.render();
 }
 
 insula::vehicle::object &

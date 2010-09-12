@@ -10,6 +10,7 @@
 #include "../physics/vec3.hpp"
 #include "../input_delegator_fwd.hpp"
 #include "../console/object_fwd.hpp"
+#include "../scene/manager_fwd.hpp"
 #include <sge/model/object_ptr.hpp>
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/audio/player_ptr.hpp>
@@ -25,6 +26,7 @@ namespace vehicle
 class parameters
 {
 public:
+	scene::manager &scene_manager;
 	sge::model::object_ptr chassis_model,wheel_model;
 	sge::renderer::device_ptr renderer;
 	sge::image::multi_loader &image_loader;
@@ -54,6 +56,7 @@ public:
 
 	explicit 
 	parameters(
+		scene::manager &scene_manager,
 		sge::model::object_ptr chassis_model,
 		sge::model::object_ptr wheel_model,
 		sge::renderer::device_ptr renderer,
@@ -80,6 +83,7 @@ public:
 		sge::audio::buffer_ptr engine_buffer,
 		sge::audio::buffer_ptr skid_buffer)
 	:
+		scene_manager(scene_manager),
 		chassis_model(chassis_model),
 		wheel_model(wheel_model),
 		renderer(renderer),

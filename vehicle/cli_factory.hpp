@@ -3,6 +3,7 @@
 
 #include "parameters.hpp"
 #include "../graphics/camera/object_fwd.hpp"
+#include "../scene/manager_fwd.hpp"
 #include "../graphics/shader/object_fwd.hpp"
 #include "../physics/world_fwd.hpp"
 #include "../physics/vec3.hpp"
@@ -18,6 +19,7 @@ namespace vehicle
 parameters const
 cli_factory(
 	boost::program_options::variables_map const &,
+	scene::manager &,
 	sge::systems::instance const &sys,
 	graphics::camera::object &camera,
 	graphics::shader::object &model_shader,

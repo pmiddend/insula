@@ -13,6 +13,7 @@
 insula::vehicle::parameters const
 insula::vehicle::cli_factory(
 	boost::program_options::variables_map const &vm,
+	scene::manager &scene_manager,
 	sge::systems::instance const &sys,
 	graphics::camera::object &camera,
 	graphics::shader::object &model_shader,
@@ -23,6 +24,7 @@ insula::vehicle::cli_factory(
 {
 	return 
 		json::parse_vehicle(
+			scene_manager,
 			sge::parse::json::parse_file_exn(
 				create_path(
 					get_option<fcppt::string>(vm,"vehicle-file"),

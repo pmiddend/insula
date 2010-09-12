@@ -168,15 +168,15 @@ insula::prop::manager::parse_single_prop(
 			params.systems.renderer());
 
 	backends_.push_back(
-		new model_backend(
+		new model::backend(
 			sge::parse::json::find_member_exn<bool>(
 				p.members,
 				FCPPT_TEXT("has_transparency")),
 			params.systems.renderer(),
 			params.camera,
 			params.model_shader,
-			fcppt::assign::make_container<model_backend::texture_map>(
-				model_backend::texture_map::value_type(
+			fcppt::assign::make_container<model::backend::texture_map>(
+				model::backend::texture_map::value_type(
 					"texture",
 					sge::image::create_texture(
 						create_path(
@@ -344,11 +344,11 @@ insula::prop::manager::instantiate(
 
 		if (r.backend.has_transparency())
 			scene_manager_.insert_transparent(
-				&r.backend,
+				r.backend,
 				instances.back());
 		else
 			scene_manager_.insert(
-				&r.backend,
+				r.backend,
 				instances.back());
 	}
 }

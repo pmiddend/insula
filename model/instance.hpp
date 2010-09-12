@@ -1,22 +1,24 @@
-#ifndef INSULA_MODEL_INSTANCE_HPP_INCLUDED
-#define INSULA_MODEL_INSTANCE_HPP_INCLUDED
+#ifndef INSULA_instance_HPP_INCLUDED
+#define INSULA_instance_HPP_INCLUDED
 
-#include "scene/transparent_instance.hpp"
-#include "graphics/mat4.hpp"
-#include "graphics/vec3.hpp"
-#include "scene/backend_fwd.hpp"
-#include "graphics/scalar.hpp"
+#include "../scene/transparent_instance.hpp"
+#include "../graphics/mat4.hpp"
+#include "../graphics/vec3.hpp"
+#include "../scene/backend_fwd.hpp"
+#include "../graphics/scalar.hpp"
 #include <fcppt/math/matrix/basic_impl.hpp>
 
 namespace insula
 {
-class model_instance
+namespace model
+{
+class instance
 :
 	public scene::transparent_instance
 {
 public:
 	explicit
-	model_instance(
+	instance(
 		graphics::mat4 const &);
 
 	void
@@ -41,6 +43,7 @@ public:
 private:
 	graphics::mat4 transformation_;
 };
+}
 }
 
 #endif

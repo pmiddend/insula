@@ -1,7 +1,7 @@
 #ifndef INSULA_STATIC_MODEL_INSTANCE_HPP_INCLUDED
 #define INSULA_STATIC_MODEL_INSTANCE_HPP_INCLUDED
 
-#include "model_instance.hpp"
+#include "model/instance.hpp"
 #include "scene/transparent_instance.hpp"
 #include "scene/backend_ptr.hpp"
 #include "graphics/scalar.hpp"
@@ -17,7 +17,7 @@ namespace insula
 {
 class static_model_instance
 :
-	public model_instance
+	public model::instance
 {
 public:
 	explicit

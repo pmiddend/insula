@@ -1,15 +1,14 @@
 #ifndef INSULA_SCENE_BACKEND_HPP_INCLUDED
 #define INSULA_SCENE_BACKEND_HPP_INCLUDED
 
-#include "auto_unlink_hook.hpp"
-
 namespace insula
 {
 namespace scene
 {
+/**
+	See scene::manager for a detailed background explanation.
+ */
 class backend
-:
-	public auto_unlink_hook
 {
 public:
 	backend(backend const &) = delete;

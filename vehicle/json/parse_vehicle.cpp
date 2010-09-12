@@ -19,6 +19,7 @@
 
 insula::vehicle::parameters const
 insula::vehicle::json::parse_vehicle(
+	scene::manager &scene_manager,
 	sge::parse::json::object const &json_file,
 	// Passing this is _much_ easier than passing all the systems
 	// separate
@@ -51,6 +52,7 @@ insula::vehicle::json::parse_vehicle(
 
 	return 
 		parameters(
+			scene_manager,
 			sys.md3_loader()->load(
 				create_path(
 					sge::parse::json::find_member_exn<sge::parse::json::string>(

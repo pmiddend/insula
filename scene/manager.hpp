@@ -26,12 +26,12 @@ public:
 
 	void
 	insert(
-		backend_ptr,
+		backend &,
 		instance &);
 
 	void
 	insert_transparent(
-		backend_ptr,
+		backend &,
 		transparent_instance &);
 
 	void

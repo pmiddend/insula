@@ -1,10 +1,10 @@
 #ifndef INSULA_MODEL_BACKEND_HPP_INCLUDED
 #define INSULA_MODEL_BACKEND_HPP_INCLUDED
 
-#include "scene/backend.hpp"
-#include "graphics/shader/object_fwd.hpp"
-#include "graphics/camera/object_fwd.hpp"
-#include "model/shared_object_ptr.hpp"
+#include "../scene/backend.hpp"
+#include "../graphics/shader/object_fwd.hpp"
+#include "../graphics/camera/object_fwd.hpp"
+#include "shared_object_ptr.hpp"
 #include <sge/renderer/glsl/string.hpp>
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/state/scoped.hpp>
@@ -15,7 +15,9 @@
 
 namespace insula
 {
-class model_backend
+namespace model
+{
+class backend
 :
 	public scene::backend
 {
@@ -29,7 +31,7 @@ public:
 	texture_map;
 
 	explicit
-	model_backend(
+	backend(
 		bool has_transparency,
 		sge::renderer::device_ptr,
 		graphics::camera::object &,
@@ -54,6 +56,8 @@ public:
 
 	insula::model::object &
 	model() const;
+
+	~backend();
 private:
 	/// If this flag is true, we activate the neccessary states in the
 	/// renderer in begin
@@ -66,9 +70,10 @@ private:
 	/// Usually we want the same shader for multiple backends, but with
 	/// different textures
 	texture_map textures_;
-	model::shared_object_ptr model_;
+	shared_object_ptr model_;
 	std::unique_ptr<sge::renderer::state::scoped> state_scope_;
 };
+}
 }
 
 #endif

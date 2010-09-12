@@ -18,6 +18,7 @@ Hierzu z.B. cgal
 ** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern
 ** TODO gizmo in math verfrachten
 ** TODO orthonormalize_gram_schmidt hinzufügen und gucken wie's läuft
+** TODO machine::input_repeat_callback fixen
 * Aktivitäten
 ** TODO Shadow Maps [1/5]
 *** DONE Neues uniform-System aufsetzen
@@ -85,13 +86,6 @@ beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
 ** TODO Musiklautstärke muss einstellbar sein
 ** TODO vehicle::speed_kmh muss relativ zu forward sein
-** TODO Approximationen erweitern
-Es kommt noch approximation::exact hinzu, sowie cylinder_x, cylinder_y
-und cylinder_z. exact bekommt ein model::object_ptr
-** TODO Alpha-Blending
-- Bisheriges Alphablending fixen, damit klar ist, wie man
-  Alphablending prinzipiell umsetzt.
-- Auf binäres Alphablending umsteigen.
 ** TODO Auto-Culling fixen
 ** TODO Auto in scene::manager integrieren
 ** TODO Autosound wird nicht moduliert
@@ -109,6 +103,15 @@ den normalisierten Gradienten, d.h. =height_map= muss den zur
 Verfügung stellen)
 ** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
+** DONE Alpha-Blending
+	 CLOSED: [2010-09-12 Sun 15:38]
+- Bisheriges Alphablending fixen, damit klar ist, wie man
+  Alphablending prinzipiell umsetzt.
+- Auf binäres Alphablending umsteigen.
+** DONE Approximationen erweitern
+	 CLOSED: [2010-09-12 Sun 01:36]
+Es kommt noch approximation::exact hinzu, sowie cylinder_x, cylinder_y
+und cylinder_z. exact bekommt ein model::object_ptr
 ** DONE config.po wegmachen
 	 CLOSED: [2010-09-11 Sat 20:52]
 In config.json Sektion "command-line", in der nur String-Optionen

@@ -5,6 +5,7 @@
 #include "../../graphics/camera/object_fwd.hpp"
 #include "../../graphics/shader/object_fwd.hpp"
 #include "../../graphics/scalar.hpp"
+#include "../../scene/manager_fwd.hpp"
 #include "../../physics/world_fwd.hpp"
 #include "../../physics/vec3.hpp"
 #include "../../console/object_fwd.hpp"
@@ -20,6 +21,7 @@ namespace json
 {
 parameters const
 parse_vehicle(
+	scene::manager &,
 	sge::parse::json::object const &,
 	// Passing this is _much_ easier than passing all the systems
 	// separate

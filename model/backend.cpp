@@ -1,6 +1,6 @@
-#include "model_backend.hpp"
-#include "model/object.hpp"
-#include "graphics/shader/object.hpp"
+#include "backend.hpp"
+#include "object.hpp"
+#include "../graphics/shader/object.hpp"
 #include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/scoped.hpp>
@@ -13,7 +13,7 @@
 #include <fcppt/assert.hpp>
 #include <boost/foreach.hpp>
 
-insula::model_backend::model_backend(
+insula::model::backend::backend(
 	bool _has_transparency,
 	sge::renderer::device_ptr _renderer,
 	graphics::camera::object &_camera,
@@ -37,13 +37,13 @@ insula::model_backend::model_backend(
 }
 
 bool
-insula::model_backend::has_transparency() const
+insula::model::backend::has_transparency() const
 {
 	return has_transparency_;
 }
 
 void
-insula::model_backend::begin()
+insula::model::backend::begin()
 {
 	// Update the shader textures (before scoping it)
 	BOOST_FOREACH(
@@ -86,7 +86,7 @@ insula::model_backend::begin()
 }
 
 void 
-insula::model_backend::end()
+insula::model::backend::end()
 {
 	// Deactivate everything in reverse order of activation
 	state_scope_.reset();
@@ -96,19 +96,23 @@ insula::model_backend::end()
 }
 
 insula::graphics::camera::object &
-insula::model_backend::camera() const
+insula::model::backend::camera() const
 {
 	return camera_;
 }
 
 insula::graphics::shader::object &
-insula::model_backend::shader() const
+insula::model::backend::shader() const
 {
 	return shader_;
 }
 
 insula::model::object &
-insula::model_backend::model() const
+insula::model::backend::model() const
 {
 	return *model_;
+}
+
+insula::model::backend::~backend()
+{
 }

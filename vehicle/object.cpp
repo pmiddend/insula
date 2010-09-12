@@ -2,8 +2,10 @@
 #include "object.hpp"
 #include "input.hpp"
 #include "speed_to_pitch.hpp"
-#include "../model/scoped.hpp"
+#include "../scene/manager.hpp"
+#include "../model/object.hpp"
 #include "../console/object.hpp"
+#include "../graphics/mat4.hpp"
 #include "../gizmo/structure_cast.hpp"
 #include "../gizmo/lock_to.hpp"
 #include "../physics/shape_from_model.hpp"
@@ -28,37 +30,58 @@
 #include <sge/exception.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/matrix/structure_cast.hpp>
+#include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/box/structure_cast.hpp>
+#include <fcppt/assign/make_container.hpp>
 #include <fcppt/text.hpp>
 #include <cmath>
 
 insula::vehicle::object::object(
 	parameters const &params)
 :
-	renderer_(
-		params.renderer),
-	chassis_model_(
-		params.chassis_model,
-		params.renderer),
-	wheel_model_(
-		params.wheel_model,
-		params.renderer),
-	model_shader_(
-		params.model_shader),
-	chassis_texture_(
-		params.renderer->create_texture(
-			params.image_loader.load(params.chassis_texture)->view(),
-			sge::renderer::filter::trilinear,
-			sge::renderer::resource_flags::none)),
-	wheel_texture_(
-		params.renderer->create_texture(
-			params.image_loader.load(params.wheel_texture)->view(),
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::none)),
+	chassis_backend_(
+		// no transparency
+		false,
+		params.renderer,
+		params.camera,
+		params.model_shader,
+		fcppt::assign::make_container<model::backend::texture_map>
+			(model::backend::texture_map::value_type(
+				"texture",
+				params.renderer->create_texture(
+					params.image_loader.load(params.chassis_texture)->view(),
+					sge::renderer::filter::trilinear,
+					sge::renderer::resource_flags::none))),
+		model::shared_object_ptr(
+			new model::object(
+				params.chassis_model,
+				params.renderer))),
+	chassis_instance_(
+		fcppt::math::matrix::translation(
+			fcppt::math::vector::structure_cast<graphics::vec3>(
+				params.position))),
+	wheel_backend_(
+		// no transparency
+		false,
+		params.renderer,
+		params.camera,
+		params.model_shader,
+		fcppt::assign::make_container<model::backend::texture_map>
+			(model::backend::texture_map::value_type(
+				"texture",
+				params.renderer->create_texture(
+					params.image_loader.load(params.wheel_texture)->view(),
+					sge::renderer::filter::linear,
+					sge::renderer::resource_flags::none))),
+		model::shared_object_ptr(
+			new model::object(
+				params.wheel_model,
+				params.renderer))),
 	physics_(
 		params.physics_world,
 		physics::shape_from_model(
-			chassis_model_,
+			chassis_backend_.model(),
 			physics::approximation::numeric_value::box),
 		params.mass,
 		params.chassis_position,
@@ -69,7 +92,7 @@ insula::vehicle::object::object(
 		params.max_speed,
 		params.track_connection,
 		fcppt::math::box::structure_cast<physics::box>(
-			wheel_model_.bounding_box()),
+			wheel_backend_.model().bounding_box()),
 		params.wheel_infos),
 	input_(
 		params.input_delegator_,
@@ -112,6 +135,22 @@ insula::vehicle::object::object(
 						params.position)))),
 	active_(false)
 {
+	params.scene_manager.insert(
+		chassis_backend_,
+		chassis_instance_);
+
+	BOOST_FOREACH(
+			physics::mat4_sequence::const_reference r,
+			physics_.wheel_transforms())
+	{
+		wheel_instances_.push_back(
+			new model::instance(
+				fcppt::math::matrix::structure_cast<graphics::mat4>(
+					r)));
+		params.scene_manager.insert(
+			wheel_backend_,
+			wheel_instances_.back());
+	}
 }
 
 insula::graphics::gizmo const
@@ -139,6 +178,21 @@ void
 insula::vehicle::object::update()
 {
 	physics_.update();
+	
+	chassis_instance_.transformation(
+		physics_.chassis_transform());
+
+	// I don't want to run through the containers with two iterators and
+	// since wheel_instance_array is already an array, I'll iterate by
+	// index.
+	wheel_instance_array::size_type i = 0;
+	BOOST_FOREACH(
+			physics::mat4_sequence::const_reference r,
+			physics_.wheel_transforms())
+		wheel_instances_[i++].transformation(
+			fcppt::math::matrix::structure_cast<graphics::mat4>(
+				r));
+	
 
 	// Sound stuff
 	if (!active_)
@@ -170,60 +224,6 @@ insula::vehicle::object::update()
 		speed_to_pitch(
 			std::abs(
 				physics_.speed_kmh())));
-}
-
-void
-insula::vehicle::object::render()
-{
-	graphics::mat4 const mvp = 
-		camera_.perspective() * 
-		camera_.world();
-
-	{
-		// FIRST update the texture, THEN scope the shader, THEN the model!
-		model_shader_.update_texture(
-			"texture",
-			chassis_texture_);
-
-		graphics::shader::scoped scoped_shader(
-			model_shader_);
-
-		model::scoped scoped_model(
-			renderer_,
-			chassis_model_);
-
-		model_shader_.set_uniform(
-			"mvp",
-			mvp * 
-			physics_.chassis_transform());
-
-		chassis_model_.render();
-	}
-
-	{
-		model::scoped scoped_model(
-			renderer_,
-			wheel_model_);
-
-		// FIRST update the texture, THEN scope the shader!
-		model_shader_.update_texture(
-			"texture",
-			wheel_texture_);
-
-		graphics::shader::scoped scoped_shader(
-			model_shader_);
-
-		BOOST_FOREACH(
-			physics::mat4_sequence::const_reference r,
-			physics_.wheel_transforms())
-		{
-			model_shader_.set_uniform(
-				"mvp",
-				mvp * 
-				r); 
-			wheel_model_.render();
-		}
-	}
 }
 
 insula::physics::scalar

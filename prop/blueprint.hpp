@@ -1,7 +1,7 @@
 #ifndef INSULA_PROP_BLUEPRINT_HPP_INCLUDED
 #define INSULA_PROP_BLUEPRINT_HPP_INCLUDED
 
-#include "../model_backend_fwd.hpp"
+#include "../model/backend_fwd.hpp"
 #include "../physics/shared_shape_ptr.hpp"
 #include "../physics/mat4.hpp"
 #include "../physics/vec3.hpp"
@@ -16,7 +16,7 @@ namespace prop
 class blueprint
 {
 public:
-	model_backend &backend;
+	model::backend &backend;
 	physics::shared_shape_ptr shape;
 	physics::vec3 rotation_axis;
 	physics::scalar rotation_angle;
@@ -27,7 +27,7 @@ public:
 
 	explicit
 	blueprint(
-		model_backend &backend,
+		model::backend &backend,
 		physics::shared_shape_ptr shape,
 		physics::vec3 rotation_axis,
 		physics::scalar rotation_angle,

@@ -3,7 +3,10 @@
 
 namespace insula
 {
-class model_backend;
+namespace model
+{
+class backend;
+}
 }
 
 #endif
