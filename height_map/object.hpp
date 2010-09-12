@@ -70,8 +70,13 @@ public:
 	graphics::box const
 	extents() const;
 
+	// Those heights are in [0,1], they're not scaled according to height_scaling
 	array const &
 	heights() const;
+
+	// Same applies to this
+	array const &
+	gradient() const;
 	
 	graphics::scalar
 	cell_size() const;
@@ -85,14 +90,17 @@ private:
 	sge::renderer::device_ptr const renderer_;
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::renderer::index_buffer_ptr ib_;
-	//graphics::shader shader_;
 	graphics::shader::object shader_;
 	sge::renderer::texture_ptr lower_texture_,upper_texture_,gradient_texture_;
 	graphics::box extents_;
-	array heights_;
+	array heights_,gradient_;
 	graphics::scalar cell_size_;
 	graphics::scalar height_scaling_;
 
+	/// This function gets the input height map (from a file or
+	/// procedurally generated, whatever) and calculates the neccesary
+	/// "sub-heightmaps" for the textures and the vertices, as well as
+	/// the gradient. It then continues to call regenerate_buffers
 	void
 	regenerate(
 		graphics::scalar const &cell_size,
@@ -103,9 +111,7 @@ private:
 	regenerate_buffers(
 		graphics::scalar const &cell_size,
 		graphics::scalar const height_scaling,
-		array const &raw,
-		array const &stretched,
-		array const &gradient);
+		array const &stretched);
 };
 }
 }

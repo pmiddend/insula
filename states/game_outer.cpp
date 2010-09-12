@@ -1,6 +1,6 @@
 #include "game_outer.hpp"
 #include "../random_seed.hpp"
-#include "../height_map/random_flat_point.hpp"
+#include "../height_map/random_point.hpp"
 #include "../generate_nuggets.hpp"
 #include "../create_path.hpp"
 #include "../media_path.hpp"
@@ -84,16 +84,22 @@ insula::states::game_outer::game_outer(
 		generate_nuggets(
 			*height_map_,
 			water_->water_level(),
-			get_option<nugget_sequence::size_type>(
+			get_option<height_map::array::size_type>(
 				context<machine>().cli_variables(),
-				"game-nuggets"))),
+				"game-nuggets"),
+			get_option<height_map::flatness_range>(
+				context<machine>().cli_variables(),
+				"game-nugget-flatness-range"))),
 	vehicle_position_engine_(
 		random_seed()),
 	vehicle_position_(
-		height_map::random_flat_point(
+		height_map::random_point(
 			*height_map_,
 			water_->water_level(),
-			vehicle_position_engine_)),
+			vehicle_position_engine_,
+			get_option<height_map::flatness_range>(
+				context<machine>().cli_variables(),
+				"vehicle-flatness-range"))),
 	large_font_(
 		json::parse_font(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(

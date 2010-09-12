@@ -272,6 +272,13 @@ insula::height_map::object::heights() const
 		heights_;
 }
 
+insula::height_map::array const &
+insula::height_map::object::gradient() const
+{
+	return 
+		gradient_;
+}
+
 insula::graphics::scalar
 insula::height_map::object::cell_size() const
 {
@@ -294,6 +301,12 @@ insula::height_map::object::regenerate(
 	graphics::scalar const height_scaling,
 	array const &raw)
 {
+	cell_size_ = 
+		cell_size;
+
+	height_scaling_ = 
+		height_scaling;
+
 	extents_ = 
 		graphics::box(
 			graphics::vec3::null(),
@@ -302,28 +315,29 @@ insula::height_map::object::regenerate(
 				height_scaling,
 				cell_size * static_cast<graphics::scalar>(raw.dimension().h())));
 
-	// We need the stretched values for the texture layers
+	// We need the stretched values for the texture layers (_before_ the
+	// convolution below!)
 	array const stretched = 
 		stdlib::normalize(
 			raw);
 	
-	array const smoothed = 
+	// heights_ is used for the vertices
+	heights_ = 
 		stdlib::grid::average_convolve(
 			stdlib::grid::average_convolve(
 				stdlib::grid::average_convolve(
 					raw)));
 
-	array gradient(
+	gradient_ = 
 		stdlib::normalize(
 			stdlib::grid::sobel_operator(
-				smoothed)));
-	
+				heights_)
+		);
+
 	regenerate_buffers(
 		cell_size,
 		height_scaling,
-		smoothed,
-		stretched,
-		gradient);
+		stretched);
 }
 
 
@@ -331,27 +345,21 @@ void
 insula::height_map::object::regenerate_buffers(
 	graphics::scalar const &cell_size,
 	graphics::scalar const height_scaling,
-	array const &raw,
-	array const &stretched,
-	array const &gradient)
+	array const &stretched)
 {
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
 
-	heights_ = raw;
-
-	cell_size_ = 
-		cell_size;
-
-	height_scaling_ = 
-		height_scaling;
+	array const gradient = 
+		stdlib::normalize(
+			gradient_);
 
 	vb_ = 
 		renderer_->create_vertex_buffer(
 			sge::renderer::vf::dynamic::make_format<vf::format>(),
 			static_cast<sge::renderer::size_type>(
-				raw.size()),
+				heights_.size()),
 			sge::renderer::resource_flags::none);
 
 	FCPPT_ASSERT_MESSAGE(
@@ -367,7 +375,7 @@ insula::height_map::object::regenerate_buffers(
 			// 2*q Tris
 			// 3*2*q Indices
 			static_cast<sge::renderer::size_type>(
-				3*2*((raw.dimension()[0]-1)*(raw.dimension()[1]-1))),
+				3*2*((heights_.dimension()[0]-1)*(heights_.dimension()[1]-1))),
 			sge::renderer::resource_flags::none);
 	
 	sge::renderer::scoped_vertex_lock const vblock(
@@ -380,9 +388,9 @@ insula::height_map::object::regenerate_buffers(
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
 
-	for (array::size_type y = 0; y < raw.dimension().h(); ++y)
+	for (array::size_type y = 0; y < heights_.dimension().h(); ++y)
 	{
-		for (array::size_type x = 0; x < raw.dimension().w(); ++x)
+		for (array::size_type x = 0; x < heights_.dimension().w(); ++x)
 		{
 			vf::packed_position p(
 				static_cast<graphics::scalar>(
@@ -392,7 +400,7 @@ insula::height_map::object::regenerate_buffers(
 				static_cast<graphics::scalar>(
 					static_cast<scalar>(
 						height_scaling) * 
-					raw[array::dim(x,y)]),
+					heights_[array::dim(x,y)]),
 				static_cast<graphics::scalar>(
 					static_cast<scalar>(
 						y) * 
@@ -404,7 +412,7 @@ insula::height_map::object::regenerate_buffers(
 			(*vb_it).set<vf::normal>(
 				normalize(
 					calculate_normal(
-						raw,
+						heights_,
 						height_scaling,
 						cell_size,
 						x,
@@ -421,7 +429,7 @@ insula::height_map::object::regenerate_buffers(
 	
 	fcppt::variant::apply_unary(
 		index_visitor(
-			raw.dimension()),
+			heights_.dimension()),
 		sge::renderer::scoped_index_lock(
 			ib_,
 			sge::renderer::lock_mode::writeonly).value().any());

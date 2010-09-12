@@ -19,6 +19,7 @@ Hierzu z.B. cgal
 ** TODO gizmo in math verfrachten
 ** TODO orthonormalize_gram_schmidt hinzufügen und gucken wie's läuft
 ** TODO machine::input_repeat_callback fixen
+** TODO Präfixe in config.json auf Sektionen in json abbilden
 * Aktivitäten
 ** TODO Shadow Maps [1/5]
 *** DONE Neues uniform-System aufsetzen
@@ -85,10 +86,6 @@ Informationseinheit (z.B. Geschwindigkeit des Vehikels), die scoped
 beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
 ** TODO Musiklautstärke muss einstellbar sein
-** TODO vehicle::speed_kmh muss relativ zu forward sein
-** TODO Auto-Culling fixen
-** TODO Auto in scene::manager integrieren
-** TODO Autosound wird nicht moduliert
 ** TODO Mehr Musik
 ** TODO Konkretes Level bauen, was man auch ausliefern kann
 ** TODO Nuggets aus game_inner rausziehen
@@ -103,6 +100,14 @@ den normalisierten Gradienten, d.h. =height_map= muss den zur
 Verfügung stellen)
 ** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
+** DONE vehicle::speed_kmh muss relativ zu forward sein
+	 CLOSED: [2010-09-12 Sun 20:10]
+** DONE Auto-Culling fixen
+	 CLOSED: [2010-09-12 Sun 20:10]
+** DONE Autosound wird nicht moduliert
+	 CLOSED: [2010-09-12 Sun 20:10]
+** DONE Auto in scene::manager integrieren
+	 CLOSED: [2010-09-12 Sun 20:09]
 ** DONE Alpha-Blending
 	 CLOSED: [2010-09-12 Sun 15:38]
 - Bisheriges Alphablending fixen, damit klar ist, wie man

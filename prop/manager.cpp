@@ -6,7 +6,6 @@
 #include "../stdlib/for_each.hpp"
 #include "../random_seed.hpp"
 #include "../physics/scalar.hpp"
-#include "../height_map/random_flat_point.hpp"
 #include "../height_map/random_point.hpp"
 #include "../height_map/object.hpp"
 #include "../height_map/vec2.hpp"
@@ -212,10 +211,15 @@ insula::prop::manager::parse_single_prop(
 
 	// We pull all the settings from the json because we need them in
 	// the loop that follows.
-	bool const flat_terrain =	
-		sge::parse::json::find_member_exn<bool>(
-			p.members,
-			FCPPT_TEXT("flat_terrain"));	
+
+
+	// We use a pair here since we've got the parse_range function on
+	// the top that's pretty handy
+	std::pair<height_map::scalar,height_map::scalar> const flatness =	
+		parse_range<height_map::scalar,sge::parse::json::float_type>(
+			sge::parse::json::find_member_exn<sge::parse::json::array>(
+				p.members,
+				FCPPT_TEXT("flatness_range")));
 
 	physics::solidity::type const solid = 
 		sge::parse::json::find_member_exn<bool>(
@@ -284,17 +288,13 @@ insula::prop::manager::parse_single_prop(
 	for (std::size_t i = 0; i < count; ++i)
 	{
 		height_map::vec2 const point2 = 
-			flat_terrain
-			?
-				height_map::random_flat_point(
-					params.height_map,
-					params.water_level,
-					rng_engine)
-			:
-				height_map::random_point(
-					params.height_map,
-					params.water_level,
-					rng_engine);
+			height_map::random_point(
+				params.height_map,
+				params.water_level,
+				rng_engine,
+				height_map::flatness_range(
+					flatness.first,
+					flatness.second));
 
 		physics::scalar const scaling = 
 			scale_rng(

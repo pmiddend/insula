@@ -27,6 +27,8 @@ insula::height_map::height_for_point(
 	scalar cell_size,
 	vec2 const &p)
 {
+	// This is too strict due to numerical inaccuracies
+	/*
 	FCPPT_ASSERT_MESSAGE(
 		fcppt::math::box::contains_point(
 			rect(
@@ -35,6 +37,16 @@ insula::height_map::height_for_point(
 					static_cast<array::size_type>(cell_size) * heights.dimension())),
 			p),
 		FCPPT_TEXT("The point is not inside the height field"));
+	*/
+
+	if(
+		!fcppt::math::box::contains_point(
+			rect(
+				vec2::null(),
+				fcppt::math::dim::structure_cast<dim2>(
+					static_cast<array::size_type>(cell_size) * heights.dimension())),
+			p))
+		return static_cast<scalar>(0);
 
 
 	// Determine which grid cell we're talking about

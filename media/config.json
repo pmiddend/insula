@@ -5,6 +5,7 @@
 
 		"game-nuggets" : "100",
 		"game-nugget-model" : "props/beacon.md3",
+		"game-nugget-flatness-range" : "(0.0,0.2)",
 		"game-nugget-texture" : "props/beacon.png",
 
 		"camera-roll-speed" : "0.78",
@@ -38,6 +39,7 @@
 		"skydome-color1" : "(0,0,1)",
 
 		"vehicle-camera-distance" : "10",
+		"vehicle-flatness-range" : "(0.0,0.2)",
 		"vehicle-camera-angle" : "30",
 		"vehicle-file" : "van.json",
 
@@ -54,7 +56,7 @@
 		{
 			"model" : "rock1.md3",
 			"texture" : "rocks.png",
-			"flat_terrain" : false,
+			"flatness_range" : [0.0,1.0],
 			"has_transparency" : false,
 			"penetration_depth" : 1.0,
 			"scale_range" : [0.5,10.0],
@@ -71,7 +73,7 @@
 		{
 			"model" : "palmtree.md3",
 			"texture" : "palmtree.png",
-			"flat_terrain" : true,
+			"flatness_range" : [0.0,0.2],
 			"has_transparency" : false,
 			"penetration_depth" : 0.0,
 			"scale_range" : [0.5,10.0],

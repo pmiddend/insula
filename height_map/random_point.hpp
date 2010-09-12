@@ -3,9 +3,11 @@
 
 #include "vec2.hpp"
 #include "scalar.hpp"
+#include "flatness_range.hpp"
 #include "object_fwd.hpp"
 #include "../random_engine.hpp"
 #include <fcppt/math/vector/basic_impl.hpp>
+#include <utility>
 
 namespace insula
 {
@@ -18,7 +20,8 @@ vec2 const
 random_point(
 	height_map::object const &,
 	scalar water_level,
-	random_engine &engine);
+	random_engine &engine,
+	flatness_range const &flatness_range);
 }
 }
 
