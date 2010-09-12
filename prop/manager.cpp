@@ -12,6 +12,7 @@
 #include "../height_map/vec2.hpp"
 #include "../height_map/height_for_point.hpp"
 #include "../physics/shape_from_approximation.hpp"
+#include "../physics/triangle_mesh/shape_from_model.hpp"
 #include "../physics/approximation/string_to_cylinder_orientation.hpp"
 #include "../model/object.hpp"
 #include "../scene/manager.hpp"
@@ -59,6 +60,25 @@
 
 namespace
 {
+template<typename T>
+bool
+member_has_type(
+	sge::parse::json::object const &o,
+	fcppt::string const &s)
+{
+	try
+	{
+		sge::parse::json::find_member_exn<T>(
+			o.members,
+			s);
+	}
+	catch (sge::parse::json::invalid_get const &)
+	{
+		return false;
+	}
+	return true;
+}
+
 template<typename T>
 typename
 fcppt::math::matrix::static_<T,3,3>::type const
@@ -249,6 +269,18 @@ insula::prop::manager::parse_single_prop(
 		scale_range.first,
 		scale_range.second);
 
+	// Test if the approximation is "exact". If so, create nonscaled
+	// prototype shape and give that to the parse_approximation function
+	bool const exact_approximation = 
+		member_has_type<sge::parse::json::string>(
+			p,
+			FCPPT_TEXT("approximation"));
+
+	if(exact_approximation)
+		mesh_prototypes_.push_back(
+			physics::triangle_mesh::shape_from_model(
+				model_raw));
+
 	for (std::size_t i = 0; i < count; ++i)
 	{
 		height_map::vec2 const point2 = 
@@ -271,12 +303,17 @@ insula::prop::manager::parse_single_prop(
 		blueprints_.push_back(
 			new blueprint(
 				backends_.back(),
-				physics::shape_from_approximation(
-					parse_approximation(
-						sge::parse::json::find_member_exn<sge::parse::json::object>(
-							p.members,
-							FCPPT_TEXT("approximation")),
-						scaling)),
+				exact_approximation
+				?
+					mesh_prototypes_.back().spawn_scaled_instance(
+						scaling)
+				:
+					physics::shape_from_approximation(
+						parse_approximation(
+							sge::parse::json::find_member_exn<sge::parse::json::object>(
+								p.members,
+								FCPPT_TEXT("approximation")),
+							scaling)),
 				rotation_axis,
 				twopi_rng(
 					rng_engine),
@@ -401,7 +438,8 @@ insula::prop::manager::parse_approximation(
 		fcppt::assign::make_container<std::vector<fcppt::string>>
 			(FCPPT_TEXT("sphere"))
 			(FCPPT_TEXT("box"))
-			(FCPPT_TEXT("cylinder"));
+			(FCPPT_TEXT("cylinder"))
+			(FCPPT_TEXT("exact"));
 
 	throw 
 		exception(
