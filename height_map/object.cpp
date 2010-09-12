@@ -331,8 +331,8 @@ insula::height_map::object::regenerate(
 	gradient_ = 
 		stdlib::normalize(
 			stdlib::grid::sobel_operator(
-				heights_)
-		);
+				heights_
+		));
 
 	regenerate_buffers(
 		cell_size,

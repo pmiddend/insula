@@ -73,7 +73,7 @@
 		{
 			"model" : "palmtree.md3",
 			"texture" : "palmtree.png",
-			"flatness_range" : [0.0,0.2],
+			"flatness_range" : [0.0,0.005],
 			"has_transparency" : false,
 			"penetration_depth" : 0.0,
 			"scale_range" : [0.5,10.0],

@@ -4,11 +4,15 @@
 - Vehicles in Bullet
 - http://vdrift.net/Forum/viewtopic.php?p=10332&sid=ce7581e8f6c9da3b93eec41440a4d776
 - Shadow Mapping: http://www.fabiensanglard.net/shadowmapping/index.php
+- Viele Paper: http://nis-lab.is.s.u-tokyo.ac.jp/~nis//abs_cgi.html#pas95
 * Ideen für später
 ** TODO Terrain zufallsgenerieren
 ** TODO Farben statt Texturen bei Höhenfeld verwenden
 Motivation hierzu: [[http://simblob.blogspot.com/2010/09/polygon-map-generation-part-1.html][von hier]]
 ** TODO LOD für Models
+** TODO Pfeil einbauen, der die Richtung weist
+Dieser Pfeil könnte z.B. in die "durchschnittliche" Richtung zeigen,
+wo noch viele Nuggets zu finden sind.
 ** TODO Terrainvereinfachung
 Hierzu z.B. cgal
 * Kleinere Sachen
