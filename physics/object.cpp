@@ -1,9 +1,12 @@
 #include "object.hpp"
 
-insula::physics::object::object()
+insula::physics::object::object(
+	object_type::type const _type)
 :
 	last_seen_(
-		static_cast<iteration>(0))
+		static_cast<iteration>(0)),
+	type_(
+		_type)
 {
 }
 
@@ -18,6 +21,12 @@ insula::physics::iteration
 insula::physics::object::last_seen() const
 {
 	return last_seen_;
+}
+
+insula::physics::object_type::type
+insula::physics::object::type() const
+{
+	return type_;
 }
 
 insula::physics::object::~object()

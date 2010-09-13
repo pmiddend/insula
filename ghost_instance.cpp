@@ -1,4 +1,4 @@
-#include "static_model_instance.hpp"
+#include "ghost_instance.hpp"
 #include "physics/world.hpp"
 #include "physics/bullet_to_vec3.hpp"
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
@@ -6,9 +6,9 @@
 #include <fcppt/math/vector/length.hpp>
 #include <algorithm>
 
-insula::static_model_instance::static_model_instance(
+insula::ghost_instance::ghost_instance(
 	graphics::mat4 const &_model_trafo,
-	physics::static_model_parameters const &params)
+	physics::ghost_parameters const &params)
 :
 	model::instance(
 		_model_trafo),
@@ -22,19 +22,19 @@ insula::static_model_instance::static_model_instance(
 }
 
 bool
-insula::static_model_instance::is_visible() const
+insula::ghost_instance::is_visible() const
 {
 	return physics_.last_seen() == physics_world_.current_iteration();
 }
 
-insula::physics::static_model const &
-insula::static_model_instance::physics_model() const
+insula::physics::ghost const &
+insula::ghost_instance::physics_model() const
 {
 	return physics_;
 }
 
 insula::graphics::scalar
-insula::static_model_instance::distance_to(
+insula::ghost_instance::distance_to(
 	graphics::vec3 const &v) const
 {
 	btVector3 center;

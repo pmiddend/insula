@@ -1,3 +1,77 @@
+* Notizen
+
+** Foliage
+
+	- Hat keinen assoziierten Body? Muss aber ins Frustum Culling
+    aufgenommen werden. Neue Klasse =foliage=, von =physics::object=
+    abgeleitet. Diese erstellt einen =btBroadphaseProxy= (mit
+    entsprechender =shape=). Sie erstellt danach ein
+    =btCollisionObject= und setzt dort den =userPointer= auf
+    =this=. Das =m_clientObject= vom btBroadphaseProxy wird auf das
+    =btCollisionObject= gesetzt. So kann die Logik in
+    =physics::culler::Process= genauso laufen wie bei Nichtfoliages.
+	- Damit das Ding trotzdem mit nichts kollidiert: von
+    =btOverlapFilterCallback= ableiten. Das kriegt zwei
+    Broadphaseproxies, die kann man beide in =physics::object= casten
+    und gucken, ob eins von denen 'ne =foliage= ist. Dann false
+    zurückgeben. Wenn beides =physics::static_model= sind, kann man
+    auch false zurückgeben, aber das bringt vermutlich nichts.
+	- Im =prop::manager= fügt man =blueprint= noch ein =foliage=-Flag
+    hinzu. Bei =instantiate= wird nun eine Liste von =scene::instance=
+    zurückgegeben und man muss ein =foliage_instance= schreiben
+    (copypaste von =static_model_instance=)
+
+** =physics::world/physics::object=
+
+	 - =physics::object= bekommt =object_type::type= enum spendiert,
+     sodass man einfach prüfen kann, von welchem Typ ein Physikobjekt
+     ist. Typen sind hier: 
+		   - foliage
+			 - nugget
+			 - prop
+			 - vehicle
+		 Beim Erstellen von =physics::static_model= muss das natürlich im
+     Konstruktor weitergeleitet werden an den Konstruktor von
+     =physics::object=.
+	 - Man kann sich dann bei der Physik registrieren via:
+		 =register_collision(object_type::type,object_type::type)=
+		 Im Prinzip muss man dann für jede mögliche Kollision zwischen
+     Objekten ein Signal deklarieren. Aber erstmal reicht ja zwischen
+     Vehikel und Nugget. Das Callback sieht aber generisch aus, man
+     bekommt =(physics::object,physics::object)=
+
+** =nugget::manager=
+	- Bekommt seine Einstellungen aus globaler Konfigurationsdatei
+    (bekommt ein =json::object=)
+		- =model=
+		- =texture=
+		- =flatness_range=
+		- =floating_height=
+		- =count=
+	- Es gibt genau ein =model::backend=.
+	- Es gibt eine =blueprint=-Klasse, die enthält aber nur die Position
+    als =vec3=
+	- Es gibt statt =instantiate= ein =create_instance=, was eine
+    Instanz erzeugt und als =auto_ptr= zurückliefert.
+	- Die Instanz bekommt die =instance_sequence= im Konstruktor. Sie
+    hat eine Methode =update()=, was den Winkel der Props verändert
+    (man kann sich aus dem =static_model= die Position holen und den
+    Winkel kann man global Speichern)
+	- Das Ding registriert sich bei der =physics::world= für Kollisionen
+    zwischen Nugget und Vehikel und löscht dann Props entsprechend und
+    spielt einen Ton ab.
+
+** Anderes
+	- Terrain und Skydome sollten in den Szenemanager eingebaut werden
+	- Dazu muss jedem Backend eine Priorität zugeordnet werden (Datenfeld in backend)
+	- Es gibt eine globale Prioritäts-enum (=scene/priorities=)
+	- In =render()= von scene wird ein =set<backend,priority_sorter>=
+		konstruiert und danach die Backends abgearbeitet
+	- Das Terrain ist Backend und Instance gleichzeitig, genau wie der
+		Skydome und das Wasser (geht das überhaupt?) und sie fügen sich
+		selber in den Szenemanager ein.
+
+
 * Links
 - Zwei Fixes für raycastvehicle: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
 - Frustum/Occlusion culling: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896

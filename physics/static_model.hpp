@@ -7,6 +7,7 @@
 #include "mat3.hpp"
 #include "mat4.hpp"
 #include "world_fwd.hpp"
+#include "static_model_parameters.hpp"
 #include "motion_state_fwd.hpp"
 #include "scoped_body.hpp"
 #include "shared_shape_ptr.hpp"
@@ -27,20 +28,16 @@ class static_model
 public:
 	explicit
 	static_model(
-		world &,
-		vec3 const &,
-		mat3 const &,
-		shared_shape_ptr,	
-		solidity::type);
+		static_model_parameters const &);
 
 	mat4 const
 	world_transform() const;
 
 	~static_model();
 private:
-	std::unique_ptr<btRigidBody> body_;
 	std::unique_ptr<motion_state> motion_state_;
 	shared_shape_ptr shape_;
+	std::unique_ptr<btRigidBody> body_;
 	std::unique_ptr<scoped_body> world_scope_;
 };
 }

@@ -155,13 +155,15 @@ insula::states::game_inner::game_inner(
 				fcppt::math::matrix::translation(
 					fcppt::math::vector::structure_cast<graphics::vec3>(
 						pos)),
-				physics_world_,
-				pos,
-				physics::mat3::identity(),
-				physics::shape_from_model(
-					*nugget_model_,
-					physics::approximation::numeric_value::box),
-				physics::solidity::nonsolid));
+				physics::static_model_parameters(
+					physics_world_,
+					physics::object_type::nugget,
+					pos,
+					physics::mat3::identity(),
+					physics::shape_from_model(
+						*nugget_model_,
+						physics::approximation::numeric_value::box),
+					physics::solidity::nonsolid)));
 		context<game_outer>().scene_manager().insert(
 			nugget_backend_,
 			nugget_models_.back());

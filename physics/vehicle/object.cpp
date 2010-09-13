@@ -75,6 +75,8 @@ insula::physics::vehicle::object::object(
 	box const &_wheel_bb,
 	wheel_info_sequence const &_wheels)
 :
+	physics::object(
+		object_type::vehicle),
 	world_(
 		_world),
 	chassis_shape_(

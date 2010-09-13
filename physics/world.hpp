@@ -6,6 +6,7 @@
 #include "iteration.hpp"
 #include "vehicle_static_callback.hpp"
 #include "object_fwd.hpp"
+#include "filter_callback.hpp"
 #include "../time_delta.hpp"
 #include "../graphics/camera/object_fwd.hpp"
 #include <fcppt/signal/auto_connection.hpp>
@@ -90,6 +91,7 @@ private:
 	std::unique_ptr<btDbvtBroadphase> broadphase_;
 	std::unique_ptr<btConstraintSolver> constraint_solver_;
 	std::unique_ptr<btDynamicsWorld> world_;
+	filter_callback filter_callback_;
 	contact_set contacts_;
 	iteration current_iteration_;
 

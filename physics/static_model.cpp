@@ -4,38 +4,42 @@
 #include "dim3.hpp"
 #include "scalar.hpp"
 #include "motion_state.hpp"
+#include "static_model_parameters.hpp"
 #include "../model/object.hpp"
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <fcppt/io/cout.hpp>
 #include <iostream>
 
 insula::physics::static_model::static_model(
-	world &w,
-	vec3 const &position,
-	mat3 const &transformation,
-	shared_shape_ptr const _shape,
-	solidity::type const _solidity)
+	static_model_parameters const &params)
 :
-	body_(),
+	object(
+		params.type),
 	motion_state_(
 		new motion_state(
-			position,
-			transformation)),
+			params.position,
+			params.transformation)),
 	shape_(
-		_shape)
-{
-	body_.reset(
+		params.shape),
+	body_(
 		new btRigidBody(
 			btRigidBody::btRigidBodyConstructionInfo(
 				static_cast<btScalar>(0),
 				motion_state_.get(),
 				shape_.get(),
-				btVector3(0,0,0))));
+				btVector3(0,0,0))))
+{
+	// It's important that we _first_ set the user pointer and _then_
+	// add the body because the constructor (indirectly) calls the
+	// collision filter which in turn wants the correct user pointer
+	body_->setUserPointer(
+		this);
+
 
 	world_scope_.reset(
-		new scoped_body(w,*body_));
+		new scoped_body(params.world_,*body_));
 
-	switch (_solidity)
+	switch (params.solidity)
 	{
 		case solidity::solid:
 			break;
@@ -45,9 +49,6 @@ insula::physics::static_model::static_model(
 				btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			break;
 	}
-
-	body_->setUserPointer(
-		this);
 
 }
 

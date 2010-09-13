@@ -51,6 +51,8 @@ insula::physics::world::world(
 			broadphase_.get(),
 			constraint_solver_.get(),
 			configuration_.get())),
+	filter_callback_(
+		*world_->getPairCache()),
 	current_iteration_(
 		// This is zero so it's different from the default iteration value
 		// of the objects

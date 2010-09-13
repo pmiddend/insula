@@ -1,5 +1,5 @@
-#ifndef INSULA_STATIC_MODEL_INSTANCE_HPP_INCLUDED
-#define INSULA_STATIC_MODEL_INSTANCE_HPP_INCLUDED
+#ifndef INSULA_GHOST_INSTANCE_HPP_INCLUDED
+#define INSULA_GHOST_INSTANCE_HPP_
 
 #include "model/instance.hpp"
 #include "scene/transparent_instance.hpp"
@@ -7,20 +7,20 @@
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
 #include "physics/world_fwd.hpp"
-#include "physics/static_model.hpp"
+#include "physics/ghost.hpp"
 #include "physics/shared_shape_ptr.hpp"
 
 namespace insula
 {
-class static_model_instance
+class ghost_instance
 :
 	public model::instance
 {
 public:
 	explicit
-	static_model_instance(
+	ghost_instance(
 		graphics::mat4 const &,
-		physics::static_model_parameters const &);
+		physics::ghost_parameters const &);
 
 	bool
 	is_visible() const;
@@ -35,7 +35,7 @@ public:
 private:
 	physics::shared_shape_ptr shape_;
 	physics::world &physics_world_;
-	physics::static_model physics_;
+	physics::ghost physics_;
 };
 }
 

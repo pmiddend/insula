@@ -2,6 +2,7 @@
 #define INSULA_PHYSICS_OBJECT_HPP_INCLUDED
 
 #include "iteration.hpp"
+#include "object_type.hpp"
 
 namespace insula
 {
@@ -11,7 +12,8 @@ class object
 {
 protected:
 	explicit
-	object();
+	object(
+		object_type::type);
 
 public:
 	virtual ~object();
@@ -23,12 +25,16 @@ public:
 	iteration 
 	last_seen() const;
 
+	object_type::type
+	type() const;
+
 private:
 	// This flag is set by the frustum culling and it denotes in which
 	// iteration the object was last seen. By comparing this to the
 	// current iteration of the world, one can deduce if an object is
 	// visible
 	iteration last_seen_;
+	object_type::type const type_;
 };
 }
 }

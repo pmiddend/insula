@@ -20,6 +20,8 @@ insula::physics::height_map::height_map(
 	insula::height_map::scalar const grid_size,
 	insula::height_map::scalar const height_scaling)
 :
+	object(
+		physics::object_type::height_map),
 	world_(
 		_world),
 	array_(

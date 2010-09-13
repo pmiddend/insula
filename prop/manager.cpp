@@ -357,27 +357,29 @@ insula::prop::manager::instantiate(
 		instances.push_back(
 			new static_model_instance(
 				model_matrix,
-				physics_world,
-				// Let's find out what the origin of the "child" shape is in
-				// relation to the model. We translate the offset with the same
-				// translation matrices as the model and add a translation to the
-				// model origin
-				r.origin + 
-				fcppt::math::vector::narrow_cast<physics::vec3>(
-					model_matrix * 
-					fcppt::math::vector::structure_cast<graphics::vec4>(
-						fcppt::math::vector::construct(
-							r.offset,
-							static_cast<physics::scalar>(
-								0)))),
-				// We cannot scale a static model and we cannot translate it
-				// with the matrix, so all that's left is the rotation
-				matrix_to_3x3<physics::scalar>(
-					fcppt::math::matrix::rotation_axis(
-						r.rotation_angle,
-						r.rotation_axis)),
-				r.shape,
-				r.solidity));
+				physics::static_model_parameters(
+					physics_world,
+					physics::object_type::prop,
+					// Let's find out what the origin of the "child" shape is in
+					// relation to the model. We translate the offset with the same
+					// translation matrices as the model and add a translation to the
+					// model origin
+					r.origin + 
+					fcppt::math::vector::narrow_cast<physics::vec3>(
+						model_matrix * 
+						fcppt::math::vector::structure_cast<graphics::vec4>(
+							fcppt::math::vector::construct(
+								r.offset,
+								static_cast<physics::scalar>(
+									0)))),
+					// We cannot scale a static model and we cannot translate it
+					// with the matrix, so all that's left is the rotation
+					matrix_to_3x3<physics::scalar>(
+						fcppt::math::matrix::rotation_axis(
+							r.rotation_angle,
+							r.rotation_axis)),
+					r.shape,
+					r.solidity)));
 
 		if (r.backend.has_transparency())
 			scene_manager_.insert_transparent(
