@@ -1,65 +1,175 @@
 * Notizen
 
-** Foliage
+** =nuggets, props, ghosts=
+*** json-Ausschnitt:
 
-	- Hat keinen assoziierten Body? Muss aber ins Frustum Culling
-    aufgenommen werden. Neue Klasse =foliage=, von =physics::object=
-    abgeleitet. Diese erstellt einen =btBroadphaseProxy= (mit
-    entsprechender =shape=). Sie erstellt danach ein
-    =btCollisionObject= und setzt dort den =userPointer= auf
-    =this=. Das =m_clientObject= vom btBroadphaseProxy wird auf das
-    =btCollisionObject= gesetzt. So kann die Logik in
-    =physics::culler::Process= genauso laufen wie bei Nichtfoliages.
-	- Damit das Ding trotzdem mit nichts kollidiert: von
-    =btOverlapFilterCallback= ableiten. Das kriegt zwei
-    Broadphaseproxies, die kann man beide in =physics::object= casten
-    und gucken, ob eins von denen 'ne =foliage= ist. Dann false
-    zurückgeben. Wenn beides =physics::static_model= sind, kann man
-    auch false zurückgeben, aber das bringt vermutlich nichts.
-	- Im =prop::manager= fügt man =blueprint= noch ein =foliage=-Flag
-    hinzu. Bei =instantiate= wird nun eine Liste von =scene::instance=
-    zurückgegeben und man muss ein =foliage_instance= schreiben
-    (copypaste von =static_model_instance=)
+#+begin_src json
+"props" : 
+[
+{
+  "model" : "foo.md3",
+	"texture" : "foo.png",
 
-** =physics::world/physics::object=
+	// Eigenschaften zur Platzierung
+  "flatness_range" : [0.0,1.0],
+	"penetration_depth" : 0.0,
+	"scale_range" : [0.5,10.0],
 
-	 - =physics::object= bekommt =object_type::type= enum spendiert,
-     sodass man einfach prüfen kann, von welchem Typ ein Physikobjekt
-     ist. Typen sind hier: 
-		   - foliage
-			 - nugget
-			 - prop
-			 - vehicle
-		 Beim Erstellen von =physics::static_model= muss das natürlich im
-     Konstruktor weitergeleitet werden an den Konstruktor von
-     =physics::object=.
-	 - Man kann sich dann bei der Physik registrieren via:
-		 =register_collision(object_type::type,object_type::type)=
-		 Im Prinzip muss man dann für jede mögliche Kollision zwischen
-     Objekten ein Signal deklarieren. Aber erstmal reicht ja zwischen
-     Vehikel und Nugget. Das Callback sieht aber generisch aus, man
-     bekommt =(physics::object,physics::object)=
+	// Kein Solid mehr, Props sind immer Solid
+	//"solid" : true,
 
-** =nugget::manager=
-	- Bekommt seine Einstellungen aus globaler Konfigurationsdatei
-    (bekommt ein =json::object=)
-		- =model=
-		- =texture=
-		- =flatness_range=
-		- =floating_height=
-		- =count=
-	- Es gibt genau ein =model::backend=.
-	- Es gibt eine =blueprint=-Klasse, die enthält aber nur die Position
-    als =vec3=
-	- Es gibt statt =instantiate= ein =create_instance=, was eine
-    Instanz erzeugt und als =auto_ptr= zurückliefert.
-	- Die Instanz bekommt die =instance_sequence= im Konstruktor. Sie
-    hat eine Methode =update()=, was den Winkel der Props verändert
-    (man kann sich aus dem =static_model= die Position holen und den
-    Winkel kann man global Speichern)
-	- Das Ding registriert sich bei der =physics::world= für Kollisionen
-    zwischen Nugget und Vehikel und löscht dann Props entsprechend und
-    spielt einen Ton ab.
+	// Gilt für props/ghosts, nicht für nuggets
+	"rotation_axis" : [0.0,1.0,0.0]
+
+	// Gilt für props/nuggets, nicht für Ghosts (die haben nur 'ne BB)
+	"approximation" : {}
+
+	// Gilt für nuggets, ghosts und props
+	"count" : 100
+}
+],
+
+"ghosts" : 
+[
+{
+  "model" : "foo.md3",
+	"texture" : "foo.png",
+
+	// Eigenschaften zur Platzierung
+  "flatness_range" : [0.0,1.0],
+	"penetration_depth" : 0.0,
+	"scale_range" : [0.5,10.0],
+
+	// Gilt für props/ghosts, nicht für nuggets
+	"rotation_axis" : [0.0,1.0,0.0]
+
+	// Gilt für nuggets, ghosts und props
+	"count" : 100
+}
+]
+
+"nuggets" : 
+{
+  "model" : "foo.md3",
+	"texture" : "foo.png",
+
+	// Eigenschaften zur Platzierung
+  "flatness_range" : [0.0,1.0],
+
+	// Angabe in Metern
+	"floating_height" : 1.5,
+
+	// Gilt für props/nuggets, nicht für Ghosts (die haben nur 'ne BB)
+	"approximation" : {}
+
+	// Gilt für nuggets, ghosts und props
+	"count" : 100
+}
+#+end_src
+
+*** nugget-Manager
+
+- Bekommt seine Einstellungen aus globaler Konfigurationsdatei
+	(bekommt ein =json::object=)
+	- =model=
+	- =texture=
+	- =flatness_range=
+	- =floating_height=
+	- =count=
+- Es gibt genau ein =model::backend=.
+- Es gibt eine =blueprint=-Klasse, die enthält aber nur die Position
+	als =vec3=
+- Es gibt statt =instantiate= ein =create_instance=, was eine
+	Instanz erzeugt und als =auto_ptr= zurückliefert.
+- Die Instanz bekommt die =instance_sequence= im Konstruktor. Sie
+	hat eine Methode =update()=, was den Winkel der Props verändert
+	(man kann sich aus dem =static_model= die Position holen und den
+	Winkel kann man global Speichern)
+- Das Ding registriert sich bei der =physics::world= für Kollisionen
+	zwischen Nugget und Vehikel und löscht dann Props entsprechend und
+	spielt einen Ton ab.
+
+*** Visibilitymanager
+
+Die Ghosts brauchen ihre eigene Broadphase, damit die Performance
+nicht leidet. Man brauch also einen Manager, der mehrere Broadphases
+verwaltet und das Culling durchführt.
+
+Die Ownership über die Broadphases soll der User haben. Daher müssen
+wir =visibility::broadphase= von =btDvbtBroadphase= ableiten und mit
+einem =list_hook= ausstatten. Dann muss eine
+=intrusive_list<broaphase>= erstellt werden. Die Funktion
+=shared_broadphase_ptr create_broadphase()= erstellt eine neue
+Broadphase, fügt sie der Liste hinzu und gibt sie zurück.
+
+Die Klasse hält die momentane Iteration und hat eine
+=update=-Funktion, die alle Broadphases durchgeht und cullt. Braucht
+dafür die Kamera.
+
+*** ghost-Manager
+
+Besitzt
+
+Felder:
+
+- =ptr_vector<model::backend>=
+- =ptr_vector<blueprint>=
+- =scene::manager&=
+- =visibility::broadphase=
+
+Methoden:
+
+- =shared_instance_ptr instantiate()=
+
+Bekommt im Konstruktor das =json::array= der Ghosts:
+
+#+begin_src json
+"ghosts" : 
+[
+{
+  "model" : "foo.md3",
+	"texture" : "foo.png",
+
+	// Eigenschaften zur Platzierung
+  "flatness_range" : [0.0,1.0],
+	"penetration_depth" : 0.0,
+	"scale_range" : [0.5,10.0],
+
+	// Gilt für props/ghosts, nicht für nuggets
+	"rotation_axis" : [0.0,1.0,0.0]
+
+	// Gilt für nuggets, ghosts und props
+	"count" : 100
+}
+]
+#+end_src
+
+Konstruktor:
+
+- Erstellt Broadphase
+- Erstellt für jeden Ghost direkt ein Model, merkt sich
+  die BB. Ghosts sind immer Nichttransparent (fürs erste!).
+- Holt sich =flatness=, =penetration_depth=, =scale_range= und
+  =rotation_axis=, sowie =count=.
+- Erstellt blueprints.
+
+Klasse "instance":
+
+- Bekommt im Konstruktor den manager mit, ist =friend= vom
+  Manager. Erstellt alle Instanzen (es gibt dazu =ghost_instance=).
+
+Klasse "ghost_instance":
+
+- Enthält ein =physics::ghosts=-Objekt, ansonsten ähnlich =static_instance=
+
+Klasse "=physics::ghost=":
+
+- Bekommt im Konstruktor eine =btDbvtBroadphase= und eine
+  =physics::box=, die in _absoluten_ Koordinaten ist. Erstellt dann
+  ein =btCollisionObject= und setzt den Userpointer auf this. Ruft
+  darauf dann "roh" createProxy auf und gibt das =btCollisionObject=
+  als userPtr an.
+- Im Destruktor löscht er sich selber natürlich.
 
 ** Anderes
 	- Terrain und Skydome sollten in den Szenemanager eingebaut werden

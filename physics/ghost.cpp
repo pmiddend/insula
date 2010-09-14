@@ -15,10 +15,7 @@ insula::physics::ghost::ghost(
 	object(
 		object_type::ghost),
 	world_(
-		params.world_.handle()),
-	shape_(
-		new btSphereShape(
-			params.radius))
+		params.world_.handle())
 {
 	m_internalType = CO_COLLISION_OBJECT;
 	m_collisionFlags |= CF_STATIC_OBJECT;
@@ -29,7 +26,7 @@ insula::physics::ghost::ghost(
 			vec3_to_bullet(
 				params.position));
 	setCollisionShape(
-		shape_.get());
+		params.shape.get());
 	m_interpolationWorldTransform = m_worldTransform;
 	m_interpolationLinearVelocity.setValue(0,0,0);
 	m_interpolationAngularVelocity.setValue(0,0,0);

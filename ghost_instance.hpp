@@ -25,10 +25,6 @@ public:
 	bool
 	is_visible() const;
 
-	// We need this in the collision callbacks
-	physics::static_model const &
-	physics_model() const;
-
 	graphics::scalar
 	distance_to(
 		graphics::vec3 const &) const;

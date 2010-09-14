@@ -2,7 +2,6 @@
 #define INSULA_PHYSICS_GHOST_HPP_INCLUDED
 
 #include "object.hpp"
-#include "shared_shape_ptr.hpp"
 #include "ghost_parameters_fwd.hpp"
 #include <BulletCollision/CollisionDispatch/btCollisionObject.h>
 
@@ -25,7 +24,6 @@ public:
 	~ghost();
 private:
 	btCollisionWorld &world_;
-	shared_shape_ptr shape_;
 };
 }
 }

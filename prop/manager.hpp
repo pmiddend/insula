@@ -10,6 +10,7 @@
 #include "../physics/approximation/variant.hpp"
 #include "../physics/triangle_mesh/shape.hpp"
 #include "../physics/scalar.hpp"
+#include "../physics/world_fwd.hpp"
 #include <BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <sge/parse/json/object.hpp>

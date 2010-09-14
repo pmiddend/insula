@@ -1,4 +1,5 @@
 #include "ghost_instance.hpp"
+#include "physics/ghost_parameters.hpp"
 #include "physics/world.hpp"
 #include "physics/bullet_to_vec3.hpp"
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
@@ -25,12 +26,6 @@ bool
 insula::ghost_instance::is_visible() const
 {
 	return physics_.last_seen() == physics_world_.current_iteration();
-}
-
-insula::physics::ghost const &
-insula::ghost_instance::physics_model() const
-{
-	return physics_;
 }
 
 insula::graphics::scalar

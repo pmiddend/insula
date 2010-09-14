@@ -24,6 +24,7 @@ public:
 	physics::vec3 origin;
 	physics::vec3 offset;
 	physics::solidity::type solidity;
+	bool is_ghost;
 
 	explicit
 	blueprint(
@@ -34,7 +35,8 @@ public:
 		physics::scalar scaling,
 		physics::vec3 origin,
 		physics::vec3 offset,
-		physics::solidity::type solidity)
+		physics::solidity::type solidity,
+		bool is_ghost)
 	:
 		backend(backend),
 		shape(shape),
@@ -43,7 +45,8 @@ public:
 		scaling(scaling),
 		origin(origin),
 		offset(offset),
-		solidity(solidity)
+		solidity(solidity),
+		is_ghost(is_ghost)
 	{
 	}
 };

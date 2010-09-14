@@ -1,6 +1,8 @@
 #include "manager.hpp"
 #include "parameters.hpp"
 #include "../create_path.hpp"
+#include "../ghost_instance.hpp"
+#include "../static_model_instance.hpp"
 #include "../exception.hpp"
 #include "../random_engine.hpp"
 #include "../stdlib/for_each.hpp"
@@ -11,6 +13,7 @@
 #include "../height_map/vec2.hpp"
 #include "../height_map/height_for_point.hpp"
 #include "../physics/shape_from_approximation.hpp"
+#include "../physics/ghost_parameters.hpp"
 #include "../physics/triangle_mesh/shape_from_model.hpp"
 #include "../physics/approximation/string_to_cylinder_orientation.hpp"
 #include "../model/object.hpp"
@@ -331,7 +334,10 @@ insula::prop::manager::parse_single_prop(
 					static_cast<physics::scalar>(
 						point2.y())),
 				physics_offset,
-				solid));
+				solid,
+				sge::parse::json::find_member_exn<bool>(
+					p.members,
+					FCPPT_TEXT("is_ghost"))));
 	}
 }
 
@@ -354,32 +360,57 @@ insula::prop::manager::instantiate(
 			uniform_scaling_matrix(
 				r.scaling);
 
+		std::auto_ptr<scene::transparent_instance> new_instance(
+			r.is_ghost
+			?
+				static_cast<scene::transparent_instance *>(
+					new ghost_instance(
+						model_matrix,
+						physics::ghost_parameters(
+							physics_world,
+							r.origin + 
+							fcppt::math::vector::narrow_cast<physics::vec3>(
+								model_matrix * 
+								fcppt::math::vector::structure_cast<graphics::vec4>(
+									fcppt::math::vector::construct(
+										r.offset,
+										static_cast<physics::scalar>(
+											0)))),
+							matrix_to_3x3<physics::scalar>(
+								fcppt::math::matrix::rotation_axis(
+									r.rotation_angle,
+									r.rotation_axis)),
+							r.shape)))
+			: 
+				static_cast<scene::transparent_instance *>(
+					new static_model_instance(
+						model_matrix,
+						physics::static_model_parameters(
+							physics_world,
+							physics::object_type::prop,
+							// Let's find out what the origin of the "child" shape is in
+							// relation to the model. We translate the offset with the same
+							// translation matrices as the model and add a translation to the
+							// model origin
+							r.origin + 
+							fcppt::math::vector::narrow_cast<physics::vec3>(
+								model_matrix * 
+								fcppt::math::vector::structure_cast<graphics::vec4>(
+									fcppt::math::vector::construct(
+										r.offset,
+										static_cast<physics::scalar>(
+											0)))),
+							// We cannot scale a static model and we cannot translate it
+							// with the matrix, so all that's left is the rotation
+							matrix_to_3x3<physics::scalar>(
+								fcppt::math::matrix::rotation_axis(
+									r.rotation_angle,
+									r.rotation_axis)),
+							r.shape,
+							r.solidity))));
+
 		instances.push_back(
-			new static_model_instance(
-				model_matrix,
-				physics::static_model_parameters(
-					physics_world,
-					physics::object_type::prop,
-					// Let's find out what the origin of the "child" shape is in
-					// relation to the model. We translate the offset with the same
-					// translation matrices as the model and add a translation to the
-					// model origin
-					r.origin + 
-					fcppt::math::vector::narrow_cast<physics::vec3>(
-						model_matrix * 
-						fcppt::math::vector::structure_cast<graphics::vec4>(
-							fcppt::math::vector::construct(
-								r.offset,
-								static_cast<physics::scalar>(
-									0)))),
-					// We cannot scale a static model and we cannot translate it
-					// with the matrix, so all that's left is the rotation
-					matrix_to_3x3<physics::scalar>(
-						fcppt::math::matrix::rotation_axis(
-							r.rotation_angle,
-							r.rotation_axis)),
-					r.shape,
-					r.solidity)));
+			new_instance);
 
 		if (r.backend.has_transparency())
 			scene_manager_.insert_transparent(
