@@ -11,6 +11,7 @@
 #include "../water/object_ptr.hpp"
 #include "../scene/manager.hpp"
 #include "../graphics/shader/object.hpp"
+#include "../physics/broadphase/manager.hpp"
 #include "../nugget_sequence.hpp"
 // If this is omitted, insula.cpp complains about incomplete tick
 // events (!?)
@@ -141,6 +142,7 @@ private:
 	sge::font::metrics_ptr large_font_;
 	sge::font::drawer_ptr font_drawer_;
 	player_time_map player_times_; 
+	physics::broadphase::manager broadphase_manager_;
 	prop::manager prop_manager_;
 };
 }

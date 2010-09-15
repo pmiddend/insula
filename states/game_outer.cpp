@@ -126,6 +126,8 @@ insula::states::game_outer::game_outer(
 						p,
 						player_time_map::mapped_type());
 			})),
+	broadphase_manager_(
+		context<machine>().camera()),
 	prop_manager_(
 		prop::parameters(
 			context<machine>().config_file(),
@@ -134,7 +136,8 @@ insula::states::game_outer::game_outer(
 			model_shader_,
 			*height_map_,
 			water_->water_level(),
-			scene_manager_))
+			scene_manager_,
+			broadphase_manager_))
 {
 	if (player_times_.empty())
 		throw exception(FCPPT_TEXT("You have to specify at least one player (two would be even better!)"));

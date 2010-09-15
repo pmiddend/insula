@@ -1,5 +1,5 @@
-#ifndef INSULA_PHYSICS_CULLER_HPP_INCLUDED
-#define INSULA_PHYSICS_CULLER_HPP_INCLUDED
+#ifndef INSULA_PHYSICS_BROADPHASE_CULLER_HPP_INCLUDED
+#define INSULA_PHYSICS_BROADPHASE_CULLER_HPP_INCLUDED
 
 #include "iteration.hpp"
 #include <BulletCollision/BroadphaseCollision/btDbvt.h>
@@ -7,6 +7,8 @@
 namespace insula
 {
 namespace physics
+{
+namespace broadphase
 {
 /**
 	Cullig works as follows: physics::world has the "update_visibility"
@@ -59,6 +61,7 @@ public:
 private:
 	iteration iteration_;
 };
+}
 }
 }
 

@@ -45,13 +45,15 @@ insula::states::game_inner::game_inner(
 	my_base(ctx),
 	current_player_(
 		context<game_outer>().next_player()),
+	physics_broadphase_(
+		context<machine>().camera()),
 	physics_world_(
-		context<machine>().camera(),
 		fcppt::math::box::structure_cast<physics::box>(
 			context<game_outer>().height_map().extents()),
 		get_option<physics::vec3>(
 			context<machine>().cli_variables(),
-			"physics-gravity")),
+			"physics-gravity"),
+		physics_broadphase_),
 	physics_height_map_(
 		physics_world_,
 		context<game_outer>().height_map().heights(),
@@ -133,8 +135,12 @@ insula::states::game_inner::game_inner(
 				&game_inner::vehicle_static_callback,
 				this,
 				std::placeholders::_1,
-				std::placeholders::_2)))
+				std::placeholders::_2))),
+	props_(
+		context<game_outer>().prop_manager().instantiate(
+			physics_world_))
 {
+#if 0
 	// stdlib::map doesn't work here
 	BOOST_FOREACH(
 		graphics::vec2 const &v,
@@ -168,10 +174,7 @@ insula::states::game_inner::game_inner(
 			nugget_backend_,
 			nugget_models_.back());
 	}
-
-	context<game_outer>().prop_manager().instantiate(
-		props_,
-		physics_world_);
+#endif
 }
 
 void
@@ -187,7 +190,8 @@ insula::states::game_inner::react(
 			FCPPT_TEXT("score"));
 	}
 	to_delete_.clear();
-	physics_world_.update_visibility();
+	// Just the broadphase, so do culling, nothing more
+	physics_broadphase_.update();
 }
 
 #include <sge/renderer/state/scoped.hpp>

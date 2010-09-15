@@ -6,7 +6,7 @@
 #include "scene/backend_ptr.hpp"
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
-#include "physics/world_fwd.hpp"
+#include "physics/broadphase/manager_fwd.hpp"
 #include "physics/static_model.hpp"
 #include "physics/shared_shape_ptr.hpp"
 
@@ -20,6 +20,7 @@ public:
 	explicit
 	static_model_instance(
 		graphics::mat4 const &,
+		physics::broadphase::manager &,
 		physics::static_model_parameters const &);
 
 	bool
@@ -34,7 +35,7 @@ public:
 		graphics::vec3 const &) const;
 private:
 	physics::shared_shape_ptr shape_;
-	physics::world &physics_world_;
+	physics::broadphase::manager &broadphase_;
 	physics::static_model physics_;
 };
 }

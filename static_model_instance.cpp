@@ -1,5 +1,5 @@
 #include "static_model_instance.hpp"
-#include "physics/world.hpp"
+#include "physics/broadphase/manager.hpp"
 #include "physics/bullet_to_vec3.hpp"
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <fcppt/math/vector/arithmetic.hpp>
@@ -8,14 +8,15 @@
 
 insula::static_model_instance::static_model_instance(
 	graphics::mat4 const &_model_trafo,
+	physics::broadphase::manager &_broadphase,
 	physics::static_model_parameters const &params)
 :
 	model::instance(
 		_model_trafo),
 	shape_(
 		params.shape),
-	physics_world_(
-		params.world_),
+	broadphase_(
+		_broadphase),
 	physics_(
 		params)
 {
@@ -24,7 +25,7 @@ insula::static_model_instance::static_model_instance(
 bool
 insula::static_model_instance::is_visible() const
 {
-	return physics_.last_seen() == physics_world_.current_iteration();
+	return physics_.last_seen() == broadphase_.current_iteration();
 }
 
 insula::physics::static_model const &

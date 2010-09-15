@@ -11,6 +11,7 @@
 #include "../physics/world.hpp"
 #include "../physics/height_map.hpp"
 #include "../physics/debug_drawer.hpp"
+#include "../physics/broadphase/manager.hpp"
 #include "../model/object.hpp"
 #include "../events/tick_fwd.hpp"
 #include "../events/render_fwd.hpp"
@@ -80,6 +81,7 @@ private:
 
 	player current_player_;
 	insula::turn_timer turn_timer_;
+	physics::broadphase::manager physics_broadphase_;
 	physics::world physics_world_;
 	physics::height_map physics_height_map_;
 	physics::debug_drawer physics_debug_drawer_;
@@ -91,7 +93,7 @@ private:
 	insula::vehicle::object vehicle_;
 	fcppt::signal::scoped_connection vehicle_static_connection_;
 	deletion_set to_delete_;
-	prop::instance_sequence props_;
+	prop::shared_instance_ptr props_;
 
 	void
 	vehicle_static_callback(

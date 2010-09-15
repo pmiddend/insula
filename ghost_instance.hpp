@@ -1,14 +1,11 @@
 #ifndef INSULA_GHOST_INSTANCE_HPP_INCLUDED
-#define INSULA_GHOST_INSTANCE_HPP_
+#define INSULA_GHOST_INSTANCE_HPP_INCLUDED
 
 #include "model/instance.hpp"
-#include "scene/transparent_instance.hpp"
-#include "scene/backend_ptr.hpp"
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
-#include "physics/world_fwd.hpp"
+#include "physics/broadphase/manager.hpp"
 #include "physics/ghost.hpp"
-#include "physics/shared_shape_ptr.hpp"
 
 namespace insula
 {
@@ -20,6 +17,7 @@ public:
 	explicit
 	ghost_instance(
 		graphics::mat4 const &,
+		physics::broadphase::manager &,
 		physics::ghost_parameters const &);
 
 	bool
@@ -29,8 +27,7 @@ public:
 	distance_to(
 		graphics::vec3 const &) const;
 private:
-	physics::shared_shape_ptr shape_;
-	physics::world &physics_world_;
+	physics::broadphase::manager &broadphase_;
 	physics::ghost physics_;
 };
 }

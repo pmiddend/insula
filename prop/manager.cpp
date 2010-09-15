@@ -1,13 +1,17 @@
 #include "manager.hpp"
 #include "parameters.hpp"
+#include "instance.hpp"
+#include "instance_parameters.hpp"
 #include "../create_path.hpp"
 #include "../ghost_instance.hpp"
 #include "../static_model_instance.hpp"
 #include "../exception.hpp"
+#include "../json/parse_vector.hpp"
 #include "../random_engine.hpp"
 #include "../stdlib/for_each.hpp"
 #include "../random_seed.hpp"
 #include "../physics/scalar.hpp"
+#include "../physics/vec2.hpp"
 #include "../height_map/random_point.hpp"
 #include "../height_map/object.hpp"
 #include "../height_map/vec2.hpp"
@@ -50,7 +54,6 @@
 #include <fcppt/math/box/basic_impl.hpp>
 #include <fcppt/math/dim/arithmetic.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
-#include <fcppt/assign/make_container.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/twopi.hpp>
 #include <boost/foreach.hpp>
@@ -81,80 +84,15 @@ member_has_type(
 	return true;
 }
 
-template<typename T>
-typename
-fcppt::math::matrix::static_<T,3,3>::type const
-matrix_to_3x3(
-	typename fcppt::math::matrix::static_<T,4,4>::type const &a)
-{
-	return 
-		typename fcppt::math::matrix::static_<T,3,3>::type(
-			a[0][0],a[0][1],a[0][2],
-			a[1][0],a[1][1],a[1][2],
-			a[2][0],a[2][1],a[2][2]);
-}
-
-template<typename Target,typename Source>
-std::pair<Target,Target> const
-parse_range(
-	sge::parse::json::array const &a)
-{
-	return 
-		std::make_pair(
-			static_cast<Target>(
-				sge::parse::json::get<Source>(
-					a.elements[0])),
-			static_cast<Target>(
-				sge::parse::json::get<Source>(
-					a.elements[1])));
-}
-
-template<typename T>
-typename 
-fcppt::math::matrix::static_<T, 4, 4>::type const
-uniform_scaling_matrix(
-	T const p)
-{
-	return 
-		fcppt::math::matrix::scaling(
-			p,
-			p,
-			p);
-}
-
-template<typename T,fcppt::math::size_type N,typename Source>
-typename
-fcppt::math::vector::static_<T,N>::type const
-parse_vector(
-	sge::parse::json::array const &a)
-{
-	typedef
-	typename
-	fcppt::math::vector::static_<T,N>::type
-	vector;
-
-	vector
-	result;
-
-	typename vector::iterator i = 
-		result.begin();
-	
-
-	BOOST_FOREACH(sge::parse::json::value const &v,a.elements)
-		*i++ = 
-			static_cast<T>(
-				sge::parse::json::get<Source>(
-					v));
-
-	return result;
-}
 }
 
 insula::prop::manager::manager(
 	parameters const &params)
 :
 	scene_manager_(
-		params.scene_manager)
+		params.scene_manager),
+	broadphase_manager_(
+		params.broadphase_manager)
 {
 	stdlib::for_each(
 		sge::parse::json::find_member_exn<sge::parse::json::array>(
@@ -175,6 +113,7 @@ insula::prop::manager::parse_single_prop(
 	parameters const &params,
 	sge::parse::json::object const &p)
 {
+	// We need this for the "exact" approximation later
 	sge::model::object_ptr const model_raw = 
 		params.systems.md3_loader()->load(
 			create_path(
@@ -184,6 +123,7 @@ insula::prop::manager::parse_single_prop(
 				FCPPT_TEXT("models/props")),
 			sge::model::load_flags::switch_yz);
 
+	// And we need this for the bounding box later
 	model::shared_object_ptr model = 
 		std::make_shared<model::object>(
 			model_raw,
@@ -191,14 +131,13 @@ insula::prop::manager::parse_single_prop(
 
 	backends_.push_back(
 		new model::backend(
-			sge::parse::json::find_member_exn<bool>(
-				p.members,
-				FCPPT_TEXT("has_transparency")),
+			// transparency is removed for now
+			false,
 			params.systems.renderer(),
 			params.camera,
 			params.model_shader,
-			fcppt::assign::make_container<model::backend::texture_map>(
-				model::backend::texture_map::value_type(
+			{
+				{
 					"texture",
 					sge::image::create_texture(
 						create_path(
@@ -209,7 +148,9 @@ insula::prop::manager::parse_single_prop(
 						params.systems.renderer(),
 						params.systems.image_loader(),
 						sge::renderer::filter::trilinear,
-						sge::renderer::resource_flags::none))),
+						sge::renderer::resource_flags::none)
+				}
+			},
 			model));
 
 	// We pull all the settings from the json because we need them in
@@ -218,20 +159,11 @@ insula::prop::manager::parse_single_prop(
 
 	// We use a pair here since we've got the parse_range function on
 	// the top that's pretty handy
-	std::pair<height_map::scalar,height_map::scalar> const flatness =	
-		parse_range<height_map::scalar,sge::parse::json::float_type>(
+	height_map::flatness_range const flatness =	
+		json::parse_vector<height_map::scalar,2,sge::parse::json::float_type>(
 			sge::parse::json::find_member_exn<sge::parse::json::array>(
 				p.members,
 				FCPPT_TEXT("flatness_range")));
-
-	physics::solidity::type const solid = 
-		sge::parse::json::find_member_exn<bool>(
-			p.members,
-			FCPPT_TEXT("solid")) 
-		? 
-			physics::solidity::solid 
-		: 
-			physics::solidity::nonsolid;
 
 	physics::scalar const penetration_depth = 
 		static_cast<physics::scalar>(
@@ -239,20 +171,20 @@ insula::prop::manager::parse_single_prop(
 				p.members,
 				FCPPT_TEXT("penetration_depth")));
 
-	std::pair<physics::scalar,physics::scalar> const scale_range = 
-		parse_range<physics::scalar,sge::parse::json::float_type>(
+	physics::vec2 const scale_range = 
+		json::parse_vector<physics::scalar,2,sge::parse::json::float_type>(
 			sge::parse::json::find_member_exn<sge::parse::json::array>(
 				p.members,
 				FCPPT_TEXT("scale_range")));
 
 	physics::vec3 const rotation_axis = 
-		parse_vector<physics::scalar,3,sge::parse::json::float_type>(
+		json::parse_vector<physics::scalar,3,sge::parse::json::float_type>(
 			sge::parse::json::find_member_exn<sge::parse::json::array>(
 				p.members,
 				FCPPT_TEXT("rotation_axis")));
 
 	physics::vec3 const physics_offset = 
-		parse_vector<physics::scalar,3,sge::parse::json::float_type>(
+		json::parse_vector<physics::scalar,3,sge::parse::json::float_type>(
 			sge::parse::json::find_member_exn<sge::parse::json::array>(
 				p.members,
 				FCPPT_TEXT("physics_offset")));
@@ -273,8 +205,8 @@ insula::prop::manager::parse_single_prop(
 		fcppt::math::twopi<physics::scalar>());
 
 	std::uniform_real_distribution<physics::scalar> scale_rng(
-		scale_range.first,
-		scale_range.second);
+		scale_range[0],
+		scale_range[1]);
 
 	// Test if the approximation is "exact". If so, create nonscaled
 	// prototype shape and give that to the parse_approximation function
@@ -295,9 +227,7 @@ insula::prop::manager::parse_single_prop(
 				params.height_map,
 				params.water_level,
 				rng_engine,
-				height_map::flatness_range(
-					flatness.first,
-					flatness.second));
+				flatness);
 
 		physics::scalar const scaling = 
 			scale_rng(
@@ -333,94 +263,19 @@ insula::prop::manager::parse_single_prop(
 					penetration_depth * scaling,
 					static_cast<physics::scalar>(
 						point2.y())),
-				physics_offset,
-				solid,
-				sge::parse::json::find_member_exn<bool>(
-					p.members,
-					FCPPT_TEXT("is_ghost"))));
+				physics_offset));
 	}
 }
 
-void
+insula::prop::shared_instance_ptr const
 insula::prop::manager::instantiate(
-	instance_sequence &instances,
-	physics::world &physics_world)
+	physics::world &world)
 {
-	BOOST_FOREACH(
-		blueprint_sequence::const_reference r,
-		blueprints_)
-	{
-		graphics::mat4 const model_matrix = 
-			fcppt::math::matrix::translation(
-					fcppt::math::vector::structure_cast<graphics::vec3>(
-						r.origin)) *
-			fcppt::math::matrix::rotation_axis(
-				r.rotation_angle,
-				r.rotation_axis) *
-			uniform_scaling_matrix(
-				r.scaling);
-
-		std::auto_ptr<scene::transparent_instance> new_instance(
-			r.is_ghost
-			?
-				static_cast<scene::transparent_instance *>(
-					new ghost_instance(
-						model_matrix,
-						physics::ghost_parameters(
-							physics_world,
-							r.origin + 
-							fcppt::math::vector::narrow_cast<physics::vec3>(
-								model_matrix * 
-								fcppt::math::vector::structure_cast<graphics::vec4>(
-									fcppt::math::vector::construct(
-										r.offset,
-										static_cast<physics::scalar>(
-											0)))),
-							matrix_to_3x3<physics::scalar>(
-								fcppt::math::matrix::rotation_axis(
-									r.rotation_angle,
-									r.rotation_axis)),
-							r.shape)))
-			: 
-				static_cast<scene::transparent_instance *>(
-					new static_model_instance(
-						model_matrix,
-						physics::static_model_parameters(
-							physics_world,
-							physics::object_type::prop,
-							// Let's find out what the origin of the "child" shape is in
-							// relation to the model. We translate the offset with the same
-							// translation matrices as the model and add a translation to the
-							// model origin
-							r.origin + 
-							fcppt::math::vector::narrow_cast<physics::vec3>(
-								model_matrix * 
-								fcppt::math::vector::structure_cast<graphics::vec4>(
-									fcppt::math::vector::construct(
-										r.offset,
-										static_cast<physics::scalar>(
-											0)))),
-							// We cannot scale a static model and we cannot translate it
-							// with the matrix, so all that's left is the rotation
-							matrix_to_3x3<physics::scalar>(
-								fcppt::math::matrix::rotation_axis(
-									r.rotation_angle,
-									r.rotation_axis)),
-							r.shape,
-							r.solidity))));
-
-		instances.push_back(
-			new_instance);
-
-		if (r.backend.has_transparency())
-			scene_manager_.insert_transparent(
-				r.backend,
-				instances.back());
-		else
-			scene_manager_.insert(
-				r.backend,
-				instances.back());
-	}
+	return 
+		std::make_shared<instance>(
+			instance_parameters(
+				world,
+				*this));
 }
 
 insula::physics::approximation::variant const
@@ -437,7 +292,7 @@ insula::prop::manager::parse_approximation(
 		return physics::approximation::box(
 			scaling * 
 			fcppt::math::vector::structure_cast<physics::dim3>(
-				parse_vector<physics::scalar,3,sge::parse::json::float_type>(
+				json::parse_vector<physics::scalar,3,sge::parse::json::float_type>(
 					sge::parse::json::find_member_exn<sge::parse::json::array>(
 						o.members,
 						FCPPT_TEXT("size")))));
@@ -467,12 +322,13 @@ insula::prop::manager::parse_approximation(
 					o.members,
 					FCPPT_TEXT("radius"))));
 
-	std::vector<fcppt::string> const allowed_types = 
-		fcppt::assign::make_container<std::vector<fcppt::string>>
-			(FCPPT_TEXT("sphere"))
-			(FCPPT_TEXT("box"))
-			(FCPPT_TEXT("cylinder"))
-			(FCPPT_TEXT("exact"));
+	std::vector<fcppt::string> const allowed_types
+	{
+		FCPPT_TEXT("sphere"),
+		FCPPT_TEXT("box"),
+		FCPPT_TEXT("cylinder"),
+		FCPPT_TEXT("exact")
+	};
 
 	throw 
 		exception(

@@ -1,45 +1,66 @@
 #include "ghost.hpp"
-#include "mat3_to_bullet.hpp"
-#include "vec3_to_bullet.hpp"
-#include "scalar.hpp"
 #include "ghost_parameters.hpp"
-#include "world.hpp"
-#include <BulletCollision/CollisionShapes/btSphereShape.h>
-#include <BulletDynamics/Dynamics/btDynamicsWorld.h>
-#include <BulletCollision/CollisionDispatch/btCollisionWorld.h>
-#include <LinearMath/btTransform.h>
+#include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
+
+namespace
+{
+// Helper functions needed to give the box to createProxy
+btVector3
+box_min(
+	insula::physics::box const &b)
+{
+	return 
+		btVector3(
+			b.left(),
+			b.bottom(),
+			b.back());
+}
+
+// Helper functions needed to give the box to createProxy
+btVector3
+box_max(
+	insula::physics::box const &b)
+{
+	return 
+		btVector3(
+			b.right(),
+			b.top(),
+			b.front());
+}
+}
 
 insula::physics::ghost::ghost(
 	ghost_parameters const &params)
 :
 	object(
 		object_type::ghost),
-	world_(
-		params.world_.handle())
+	collision_object_(),
+	broadphase_(
+		params.broadphase),
+	proxy_(
+		*(broadphase_->createProxy(
+			box_min(
+				params.aabb),
+			box_max(
+				params.aabb),
+			// shapeType, unused by broadphase (the dispatcher uses it)
+			0,
+			// user pointer
+			&collision_object_,
+			// group and mask (the CDDemo uses 1,1, too , so I copied it)
+			1,
+			1,
+			// dispatcher, unused
+			0,
+			// sapProxy, unused
+			0)))
 {
-	m_internalType = CO_COLLISION_OBJECT;
-	m_collisionFlags |= CF_STATIC_OBJECT;
-	m_worldTransform = 
-		btTransform(
-			mat3_to_bullet(
-				params.transformation),
-			vec3_to_bullet(
-				params.position));
-	setCollisionShape(
-		params.shape.get());
-	m_interpolationWorldTransform = m_worldTransform;
-	m_interpolationLinearVelocity.setValue(0,0,0);
-	m_interpolationAngularVelocity.setValue(0,0,0);
-	m_friction = static_cast<scalar>(0);
-	m_restitution = static_cast<scalar>(0);
-	m_userObjectPointer = this;
-
-	world_.addCollisionObject(
-		this);
 }
 
 insula::physics::ghost::~ghost()
 {
-	world_.removeCollisionObject(
-		this);
+	broadphase_->destroyProxy(
+		&proxy_,
+		// Dispatcher
+		0);
 }

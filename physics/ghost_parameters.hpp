@@ -1,14 +1,11 @@
 #ifndef INSULA_PHYSICS_GHOST_PARAMETERS_HPP_INCLUDED
 #define INSULA_PHYSICS_GHOST_PARAMETERS_HPP_INCLUDED
 
-#include "object_type.hpp"
-#include "vec3.hpp"
-#include "mat3.hpp"
-#include "scalar.hpp"
-#include "world_fwd.hpp"
-#include "shared_shape_ptr.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
+#include "box.hpp"
+#include "broadphase/shared_object_ptr.hpp"
+#include <fcppt/math/box/basic_impl.hpp>
+
+class btDbvtBroadphase;
 
 namespace insula
 {
@@ -17,23 +14,16 @@ namespace physics
 class ghost_parameters
 {
 public:
-	world &world_;
-	vec3 position;
-	mat3 transformation;
-	scalar radius;
-	shared_shape_ptr shape;
+	broadphase::shared_object_ptr broadphase;
+	box aabb;
 
 	explicit
 	ghost_parameters(
-		world &world_,
-		vec3 position,
-		mat3 transformation,
-		shared_shape_ptr shape)
+		broadphase::shared_object_ptr broadphase,
+		box const &aabb)
 	:
-		world_(world_),
-		position(position),
-		transformation(transformation),
-		shape(shape)
+		broadphase(broadphase),
+		aabb(aabb)
 	{
 	}
 };

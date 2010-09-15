@@ -89,23 +89,6 @@
 	zwischen Nugget und Vehikel und löscht dann Props entsprechend und
 	spielt einen Ton ab.
 
-*** Visibilitymanager
-
-Die Ghosts brauchen ihre eigene Broadphase, damit die Performance
-nicht leidet. Man brauch also einen Manager, der mehrere Broadphases
-verwaltet und das Culling durchführt.
-
-Die Ownership über die Broadphases soll der User haben. Daher müssen
-wir =visibility::broadphase= von =btDvbtBroadphase= ableiten und mit
-einem =list_hook= ausstatten. Dann muss eine
-=intrusive_list<broaphase>= erstellt werden. Die Funktion
-=shared_broadphase_ptr create_broadphase()= erstellt eine neue
-Broadphase, fügt sie der Liste hinzu und gibt sie zurück.
-
-Die Klasse hält die momentane Iteration und hat eine
-=update=-Funktion, die alle Broadphases durchgeht und cullt. Braucht
-dafür die Kamera.
-
 *** ghost-Manager
 
 Besitzt
@@ -162,15 +145,6 @@ Klasse "ghost_instance":
 
 - Enthält ein =physics::ghosts=-Objekt, ansonsten ähnlich =static_instance=
 
-Klasse "=physics::ghost=":
-
-- Bekommt im Konstruktor eine =btDbvtBroadphase= und eine
-  =physics::box=, die in _absoluten_ Koordinaten ist. Erstellt dann
-  ein =btCollisionObject= und setzt den Userpointer auf this. Ruft
-  darauf dann "roh" createProxy auf und gibt das =btCollisionObject=
-  als userPtr an.
-- Im Destruktor löscht er sich selber natürlich.
-
 ** Anderes
 	- Terrain und Skydome sollten in den Szenemanager eingebaut werden
 	- Dazu muss jedem Backend eine Priorität zugeordnet werden (Datenfeld in backend)
@@ -208,6 +182,7 @@ Hierzu z.B. cgal
 ** TODO orthonormalize_gram_schmidt hinzufügen und gucken wie's läuft
 ** TODO machine::input_repeat_callback fixen
 ** TODO Präfixe in config.json auf Sektionen in json abbilden
+** TODO fcppt::assign durch initializer_list ersetzen
 * Aktivitäten
 ** TODO Shadow Maps [1/5]
 *** DONE Neues uniform-System aufsetzen

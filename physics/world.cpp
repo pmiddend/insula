@@ -1,9 +1,8 @@
 #include "world.hpp"
 #include "vec3_to_bullet.hpp"
 #include "object.hpp"
-#include "culler.hpp"
+#include "broadphase/manager.hpp"
 #include "../graphics/frustum.hpp"
-#include "../graphics/camera/object.hpp"
 #include "vehicle/object.hpp"
 #include "static_model.hpp"
 #include "../math/extract_frustum.hpp"
@@ -21,28 +20,19 @@
 #include <fcppt/io/cerr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/range/iterator_range_core.hpp>
-#include <array>
 
 insula::physics::world::world(
-	graphics::camera::object &_camera,
 	box const &/*world_size*/,
-	vec3 const &gravity)
+	vec3 const &gravity,
+	broadphase::manager &broadphase_manager)
 :
-	camera_(
-		_camera),
 	configuration_(
 		new btDefaultCollisionConfiguration()),
 	dispatcher_(
 		new btCollisionDispatcher(
 			configuration_.get())),
 	broadphase_(
-		new btDbvtBroadphase()
-		/*
-		new btAxisSweep3(
-			vec3_to_bullet(
-				world_size.pos()),
-			vec3_to_bullet(
-				world_size.pos() + world_size.dimension()))*/),
+		broadphase_manager.create()),
 	constraint_solver_(
 		new btSequentialImpulseConstraintSolver()),
 	world_(
@@ -52,12 +42,7 @@ insula::physics::world::world(
 			constraint_solver_.get(),
 			configuration_.get())),
 	filter_callback_(
-		*world_->getPairCache()),
-	current_iteration_(
-		// This is zero so it's different from the default iteration value
-		// of the objects
-		static_cast<iteration>(
-			1))
+		*world_->getPairCache())
 {
 	// bullet sets some default value, so we better override this here
 	world_->setGravity(
@@ -131,12 +116,6 @@ btDynamicsWorld &
 insula::physics::world::handle()
 {
 	return *world_;
-}
-
-insula::physics::iteration
-insula::physics::world::current_iteration() const
-{
-	return current_iteration_;
 }
 
 fcppt::signal::auto_connection
@@ -234,48 +213,4 @@ insula::physics::world::process_collisions()
 			continue;
 		}
 	}
-}
-
-void
-insula::physics::world::update_visibility()
-{
-	std::size_t const plane_count = 4;
-	
-	std::array<btVector3,plane_count> normals;
-	std::array<scalar,plane_count> lambdas;
-
-	graphics::frustum const f = 
-		math::extract_frustum<graphics::scalar>(
-			camera_.mvp());
-
-	normals[0] = vec3_to_bullet(f.left().normal());
-	normals[1] = vec3_to_bullet(f.right().normal());
-	normals[2] = vec3_to_bullet(f.top().normal());
-	normals[3] = vec3_to_bullet(f.bottom().normal());
-
-	lambdas[0] = f.left().lambda();
-	lambdas[1] = f.right().lambda();
-	lambdas[2] = f.top().lambda();
-	lambdas[3] = f.bottom().lambda();
-
-	culler culler_(
-		++current_iteration_);
-	
-	//fcppt::io::cout << "collide static\n";
-	btDbvt::collideKDOP(
-		broadphase_->m_sets[0].m_root,
-		normals.data(),
-		lambdas.data(),
-		static_cast<int>(
-			normals.size()),
-		culler_);
-
-	//fcppt::io::cout << "collide dynamic\n";
-	btDbvt::collideKDOP(
-		broadphase_->m_sets[1].m_root,
-		normals.data(),
-		lambdas.data(),
-		static_cast<int>(
-			normals.size()),
-		culler_);
 }

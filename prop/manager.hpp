@@ -4,11 +4,13 @@
 #include "blueprint.hpp"
 #include "instance_sequence.hpp"
 #include "parameters_fwd.hpp"
+#include "shared_instance_ptr.hpp"
 #include "../scene/manager_fwd.hpp"
 #include "../model/backend.hpp"
 #include "../physics/shared_shape_ptr.hpp"
 #include "../physics/approximation/variant.hpp"
 #include "../physics/triangle_mesh/shape.hpp"
+#include "../physics/broadphase/manager_fwd.hpp"
 #include "../physics/scalar.hpp"
 #include "../physics/world_fwd.hpp"
 #include <BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
@@ -27,13 +29,14 @@ public:
 	manager(
 		parameters const &);
 
-	void
+	shared_instance_ptr	const
 	instantiate(
-		instance_sequence &,
 		physics::world &);
 
 	~manager();
 private:
+	friend class instance;
+
 	typedef
 	boost::ptr_vector<physics::triangle_mesh::shape>
 	mesh_prototype_sequence;
@@ -47,6 +50,7 @@ private:
 	blueprint_sequence;
 
 	scene::manager &scene_manager_;
+	physics::broadphase::manager &broadphase_manager_;
 	backend_sequence backends_;
 	blueprint_sequence blueprints_;
 	mesh_prototype_sequence mesh_prototypes_;
