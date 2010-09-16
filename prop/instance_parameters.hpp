@@ -19,8 +19,8 @@ public:
 		physics::world &world,
 		manager &manager_)
 	:
-		world(world),
-		manager_(manager_)
+		manager_(manager_),
+		world(world)
 	{
 	}
 };

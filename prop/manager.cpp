@@ -7,6 +7,7 @@
 #include "../static_model_instance.hpp"
 #include "../exception.hpp"
 #include "../json/parse_vector.hpp"
+#include "../json/member_has_type.hpp"
 #include "../random_engine.hpp"
 #include "../stdlib/for_each.hpp"
 #include "../random_seed.hpp"
@@ -62,29 +63,6 @@
 #include <utility>
 #include <vector>
 #include <random>
-
-namespace
-{
-template<typename T>
-bool
-member_has_type(
-	sge::parse::json::object const &o,
-	fcppt::string const &s)
-{
-	try
-	{
-		sge::parse::json::find_member_exn<T>(
-			o.members,
-			s);
-	}
-	catch (sge::parse::json::invalid_get const &)
-	{
-		return false;
-	}
-	return true;
-}
-
-}
 
 insula::prop::manager::manager(
 	parameters const &params)
@@ -211,7 +189,7 @@ insula::prop::manager::parse_single_prop(
 	// Test if the approximation is "exact". If so, create nonscaled
 	// prototype shape and give that to the parse_approximation function
 	bool const exact_approximation = 
-		member_has_type<sge::parse::json::string>(
+		json::member_has_type<sge::parse::json::string>(
 			p,
 			FCPPT_TEXT("approximation"));
 

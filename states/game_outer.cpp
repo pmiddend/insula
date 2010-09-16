@@ -169,6 +169,8 @@ insula::states::game_outer::react(
 				sge::renderer::state::cull_mode::off,
 				water_->water_level());
 		});
+
+	broadphase_manager_.update();
 }
 
 void

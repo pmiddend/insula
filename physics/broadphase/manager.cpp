@@ -55,6 +55,8 @@ insula::physics::broadphase::manager::update()
 	lambdas[2] = f.top().lambda();
 	lambdas[3] = f.bottom().lambda();
 
+	current_iteration_++;
+
 	BOOST_FOREACH(
 		object_list::reference r,
 		objects_)
@@ -79,8 +81,6 @@ insula::physics::broadphase::manager::update()
 				normals.size()),
 			culler_);
 	}
-
-	current_iteration_++;
 }
 
 insula::physics::broadphase::iteration
