@@ -1,15 +1,18 @@
 #include "manager.hpp"
 #include "manager_parameters.hpp"
-#include "../ghost_instance.hpp"
+#include "instance.hpp"
+#include "../scene/manager.hpp"
 #include "../physics/vec2.hpp"
 #include "../physics/broadphase/manager.hpp"
 #include "../physics/ghost_parameters.hpp"
 #include "../physics/dim3.hpp"
+#include "../physics/vec3.hpp"
 #include "../stdlib/for_each.hpp"
 #include "../math/uniform_scaling_matrix.hpp"
 #include "../graphics/box.hpp"
 #include "../graphics/vec3.hpp"
 #include "../graphics/mat4.hpp"
+#include "../graphics/dim3.hpp"
 #include "../create_path.hpp"
 #include "../json/parse_vector.hpp"
 #include "../model/object.hpp"
@@ -40,9 +43,15 @@
 #include <fcppt/math/matrix/rotation_axis.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/length.hpp>
+#include <fcppt/math/vector/output.hpp>
+#include <fcppt/math/vector/dim.hpp>
+#include <fcppt/math/dim/arithmetic.hpp>
+#include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/twopi.hpp>
-#include <fcppt/assign/make_container.hpp>
+#include <fcppt/io/cout.hpp>
+#include <fcppt/assert.hpp>
 #include <functional>
 #include <memory>
 #include <algorithm>
@@ -86,12 +95,6 @@ insula::ghost::manager::parse_single(
 				sge::model::load_flags::switch_yz),
 			params.systems.renderer());
 
-	// We cannot take this bounding box as the bounding box for the
-	// broadphase since the model is rotated and scaled. We need to take
-	// both into account.
-	graphics::box const aabb = 
-		model->bounding_box();
-	
 	// This is the same as with nuggets and props
 	backends_.push_back(
 		new model::backend(
@@ -193,14 +196,23 @@ insula::ghost::manager::parse_single(
 			static_cast<physics::scalar>(
 				point2.y()));
 
-		physics::scalar const box_edge_length = 
+		FCPPT_ASSERT(model);
+
+		// We cannot take this bounding box as the bounding box for the
+		// broadphase since the model is rotated and scaled. We need to take
+		// both into account.
+		graphics::box const aabb = 
+			model->bounding_box();
+
+		physics::scalar box_edge_length = 
 			scaling * 
-			(*std::max_element(
-				model->bounding_box().dimension().begin(),
-				model->bounding_box().dimension().end()));
+			fcppt::math::vector::length(
+				fcppt::math::dim::structure_cast<physics::vec3>(
+					aabb.dimension()/
+					static_cast<graphics::scalar>(2)));
 
 		instances_.push_back(
-			new ghost_instance(
+			new instance(
 				fcppt::math::matrix::translation(
 					fcppt::math::vector::structure_cast<graphics::vec3>(
 						origin)) *
@@ -215,12 +227,16 @@ insula::ghost::manager::parse_single(
 					physics::box(
 						origin - 
 						physics::vec3(
-							box_edge_length,
-							box_edge_length,
-							box_edge_length),
+							static_cast<physics::scalar>(box_edge_length),
+							static_cast<physics::scalar>(box_edge_length),
+							static_cast<physics::scalar>(box_edge_length)),
 						physics::dim3(
-							box_edge_length,
-							box_edge_length,
-							box_edge_length)))));
+							2*box_edge_length,
+							2*box_edge_length,
+							2*box_edge_length)))));
+
+		scene_manager_.insert(
+			backends_.back(),
+			instances_.back());
 	}
 }

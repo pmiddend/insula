@@ -1,5 +1,10 @@
 #include "ghost.hpp"
 #include "ghost_parameters.hpp"
+#include "vec3_to_bullet.hpp"
+#include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/dim.hpp>
+#include <fcppt/math/box/basic_impl.hpp>
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
 
 namespace
@@ -10,10 +15,8 @@ box_min(
 	insula::physics::box const &b)
 {
 	return 
-		btVector3(
-			b.left(),
-			b.bottom(),
-			b.back());
+		insula::physics::vec3_to_bullet(
+			b.pos());
 }
 
 // Helper functions needed to give the box to createProxy
@@ -22,10 +25,8 @@ box_max(
 	insula::physics::box const &b)
 {
 	return 
-		btVector3(
-			b.right(),
-			b.top(),
-			b.front());
+		insula::physics::vec3_to_bullet(
+			b.pos() + b.dimension());
 }
 }
 
@@ -55,12 +56,16 @@ insula::physics::ghost::ghost(
 			// sapProxy, unused
 			0)))
 {
+	collision_object_.setUserPointer(
+		this);
 }
 
 insula::physics::ghost::~ghost()
 {
+	/*
 	broadphase_->destroyProxy(
 		&proxy_,
 		// Dispatcher
 		0);
+	*/
 }

@@ -21,6 +21,7 @@
 #include <sge/font/drawer_ptr.hpp>
 #include "game_inner_fwd.hpp"
 #include "../prop/manager.hpp"
+#include "../ghost/manager.hpp"
 
 // vehicle position begin
 #include "../random_engine.hpp"
@@ -144,6 +145,7 @@ private:
 	player_time_map player_times_; 
 	physics::broadphase::manager broadphase_manager_;
 	prop::manager prop_manager_;
+	ghost::manager ghost_manager_;
 };
 }
 }

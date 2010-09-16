@@ -29,7 +29,7 @@ public:
 	explicit
 	manager_parameters(
 		scene::manager &scene_manager,
-		physics::broadphase::manager broadphase_manager,
+		physics::broadphase::manager &broadphase_manager,
 		sge::parse::json::array const &array,
 		sge::systems::instance const &systems,
 		graphics::camera::object &camera,

@@ -1,10 +1,8 @@
 #ifndef INSULA_GHOST_MANAGER_HPP_INCLUDED
 #define INSULA_GHOST_MANAGER_HPP_INCLUDED
 
-#include "shared_instance_ptr.hpp"
-#include "blueprint.hpp"
 #include "manager_parameters_fwd.hpp"
-#include "../ghost_instance.hpp"
+#include "instance.hpp"
 #include "../model/backend.hpp"
 #include "../scene/manager_fwd.hpp"
 #include "../physics/broadphase/manager_fwd.hpp"
@@ -44,7 +42,7 @@ private:
 	backend_sequence;
 
 	typedef
-	boost::ptr_vector<ghost_instance>
+	boost::ptr_vector<instance>
 	instance_sequence;
 
 	scene::manager &scene_manager_;

@@ -183,6 +183,7 @@ Hierzu z.B. cgal
 ** TODO machine::input_repeat_callback fixen
 ** TODO Präfixe in config.json auf Sektionen in json abbilden
 ** TODO fcppt::assign durch initializer_list ersetzen
+** TODO height_map und water mit parameters-Klassen ausstatten
 * Aktivitäten
 ** TODO Shadow Maps [1/5]
 *** DONE Neues uniform-System aufsetzen

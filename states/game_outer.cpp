@@ -5,6 +5,7 @@
 #include "../create_path.hpp"
 #include "../media_path.hpp"
 #include "../get_option.hpp"
+#include "../ghost/manager_parameters.hpp"
 #include "../height_map/cli_factory.hpp"
 #include "../stdlib/map.hpp"
 #include "../height_map/object.hpp"
@@ -29,6 +30,7 @@
 #include <sge/renderer/state/cull_mode.hpp>
 #include <sge/font/drawer_3d.hpp>
 #include <sge/parse/json/find_member_exn.hpp>
+#include <sge/parse/json/array.hpp>
 #include <sge/parse/json/string.hpp>
 #include <sge/image/colors.hpp>
 #include <sge/image/color/rgb8.hpp>
@@ -137,7 +139,20 @@ insula::states::game_outer::game_outer(
 			*height_map_,
 			water_->water_level(),
 			scene_manager_,
-			broadphase_manager_))
+			broadphase_manager_)),
+	ghost_manager_(
+		ghost::manager_parameters(
+			scene_manager_,
+			broadphase_manager_,
+			sge::parse::json::find_member_exn<sge::parse::json::array>(
+				context<machine>().config_file().members,
+				FCPPT_TEXT("ghosts")),
+			context<machine>().systems(),
+			context<machine>().camera(),
+			model_shader_,
+			*height_map_,
+			static_cast<height_map::scalar>(
+				water_->water_level())))
 {
 	if (player_times_.empty())
 		throw exception(FCPPT_TEXT("You have to specify at least one player (two would be even better!)"));

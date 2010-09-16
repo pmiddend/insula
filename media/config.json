@@ -57,11 +57,8 @@
 			"model" : "rock1.md3",
 			"texture" : "rocks.png",
 			"flatness_range" : [0.0,1.0],
-			"has_transparency" : false,
 			"penetration_depth" : 1.0,
 			"scale_range" : [0.5,10.0],
-			"solid" : true,
-			"is_ghost" : false,
 			"rotation_axis" : [0.0,1.0,0.0],
 			"physics_offset" : [0.0,0.0,0.0],
 			"approximation" : 
@@ -72,48 +69,30 @@
 			"count" : 100
 		},
 		{
-			"model" : "grass1.md3",
-			"texture" : "grass.png",
-			"flatness_range" : [0.0,0.05],
-			"has_transparency" : false,
-			"penetration_depth" : 0.0,
-			"scale_range" : [4.0,6.0],
-			"solid" : false,
-			"is_ghost" : true,
-			"rotation_axis" : [0.0,1.0,0.0],
-			"physics_offset_old" : [0.0,0.0,0.0],
-			"physics_offset" : [0.0,0.0,0.0],
-			"approximation" : "exact",
-			"approximation_alternative" : 
-			{
-				"type" : "cylinder",
-				"orientation" : "y",
-				"height" : 5.0,
-				"radius" : 1.0
-			},
-			"count" : 10000
-		},
-		{
 			"model" : "palmtree.md3",
 			"texture" : "palmtree.png",
 			"flatness_range" : [0.0,0.005],
-			"has_transparency" : false,
 			"penetration_depth" : 0.0,
 			"scale_range" : [0.5,10.0],
-			"solid" : true,
-			"is_ghost" : false,
 			"rotation_axis" : [0.0,1.0,0.0],
 			"physics_offset_old" : [-3.73,-3.48,-0.36],
 			"physics_offset" : [0.0,0.0,0.0],
 			"approximation" : "exact",
-			"approximation_alternative" : 
-			{
-				"type" : "cylinder",
-				"orientation" : "y",
-				"height" : 5.0,
-				"radius" : 1.0
-			},
 			"count" : 100
+		}
+	],
+
+	"ghosts" : 
+	[
+		{
+			"model" : "grass1.md3",
+			"texture" : "grass.png",
+			"flatness_range" : [0.0,0.05],
+			"penetration_depth" : 0.0,
+			"scale_range" : [4.0,6.0],
+			"rotation_axis" : [0.0,1.0,0.0],
+			"physics_offset" : [0.0,0.0,0.0],
+			"count" : 10000
 		}
 	],
 	
