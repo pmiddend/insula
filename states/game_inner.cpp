@@ -120,7 +120,6 @@ insula::states::game_inner::react(
 	events::tick const &)
 {
 	nuggets_->update();
-	physics_broadphase_.update();
 }
 
 void

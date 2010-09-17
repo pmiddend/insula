@@ -19,7 +19,5 @@ table.floating_image
 	margin: 1em;
 }
 
-h1
-{
-	text-color:#345d01
-}
+h2 { color:#345d01; }
+h3 { color:#5c9002; }
