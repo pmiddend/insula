@@ -31,6 +31,7 @@
 #include <fcppt/math/vector/normalize.hpp>
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/angle_between.hpp>
+#include <fcppt/math/vector/atan2.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/text.hpp>
 
@@ -107,19 +108,35 @@ insula::arrow::render()
 	model_shader_.set_uniform(
 		"mvp",
 		camera_.perspective() * 
+
 		fcppt::math::matrix::translation(
 			offset_) * 
+
 		// NOTE: Yes, this is relative to the camera, so not perfectly
 		// alright, I'll have to fix that some day
 		fcppt::math::matrix::rotation_y(
+
+			// See http://www.euclideanspace.com/maths/geometry/trig/inverse/index.htm
+
+			(*fcppt::math::vector::atan2(forward)) - (*fcppt::math::vector::atan2(to_nugget))
+
+			/*
 			std::acos(
 				fcppt::math::vector::dot(
+					to_nugget,
+					forward)
+
+				/
+
+				(length(to_nugget)*length(forward)))
+			*/
+
+			/*
+			 (*fcppt::math::vector::angle_between<graphics::scalar>(
 				to_nugget,
-				forward)/
-			(length(to_nugget)*length(forward))
-			/* *fcppt::math::vector::angle_between<graphics::scalar>(
-				to_nugget,
-				forward)*/))
+				forward))*/
+
+		)
 		/*
 		fcppt::math::matrix::rotation_y(
 			static_cast<graphics::scalar>(
