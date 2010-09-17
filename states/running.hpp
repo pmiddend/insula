@@ -8,6 +8,7 @@
 #include "../events/nuggets_empty.hpp"
 #include "../events/key.hpp"
 #include "../vehicle/scoped.hpp"
+#include "../arrow.hpp"
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
@@ -52,6 +53,7 @@ public:
 		events::key const &);
 private:
 	vehicle::scoped scoped_vehicle_;
+	arrow arrow_;
 };
 }
 }

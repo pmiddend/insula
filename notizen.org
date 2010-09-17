@@ -184,6 +184,7 @@ Hierzu z.B. cgal
 ** TODO Präfixe in config.json auf Sektionen in json abbilden
 ** TODO fcppt::assign durch initializer_list ersetzen
 ** TODO height_map und water mit parameters-Klassen ausstatten
+** TODO Die Nuggets sollten sich schön drehen
 * Aktivitäten
 ** TODO Shadow Maps [1/5]
 *** DONE Neues uniform-System aufsetzen
@@ -252,18 +253,21 @@ noch überlegen.
 ** TODO Musiklautstärke muss einstellbar sein
 ** TODO Mehr Musik
 ** TODO Konkretes Level bauen, was man auch ausliefern kann
-** TODO Nuggets aus game_inner rausziehen
-** TODO "Nugget-Indikatoren" einbauen
 ** TODO Persistente Konsolenhistory
 ** TODO Partikelsystem
-** TODO random_point erweitern
+** TODO Looping von Musik fixen
+Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
+** DONE Nuggets aus game_inner rausziehen
+	 CLOSED: [2010-09-17 Fri 19:40]
+** DONE "Nugget-Indikatoren" einbauen
+	 CLOSED: [2010-09-17 Fri 19:40]
+** DONE random_point erweitern
+	 CLOSED: [2010-09-17 Fri 19:40]
 Die Funktion sollte eine =steepness_range= bekommen (also ein
 Intervall in $[0,1]$) und generiert dann mit Hilfe des normalisierten
 Gradienten einen Punkt mit dieser Steilheit. Dei Funktion brauch dazu
 den normalisierten Gradienten, d.h. =height_map= muss den zur
 Verfügung stellen)
-** TODO Looping von Musik fixen
-Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
 ** DONE vehicle::speed_kmh muss relativ zu forward sein
 	 CLOSED: [2010-09-12 Sun 20:10]
 ** DONE Auto-Culling fixen

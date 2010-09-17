@@ -1,5 +1,6 @@
 #include "running.hpp"
 #include "finished.hpp"
+#include "../arrow_parameters.hpp"
 #include "../timed_output.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
@@ -13,8 +14,11 @@
 #include <sge/font/align_h.hpp>
 #include <sge/font/align_v.hpp>
 #include <sge/font/flags_none.hpp>
+#include <sge/parse/json/find_member_exn.hpp>
+#include <sge/parse/json/object.hpp>
 #include <sge/renderer/device.hpp>
 #include <fcppt/io/cout.hpp>
+#include <fcppt/text.hpp>
 #include <functional>
 
 insula::states::running::running(
@@ -23,7 +27,16 @@ insula::states::running::running(
 	my_base(
 		ctx),
 	scoped_vehicle_(
-		context<game_inner>().vehicle())
+		context<game_inner>().vehicle()),
+	arrow_(
+		arrow_parameters(
+			context<machine>().systems(),
+			sge::parse::json::find_member_exn<sge::parse::json::object>(
+				context<machine>().config_file().members,
+				FCPPT_TEXT("arrow")),
+			context<game_outer>().model_shader(),
+			context<machine>().camera(),
+			context<game_inner>().nugget_instance()))
 {
 	context<machine>().sounds().play(
 		FCPPT_TEXT("honk"));
@@ -62,6 +75,8 @@ insula::states::running::react(
 
 	context<game_inner>().react(
 		r);
+
+	arrow_.render();
 
 	sge::font::draw_text(
 		context<game_outer>().large_font(),

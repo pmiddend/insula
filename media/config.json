@@ -106,6 +106,13 @@
 		"size" : 30 
 	},
 
+	"arrow" : 
+	{
+		"model" : "arrow.md3",
+		"texture" : "arrow.png",
+		"offset" : [0.0,2.0,-3.0]
+	},
+
 	"music" : 
 	{  
 		"events" : 

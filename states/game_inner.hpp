@@ -56,6 +56,12 @@ public:
 	physics::world &
 	physics_world();
 
+	nugget::instance &
+	nugget_instance();
+
+	nugget::instance const &
+	nugget_instance() const;
+
 	~game_inner();
 private:
 	player current_player_;

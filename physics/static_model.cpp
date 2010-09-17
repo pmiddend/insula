@@ -1,6 +1,7 @@
 #include "static_model.hpp"
 #include "dim3_to_bullet.hpp"
 #include "transform_to_mat4.hpp"
+#include "bullet_to_vec3.hpp"
 #include "dim3.hpp"
 #include "scalar.hpp"
 #include "motion_state.hpp"
@@ -50,6 +51,14 @@ insula::physics::static_model::static_model(
 			break;
 	}
 
+}
+
+insula::physics::vec3 const
+insula::physics::static_model::position() const
+{
+	return 
+		bullet_to_vec3(
+			motion_state_->transform().getOrigin());
 }
 
 insula::physics::mat4 const

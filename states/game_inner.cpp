@@ -168,6 +168,18 @@ insula::states::game_inner::physics_world()
 	return physics_world_;
 }
 
+insula::nugget::instance &
+insula::states::game_inner::nugget_instance()
+{
+	return *nuggets_;
+}
+
+insula::nugget::instance const &
+insula::states::game_inner::nugget_instance() const
+{
+	return *nuggets_;
+}
+
 insula::states::game_inner::~game_inner()
 {
 }

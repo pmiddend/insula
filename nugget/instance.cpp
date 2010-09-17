@@ -13,10 +13,14 @@
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/vector/length.hpp>
+#include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/algorithm/ptr_container_erase.hpp>
+#include <fcppt/assert.hpp>
 #include <boost/foreach.hpp>
 #include <algorithm>
 #include <functional>
+#include <limits>
 
 insula::nugget::instance::instance(
 	manager &_manager,
@@ -117,4 +121,32 @@ insula::nugget::instance::physics_callback(
 
 	if (models_.size() == 1)
 		empty_signal_();
+}
+
+insula::physics::vec3 const
+insula::nugget::instance::closest_nugget(
+	physics::vec3 const &ref) const
+{
+	FCPPT_ASSERT(!models_.empty());
+
+	physics::scalar min_dist = 
+		std::numeric_limits<physics::scalar>::max();
+	physics::vec3 min;
+
+	BOOST_FOREACH(
+		static_model_instance const &sm,
+		models_)
+	{
+		physics::scalar const new_dist = 
+			fcppt::math::vector::length(
+				ref - sm.physics_model().position()); 
+
+		if (new_dist < min_dist)
+		{
+			min_dist = new_dist;
+			min = sm.physics_model().position();
+		}
+	}
+
+	return min;
 }

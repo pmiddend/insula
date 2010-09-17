@@ -59,11 +59,11 @@ insula::nugget::manager::manager(
 		},
 		std::make_shared<model::object>(
 			params.systems.md3_loader()->load(
-			create_path(
-				sge::parse::json::find_member_exn<sge::parse::json::string>(
-					params.json.members,
-					FCPPT_TEXT("model")),
-				FCPPT_TEXT("models/props")),
+				create_path(
+					sge::parse::json::find_member_exn<sge::parse::json::string>(
+						params.json.members,
+						FCPPT_TEXT("model")),
+					FCPPT_TEXT("models/props")),
 			sge::model::load_flags::switch_yz),
 			params.systems.renderer())),
 	shape_(

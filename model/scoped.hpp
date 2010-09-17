@@ -1,4 +1,5 @@
 #ifndef INSULA_MODEL_SCOPED_HPP_INCLUDED
+
 #define INSULA_MODEL_SCOPED_HPP_INCLUDED
 
 #include "object_fwd.hpp"

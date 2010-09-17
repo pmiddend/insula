@@ -30,6 +30,9 @@ public:
 	static_model(
 		static_model_parameters const &);
 
+	vec3 const 
+	position() const;
+
 	mat4 const
 	world_transform() const;
 

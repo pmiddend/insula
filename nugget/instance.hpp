@@ -6,8 +6,10 @@
 #include "../physics/vehicle/object_fwd.hpp"
 #include "../physics/static_model_fwd.hpp"
 #include "../static_model_instance.hpp"
+#include "../physics/vec3.hpp"
 #include "empty_callback.hpp"
 #include <fcppt/signal/object.hpp>
+#include <fcppt/math/vector/basic_impl.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <set>
 
@@ -29,6 +31,11 @@ public:
 
 	void
 	update();
+
+	// We need this to calculate the arrow's orientation
+	physics::vec3 const
+	closest_nugget(
+		physics::vec3 const &) const;
 private:
 	typedef
 	boost::ptr_vector<static_model_instance>
