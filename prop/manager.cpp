@@ -132,9 +132,6 @@ insula::prop::manager::parse_single_prop(
 	// We pull all the settings from the json because we need them in
 	// the loop that follows.
 
-
-	// We use a pair here since we've got the parse_range function on
-	// the top that's pretty handy
 	height_map::flatness_range const flatness =	
 		json::parse_vector<height_map::scalar,2,sge::parse::json::float_type>(
 			sge::parse::json::find_member_exn<sge::parse::json::array>(

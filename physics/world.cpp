@@ -82,14 +82,12 @@ insula::physics::world::add(
 {
 	world_->addRigidBody(
 		&b);
-	//fcppt::io::cout << "Added body with broadphase address: " << b.getBroadphaseHandle() << "\n";
 }
 
 void
 insula::physics::world::remove(
 	btRigidBody &b)
 {
-	//fcppt::io::cerr << "Removing a rigid body with collision handle: " << b.getBroadphaseHandle() << "\n";
 	world_->removeRigidBody(
 		&b);
 }

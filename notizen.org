@@ -155,7 +155,7 @@ Klasse "ghost_instance":
 		Skydome und das Wasser (geht das überhaupt?) und sie fügen sich
 		selber in den Szenemanager ein.
 
-
+		
 * Links
 - Zwei Fixes für raycastvehicle: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
 - Frustum/Occlusion culling: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896

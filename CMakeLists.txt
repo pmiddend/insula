@@ -75,6 +75,7 @@ FILE(GLOB_RECURSE events_files events/*)
 FILE(GLOB_RECURSE states_files states/*)
 FILE(GLOB_RECURSE vehicle_files vehicle/*)
 FILE(GLOB_RECURSE physics_files physics/*)
+FILE(GLOB_RECURSE nugget_files nugget/*)
 FILE(GLOB_RECURSE model_files model/*)
 FILE(GLOB_RECURSE json_files json/*)
 FILE(GLOB base_files media_path.cpp input_delegator.cpp create_path.cpp vehicle_input.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp help_needed.cpp create_variables_map.cpp generate_nuggets.cpp random_flat_point.cpp game_cli_options.cpp random_seed.cpp scoped_machine.cpp timed_output.cpp turn_timer.cpp milliseconds_to_string.cpp model_backend.cpp model_instance.cpp static_model_instance.cpp ghost_instance.cpp parse_json_config.cpp)
@@ -85,7 +86,7 @@ SET_SOURCE_FILES_PROPERTIES(
 	COMPILE_FLAGS
 	-DMEDIA_PATH="\\\"${media_path}\\\"")
 
-ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${vehicle_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files})
+ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${vehicle_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files} ${nugget_files})
 
 FUNCTION(CREATE_INSULA_EXE name)
 	ADD_EXECUTABLE(${name} ${name}.cpp)

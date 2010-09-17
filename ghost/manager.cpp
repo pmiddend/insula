@@ -25,6 +25,7 @@
 #include "../height_map/object.hpp"
 #include "../random_engine.hpp"
 #include "../random_seed.hpp"
+#include "../math/box_radius.hpp"
 #include <sge/model/loader.hpp>
 #include <sge/model/load_flags.hpp>
 #include <sge/parse/json/array.hpp>
@@ -43,11 +44,8 @@
 #include <fcppt/math/matrix/rotation_axis.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/length.hpp>
 #include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/vector/dim.hpp>
-#include <fcppt/math/dim/arithmetic.hpp>
-#include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/twopi.hpp>
 #include <fcppt/io/cout.hpp>
@@ -206,10 +204,8 @@ insula::ghost::manager::parse_single(
 
 		physics::scalar box_edge_length = 
 			scaling * 
-			fcppt::math::vector::length(
-				fcppt::math::dim::structure_cast<physics::vec3>(
-					aabb.dimension()/
-					static_cast<graphics::scalar>(2)));
+			math::box_radius(
+				aabb);
 
 		instances_.push_back(
 			new instance(
