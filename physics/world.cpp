@@ -116,13 +116,6 @@ insula::physics::world::handle()
 	return *world_;
 }
 
-fcppt::signal::auto_connection
-insula::physics::world::register_vehicle_static_callback(
-	vehicle_static_callback const &c)
-{
-	return vehicle_static_signal_.connect(c);
-}
-
 insula::physics::world::~world()
 {
 }
@@ -194,7 +187,7 @@ insula::physics::world::process_collisions()
 
 		if (v && sm)
 		{
-			vehicle_static_signal_(
+			signals_[std::minmax(v->type(),sm->type())](
 				std::ref(*v),
 				std::ref(*sm));
 			continue;
@@ -205,7 +198,7 @@ insula::physics::world::process_collisions()
 
 		if (v && sm)
 		{
-			vehicle_static_signal_(
+			signals_[std::minmax(v->type(),sm->type())](
 				std::ref(*v),
 				std::ref(*sm));
 			continue;

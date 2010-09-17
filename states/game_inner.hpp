@@ -56,29 +56,8 @@ public:
 	physics::world &
 	physics_world();
 
-	void
-	erase_nugget(
-		physics::static_model &);
-
-	// FIXME: is size_t ok here?
-	std::size_t 	
-	nugget_count() const;
-
 	~game_inner();
 private:
-	// These are the actual physics models (which will be deleted
-	// once the player touches them). They are kept here because they
-	// are needed from freelook on. That's why some of the game control
-	// logic like deleting this models is handled in game_inner, too
-	// (though it might be better placed in running)
-	typedef
-	boost::ptr_vector<static_model_instance>
-	nugget_model_sequence;
-
-	typedef
-	std::set<static_model_instance const *>
-	deletion_set;
-
 	player current_player_;
 	insula::turn_timer turn_timer_;
 	physics::broadphase::manager physics_broadphase_;
@@ -87,18 +66,10 @@ private:
 	physics::debug_drawer physics_debug_drawer_;
 	bool physics_debug_;
 	fcppt::signal::scoped_connection toggle_physics_debug_; 
-	model::shared_object_ptr nugget_model_;
-	model::backend nugget_backend_;
-	nugget_model_sequence nugget_models_;
+	nugget::shared_instance_ptr nuggets_;
+	fcppt::signal::scoped_connection nugget_empty_connection_; 
 	insula::vehicle::object vehicle_;
-	fcppt::signal::scoped_connection vehicle_static_connection_;
-	deletion_set to_delete_;
 	prop::shared_instance_ptr props_;
-
-	void
-	vehicle_static_callback(
-		physics::vehicle::object &,
-		physics::static_model &);
 };
 }
 }

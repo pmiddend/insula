@@ -3,6 +3,7 @@
 
 #include "parameters_fwd.hpp"
 #include "shared_instance_ptr.hpp"
+#include "../sound_controller.hpp"
 #include "../model/backend.hpp"
 #include "../physics/vec3.hpp"
 #include "../physics/world_fwd.hpp"
@@ -40,6 +41,7 @@ private:
 	physics::shared_shape_ptr shape_;
 	scene::manager &scene_manager_;
 	physics::broadphase::manager &broadphase_manager_;
+	sound_controller &sounds_;
 };
 }
 }

@@ -5,7 +5,7 @@
 #include "game_inner.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
-#include "../events/vehicle_nugget_collision.hpp"
+#include "../events/nuggets_empty.hpp"
 #include "../events/key.hpp"
 #include "../vehicle/scoped.hpp"
 #include <boost/statechart/state.hpp>
@@ -26,7 +26,7 @@ public:
 	<
 		boost::statechart::custom_reaction<events::tick>,
 		boost::statechart::custom_reaction<events::render>,
-		boost::statechart::custom_reaction<events::vehicle_nugget_collision>,
+		boost::statechart::custom_reaction<events::nuggets_empty>,
 		boost::statechart::custom_reaction<events::key>
 	> 
 	reactions;
@@ -45,7 +45,7 @@ public:
 
 	boost::statechart::result
 	react(
-		events::vehicle_nugget_collision const &);
+		events::nuggets_empty const &);
 
 	boost::statechart::result
 	react(

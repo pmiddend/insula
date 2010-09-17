@@ -85,25 +85,13 @@ insula::states::running::react(
 
 boost::statechart::result
 insula::states::running::react(
-	events::vehicle_nugget_collision const &s)
+	events::nuggets_empty const &)
 {
-	fcppt::io::cout << "There as a nugget collision, erasing the nugget\n";
-
-	context<game_inner>().erase_nugget(
-		s.nugget());
-
-	// That was the only nugget?
-	if (context<game_inner>().nugget_count() == 1)
-	{
-		fcppt::io::cout << "No nuggets left, so switching to finished state\n";
-		context<game_inner>().turn_timer().stop();
-		context<game_outer>().place_time(
-			context<game_inner>().current_player(),
-			context<game_inner>().turn_timer().milliseconds());
-		return transit<finished>();
-	}
-	
-	return discard_event();
+	context<game_inner>().turn_timer().stop();
+	context<game_outer>().place_time(
+		context<game_inner>().current_player(),
+	context<game_inner>().turn_timer().milliseconds());
+	return transit<finished>();
 }
 
 boost::statechart::result

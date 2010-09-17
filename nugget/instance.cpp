@@ -4,13 +4,19 @@
 #include "../graphics/mat4.hpp"
 #include "../static_model_instance.hpp"
 #include "../physics/static_model_parameters.hpp"
+#include "../physics/static_model.hpp"
+#include "../physics/vehicle/object.hpp"
 #include "../physics/object_type.hpp"
 #include "../physics/mat3.hpp"
 #include "../physics/solidity.hpp"
+#include "../physics/world.hpp"
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/algorithm/ptr_container_erase.hpp>
 #include <boost/foreach.hpp>
+#include <algorithm>
+#include <functional>
 
 insula::nugget::instance::instance(
 	manager &_manager,
@@ -19,7 +25,20 @@ insula::nugget::instance::instance(
 	manager_(
 		_manager),
 	world_(
-		_world)
+		_world),
+	connection_(
+		world_.register_callback
+		<
+			physics::vehicle::object,
+			physics::static_model
+		>(
+			physics::object_type::vehicle,
+			physics::object_type::nugget,
+			std::bind(
+				&instance::physics_callback,
+				this,
+				std::placeholders::_1,
+				std::placeholders::_2)))
 {
 	BOOST_FOREACH(
 		manager::position_sequence::const_reference r,
@@ -51,4 +70,51 @@ insula::nugget::instance::instance(
 				manager_.backend_,
 				models_.back());
 	}
+}
+
+fcppt::signal::auto_connection
+insula::nugget::instance::register_empty_callback(
+	empty_callback const &e)
+{
+	return empty_signal_.connect(e);
+}
+
+void
+insula::nugget::instance::update()
+{
+	BOOST_FOREACH(
+		static_model_instance const *m,
+		to_delete_)
+	{
+		fcppt::algorithm::ptr_container_erase(
+			models_,
+			m);
+		manager_.sounds_.play(
+			FCPPT_TEXT("score"));
+	}
+	to_delete_.clear();
+}
+
+void
+insula::nugget::instance::physics_callback(
+	physics::vehicle::object &,
+	physics::static_model &s)
+{
+	model_sequence::const_iterator i = 
+		std::find_if(
+			models_.begin(),
+			models_.end(),
+			[&s](static_model_instance const &m) 
+			{
+				return &m.physics_model() == &s;
+			});
+
+	// It's not a nugget model
+	if (i == models_.end())
+		return;
+
+	to_delete_.insert(&(*i));
+
+	if (models_.size() == 1)
+		empty_signal_();
 }

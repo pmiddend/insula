@@ -14,7 +14,8 @@
 #include "../graphics/camera/object.hpp"
 #include "../model/scoped.hpp"
 #include "../model/vf/format.hpp"
-#include "../events/vehicle_nugget_collision.hpp"
+#include "../nugget/instance.hpp"
+#include "../events/nuggets_empty.hpp"
 // vehicle begin
 #include "../vehicle/cli_factory.hpp"
 #include "../vehicle/object.hpp"
@@ -75,36 +76,16 @@ insula::states::game_inner::game_inner(
 				physics_debug_ = !physics_debug_;
 			},
 			FCPPT_TEXT("Toggle the physics debug drawer"))),
-	nugget_model_(
-		new model::object(
-			context<machine>().systems().md3_loader()->load(
-				create_path(
-					get_option<fcppt::string>(
-						context<machine>().cli_variables(),
-						"game-nugget-model"),
-					FCPPT_TEXT("models")),
-				sge::model::load_flags::switch_yz),
-				context<machine>().systems().renderer())),
-	nugget_backend_(
-		// no transparency
-		false,
-		context<machine>().systems().renderer(),
-		context<machine>().camera(),
-		context<game_outer>().model_shader(),
-		fcppt::assign::make_container<model::backend::texture_map>(
-			model::backend::texture_map::value_type(
-				sge::renderer::glsl::string("texture"),
-				sge::image::create_texture(
-					create_path(
-						get_option<fcppt::string>(
-							context<machine>().cli_variables(),
-							"game-nugget-texture"),
-						FCPPT_TEXT("textures")),
-					context<machine>().systems().renderer(),
-					context<machine>().systems().image_loader(),
-					sge::renderer::filter::linear,
-					sge::renderer::resource_flags::none))),
-		nugget_model_),
+	nuggets_(
+		context<game_outer>().nugget_manager().instantiate(
+			physics_world_)),
+	nugget_empty_connection_(
+		nuggets_->register_empty_callback(
+			[this]() 
+			{
+				this->post_event(
+					events::nuggets_empty());
+			})),
 	vehicle_(
 		insula::vehicle::cli_factory(
 			context<machine>().cli_variables(),
@@ -129,75 +110,19 @@ insula::states::game_inner::game_inner(
 					context<game_outer>().vehicle_position().y())),
 			context<machine>().input_delegator(),
 			context<machine>().console())),
-	vehicle_static_connection_(
-		context<game_inner>().physics_world().register_vehicle_static_callback(
-			std::bind(
-				&game_inner::vehicle_static_callback,
-				this,
-				std::placeholders::_1,
-				std::placeholders::_2))),
 	props_(
 		context<game_outer>().prop_manager().instantiate(
 			physics_world_))
 {
-#if 0
-	// stdlib::map doesn't work here
-	BOOST_FOREACH(
-		graphics::vec2 const &v,
-		context<game_outer>().nugget_positions())
-	{
-		physics::vec3 pos(
-			v.x(),
-			height_map::height_for_point(
-				context<game_outer>().height_map().heights(),
-				context<game_outer>().height_map().cell_size(),
-				fcppt::math::vector::structure_cast<height_map::vec2>(
-					v)) * context<game_outer>().height_map().height_scaling() + 
-			static_cast<physics::scalar>(nugget_model_->bounding_box().h()/2)/**
-			static_cast<physics::scalar>(1.5)*/,
-			v.y());
-		nugget_models_.push_back(
-			new static_model_instance(
-				fcppt::math::matrix::translation(
-					fcppt::math::vector::structure_cast<graphics::vec3>(
-						pos)),
-				physics::static_model_parameters(
-					physics_world_,
-					physics::object_type::nugget,
-					pos,
-					physics::mat3::identity(),
-					physics::shape_from_model(
-						*nugget_model_,
-						physics::approximation::numeric_value::box),
-					physics::solidity::nonsolid)));
-		context<game_outer>().scene_manager().insert(
-			nugget_backend_,
-			nugget_models_.back());
-	}
-#endif
 }
 
 void
 insula::states::game_inner::react(
 	events::tick const &)
 {
-	BOOST_FOREACH(static_model_instance const *m,to_delete_)
-	{
-		fcppt::algorithm::ptr_container_erase(
-			nugget_models_,
-			m);
-		context<machine>().sounds().play(
-			FCPPT_TEXT("score"));
-	}
-	to_delete_.clear();
-	// Just the broadphase, so do culling, nothing more
+	nuggets_->update();
 	physics_broadphase_.update();
 }
-
-#include <sge/renderer/state/scoped.hpp>
-#include <sge/renderer/state/list.hpp>
-#include <sge/renderer/state/bool.hpp>
-#include <sge/renderer/state/trampoline.hpp>
 
 void
 insula::states::game_inner::react(
@@ -243,57 +168,6 @@ insula::states::game_inner::physics_world()
 	return physics_world_;
 }
 
-void
-insula::states::game_inner::erase_nugget(
-	physics::static_model &m)
-{
-	nugget_model_sequence::const_iterator i = 
-		std::find_if(
-			nugget_models_.begin(),
-			nugget_models_.end(),
-			[&m](static_model_instance const &m2) 
-			{
-				return &m == &(m2.physics_model());
-			});
-
-	FCPPT_ASSERT(
-		i != nugget_models_.end());
-
-	// If so, schedule for deletion (lazy deletion!)
-	to_delete_.insert(
-		&(*i));
-}
-
-std::size_t
-insula::states::game_inner::nugget_count() const
-{
-	return nugget_models_.size();
-}
-
 insula::states::game_inner::~game_inner()
 {
-}
-
-void
-insula::states::game_inner::vehicle_static_callback(
-	physics::vehicle::object &v,
-	physics::static_model &s)
-{
-	nugget_model_sequence::const_iterator i = 
-		std::find_if(
-			nugget_models_.begin(),
-			nugget_models_.end(),
-			[&s](static_model_instance const &m) 
-			{
-				return &m.physics_model() == &s;
-			});
-
-	// It's not a nugget model
-	if (i == nugget_models_.end())
-		return;
-
-	post_event(
-		events::vehicle_nugget_collision(
-			v,
-			s));
 }

@@ -1,7 +1,6 @@
 #include "game_outer.hpp"
 #include "../random_seed.hpp"
 #include "../height_map/random_point.hpp"
-#include "../generate_nuggets.hpp"
 #include "../create_path.hpp"
 #include "../media_path.hpp"
 #include "../get_option.hpp"
@@ -17,6 +16,7 @@
 #include "../graphics/shader/sampler.hpp"
 #include "../graphics/shader/sampler_sequence.hpp"
 #include "../graphics/shader/vf_to_string.hpp"
+#include "../nugget/parameters.hpp"
 #include "../model/vf/format.hpp"
 #include "../prop/parameters.hpp"
 #include "../water/cli_factory.hpp"
@@ -82,16 +82,6 @@ insula::states::game_outer::game_outer(
 			fcppt::math::box::structure_cast<graphics::box>(
 				height_map_->extents()),
 			context<machine>().systems().image_loader())),
-	nugget_positions_(
-		generate_nuggets(
-			*height_map_,
-			water_->water_level(),
-			get_option<height_map::array::size_type>(
-				context<machine>().cli_variables(),
-				"game-nuggets"),
-			get_option<height_map::flatness_range>(
-				context<machine>().cli_variables(),
-				"game-nugget-flatness-range"))),
 	vehicle_position_engine_(
 		random_seed()),
 	vehicle_position_(
@@ -130,6 +120,19 @@ insula::states::game_outer::game_outer(
 			})),
 	broadphase_manager_(
 		context<machine>().camera()),
+	nugget_manager_(
+		nugget::parameters(
+			sge::parse::json::find_member_exn<sge::parse::json::object>(
+				context<machine>().config_file().members,
+				FCPPT_TEXT("nuggets")),
+			*height_map_,
+			water_->water_level(),
+			context<machine>().sounds(),
+			context<machine>().systems(),
+			context<machine>().camera(),
+			model_shader_,
+			scene_manager_,
+			broadphase_manager_)),
 	prop_manager_(
 		prop::parameters(
 			context<machine>().config_file(),
@@ -196,12 +199,6 @@ insula::states::game_outer::react(
 	height_map_->render(
 		sge::renderer::state::cull_mode::back);
 	water_->render();
-}
-
-insula::nugget_sequence const &
-insula::states::game_outer::nugget_positions() const
-{
-	return nugget_positions_;
 }
 
 insula::graphics::vec2 const &
@@ -276,6 +273,12 @@ insula::scene::manager &
 insula::states::game_outer::scene_manager()
 {
 	return scene_manager_;
+}
+
+insula::nugget::manager &
+insula::states::game_outer::nugget_manager()
+{
+	return nugget_manager_;
 }
 
 insula::prop::manager &

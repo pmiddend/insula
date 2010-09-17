@@ -74,7 +74,9 @@ insula::nugget::manager::manager(
 	scene_manager_(
 		params.scene_manager),
 	broadphase_manager_(
-		params.broadphase_manager)
+		params.broadphase_manager),
+	sounds_(
+		params.sounds)
 {
 	physics::scalar const floating_height = 
 		static_cast<physics::scalar>(

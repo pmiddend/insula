@@ -21,6 +21,7 @@
 #include <sge/font/drawer_ptr.hpp>
 #include "game_inner_fwd.hpp"
 #include "../prop/manager.hpp"
+#include "../nugget/manager.hpp"
 #include "../ghost/manager.hpp"
 
 // vehicle position begin
@@ -116,6 +117,9 @@ public:
 	scene::manager &
 	scene_manager();
 
+	nugget::manager &
+	nugget_manager();
+
 	prop::manager &
 	prop_manager();
 
@@ -144,6 +148,7 @@ private:
 	sge::font::drawer_ptr font_drawer_;
 	player_time_map player_times_; 
 	physics::broadphase::manager broadphase_manager_;
+	nugget::manager nugget_manager_;
 	prop::manager prop_manager_;
 	ghost::manager ghost_manager_;
 };

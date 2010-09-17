@@ -3,15 +3,19 @@
 
 #include "box.hpp"
 #include "vec3.hpp"
-#include "vehicle_static_callback.hpp"
+#include "callback_fn.hpp"
 #include "object_fwd.hpp"
 #include "filter_callback.hpp"
+#include "trampoline.hpp"
+#include "object_type.hpp"
 #include "broadphase/shared_object_ptr.hpp"
 #include "broadphase/manager_fwd.hpp"
 #include "../time_delta.hpp"
 #include <fcppt/signal/auto_connection.hpp>
 #include <fcppt/signal/object.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
 #include <memory>
+#include <algorithm>
 #include <set>
 
 class btCollisionConfiguration;
@@ -64,9 +68,42 @@ public:
 	btDynamicsWorld &
 	handle();
 
+	/**
+		Some explanation is needed here:
+		
+		The physics itself offers several different types of objects:
+
+		- vehicle
+		- terrain
+		- static_model
+
+		Those are C++ types, and we want collision signals for each pair
+		those types. _But_ that's not enough, since we have objects with
+		the same C++ type but which are distinct, like a nugget and a
+		static model (a palm tree, for example). So we invented
+		physics::object_type. Two static_models can now have the types
+		physics::nugget and physics::prop. The object_type and the physics
+		type are really orthogonal. 
+
+		So we have a template function here because we want callbacks with
+		type "void (A first_object,B second_object)", and we also want to
+		filter out specific object_types. To avoid issues with the order
+		of the signal_map we use minmax here. The trampoline type
+		dynamic-downcasts the objects accordingly. No real magic done
+		here.
+	 */
+	template<typename A,typename B,typename F>
 	fcppt::signal::auto_connection
-	register_vehicle_static_callback(
-		vehicle_static_callback const &);
+	register_callback(
+		object_type::type const a,
+		object_type::type const b,
+		F const &f)
+	{
+		return 
+			signals_[std::minmax(a,b)].connect(
+				trampoline<A,B>(
+					f));
+	}
 
 	// Has to be there because of the destructors of incomplete types
 	~world();
@@ -75,7 +112,15 @@ private:
 	std::set<std::pair<object *,object *>>
 	contact_set;
 
-	fcppt::signal::object<vehicle_static_callback_fn> vehicle_static_signal_;
+	typedef
+	boost::ptr_map
+	<
+		std::pair<object_type::type,object_type::type>,
+		fcppt::signal::object<callback_fn>
+	>
+	signal_map;
+
+	signal_map signals_;
 	std::unique_ptr<btCollisionConfiguration> configuration_;
 	std::unique_ptr<btDispatcher> dispatcher_;
 	broadphase::shared_object_ptr broadphase_;

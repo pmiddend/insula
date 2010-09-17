@@ -62,8 +62,10 @@ insula::physics::ghost::ghost(
 
 insula::physics::ghost::~ghost()
 {
+	/*
 	broadphase_->destroyProxy(
 		&proxy_,
 		// Dispatcher
 		0);
+	*/
 }
