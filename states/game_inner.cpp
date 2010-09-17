@@ -33,6 +33,7 @@
 #include <fcppt/math/matrix/structure_cast.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/translation.hpp>
+#include <fcppt/io/cout.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/algorithm/ptr_container_erase.hpp>
 #include <fcppt/assign/make_container.hpp>
@@ -46,15 +47,13 @@ insula::states::game_inner::game_inner(
 	my_base(ctx),
 	current_player_(
 		context<game_outer>().next_player()),
-	physics_broadphase_(
-		context<machine>().camera()),
 	physics_world_(
 		fcppt::math::box::structure_cast<physics::box>(
 			context<game_outer>().height_map().extents()),
 		get_option<physics::vec3>(
 			context<machine>().cli_variables(),
 			"physics-gravity"),
-		physics_broadphase_),
+		context<game_outer>().broadphase_manager()),
 	physics_height_map_(
 		physics_world_,
 		context<game_outer>().height_map().heights(),
@@ -182,4 +181,5 @@ insula::states::game_inner::nugget_instance() const
 
 insula::states::game_inner::~game_inner()
 {
+	fcppt::io::cout << "~game_inner\n";
 }

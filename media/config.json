@@ -52,7 +52,7 @@
 		"texture" : "beacon.png",
 		"flatness_range" : [0.0,0.2],
 		"floating_height" : 1.0,
-		"count" : 100
+		"count" : 1
  },
 
 	"props" :
@@ -75,7 +75,7 @@
 		{
 			"model" : "palmtree.md3",
 			"texture" : "palmtree.png",
-			"flatness_range" : [0.0,0.005],
+			"flatness_range" : [0.0,0.2],
 			"penetration_depth" : 0.0,
 			"scale_range" : [0.5,10.0],
 			"rotation_axis" : [0.0,1.0,0.0],

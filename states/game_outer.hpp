@@ -123,6 +123,9 @@ public:
 	prop::manager &
 	prop_manager();
 
+	physics::broadphase::manager &
+	broadphase_manager();
+
 	// Holds height_map, skydome and the water
 	~game_outer();
 

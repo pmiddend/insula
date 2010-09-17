@@ -287,6 +287,12 @@ insula::states::game_outer::prop_manager()
 	return prop_manager_;
 }
 
+insula::physics::broadphase::manager &
+insula::states::game_outer::broadphase_manager()
+{
+	return broadphase_manager_;
+}
+
 insula::states::game_outer::~game_outer()
 {
 }

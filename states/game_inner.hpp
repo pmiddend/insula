@@ -66,7 +66,6 @@ public:
 private:
 	player current_player_;
 	insula::turn_timer turn_timer_;
-	physics::broadphase::manager physics_broadphase_;
 	physics::world physics_world_;
 	physics::height_map physics_height_map_;
 	physics::debug_drawer physics_debug_drawer_;
