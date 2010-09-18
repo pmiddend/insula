@@ -4,7 +4,7 @@
 
 insula::graphics::shader::sampler::sampler(
 	sge::renderer::glsl::string const &_name,
-	sge::renderer::texture_ptr const _texture)
+	sge::renderer::texture_base_ptr const _texture)
 :
 	name_(
 		_name),
@@ -44,7 +44,7 @@ insula::graphics::shader::sampler::texture_unit() const
 }
 
 // This is needed on shader activation
-sge::renderer::texture_ptr const
+sge::renderer::texture_base_ptr const
 insula::graphics::shader::sampler::texture() const
 {
 	return texture_;
@@ -52,7 +52,7 @@ insula::graphics::shader::sampler::texture() const
 
 void
 insula::graphics::shader::sampler::texture(
-	sge::renderer::texture_ptr const _texture)
+	sge::renderer::texture_base_ptr const _texture)
 {
 	texture_ = _texture;
 }

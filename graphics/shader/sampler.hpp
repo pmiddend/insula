@@ -2,7 +2,7 @@
 #define INSULA_GRAPHICS_SHADER_SAMPLER_HPP_INCLUDED
 
 #include <sge/renderer/glsl/string.hpp>
-#include <sge/renderer/texture_ptr.hpp>
+#include <sge/renderer/texture_base_ptr.hpp>
 
 namespace insula
 {
@@ -21,8 +21,8 @@ public:
 	explicit
 	sampler(
 		sge::renderer::glsl::string const &name,
-		sge::renderer::texture_ptr = 
-			sge::renderer::texture_ptr());
+		sge::renderer::texture_base_ptr = 
+			sge::renderer::texture_base_ptr());
 
 	sge::renderer::glsl::string const
 	name() const;
@@ -40,19 +40,19 @@ public:
 	texture_unit() const;
 
 	// This is needed on shader activation
-	sge::renderer::texture_ptr const
+	sge::renderer::texture_base_ptr const
 	texture() const;
 
 	// In water, we need to update the reflection texture, so we need
 	// this
 	void
 	texture(
-		sge::renderer::texture_ptr);
+		sge::renderer::texture_base_ptr);
 	
 	~sampler();
 private:
 	sge::renderer::glsl::string name_,declaration_;
-	sge::renderer::texture_ptr texture_;
+	sge::renderer::texture_base_ptr texture_;
 	texture_unit_type texture_unit_;
 };
 }

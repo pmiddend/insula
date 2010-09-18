@@ -95,6 +95,7 @@ ENDFUNCTION(CREATE_INSULA_EXE)
 
 CREATE_INSULA_EXE(load_image_to_array)
 CREATE_INSULA_EXE(view_model)
+CREATE_INSULA_EXE(shadow_map)
 CREATE_INSULA_EXE(render_height_map)
 CREATE_INSULA_EXE(point_sprite_test)
 #CREATE_INSULA_EXE(render_scene)

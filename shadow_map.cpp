@@ -1,5 +1,7 @@
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
+#include "graphics/vec2.hpp"
+#include "graphics/dim2.hpp"
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
@@ -7,7 +9,10 @@
 #include "graphics/shader/vf_to_string.hpp"
 #include "graphics/shader/scoped.hpp"
 #include "graphics/cli_options.hpp"
+#include "graphics/rect.hpp"
 #include "console/object.hpp"
+#include "gizmo/rotation_to_mat4.hpp"
+#include "timed_output.hpp"
 #include "model/object.hpp"
 #include "model/scoped.hpp"
 #include "model/vf/format.hpp"
@@ -21,8 +26,11 @@
 #include <sge/image/create_texture.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/renderer/aspect.hpp>
-#include <sge/renderer/texture.hpp>
+#include <sge/renderer/texture_base_ptr.hpp>
 #include <sge/systems/parameterless.hpp>
+#include <sge/renderer/texture.hpp>
+#include <sge/renderer/scoped_target.hpp>
+#include <sge/renderer/depth_stencil_texture.hpp>
 #include <sge/systems/image_loader.hpp>
 #include <sge/console/arg_list.hpp>
 #include <sge/console/object.hpp>
@@ -45,6 +53,44 @@
 #include <sge/renderer/state/bool.hpp>
 #include <sge/renderer/state/color.hpp>
 #include <sge/renderer/state/float.hpp>
+#include <sge/renderer/vf/format.hpp>
+#include <sge/renderer/vf/make_unspecified_tag.hpp>
+#include <sge/renderer/vf/unspecified.hpp>
+#include <sge/renderer/vf/vector.hpp>
+#include <sge/renderer/device.hpp>
+#include <sge/renderer/vertex_buffer.hpp>
+#include <sge/renderer/vertex_count.hpp>
+#include <sge/renderer/nonindexed_primitive_type.hpp>
+#include <sge/renderer/first_vertex.hpp>
+#include <sge/renderer/filter/linear.hpp>
+#include <sge/renderer/glsl/scoped_program.hpp>
+#include <sge/renderer/scoped_vertex_buffer.hpp>
+#include <sge/renderer/vf/dynamic/make_format.hpp>
+#include <sge/renderer/size_type.hpp>
+#include <sge/renderer/scoped_vertex_lock.hpp>
+#include <sge/renderer/resource_flags_field.hpp>
+#include <sge/renderer/resource_flags_none.hpp>
+#include <sge/renderer/vf/view.hpp>
+#include <sge/renderer/lock_mode.hpp>
+#include <sge/renderer/dim_type.hpp>
+#include <sge/renderer/vf/vertex.hpp>
+#include <sge/renderer/vf/iterator.hpp>
+#include <sge/renderer/vf/view.hpp>
+#include <sge/renderer/state/list.hpp>
+#include <sge/renderer/state/trampoline.hpp>
+#include <sge/renderer/state/scoped.hpp>
+#include <sge/renderer/state/depth_func.hpp>
+#include <boost/mpl/vector/vector10.hpp>
+#include <boost/foreach.hpp>
+#include <fcppt/math/matrix/basic_impl.hpp>
+#include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/output.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/io/cerr.hpp>
+#include <fcppt/assign/make_container.hpp>
+#include <fcppt/text.hpp>
+#include <fcppt/from_std_string.hpp>
 #include <sge/mainloop/dispatch.hpp>
 #include <sge/renderer/scoped_block.hpp>
 #include <sge/exception.hpp>
@@ -78,6 +124,7 @@
 #include <fcppt/math/dim/output.hpp>
 #include <fcppt/math/dim/input.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/io/cifstream.hpp>
 #include <boost/program_options.hpp>
@@ -87,6 +134,201 @@
 #include <iostream>
 #include <iterator>
 #include <ostream>
+
+namespace
+{
+namespace vf_tags
+{
+SGE_RENDERER_VF_MAKE_UNSPECIFIED_TAG(position)
+}
+
+typedef 
+sge::renderer::vf::unspecified
+<
+	sge::renderer::vf::vector
+	<
+		insula::graphics::scalar,
+		3
+	>,
+	vf_tags::position
+> 
+vf_position;
+
+typedef 
+sge::renderer::vf::format
+<
+	boost::mpl::vector1
+	<
+		vf_position
+	>
+> 
+vertex_format;
+
+typedef 
+sge::renderer::vf::view
+<
+	vertex_format
+> 
+vertex_view;
+}
+
+namespace
+{
+
+
+class quad
+{
+public:
+	explicit 
+	quad(
+		insula::graphics::rect const &extents,
+		sge::renderer::device_ptr _renderer,
+		insula::graphics::camera::object &_camera,
+		insula::graphics::mat4 const &mvp_sun)
+	:
+		renderer_(
+			_renderer),
+		camera_(
+			_camera),
+		shader_(
+			renderer_,
+			insula::media_path()/FCPPT_TEXT("shadow_vertex.glsl"),
+			insula::media_path()/FCPPT_TEXT("shadow_fragment.glsl"),
+			insula::graphics::shader::vf_to_string<vertex_format>(),
+			{
+				insula::graphics::shader::variable(
+					"mvp",
+					insula::graphics::shader::variable_type::uniform,
+					insula::graphics::mat4())
+			},
+			{}),
+		depth_texture_(
+			renderer_->create_depth_stencil_texture(
+				sge::renderer::dim_type(1024,1024),
+				sge::renderer::depth_stencil_format::d16)),
+		alt_shader_(
+			renderer_,
+			insula::media_path()/FCPPT_TEXT("shadow_alt_vertex.glsl"),
+			insula::media_path()/FCPPT_TEXT("shadow_alt_fragment.glsl"),
+			insula::graphics::shader::vf_to_string<vertex_format>(),
+			{
+				insula::graphics::shader::variable(
+					"mvp",
+					insula::graphics::shader::variable_type::uniform,
+					insula::graphics::mat4()),
+				insula::graphics::shader::variable(
+					"mvp_sun",
+					insula::graphics::shader::variable_type::uniform,
+					mvp_sun)
+			},
+			{
+				insula::graphics::shader::sampler(
+					"depth_texture",
+					depth_texture_)
+			}),
+		vb_(
+			renderer_->create_vertex_buffer(
+				sge::renderer::vf::dynamic::make_format<vertex_format>(),
+				static_cast<sge::renderer::size_type>(
+					6),
+				sge::renderer::resource_flags::none))
+	{
+		sge::renderer::scoped_vertex_buffer const scoped_vb_(
+			renderer_,
+			vb_);
+
+		{
+			sge::renderer::scoped_vertex_lock const vblock(
+				vb_,
+				sge::renderer::lock_mode::writeonly);
+
+			vertex_view const vertices(
+				vblock.value());
+
+			vertex_view::iterator vb_it(
+				vertices.begin());
+
+			insula::graphics::scalar y = -1;
+
+			(vb_it++)->set<vf_position>(
+				insula::graphics::vec3(
+					extents.left(),
+					y,
+					extents.top()));
+			(vb_it++)->set<vf_position>(
+				insula::graphics::vec3(
+					extents.left(),
+					y,
+					extents.bottom()));
+			(vb_it++)->set<vf_position>(
+				insula::graphics::vec3(
+					extents.right(),
+					y,
+					extents.bottom()));
+			(vb_it++)->set<vf_position>(
+				insula::graphics::vec3(
+					extents.right(),
+					y,
+					extents.bottom()));
+			(vb_it++)->set<vf_position>(
+				insula::graphics::vec3(
+					extents.right(),
+					y,
+					extents.top()));
+			(vb_it++)->set<vf_position>(
+				insula::graphics::vec3(
+					extents.left(),
+					y,
+					extents.top()));
+		}
+	}
+
+	void
+	render()
+	{
+		insula::graphics::shader::scoped scoped_shader(
+			shader_);
+		sge::renderer::scoped_vertex_buffer const scoped_vb_(
+			renderer_,
+			vb_);
+		shader_.set_uniform(
+			"mvp",
+			camera_.mvp());
+		renderer_->render(
+			sge::renderer::first_vertex(
+				0),
+			sge::renderer::vertex_count(
+				vb_->size()),
+			sge::renderer::nonindexed_primitive_type::triangle);
+	}
+
+	void
+	render_alternative()
+	{
+		insula::graphics::shader::scoped scoped_shader(
+			alt_shader_);
+		sge::renderer::scoped_vertex_buffer const scoped_vb_(
+			renderer_,
+			vb_);
+		alt_shader_.set_uniform(
+			"mvp",
+			camera_.mvp());
+		renderer_->render(
+			sge::renderer::first_vertex(
+				0),
+			sge::renderer::vertex_count(
+				vb_->size()),
+			sge::renderer::nonindexed_primitive_type::triangle);
+	}
+
+	sge::renderer::device_ptr renderer_;
+	insula::graphics::camera::object &camera_;
+	insula::graphics::shader::object shader_;
+	sge::renderer::depth_stencil_texture_ptr depth_texture_;
+	insula::graphics::shader::object alt_shader_;
+	sge::renderer::vertex_buffer_ptr vb_;
+};
+}
 
 int main(int argc,char *argv[])
 try
@@ -240,6 +482,44 @@ try
 			sge::input::action(
 				sge::input::kc::key_escape,
 				[&running]() { running = false; })));
+
+	// target begin
+	insula::graphics::gizmo sun_gizmo(
+		insula::graphics::gizmo::init()
+			.position(
+				insula::graphics::vec3(5.87982,5.8455,4.90575))
+			.forward(
+				insula::graphics::vec3(0.431345,0.781761,0.450323))
+			.right(
+				insula::graphics::vec3(0.752727,-0.0366905,-0.657309))
+			.up(
+				insula::graphics::vec3(-0.497337,0.622497,-0.604279)));
+
+	sge::renderer::texture_ptr const target_texture = 
+		sys.renderer()->create_texture(
+			sge::renderer::dim_type(1024,1024),
+			sge::image::color::format::rgb8,
+			sge::renderer::filter::linear,
+			sge::renderer::resource_flags::readable);
+
+	quad ground_object(
+		insula::graphics::rect(
+			insula::graphics::vec2(-5,-5),
+			insula::graphics::dim2(10,10)),
+		sys.renderer(),
+		*cam,
+		cam->perspective() * 
+		insula::gizmo::rotation_to_mat4(
+			sun_gizmo) *
+		fcppt::math::matrix::translation(
+			sun_gizmo.position() * -1.0f));
+
+	sge::renderer::target_ptr target = 
+		sys.renderer()->create_target(
+			target_texture,
+			ground_object.depth_texture_);
+
+	// target end
 	
 	fcppt::signal::scoped_connection wireframe_conn(
 		console.model().insert(
@@ -279,12 +559,12 @@ try
 	sys.renderer()->state(
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::clear_backbuffer = true)
-			(sge::renderer::state::color::clear_color = sge::image::colors::white())
+			(sge::renderer::state::color::clear_color = sge::image::colors::black())
 			(sge::renderer::state::bool_::clear_zbuffer = true)
 		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
-			//(sge::renderer::state::cull_mode::off)
-			//(sge::renderer::state::depth_func::less)
-			(sge::renderer::state::depth_func::off)
+			(sge::renderer::state::cull_mode::off)
+			(sge::renderer::state::depth_func::less)
+			//(sge::renderer::state::depth_func::off)
 			);
 
 	while(running)
@@ -294,25 +574,65 @@ try
 		cam->update(
 			frame_timer.reset());
 
-		sge::renderer::scoped_block const block_(
-			sys.renderer());
+	//	insula::timed_output() << "cam_pos: " << cam->gizmo().position() << ", forward: " << cam->gizmo().forward() << ", right: " << cam->gizmo().right() << ", up: " << cam->gizmo().up() << "\n";
 
 		{
-		graphics::shader::scoped scoped_shader(
-			model_shader);
+			insula::graphics::gizmo const old_gizmo = 
+				cam->gizmo();
 
-		model::scoped scoped_model(
-			sys.renderer(),
-			model);
+			cam->gizmo() = sun_gizmo;
 
-		model_shader.set_uniform(
-			"mvp",
-			cam->perspective() * 
-			cam->world());
+			sge::renderer::scoped_target const starget(
+				sys.renderer(),
+				target);
 
-		model.render();
+			sge::renderer::scoped_block const block_(
+				sys.renderer());
+
+
+			{
+				graphics::shader::scoped scoped_shader(
+					model_shader);
+
+				model::scoped scoped_model(
+					sys.renderer(),
+					model);
+
+				model_shader.set_uniform(
+					"mvp",
+					cam->perspective() * 
+					cam->world());
+
+				model.render();
+			}
+			ground_object.render();
+
+			cam->gizmo() = old_gizmo;
 		}
-		console.render();
+
+		{
+			sge::renderer::scoped_block const block_(
+				sys.renderer());
+
+			{
+				graphics::shader::scoped scoped_shader(
+					model_shader);
+
+				model::scoped scoped_model(
+					sys.renderer(),
+					model);
+
+				model_shader.set_uniform(
+					"mvp",
+					cam->perspective() * 
+					cam->world());
+
+				model.render();
+			}
+			ground_object.render_alternative();
+
+			console.render();
+		}
 	}
 }
 catch(sge::exception const &e)
