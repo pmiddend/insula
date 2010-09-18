@@ -1,0 +1,28 @@
+body
+{
+	background-color:#17310e;
+}
+
+#main_column
+{
+	background-color:#fff0cc;
+	width:80%;
+	margin-left: auto;
+	margin-right: auto;
+	padding:1em;
+}
+
+#screenshot_list
+{
+	list-style-type:none;
+}
+
+table.floating_image
+{
+	float:left;
+	border: 1px solid black;
+	margin: 1em;
+}
+
+h2 { color:#345d01; }
+h3 { color:#5c9002; }
