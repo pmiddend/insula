@@ -8,8 +8,36 @@
 	</head>  
 	<body>
 		<div id="main_column">
-			<img src="images/splash.png" alt="insula main logo" style="display:block;margin:auto"/>
-			<h2>About</h2>
+			<div style="float:right;">
+				<h1>Table of contents</h1>
+				<ol id="toc">
+					<li>
+						<a href="#about">About</a>
+						<ol>
+							<li>Abstract</li>
+							<li>Game mode</li>
+							<li>Goal</li>
+						</ol>
+					</li>
+					<li>
+						<a href="#getting_it">Getting it</a>
+						<ol>
+							<li>Warning</li>
+							<li>Requirements</li>
+							<li>Compilation step by step</li>
+						</ol>
+					</li>
+					<li>
+						<a href="#screenshots">Screenshots</a>
+					</li>
+					<li>
+						<a href="#contact">Contact</a>
+					</li>
+				</ol>
+			</div>
+<!--			<img src="images/splash.png" alt="insula main logo" style="display:block;margin:auto"/> -->
+				<img  src="images/splash.png" alt="insula main logo" style="" />
+			<h2><a name="about"></a>About</h2>
 			<h3>Abstract</h3>
 			<p>
 				insula is a an <em>arcade</em> racing game, meaning it doesn't
@@ -35,7 +63,7 @@
 					<img src="images/nugget.png" alt="Illustration of a nugget in-game"/>
 				</td></tr>
 				<tr><td>
-					<em>Fig. 1: A nugget example</em>
+					<span class="caption">Fig. 1: A nugget example</span>
 				</td></tr>
 			</table>
 			<p>
@@ -49,7 +77,7 @@
 				pedal once, it's random after all). The starting position is
 				also the same for each player.
 			</p>
-			<h2>Getting it</h2>
+			<h2><a name="getting_it"></a>Getting it</h2>
 			<h3>Warning</h3>
 				<p>
 					Getting insula is not easy and you might not be able to compile it
@@ -64,7 +92,7 @@
 				article</a> for
 				more info), so you need a compiler that
 				supports it. Currently,
-				only <a href="http://gcc.gnu.org/"><dfn>&gt;gcc-4.5</dfn></a>
+				only <a href="http://gcc.gnu.org/"><dfn>&gt;=gcc-4.5</dfn></a>
 				is a candidate,
 				but <a href="http://clang.llvm.org/"><dfn>clang</dfn></a> and
 				MSVC++-10 might work in the future, too (maybe even now, it's
@@ -105,7 +133,7 @@
 			<h4>System</h4>
 			<p>
 				This installation guide will assume that you
-				use <dfn>&gt;gcc-4.5</dfn>. I will not explain how this is
+				use <dfn>&gt;=gcc-4.5</dfn>. I will not explain how this is
 				installed. It's highly dependant on the
 				distribution. To <em>test</em> if you've got the right
 				compiler, open a terminal and type:
@@ -139,7 +167,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 				downloadable via http). You can download git
 				from <a href="http://git-scm.com/download">here</a>. Compiling
 				it from source is straightforward: just download, extract, go
-				to the directory and do <kbd>./configure --prefix=/tmp && make
+				to the directory and do <kbd>./configure --prefix=/tmp &amp;&amp; make
 				install</kbd>, assuming you want it installed in
 				the <kbd>/tmp/</kbd> directory. git is, however, widely
 				available on all operating systems.
@@ -164,17 +192,31 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 			FIXME
 			Get the latest version of fcppt either from the installation
 			instruction page (see above) or from git using the
-			command <kbd>git pull
+			command <kbd>git clone
 			git://timeout.supraverse.net/fcppt.git</kbd>. This, of course,
 			assumes that you have git installed. You end up with a 
 		</p>
-		<h2>Screenshots</h2>
-			<ul id="screenshot_list">
-			<li><a href="images/screen1.jpg"><img src="images/screen1_thumb.jpg" alt="Screenshot"/></a></li>
-			<li><a href="images/screen2.jpg"><img src="images/screen2_thumb.jpg" alt="Screenshot"/></a></li>
-			<li><a href="images/screen3.jpg"><img src="images/screen3_thumb.jpg" alt="Screenshot"/></a></li>
-			<li><a href="images/screen4.jpg"><img src="images/screen4_thumb.jpg" alt="Screenshot"/></a></li>
-			</ul>
+		<h2><a name="screenshots"></a>Screenshots</h2>
+			<table id="screenshot_table">
+				<tr>
+					<td><a href="images/screen1.jpg"><img src="images/screen1_thumb.jpg" alt="Screenshot"/></a></td>
+					<td><a href="images/screen2.jpg"><img src="images/screen2_thumb.jpg" alt="Screenshot"/></a></td>
+				</tr>
+				<tr>
+					<td><span class="caption">Some nice water reflection effects</span></td>
+					<td><span class="caption">The ingame perspective with the &#x2013; hopefully not copyrighted &#x2013; car "van.json"</span></td>
+				</tr>
+				<tr>
+					<td><a href="images/screen3.jpg"><img src="images/screen3_thumb.jpg" alt="Screenshot"/></a></td>
+					<td><a href="images/screen4.jpg"><img src="images/screen4_thumb.jpg" alt="Screenshot"/></a></td>
+				</tr>
+				<tr>
+					<td><span class="caption">Note that the arrow shows the way to the nearest nugget</span></td>
+					<td><span class="caption">A full view of the test level. Note the sharp boundaries of the water and the non-shaded palm trees. There's some work left to be done.</span></td>
+				</tr>
+			</table>
+			<h2><a name="contact"></a>Contact</h2>
+				If you want to talk to me, go to #sge-sanguis on irc.freenode.org
 		</div>
 	</body>  
 </html>

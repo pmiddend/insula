@@ -1,6 +1,12 @@
 body
 {
 	background-color:#17310e;
+	font-family: sans-serif
+}
+
+img
+{
+	border:0px;
 }
 
 #main_column
@@ -12,11 +18,6 @@ body
 	padding:1em;
 }
 
-#screenshot_list
-{
-	list-style-type:none;
-}
-
 table.floating_image
 {
 	float:left;
@@ -24,5 +25,34 @@ table.floating_image
 	margin: 1em;
 }
 
+span.caption
+{
+	font-style:italic;
+	font-size:0.8em;
+	text-align:justify;
+}
+
+#screenshot_table
+{
+	width:80%;
+}
+
+#screenshot_table td
+{
+	text-align:center;
+	vertical-align:top;
+	padding:1em;
+}
+
 h2 { color:#345d01; }
 h3 { color:#5c9002; }
+
+#toc
+{
+	list-style-type:lower-roman;
+}
+
+#toc ol
+{
+	list-style-type:lower-greek;
+}
