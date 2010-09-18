@@ -8,7 +8,7 @@
 	</head>  
 	<body>
 		<div id="main_column">
-			<div style="float:right;">
+			<div style="float:left;">
 				<h1>Table of contents</h1>
 				<ol id="toc">
 					<li>
@@ -159,7 +159,8 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 				You'll also need <dfn>boost</dfn>. This is included in most
 				Linux distributions and it's available on Windows,
 				too. Installation is &#x2013; again &#x2013; distribution and
-				operating system dependent and I'll not explain it here.
+				operating system dependent and I'll not explain it here. You
+				have to have a recent version of it, at least 1.44.
 			</p>
 			<p>
 				You also need <a href="http://git-scm.com/">git</a> to
@@ -172,7 +173,13 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 				the <kbd>/tmp/</kbd> directory. git is, however, widely
 				available on all operating systems.
 			</p>
+			<p>
+				Last but not least, you
+				need <a href="http://www.cmake.org/">&gt;=cmake-2.8</a>, which
+				is portable and widely available, just as git.
+			</p>
 		<h4>A note about the process</h4>
+		<p>
 			I'm assuming you're only interested in trying out insula and you
 			don't want permanent or system-wide changes to your Linux
 			installation. So we're going to install all of the libraries in
@@ -182,6 +189,21 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 			in <code>ROOT/insula</code>, sge will be installed
 			in <code>ROOT/include/sge</code>, <code>ROOT/lib</code> and so
 			on. 
+		</p>
+		<p>
+			From now on I'll also assume that you opened a terminal (Konsole, xterm or whatever you prefer) and are able to type commands into it. The first command will be:
+<pre>
+export ROOT="/pick_a_directory"
+export CPLUS_INCLUDE_PATH="${ROOT}/include:${CPLUS_INCLUDE_PATH}"
+export LD_LIBRARY_PATH="${ROOT}/lib:${LD_LIBRARY_PATH}"
+export LIBRARY_PATH="${ROOT}/lib:${LIBRARY_PATH}"
+export PATH="${ROOT}/bin:${PATH}"
+export PKG_CONFIG_PATH="${ROOT}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+cd $ROOT;
+</pre>
+
+		For example, you could pick <code>ROOT</code> as <code>/tmp/insula</code>
+		</p>
 		<h4>fcppt</h4>
 		<p>
 			Installation instructions for fcppt are already
@@ -189,13 +211,181 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 			but I'll explain it again here. Just for consistency.
 		</p>
 		<p>
-			FIXME
 			Get the latest version of fcppt either from the installation
 			instruction page (see above) or from git using the
 			command <kbd>git clone
 			git://timeout.supraverse.net/fcppt.git</kbd>. This, of course,
-			assumes that you have git installed. You end up with a 
+			assumes that you have git installed. You end up with a directory
+			called <code>fcppt</code>. Execute the following:
 		</p>
+<pre>
+cd fcppt;
+mkdir build;
+cd build;
+cmake -D CMAKE_INSTALL_PREFIX:=$ROOT ..;
+</pre>
+
+		<p>
+			This should search for the correct boost library and the correct
+			compiler and output some diagnostic messages. If you get an
+			error that boost was not found, check if you've really got a
+			version above 1.43. cmake also gives some information about the
+			source of the problem. You might also see an error message
+			indicating that your cmake version is not high enough (in which
+			case you must, of course, update cmake).
+		</p>
+		<p>
+			If the cmake command went well, you can start compilation (in
+			the <kbd>build/</kbd> directory) with:
+		</p>
+<pre>
+make install
+</pre>
+		<p>
+			Which should take a few minutes on recent machines. If there are
+			any errors while compiling fcppt, join
+			our <a href="#contact">IRC channel</a> and report the problem.
+		</p>
+		<h4>mizuiro</h4>
+		<p>
+			mizuiro is easy to install because it's header-only. It's not
+			stable, however, so you can only get it via git. The following
+			commands download and install it:
+		</p>
+<pre>
+cd $ROOT;
+git clone git://timeout.supraverse.net/mizuiro;
+cd mizuiro;
+mkdir build;
+cd build;
+cmake -D CMAKE_INSTALL_PREFIX=$ROOT ..;
+make install;
+</pre>
+		<p>
+			Again, if there are difficulties, feel free to contact us.
+		</p>
+		<h4>sge</h4>
+		<p>
+			sge is a big package, mostly because it depends on a few other
+			libraries. To load images, you
+			need <a href="http://www.libpng.org/pub/png/libpng.html">libpng</a>. There
+			are no specific version requirements here and chances are you
+			already have this installed. If not, download the latest version
+			from the web site and put it in <code>$ROOT</code>. Extract it (with <kbd>tar xzf filename</kbd> for example), then execute the following:
+		</p>
+<pre>
+cd libpng*;
+./configure --prefix=$ROOT &amp;&amp; make install
+</pre>
+		<p>
+			Next thing you need
+			is <a href="http://connect.creativelabs.com/openal/default.aspx">OpenAL</a>. In the risk of sounding like a broken record: this library also is available on Windows and all Linux distributions, so you can install it easily. However, if not, see the following:
+		</p>
+		<p>
+			First of all, more than one implementation of this open standard is
+			available. We
+			use <a href="http://kcat.strangesoft.net/openal.html">OpenAL-soft</a>. Download
+			the latest version, extract it to <code>$ROOT</code> and the do
+			the old cmake trick:
+		</p>
+<pre>
+cd openal-soft*/build;
+cmake -D CMAKE_INSTALL_PREFIX=$ROOT ..;
+make install
+</pre>
+		<p>
+			Since there's music in the game, too, and OpenAL doesn't load
+			audio files, we need yet another library, two
+			even: libogg and libvorbis, both downloadable
+			from <a href="http://www.xiph.org/downloads/">here</a>. If they're not available for your platform, download them, extract both to <code>$ROOT</code> and execute:
+		</p>
+<pre>
+cd libogg*;
+./configure --prefix=$ROOT &amp;&amp; make &amp;&amp; make install;
+cd ../libvorbis*;
+./configure --prefix=$ROOT  &amp;&amp; make &amp;&amp; make install;
+</pre>
+		<p>
+			Now on
+			to <a href="http://freetype.sourceforge.net/index2.html">freetype</a>,
+			which is responsible for loading the truetype fonts. Download the latest version, extract it to <code>$ROOT</code> and execute
+		</p>
+<pre>
+cd freetype*;
+./configure --prefix=$ROOT &amp;&amp; make &amp;&amp; make install
+</pre>
+		<p>
+			Since sge uses libx11 to open an X11 window you need this
+			library plus its headers, too. This is implementation dependant
+			and will not be described here. The same goes for libGL an
+			libGLU, which are also required. On Debian-like systems you need
+			the *-dev packages for the libraries (not just the libraries
+			themselves).
+		</p>	
+		<p>
+			Hopefully, by now, you should finally be able to install
+			sge. Like mizuiro, this library doesn't have any official
+			releases yet and is thus only available via git: <kbd>git clone
+			git://timeout.supraverse.net/spacegameengine.git</kbd>. Install it via:
+		</p>
+<pre>
+cd spacegameengine;
+mkdir build;
+cd build;
+cmake -D CMAKE_INSTALL_PREFIX=$ROOT ..;
+make install
+</pre>
+		<p>
+			sge should automatically enable all the plugins we just
+			installed. Watch the cmake output closely to see if anything
+			went wrong or was omitted.
+		</p>
+		<p>
+			The installation should take about 20 minutes on a recent machine.
+		</p>
+		<h4>insula</h4>
+		<p>
+			insula needs bullet for the physics part, which can be
+			downloaded
+			from <a href="http://code.google.com/p/bullet/downloads/list">here</a>. Extract
+			it to <code>$ROOT</code> and execute
+		</p>
+<pre>
+cd bullet*;
+mkdir build;
+cmake -D CMAKE_INSTALL_PREFIX=$ROOT -D BUILD_SHARED_LIBS=ON -D INSTALL_LIBS=ON -D INSTALL_EXTRA_LIBS=ON ..;
+make install;
+mkdir -p $ROOT/lib/pkgconfig
+echo "prefix=${ROOT}" > $ROOT/lib/pkgconfig/bullet.pc
+echo "exec_prefix=${prefix}" >> $ROOT/lib/pkgconfig/bullet.pc
+echo "libdir=${exec_prefix}/lib" >> $ROOT/lib/pkgconfig/bullet.pc
+echo "includedir=${prefix}/include" >> $ROOT/lib/pkgconfig/bullet.pc
+echo "Name: bullet" >> $ROOT/lib/pkgconfig/bullet.pc
+echo "Description: Bullet Continuous Collision Detection and Physics Library" >> $ROOT/lib/pkgconfig/bullet.pc
+echo "Requires:" >> $ROOT/lib/pkgconfig/bullet.pc
+echo "Version: 2.76" >> $ROOT/lib/pkgconfig/bullet.pc
+echo "Libs: -L${libdir} -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath" >> $ROOT/lib/pkgconfig/bullet.pc
+echo "Cflags: -I${includedir}/bullet" >> $ROOT/lib/pkgconfig/bullet.pc
+</pre>
+		<p>
+			Now, finally, you're able to install insula. Get it via <kbd>git clone git://github.com/Phillemann/insula.git</kbd> and execute
+		</p>
+<pre>
+cd insula;
+mkdir build;
+cd build;
+cmake -D CMAKE_INSTALL_PREFIX=$ROOT ..;
+make
+</pre>
+		<p>
+			This should take about 10 minutes on a recent machine. When the
+			compilation process is finished, there's an executable in the
+			build directory called <code>insula</code>. You can start a game
+			with, for example, two players via:
+		</p>
+<pre>
+build/insula --player foo --player bar
+</pre>
 		<h2><a name="screenshots"></a>Screenshots</h2>
 			<table id="screenshot_table">
 				<tr>

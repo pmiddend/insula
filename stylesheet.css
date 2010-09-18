@@ -56,3 +56,8 @@ h3 { color:#5c9002; }
 {
 	list-style-type:lower-greek;
 }
+
+a:link, a:visited, a:hover, a:active
+{
+	color:blue;
+}
