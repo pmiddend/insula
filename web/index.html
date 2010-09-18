@@ -4,10 +4,11 @@
 	<head>  
 		<title>insula - a simple and fun hot seat racing game</title>  
 		<link rel="stylesheet" type="text/css" href="stylesheet.css" />
+		<link rel="shortcut icon" href="images/favicon.png" />
 	</head>  
 	<body>
 		<div id="main_column">
-			<img src="../media/insula_splash.png" alt="insula main logo" style="display:block;margin:auto"/>
+			<img src="images/splash.png" alt="insula main logo" style="display:block;margin:auto"/>
 			<h2>About</h2>
 			<h3>Abstract</h3>
 			<p>
@@ -31,7 +32,7 @@
 			<h3>Goal</h3>
 			<table class="floating_image">
 				<tr><td>
-					<img src="nugget.png" alt="Illustration of a nugget in-game"/>
+					<img src="images/nugget.png" alt="Illustration of a nugget in-game"/>
 				</td></tr>
 				<tr><td>
 					<em>Fig. 1: A nugget example</em>
@@ -52,17 +53,128 @@
 			<h3>Warning</h3>
 				<p>
 					Getting insula is not easy and you might not be able to compile it
-					at all. Be patient, don't frustrate, don't panic. :)
+					at all. Be patient, don't get frustrated, don't panic. :)
 				</p>
 			<h3>Requirements</h3>
+			<h4>System</h4>
+				insula uses <strong>OpenGL-3</strong>, so you need a fairly
+				recent graphics card. Also, it's written
+				in <strong>C++0x</strong> (see
+				the <a href="http://en.wikipedia.org/wiki/C_0x">Wiki
+				article</a> for
+				more info), so you need a compiler that
+				supports it. Currently,
+				only <a href="http://gcc.gnu.org/"><dfn>&gt;gcc-4.5</dfn></a>
+				is a candidate,
+				but <a href="http://clang.llvm.org/"><dfn>clang</dfn></a> and
+				MSVC++-10 might work in the future, too (maybe even now, it's
+				untested on those compilers).
+			<h4>Libraries</h4>
 				<p>
 					insula relies on the following "main" libraries:
 				</p>
 				<ul>
-					<li>sge (as mentioned above) - the graphics engine, currently &#x2013; </li>
-					<li>bullet (for the physics)</li>
-					<li><a href="http://fcppt.net">fcppt</a> - A C++ toolkit, similar to boost (which is already a dependency for sge, but insula relies heavily on it, too)</li>
+					<li>
+						<a href="http://www.boost.org/">boost</a> &#x2013; an
+						essential C++ library (portable)
+					</li>
+					<li>
+						<dfn>sge</dfn> (as mentioned above) &#x2013; the graphics engine,
+						currently supporting <em>OpenGL</em> as a graphics
+						backend, <em>OpenAL</em> as a sound backend
+						and <em>libpng</em> to load images. You will need all of
+						those dependencies. <strong>Currently only runs on
+						Linux</strong>. Windows support is on the way, though.
+					</li>
+					<li>
+						<a href="http://www.bulletphysics.com/">bullet</a> for the
+						physics (portable)
+					</li>
+					<li>
+						<a href="http://fcppt.net"><acronym title="Freundlich's
+						C++ toolkit">fcppt</acronym></a> &#x2013; a C++ toolkit,
+						similar to boost (which is already a dependency for sge,
+						but insula relies heavily on it, too).
+					</li>
+					<li>
+						<dfn>mizuiro</dfn> &#x2013; a templated image processing library
+						(already a depenceny for sge), similar (but far superior to) <a href="http://opensource.adobe.com/wiki/display/gil/Generic+Image+Library">boost::gil</a>
+					</li>
 				</ul>
+			<h3>Compilation step by step</h3>
+			<h4>System</h4>
+			<p>
+				This installation guide will assume that you
+				use <dfn>&gt;gcc-4.5</dfn>. I will not explain how this is
+				installed. It's highly dependant on the
+				distribution. To <em>test</em> if you've got the right
+				compiler, open a terminal and type:
+			</p>
+			<p>
+				<kbd>gcc --version</kbd>
+			</p>
+			<p>
+				It should output something like this:
+			</p>
+			<pre>
+gcc (Gentoo 4.5.1 p1.0, pie-0.4.5) 4.5.1
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+			</pre>
+			<p>
+				As you can see, I'm using gcc-4.5.1
+				on <a href="http://gentoo.org">Gentoo Linux</a>. From now on
+				I'll assume the right compiler is present.
+			</p>
+			<p>
+				You'll also need <dfn>boost</dfn>. This is included in most
+				Linux distributions and it's available on Windows,
+				too. Installation is &#x2013; again &#x2013; distribution and
+				operating system dependent and I'll not explain it here.
+			</p>
+			<p>
+				You also need <a href="http://git-scm.com/">git</a> to
+				download some of the libraries (not all of them are
+				downloadable via http). You can download git
+				from <a href="http://git-scm.com/download">here</a>. Compiling
+				it from source is straightforward: just download, extract, go
+				to the directory and do <kbd>./configure --prefix=/tmp && make
+				install</kbd>, assuming you want it installed in
+				the <kbd>/tmp/</kbd> directory. git is, however, widely
+				available on all operating systems.
+			</p>
+		<h4>A note about the process</h4>
+			I'm assuming you're only interested in trying out insula and you
+			don't want permanent or system-wide changes to your Linux
+			installation. So we're going to install all of the libraries in
+			a separate (and later deletable) directory structure. I'll refer
+			to the root of that directory structure as <code>ROOT</code>
+			from now on. For example, insula will be located
+			in <code>ROOT/insula</code>, sge will be installed
+			in <code>ROOT/include/sge</code>, <code>ROOT/lib</code> and so
+			on. 
+		<h4>fcppt</h4>
+		<p>
+			Installation instructions for fcppt are already
+			available <a href="http://fcppt.net/fcppt_/requirements__download_and_installation.html">here</a>
+			but I'll explain it again here. Just for consistency.
+		</p>
+		<p>
+			FIXME
+			Get the latest version of fcppt either from the installation
+			instruction page (see above) or from git using the
+			command <kbd>git pull
+			git://timeout.supraverse.net/fcppt.git</kbd>. This, of course,
+			assumes that you have git installed. You end up with a 
+		</p>
+		<h2>Screenshots</h2>
+			<ul>
+			<li><a href="images/screen1.jpg"><img src="images/screen1_thumb.jpg" alt="Screenshot"/></a></li>
+			<li><a href="images/screen2.jpg"><img src="images/screen2_thumb.jpg" alt="Screenshot"/></a></li>
+			<li><a href="images/screen3.jpg"><img src="images/screen3_thumb.jpg" alt="Screenshot"/></a></li>
+			<li><a href="images/screen4.jpg"><img src="images/screen4_thumb.jpg" alt="Screenshot"/></a></li>
+			</ul>
 		</div>
 	</body>  
 </html>

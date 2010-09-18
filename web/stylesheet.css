@@ -12,6 +12,11 @@ body
 	padding:1em;
 }
 
+#screenshot_list
+{
+	list-style-type:none;
+}
+
 table.floating_image
 {
 	float:left;
