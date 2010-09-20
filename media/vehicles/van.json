@@ -11,11 +11,11 @@
 		},
 
 	"engine_sound" : "motor.wav",
-	"mass" : 400.0,
+	"mass" : 1400.0,
 	"chassis_center_of_mass_shift" : 0.0,
 	"scaling" : 1.0,
-	"max_engine_force" : 1000.0,
-	"max_breaking_force" : 100.0,
+	"max_engine_force" : 3000.0,
+	"max_breaking_force" : 400.0,
 	"steering_clamp" : 0.2,
 	"max_speed" : 100.0,
 	"track_connection" : 2.0,
@@ -27,34 +27,34 @@
 			"suspension_compression" : 0.3,
 			"suspension_relaxation" : 0.5,
 			"suspension_travel_cm" : 30.0,
-			"suspension_rest_length" : 0.60,
-			"friction_slip" : 1000.0,
+			"suspension_rest_length" : 0.1,
+			"friction_slip" : 5.0,
 			"roll_influence" : 0.05
 		},
 		
 	"wheels" : 
 		[
 			{
-				"offset" : [0.72,-0.0,1.65],
+				"offset" : [-0.72,-0.47,1.65],
 				"front_wheel" : true,
 				"gets_steering" : true,
 				"mirror" : true
 			},
 			{
-				"offset" : [-0.72,-0.0,1.65],
+				"offset" : [0.72,-0.47,1.65],
 				"front_wheel" : true,
 				"gets_steering" : true
 			},
 			{
-				"offset" : [0.72,-0.0,-1.05],
+				"offset" : [0.72,-0.47,-1.05],
+				"gets_engine_force" : true,
+				"gets_breaking_force" : true
+			},
+			{
+				"offset" : [-0.72,-0.47,-1.05],
 				"gets_engine_force" : true,
 				"gets_breaking_force" : true,
 				"mirror" : true
-			},
-			{
-				"offset" : [-0.72,-0.0,-1.05],
-				"gets_engine_force" : true,
-				"gets_breaking_force" : true
 			}
 		]
 }
