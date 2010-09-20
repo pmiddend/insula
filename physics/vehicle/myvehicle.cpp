@@ -10,7 +10,9 @@
 #include <LinearMath/btMinMax.h>
 #include <LinearMath/btIDebugDraw.h>
 #include <BulletDynamics/ConstraintSolver/btContactConstraint.h>
+#include <cmath>
 
+btScalar const magic_zero_constant = static_cast<btScalar>(0.0001);
 
 
 myvehicle::myvehicle(const btVehicleTuning& tuning,btRigidBody* chassis,	btVehicleRaycaster* raycaster )
@@ -307,6 +309,7 @@ void myvehicle::updateVehicle( btScalar step )
 	updateFriction( step);
 
 	
+	// Updates the wheel rotation (not important)
 	for (i=0;i<m_wheelInfo.size();i++)
 	{
 		btWheelInfo& wheel = m_wheelInfo[i];
@@ -473,7 +476,10 @@ struct btWheelContactPoint
 
 };
 
+// Uhm...?
 btScalar calcRollingFriction(btWheelContactPoint& contactPoint);
+// This is strikingly similar to resolveSingleBilateral (somewhere
+// above)
 btScalar calcRollingFriction(btWheelContactPoint& contactPoint)
 {
 
@@ -566,6 +572,8 @@ void	myvehicle::updateFriction(btScalar	timeStep)
 				m_forwardWS[i] = surfNormalWS.cross(m_axle[i]);
 				m_forwardWS[i].normalize();
 
+				// This takes both bodies' velocities and calculates the
+				// magnitude of the side impulse
 				resolveSingleBilateral(
 					*m_chassisBody, 
 					wheelInfo.m_raycastInfo.m_contactPointWS,
@@ -583,26 +591,51 @@ void	myvehicle::updateFriction(btScalar	timeStep)
 	btScalar sideFactor = btScalar(1.);
 	btScalar fwdFactor = 0.5;
 
+	// The sliding constant is global. One wheel slides => sliding = true
 	bool sliding = false;
 	{
+		// This loop is for rolling friction. 
+		// If the vehicle is braking, this will calculate a negative force,
+		// if it's accelerating, this will be a positive force,
+		// if neither is the case, this will be a negative force (of with
+		// later user-controllable magnitude)
 		for (int wheel =0;wheel <getNumWheels();wheel++)
 		{
 			btWheelInfo& wheelInfo = m_wheelInfo[wheel];
-			class btRigidBody* groundObject = (class btRigidBody*) wheelInfo.m_raycastInfo.m_groundObject;
+			btRigidBody* groundObject = 
+				static_cast<btRigidBody *>(
+					wheelInfo.m_raycastInfo.m_groundObject);
 
 			btScalar	rollingFriction = 0.f;
 
+			// If the current wheel touches the ground
 			if (groundObject)
 			{
-				if (wheelInfo.m_engineForce != 0.f)
+				// And if there's engine force applied to it
+				if (std::abs(wheelInfo.m_engineForce) > magic_zero_constant)
 				{
-					rollingFriction = wheelInfo.m_engineForce* timeStep;
-				} else
+					// Set the rolling friction (the force that resists the
+					// wheel going forward) to the engine force (making it an
+					// amplifying force)
+					rollingFriction = wheelInfo.m_engineForce * timeStep;
+				} 
+				else
 				{
-					btScalar defaultRollingFrictionImpulse = 0.f;
-					btScalar maxImpulse = wheelInfo.m_brake ? wheelInfo.m_brake : defaultRollingFrictionImpulse;
-					btWheelContactPoint contactPt(m_chassisBody,groundObject,wheelInfo.m_raycastInfo.m_contactPointWS,m_forwardWS[wheel],maxImpulse);
-					rollingFriction = calcRollingFriction(contactPt);
+					btScalar defaultRollingFrictionImpulse = 1.f;
+					btScalar maxImpulse = 
+						std::abs(wheelInfo.m_brake) > magic_zero_constant
+						? 
+							wheelInfo.m_brake 
+						: 
+							defaultRollingFrictionImpulse;
+					btWheelContactPoint contactPt(
+						m_chassisBody,groundObject,
+						wheelInfo.m_raycastInfo.m_contactPointWS,
+						m_forwardWS[wheel],
+						maxImpulse);
+					rollingFriction = 
+						calcRollingFriction(
+							contactPt);
 				}
 			}
 
@@ -614,17 +647,24 @@ void	myvehicle::updateFriction(btScalar	timeStep)
 			m_forwardImpulse[wheel] = btScalar(0.);
 			m_wheelInfo[wheel].m_skidInfo= btScalar(1.);
 
+			// Determines if the vehicle slides and if so, by how much.
+			// Formally, a vehicle slides if
+			// |Force pulling down|^2 < |Force pulling forward|^2 + |Force pulling sideways|^2
 			if (groundObject)
 			{
 				m_wheelInfo[wheel].m_skidInfo= btScalar(1.);
 				
-				btScalar maximp = wheelInfo.m_wheelsSuspensionForce * timeStep * wheelInfo.m_frictionSlip;
-				btScalar maximpSide = maximp;
-
-				btScalar maximpSquared = maximp * maximpSide;
+				// "Maximum" in this case means: If it's above this marker,
+				// then the force that pushes the vehicle _down_ is smaller
+				// than the force which pushes it forward. In other words, it slides
+				btScalar maximp = 
+					wheelInfo.m_wheelsSuspensionForce * timeStep * wheelInfo.m_frictionSlip;
+				btScalar maximpSide = 
+					maximp;
+				btScalar maximpSquared = 
+					maximp * maximpSide;
 			
-
-				m_forwardImpulse[wheel] = rollingFriction;//wheelInfo.m_engineForce* timeStep;
+				m_forwardImpulse[wheel] = rollingFriction;
 
 				btScalar x = (m_forwardImpulse[wheel] ) * fwdFactor;
 				btScalar y = (m_sideImpulse[wheel] ) * sideFactor;
@@ -634,9 +674,7 @@ void	myvehicle::updateFriction(btScalar	timeStep)
 				if (impulseSquared > maximpSquared)
 				{
 					sliding = true;
-					
 					btScalar factor = maximp / btSqrt(impulseSquared);
-					
 					m_wheelInfo[wheel].m_skidInfo *= factor;
 				}
 			} 
@@ -645,54 +683,64 @@ void	myvehicle::updateFriction(btScalar	timeStep)
 	}
 
 	
-
-
-		if (sliding)
+	// All the wheels with side impulse (those standing non-straight)
+	// will get the skid information, too
+	if (sliding)
+	{
+		for (int wheel = 0;wheel < getNumWheels(); wheel++)
 		{
-			for (int wheel = 0;wheel < getNumWheels(); wheel++)
+			if (std::abs(m_sideImpulse[wheel]) > magic_zero_constant)
 			{
-				if (m_sideImpulse[wheel] != btScalar(0.))
+				if (m_wheelInfo[wheel].m_skidInfo < btScalar(1.))
 				{
-					if (m_wheelInfo[wheel].m_skidInfo< btScalar(1.))
-					{
-						m_forwardImpulse[wheel] *=	m_wheelInfo[wheel].m_skidInfo;
-						m_sideImpulse[wheel] *= m_wheelInfo[wheel].m_skidInfo;
-					}
+					m_forwardImpulse[wheel] *=	m_wheelInfo[wheel].m_skidInfo;
+					m_sideImpulse[wheel] *= m_wheelInfo[wheel].m_skidInfo;
 				}
 			}
 		}
+	}
 
-		// apply the impulses
+	// apply the impulses
+	{
+		for (int wheel = 0;wheel<getNumWheels() ; wheel++)
 		{
-			for (int wheel = 0;wheel<getNumWheels() ; wheel++)
+			btWheelInfo& wheelInfo = m_wheelInfo[wheel];
+
+			btVector3 rel_pos = 
+				wheelInfo.m_raycastInfo.m_contactPointWS - 
+				m_chassisBody->getCenterOfMassPosition();
+
+			if (std::abs(m_forwardImpulse[wheel]) > magic_zero_constant)
+				m_chassisBody->applyImpulse(
+					m_forwardWS[wheel]*(m_forwardImpulse[wheel]),
+					rel_pos);
+
+			if (std::abs(m_sideImpulse[wheel]) > magic_zero_constant)
 			{
-				btWheelInfo& wheelInfo = m_wheelInfo[wheel];
+				btRigidBody* groundObject = 
+					static_cast<btRigidBody*>(
+						m_wheelInfo[wheel].m_raycastInfo.m_groundObject);
 
-				btVector3 rel_pos = wheelInfo.m_raycastInfo.m_contactPointWS - 
-						m_chassisBody->getCenterOfMassPosition();
+				btVector3 rel_pos2 = 
+					wheelInfo.m_raycastInfo.m_contactPointWS - 
+					groundObject->getCenterOfMassPosition();
 
-				if (m_forwardImpulse[wheel] != btScalar(0.))
-				{
-					m_chassisBody->applyImpulse(m_forwardWS[wheel]*(m_forwardImpulse[wheel]),rel_pos);
-				}
-				if (m_sideImpulse[wheel] != btScalar(0.))
-				{
-					class btRigidBody* groundObject = (class btRigidBody*) m_wheelInfo[wheel].m_raycastInfo.m_groundObject;
+				btVector3 sideImp = m_axle[wheel] * m_sideImpulse[wheel];
 
-					btVector3 rel_pos2 = wheelInfo.m_raycastInfo.m_contactPointWS - 
-						groundObject->getCenterOfMassPosition();
+				rel_pos[m_indexUpAxis] *= wheelInfo.m_rollInfluence;
 
-					
-					btVector3 sideImp = m_axle[wheel] * m_sideImpulse[wheel];
+				m_chassisBody->applyImpulse(
+					sideImp,
+					rel_pos);
 
-					rel_pos[m_indexUpAxis] *= wheelInfo.m_rollInfluence;
-					m_chassisBody->applyImpulse(sideImp,rel_pos);
-
-					//apply friction impulse on the ground
-					groundObject->applyImpulse(-sideImp,rel_pos2);
-				}
+				//apply friction impulse on the ground (useless, groundObject
+				//is the fixed body)
+				groundObject->applyImpulse(
+					-sideImp,
+					rel_pos2);
 			}
 		}
+	}
 
 	
 }

@@ -5,6 +5,7 @@
 #include "../input_delegator_fwd.hpp"
 #include <sge/input/key_pair_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
+#include <map>
 
 namespace insula
 {
@@ -32,6 +33,16 @@ private:
 	bool is_active_;
 
 	fcppt::signal::scoped_connection input_connection_;
+
+	typedef
+	std::map
+	<
+		char,
+		bool
+	>
+	key_map;
+
+	key_map key_pressed_;
 	
 	void
 	callback(
