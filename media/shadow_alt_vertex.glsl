@@ -1,8 +1,12 @@
 #version 140
 
-$$$HEADER$$$
+uniform mat4 mvp;
+uniform mat4 mvp_sun;
+in vec3 position;
+in vec2 mytexcoord;
 
 out vec4 shadow_coord;
+out vec2 texcoord_out;
 
 void main()
 {
@@ -15,4 +19,5 @@ void main()
 		mvp_sun * 
 		vec4(position,1.0);
 	gl_Position = mvp * vec4(position,1.0);
+	texcoord_out = mytexcoord;
 }

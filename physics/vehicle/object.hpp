@@ -3,7 +3,7 @@
 
 #include "wheel_info_sequence.hpp"
 #include "bullet_wrapper_fwd.hpp"
-//#include "friction_constraint_fwd.hpp"
+#include "friction_constraint_fwd.hpp"
 #include "../gizmo.hpp"
 #include "../motion_state_fwd.hpp"
 #include "../scoped_body.hpp"
@@ -115,8 +115,8 @@ private:
 	std::unique_ptr<upright_constraint> constraint_;
 	std::unique_ptr<scoped_constraint> scoped_constraint_;
 
-//	std::unique_ptr<friction_constraint> friction_constraint_;
-//	std::unique_ptr<scoped_constraint> scoped_friction_constraint_;
+	std::unique_ptr<friction_constraint> friction_constraint_;
+	std::unique_ptr<scoped_constraint> scoped_friction_constraint_;
 
 	bool is_skidding_;
 	std::unique_ptr<scoped_body> world_body_scope_;

@@ -43,7 +43,7 @@ public:
 	void
 	update_texture(
 		sge::renderer::glsl::string const &name,
-		sge::renderer::texture_ptr);
+		sge::renderer::texture_base_ptr);
 
 	sge::renderer::glsl::program_ptr const
 	program();

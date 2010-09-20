@@ -10,6 +10,7 @@
 #include <sge/renderer/state/source_blend_func.hpp>
 #include <sge/renderer/state/dest_blend_func.hpp>
 #include <sge/renderer/device.hpp>
+#include <sge/renderer/texture.hpp>
 #include <fcppt/assert.hpp>
 #include <boost/foreach.hpp>
 

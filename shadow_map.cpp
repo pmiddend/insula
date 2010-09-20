@@ -140,6 +140,7 @@ namespace
 namespace vf_tags
 {
 SGE_RENDERER_VF_MAKE_UNSPECIFIED_TAG(position)
+SGE_RENDERER_VF_MAKE_UNSPECIFIED_TAG(mytexcoord)
 }
 
 typedef 
@@ -155,11 +156,24 @@ sge::renderer::vf::unspecified
 vf_position;
 
 typedef 
+sge::renderer::vf::unspecified
+<
+	sge::renderer::vf::vector
+	<
+		insula::graphics::scalar,
+		2
+	>,
+	vf_tags::mytexcoord
+> 
+vf_texcoord;
+
+typedef 
 sge::renderer::vf::format
 <
-	boost::mpl::vector1
+	boost::mpl::vector2
 	<
-		vf_position
+		vf_position,
+		vf_texcoord
 	>
 > 
 vertex_format;
@@ -184,7 +198,8 @@ public:
 		insula::graphics::rect const &extents,
 		sge::renderer::device_ptr _renderer,
 		insula::graphics::camera::object &_camera,
-		insula::graphics::mat4 const &mvp_sun)
+		insula::graphics::mat4 const &mvp_sun,
+		sge::renderer::texture_ptr test_texture)
 	:
 		renderer_(
 			_renderer),
@@ -204,8 +219,8 @@ public:
 			{}),
 		depth_texture_(
 			renderer_->create_depth_stencil_texture(
-				sge::renderer::dim_type(1024,1024),
-				sge::renderer::depth_stencil_format::d16)),
+				sge::renderer::dim_type(1024,768),
+				sge::renderer::depth_stencil_format::d32)),
 		alt_shader_(
 			renderer_,
 			insula::media_path()/FCPPT_TEXT("shadow_alt_vertex.glsl"),
@@ -233,6 +248,9 @@ public:
 					6),
 				sge::renderer::resource_flags::none))
 	{
+		insula::graphics::shader::scoped scoped_shader(
+			alt_shader_);
+
 		sge::renderer::scoped_vertex_buffer const scoped_vb_(
 			renderer_,
 			vb_);
@@ -250,31 +268,55 @@ public:
 
 			insula::graphics::scalar y = -1;
 
+			(vb_it)->set<vf_texcoord>(
+				insula::graphics::vec2(
+					0,
+					0));
 			(vb_it++)->set<vf_position>(
 				insula::graphics::vec3(
 					extents.left(),
 					y,
 					extents.top()));
+			(vb_it)->set<vf_texcoord>(
+				insula::graphics::vec2(
+					0,
+					1));
 			(vb_it++)->set<vf_position>(
 				insula::graphics::vec3(
 					extents.left(),
 					y,
 					extents.bottom()));
+			(vb_it)->set<vf_texcoord>(
+				insula::graphics::vec2(
+					1,
+					1));
 			(vb_it++)->set<vf_position>(
 				insula::graphics::vec3(
 					extents.right(),
 					y,
 					extents.bottom()));
+			(vb_it)->set<vf_texcoord>(
+				insula::graphics::vec2(
+					1,
+					1));
 			(vb_it++)->set<vf_position>(
 				insula::graphics::vec3(
 					extents.right(),
 					y,
 					extents.bottom()));
+			(vb_it)->set<vf_texcoord>(
+				insula::graphics::vec2(
+					1,
+					0));
 			(vb_it++)->set<vf_position>(
 				insula::graphics::vec3(
 					extents.right(),
 					y,
 					extents.top()));
+			(vb_it)->set<vf_texcoord>(
+				insula::graphics::vec2(
+					0,
+					0));
 			(vb_it++)->set<vf_position>(
 				insula::graphics::vec3(
 					extents.left(),
@@ -335,10 +377,12 @@ try
 {
 	using namespace insula;
 
+	/*
 	fcppt::log::activate_levels(
 		sge::log::global(),
 		fcppt::log::level::debug
 	);
+	*/
 
 	boost::program_options::options_description desc("Allowed options");
 
@@ -440,6 +484,16 @@ try
 		return EXIT_FAILURE;
 	}
 
+	sge::renderer::texture_ptr model_texture = 
+		sge::image::create_texture(
+				create_path(
+					get_option<fcppt::string>(vm,"texture"),
+					FCPPT_TEXT("textures")),
+				sys.renderer(),
+				sys.image_loader(),
+				sge::renderer::filter::linear,
+				sge::renderer::resource_flags::none);
+
 	graphics::shader::object model_shader(
 		sys.renderer(),
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
@@ -455,14 +509,7 @@ try
 		(
 			graphics::shader::sampler(
 				"texture",
-				sge::image::create_texture(
-				create_path(
-					get_option<fcppt::string>(vm,"texture"),
-					FCPPT_TEXT("textures")),
-				sys.renderer(),
-				sys.image_loader(),
-				sge::renderer::filter::linear,
-				sge::renderer::resource_flags::none))));
+				model_texture)));
 
 	model::object model(
 		model_object,
@@ -512,11 +559,12 @@ try
 		insula::gizmo::rotation_to_mat4(
 			sun_gizmo) *
 		fcppt::math::matrix::translation(
-			sun_gizmo.position() * -1.0f));
+			sun_gizmo.position() * -1.0f),
+		model_texture);
 
 	sge::renderer::target_ptr target = 
 		sys.renderer()->create_target(
-			target_texture,
+			/*target_texture*/sge::renderer::texture_ptr(),
 			ground_object.depth_texture_);
 
 	// target end
@@ -559,24 +607,16 @@ try
 	sys.renderer()->state(
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::clear_backbuffer = true)
-			(sge::renderer::state::color::clear_color = sge::image::colors::black())
+			(sge::renderer::state::color::clear_color = sge::image::colors::white())
 			(sge::renderer::state::bool_::clear_zbuffer = true)
-		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.f)
+		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.0f)
+		 	(sge::renderer::state::bool_::write_to_zbuffer = true)
 			(sge::renderer::state::cull_mode::off)
 			(sge::renderer::state::depth_func::less)
 			//(sge::renderer::state::depth_func::off)
 			);
 
-	while(running)
 	{
-		sge::mainloop::dispatch();
-
-		cam->update(
-			frame_timer.reset());
-
-	//	insula::timed_output() << "cam_pos: " << cam->gizmo().position() << ", forward: " << cam->gizmo().forward() << ", right: " << cam->gizmo().right() << ", up: " << cam->gizmo().up() << "\n";
-
-		{
 			insula::graphics::gizmo const old_gizmo = 
 				cam->gizmo();
 
@@ -588,6 +628,8 @@ try
 
 			sge::renderer::scoped_block const block_(
 				sys.renderer());
+
+			ground_object.render();
 
 
 			{
@@ -604,11 +646,34 @@ try
 					cam->world());
 
 				model.render();
-			}
-			ground_object.render();
 
+				model_shader.set_uniform(
+					"mvp",
+					cam->perspective() * 
+					cam->world() * 
+					fcppt::math::matrix::translation(
+						insula::graphics::vec3(
+							0,-4,0)));
+
+				model.render();
+			}
 			cam->gizmo() = old_gizmo;
 		}
+	
+	//ground_object.depth_texture_->debug();
+
+	while(running)
+	{
+		sge::mainloop::dispatch();
+
+		cam->update(
+			frame_timer.reset());
+
+	//	insula::timed_output() << "cam_pos: " << cam->gizmo().position() << ", forward: " << cam->gizmo().forward() << ", right: " << cam->gizmo().right() << ", up: " << cam->gizmo().up() << "\n";
+
+		
+
+	//	ground_object.depth_texture_->debug();
 
 		{
 			sge::renderer::scoped_block const block_(
@@ -625,7 +690,10 @@ try
 				model_shader.set_uniform(
 					"mvp",
 					cam->perspective() * 
-					cam->world());
+					cam->world() *
+					fcppt::math::matrix::translation(
+						insula::graphics::vec3(
+							0,-4,0)));
 
 				model.render();
 			}
