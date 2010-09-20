@@ -279,3 +279,4 @@ insula::physics::debug_drawer::render()
 }
 
 insula::physics::debug_drawer::~debug_drawer() {}
+

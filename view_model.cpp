@@ -21,6 +21,7 @@
 #include <sge/image/create_texture.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/renderer/aspect.hpp>
+#include <sge/renderer/texture.hpp>
 #include <sge/systems/parameterless.hpp>
 #include <sge/systems/image_loader.hpp>
 #include <sge/console/arg_list.hpp>

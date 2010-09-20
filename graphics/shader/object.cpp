@@ -210,7 +210,7 @@ insula::graphics::shader::object::set_uniform(
 void
 insula::graphics::shader::object::update_texture(
 	sge::renderer::glsl::string const &name,
-	sge::renderer::texture_ptr const newtex)
+	sge::renderer::texture_base_ptr const newtex)
 {
 	BOOST_FOREACH(
 		sampler_sequence::reference r,

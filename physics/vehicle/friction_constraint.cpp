@@ -37,7 +37,7 @@ insula::physics::vehicle::friction_constraint::getInfo1(
 		btWheelInfo const& wheel_info = 
 			vehicle_.getWheelInfo(i);
 		info->m_numConstraintRows += 
-			2 * (wheel_info.m_raycastInfo.m_groundObject != 0);
+			/*2 * */(wheel_info.m_raycastInfo.m_groundObject != 0);
 	}
 }
 
@@ -105,6 +105,7 @@ insula::physics::vehicle::friction_constraint::getInfo2(
 		info->m_upperLimit[row_index] = max_friction;
 	}
 
+#if 0
 	// Setup forward friction.
 	for (int i = 0; i < vehicle_.getNumWheels(); ++i)
 	{
@@ -160,6 +161,7 @@ insula::physics::vehicle::friction_constraint::getInfo2(
 		info->m_lowerLimit[row_index] = -max_friction;
 		info->m_upperLimit[row_index] =  max_friction;
 	}
+#endif
 }
 
 // @override

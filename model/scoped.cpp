@@ -18,7 +18,7 @@ insula::model::scoped::scoped(
 	scoped_state_(
 		renderer_,
 		sge::renderer::state::list
-			(sge::renderer::state::cull_mode::front)
+			(sge::renderer::state::cull_mode::off)
 			(sge::renderer::state::depth_func::less))
 {
 }
