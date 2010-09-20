@@ -12,7 +12,7 @@
 
 	"engine_sound" : "motor.wav",
 	"mass" : 400.0,
-	"chassis_center_of_mass_shift" : 0.3,
+	"chassis_center_of_mass_shift" : 0.0,
 	"scaling" : 1.0,
 	"max_engine_force" : 1000.0,
 	"max_breaking_force" : 100.0,
@@ -27,7 +27,7 @@
 			"suspension_compression" : 0.3,
 			"suspension_relaxation" : 0.5,
 			"suspension_travel_cm" : 30.0,
-			"suspension_rest_length" : 0.40,
+			"suspension_rest_length" : 0.60,
 			"friction_slip" : 1000.0,
 			"roll_influence" : 0.05
 		},

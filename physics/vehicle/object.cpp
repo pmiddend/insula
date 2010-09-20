@@ -1,5 +1,5 @@
 #include "object.hpp"
-#include "bullet_wrapper.hpp"
+#include "myvehicle.hpp"
 #include "friction_constraint.hpp"
 #include "../../timed_output.hpp"
 #include "../dim3_to_bullet.hpp"
@@ -47,11 +47,11 @@
 namespace
 {
 // NOTE: There's also just btVehicleTuning, but I think that's a bug
-btRaycastVehicle::btVehicleTuning const
+myvehicle::btVehicleTuning const
 create_tuning(
 	insula::physics::vehicle::wheel_info const &w)
 {
-	btRaycastVehicle::btVehicleTuning t;
+	myvehicle::btVehicleTuning t;
 	t.m_suspensionStiffness = w.suspension_stiffness();
 	t.m_suspensionCompression = w.suspension_compression();
 	t.m_suspensionDamping = w.suspension_damping();
@@ -140,6 +140,7 @@ insula::physics::vehicle::object::object(
 			world_,
 			*car_body_));
 
+	/*
 	btTransform t;
 	t.setIdentity();
 	constraint_.reset(
@@ -150,6 +151,7 @@ insula::physics::vehicle::object::object(
 		new scoped_constraint(
 			world_,
 			*constraint_));
+	*/
 
 	// TODO: What happens if this is omitted?
 	car_body_->setActivationState(
@@ -185,13 +187,18 @@ insula::physics::vehicle::object::object(
 			&(world_.handle())));
 
 	vehicle_.reset(
+		new myvehicle(
+			myvehicle::btVehicleTuning(),
+			car_body_.get(),
+			raycaster_.get())
+		/*
 		new bullet_wrapper(
 			// bullet doesn't need this structure here, it's probably there for
 			// historical reasons
 			btRaycastVehicle::btVehicleTuning(),
 			car_body_.get(),
 			raycaster_.get(),
-			_track_connection));
+			_track_connection)*/);
 
 	world_vehicle_scope_.set(
 		*vehicle_);

@@ -4,6 +4,7 @@
 #include "wheel_info_sequence.hpp"
 #include "bullet_wrapper_fwd.hpp"
 #include "friction_constraint_fwd.hpp"
+#include "myvehicle_fwd.hpp"
 #include "../gizmo.hpp"
 #include "../motion_state_fwd.hpp"
 #include "../scoped_body.hpp"
@@ -28,7 +29,6 @@ class btCompoundShape;
 class btCylinderShapeX;
 class btTransform;
 class btVehicleRaycaster;
-class btRaycastVehicle;
 
 namespace insula
 {
@@ -102,7 +102,8 @@ private:
 	std::unique_ptr<btRigidBody> car_body_;
 	std::unique_ptr<btCylinderShapeX> wheel_shape_;
 	std::unique_ptr<btVehicleRaycaster> raycaster_; 
-	std::unique_ptr<bullet_wrapper> vehicle_;
+	//std::unique_ptr<bullet_wrapper> vehicle_;
+	std::unique_ptr<myvehicle> vehicle_;
 	std::unique_ptr<motion_state> motion_state_;
 	wheel_info_sequence const wheels_;
 	scalar max_engine_force_;
