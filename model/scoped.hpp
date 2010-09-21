@@ -6,6 +6,7 @@
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/state/scoped.hpp>
+#include <sge/renderer/state/cull_mode.hpp>
 
 namespace insula
 {
@@ -20,7 +21,8 @@ public:
 	explicit
 	scoped(
 		sge::renderer::device_ptr,
-		object &);
+		object &,
+		sge::renderer::state::cull_mode::type = sge::renderer::state::cull_mode::front);
 
 	~scoped();
 private:

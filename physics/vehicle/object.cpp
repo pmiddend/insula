@@ -47,11 +47,11 @@
 namespace
 {
 // NOTE: There's also just btVehicleTuning, but I think that's a bug
-myvehicle::btVehicleTuning const
+insula::physics::vehicle::myvehicle::btVehicleTuning const
 create_tuning(
 	insula::physics::vehicle::wheel_info const &w)
 {
-	myvehicle::btVehicleTuning t;
+	insula::physics::vehicle::myvehicle::btVehicleTuning t;
 	t.m_suspensionStiffness = w.suspension_stiffness();
 	t.m_suspensionCompression = w.suspension_compression();
 	t.m_suspensionDamping = w.suspension_damping();

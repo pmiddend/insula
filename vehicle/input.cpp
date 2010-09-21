@@ -43,14 +43,6 @@ insula::vehicle::input::is_active() const
 	return is_active_;
 }
 
-// FIXME
-/*
-void
-insula::vehicle::input::update()
-{
-}
-*/
-
 void
 insula::vehicle::input::callback(
 	sge::input::key_pair const &k)
@@ -95,8 +87,8 @@ insula::vehicle::input::callback(
 	if (key_pressed_[FCPPT_TEXT('d')])
 		sideways_force += -1;
 
-	if (drive_sideways)
-		forward_force = 0;
+//	if (drive_sideways && vehicle_.speed_kmh() > 30)
+//		forward_force = 0;
 
 	vehicle_.engine_force(forward_force);
 	vehicle_.steering(sideways_force);

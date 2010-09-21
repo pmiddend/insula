@@ -15,7 +15,7 @@
 btScalar const magic_zero_constant = static_cast<btScalar>(0.0001);
 
 
-myvehicle::myvehicle(const btVehicleTuning& tuning,btRigidBody* chassis,	btVehicleRaycaster* raycaster )
+insula::physics::vehicle::myvehicle::myvehicle(const btVehicleTuning& tuning,btRigidBody* chassis,	btVehicleRaycaster* raycaster )
 :m_vehicleRaycaster(raycaster),
 m_pitchControl(btScalar(0.))
 {
@@ -27,7 +27,8 @@ m_pitchControl(btScalar(0.))
 }
 
 
-void myvehicle::defaultInit(const btVehicleTuning& tuning)
+void 
+insula::physics::vehicle::myvehicle::defaultInit(const btVehicleTuning& tuning)
 {
 	(void)tuning;
 	m_currentVehicleSpeedKmHour = btScalar(0.);
@@ -35,9 +36,7 @@ void myvehicle::defaultInit(const btVehicleTuning& tuning)
 	
 }
 
-	
-
-myvehicle::~myvehicle()
+insula::physics::vehicle::myvehicle::~myvehicle()
 {
 }
 
@@ -45,7 +44,8 @@ myvehicle::~myvehicle()
 //
 // basically most of the code is general for 2 or 4 wheel vehicles, but some of it needs to be reviewed
 //
-btWheelInfo&	myvehicle::addWheel( const btVector3& connectionPointCS, const btVector3& wheelDirectionCS0,const btVector3& wheelAxleCS, btScalar suspensionRestLength, btScalar wheelRadius,const btVehicleTuning& tuning, bool isFrontWheel)
+btWheelInfo&	
+insula::physics::vehicle::myvehicle::myvehicle::addWheel( const btVector3& connectionPointCS, const btVector3& wheelDirectionCS0,const btVector3& wheelAxleCS, btScalar suspensionRestLength, btScalar wheelRadius,const btVehicleTuning& tuning, bool isFrontWheel)
 {
 
 	btWheelInfoConstructionInfo ci;
@@ -75,7 +75,8 @@ btWheelInfo&	myvehicle::addWheel( const btVector3& connectionPointCS, const btVe
 
 
 
-const btTransform&	myvehicle::getWheelTransformWS( int wheelIndex ) const
+const btTransform&	
+insula::physics::vehicle::myvehicle::myvehicle::getWheelTransformWS( int wheelIndex ) const
 {
 	btAssert(wheelIndex < getNumWheels());
 	const btWheelInfo& wheel = m_wheelInfo[wheelIndex];
@@ -83,7 +84,8 @@ const btTransform&	myvehicle::getWheelTransformWS( int wheelIndex ) const
 
 }
 
-void	myvehicle::updateWheelTransform( int wheelIndex , bool interpolatedTransform)
+void	
+insula::physics::vehicle::myvehicle::myvehicle::updateWheelTransform( int wheelIndex , bool interpolatedTransform)
 {
 	
 	btWheelInfo& wheel = m_wheelInfo[ wheelIndex ];
@@ -116,7 +118,8 @@ void	myvehicle::updateWheelTransform( int wheelIndex , bool interpolatedTransfor
 	);
 }
 
-void myvehicle::resetSuspension()
+void 
+insula::physics::vehicle::myvehicle::myvehicle::resetSuspension()
 {
 
 	int i;
@@ -132,7 +135,8 @@ void myvehicle::resetSuspension()
 	}
 }
 
-void	myvehicle::updateWheelTransformsWS(btWheelInfo& wheel , bool interpolatedTransform)
+void	
+insula::physics::vehicle::myvehicle::myvehicle::updateWheelTransformsWS(btWheelInfo& wheel , bool interpolatedTransform)
 {
 	wheel.m_raycastInfo.m_isInContact = false;
 
@@ -147,7 +151,7 @@ void	myvehicle::updateWheelTransformsWS(btWheelInfo& wheel , bool interpolatedTr
 	wheel.m_raycastInfo.m_wheelAxleWS = chassisTrans.getBasis() * wheel.m_wheelAxleCS;
 }
 
-btScalar myvehicle::rayCast(btWheelInfo& wheel)
+btScalar insula::physics::vehicle::myvehicle::myvehicle::rayCast(btWheelInfo& wheel)
 {
 	updateWheelTransformsWS( wheel,false);
 
@@ -233,7 +237,7 @@ btScalar myvehicle::rayCast(btWheelInfo& wheel)
 }
 
 
-const btTransform& myvehicle::getChassisWorldTransform() const
+const btTransform& insula::physics::vehicle::myvehicle::myvehicle::getChassisWorldTransform() const
 {
 	/*if (getRigidBody()->getMotionState())
 	{
@@ -248,7 +252,7 @@ const btTransform& myvehicle::getChassisWorldTransform() const
 }
 
 
-void myvehicle::updateVehicle( btScalar step )
+void insula::physics::vehicle::myvehicle::myvehicle::updateVehicle( btScalar step )
 {
 	{
 		for (int i=0;i<getNumWheels();i++)
@@ -347,7 +351,7 @@ void myvehicle::updateVehicle( btScalar step )
 }
 
 
-void	myvehicle::setSteeringValue(btScalar steering,int wheel)
+void	insula::physics::vehicle::myvehicle::myvehicle::setSteeringValue(btScalar steering,int wheel)
 {
 	btAssert(wheel>=0 && wheel < getNumWheels());
 
@@ -357,13 +361,13 @@ void	myvehicle::setSteeringValue(btScalar steering,int wheel)
 
 
 
-btScalar	myvehicle::getSteeringValue(int wheel) const
+btScalar	insula::physics::vehicle::myvehicle::myvehicle::getSteeringValue(int wheel) const
 {
 	return getWheelInfo(wheel).m_steering;
 }
 
 
-void	myvehicle::applyEngineForce(btScalar force, int wheel)
+void	insula::physics::vehicle::myvehicle::myvehicle::applyEngineForce(btScalar force, int wheel)
 {
 	btAssert(wheel>=0 && wheel < getNumWheels());
 	btWheelInfo& wheelInfo = getWheelInfo(wheel);
@@ -371,28 +375,28 @@ void	myvehicle::applyEngineForce(btScalar force, int wheel)
 }
 
 
-const btWheelInfo&	myvehicle::getWheelInfo(int index) const
+const btWheelInfo&	insula::physics::vehicle::myvehicle::myvehicle::getWheelInfo(int index) const
 {
 	btAssert((index >= 0) && (index < 	getNumWheels()));
 	
 	return m_wheelInfo[index];
 }
 
-btWheelInfo&	myvehicle::getWheelInfo(int index) 
+btWheelInfo&	insula::physics::vehicle::myvehicle::myvehicle::getWheelInfo(int index) 
 {
 	btAssert((index >= 0) && (index < 	getNumWheels()));
 	
 	return m_wheelInfo[index];
 }
 
-void myvehicle::setBrake(btScalar brake,int wheelIndex)
+void insula::physics::vehicle::myvehicle::myvehicle::setBrake(btScalar brake,int wheelIndex)
 {
 	btAssert((wheelIndex >= 0) && (wheelIndex < 	getNumWheels()));
 	getWheelInfo(wheelIndex).m_brake = brake;
 }
 
 
-void	myvehicle::updateSuspension(btScalar deltaTime)
+void	insula::physics::vehicle::myvehicle::myvehicle::updateSuspension(btScalar deltaTime)
 {
 	(void)deltaTime;
 
@@ -510,7 +514,7 @@ btScalar calcRollingFriction(btWheelContactPoint& contactPoint)
 
 
 btScalar sideFrictionStiffness2 = btScalar(1.0);
-void	myvehicle::updateFriction(btScalar	timeStep)
+void	insula::physics::vehicle::myvehicle::myvehicle::updateFriction(btScalar	timeStep)
 {
 
 		//calculate the impulse, so that the wheels don't move sidewards
@@ -747,7 +751,7 @@ void	myvehicle::updateFriction(btScalar	timeStep)
 
 
 
-void	myvehicle::debugDraw(btIDebugDraw* debugDrawer)
+void	insula::physics::vehicle::myvehicle::myvehicle::debugDraw(btIDebugDraw* debugDrawer)
 {
 
 	for (int v=0;v<this->getNumWheels();v++)

@@ -29,6 +29,7 @@
 #include <sge/renderer/texture_base_ptr.hpp>
 #include <sge/systems/parameterless.hpp>
 #include <sge/renderer/texture.hpp>
+#include <sge/renderer/viewport.hpp>
 #include <sge/renderer/scoped_target.hpp>
 #include <sge/renderer/depth_stencil_texture.hpp>
 #include <sge/systems/image_loader.hpp>
@@ -219,7 +220,7 @@ public:
 			{}),
 		depth_texture_(
 			renderer_->create_depth_stencil_texture(
-				sge::renderer::dim_type(1024,768),
+				sge::renderer::dim_type(512,512),
 				sge::renderer::depth_stencil_format::d32)),
 		alt_shader_(
 			renderer_,
@@ -280,7 +281,8 @@ public:
 			(vb_it)->set<vf_texcoord>(
 				insula::graphics::vec2(
 					0,
-					1));
+	//				1));
+					0));
 			(vb_it++)->set<vf_position>(
 				insula::graphics::vec3(
 					extents.left(),
@@ -288,8 +290,20 @@ public:
 					extents.bottom()));
 			(vb_it)->set<vf_texcoord>(
 				insula::graphics::vec2(
-					1,
-					1));
+		//			1,
+	//				1));
+				0,0));
+			(vb_it++)->set<vf_position>(
+				insula::graphics::vec3(
+					extents.right(),
+
+					y,
+					extents.bottom()));
+			(vb_it)->set<vf_texcoord>(
+				insula::graphics::vec2(
+	//				1,
+	//				1));
+				0,0));
 			(vb_it++)->set<vf_position>(
 				insula::graphics::vec3(
 					extents.right(),
@@ -297,16 +311,8 @@ public:
 					extents.bottom()));
 			(vb_it)->set<vf_texcoord>(
 				insula::graphics::vec2(
-					1,
-					1));
-			(vb_it++)->set<vf_position>(
-				insula::graphics::vec3(
-					extents.right(),
-					y,
-					extents.bottom()));
-			(vb_it)->set<vf_texcoord>(
-				insula::graphics::vec2(
-					1,
+	//				1,
+					0,
 					0));
 			(vb_it++)->set<vf_position>(
 				insula::graphics::vec3(
@@ -328,6 +334,10 @@ public:
 	void
 	render()
 	{
+		sge::renderer::state::scoped scoped_state_(
+			renderer_,
+			sge::renderer::state::list
+				(sge::renderer::state::cull_mode::front));
 		insula::graphics::shader::scoped scoped_shader(
 			shader_);
 		sge::renderer::scoped_vertex_buffer const scoped_vb_(
@@ -347,6 +357,10 @@ public:
 	void
 	render_alternative()
 	{
+		sge::renderer::state::scoped scoped_state_(
+			renderer_,
+			sge::renderer::state::list
+				(sge::renderer::state::cull_mode::back));
 		insula::graphics::shader::scoped scoped_shader(
 			alt_shader_);
 		sge::renderer::scoped_vertex_buffer const scoped_vb_(
@@ -542,13 +556,6 @@ try
 			.up(
 				insula::graphics::vec3(-0.497337,0.622497,-0.604279)));
 
-	sge::renderer::texture_ptr const target_texture = 
-		sys.renderer()->create_texture(
-			sge::renderer::dim_type(1024,1024),
-			sge::image::color::format::rgb8,
-			sge::renderer::filter::linear,
-			sge::renderer::resource_flags::readable);
-
 	quad ground_object(
 		insula::graphics::rect(
 			insula::graphics::vec2(-5,-5),
@@ -607,7 +614,7 @@ try
 	sys.renderer()->state(
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::clear_backbuffer = true)
-			(sge::renderer::state::color::clear_color = sge::image::colors::white())
+			(sge::renderer::state::color::clear_color = sge::image::colors::black())
 			(sge::renderer::state::bool_::clear_zbuffer = true)
 		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.0f)
 		 	(sge::renderer::state::bool_::write_to_zbuffer = true)
@@ -625,6 +632,11 @@ try
 			sge::renderer::scoped_target const starget(
 				sys.renderer(),
 				target);
+
+			sys.renderer()->viewport(
+				sge::renderer::viewport(
+					sge::renderer::pixel_pos::null(),
+					sge::renderer::screen_size(512,512)));
 
 			sge::renderer::scoped_block const block_(
 				sys.renderer());
@@ -659,6 +671,10 @@ try
 			}
 			cam->gizmo() = old_gizmo;
 		}
+			sys.renderer()->viewport(
+				sge::renderer::viewport(
+					sge::renderer::pixel_pos::null(),
+					sge::renderer::screen_size(1024,768)));
 	
 	//ground_object.depth_texture_->debug();
 
@@ -686,6 +702,12 @@ try
 				model::scoped scoped_model(
 					sys.renderer(),
 					model);
+				model_shader.set_uniform(
+					"mvp",
+					cam->perspective() * 
+					cam->world());
+
+				model.render();
 
 				model_shader.set_uniform(
 					"mvp",

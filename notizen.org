@@ -99,11 +99,17 @@ noch überlegen.
 ** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
 ** TODO Autoverbesserungen
-- Frictionconstraint wieder rausnehmen
-- Vehiclecode in Bullet nochmal durchgehen
-- Vehiclecode diffen mit Code aus stk, Veränderungen übernehmen, gucken ob man dann driften kann
-- Selber Gedanken machen
 - Normaleninterpolation einbauen
+	- Man braucht an jedem diskreten Punkt die Normale.
+	- Für die Normale an einem Punkt benötigt man jeden diskreten Punkt.
+	- Für =height_for_point= benötigt man das Dreieck zu einem
+    nichtdiskreten Punkt
+	- Für den Raycast braucht man das Dreieck und die Normalen zu einem
+    nichtdiskreten Punkt
+	-> Lösung: height_map::object speichert ein Array von Punkten und
+             ein Array von Normalen. Zu einem nichtdiskreten Punkt kann man sich
+						 das Dreieck mit Punkten und normalen zurückgeben lassen.
+- Engineforce wegnehmen, sobald ein Rad in der Luft ist
 ** DONE Nuggets aus game_inner rausziehen
 	 CLOSED: [2010-09-17 Fri 19:40]
 ** DONE "Nugget-Indikatoren" einbauen

@@ -1,5 +1,5 @@
-#ifndef INSUAL_PHYSICS_VEHICLE_MYVEHICLE_HPP_INCLUDED
-#define INSUAL_PHYSICS_VEHICLE_MYVEHICLE_HPP_INCLUDED
+#ifndef INSULA_PHYSICS_VEHICLE_MYVEHICLE_HPP_INCLUDED
+#define INSULA_PHYSICS_VEHICLE_MYVEHICLE_HPP_INCLUDED
 
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <BulletDynamics/ConstraintSolver/btTypedConstraint.h>
@@ -11,10 +11,16 @@
 class btVehicleTuning;
 class btDynamicsWorld;
 
-///rayCast vehicle, very special constraint that turn a rigidbody into a vehicle.
-class myvehicle : public btActionInterface
+namespace insula
 {
-
+namespace physics
+{
+namespace vehicle
+{
+class myvehicle 
+: 
+	public btActionInterface
+{
 		btAlignedObjectArray<btVector3>	m_forwardWS;
 		btAlignedObjectArray<btVector3>	m_axle;
 		btAlignedObjectArray<btScalar>	m_forwardImpulse;
@@ -207,6 +213,9 @@ public:
 	}
 
 };
+}
+}
+}
 
 class btDefaultVehicleRaycaster : public btVehicleRaycaster
 {

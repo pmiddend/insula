@@ -119,37 +119,7 @@ insula::arrow::render()
 			// See http://www.euclideanspace.com/maths/geometry/trig/inverse/index.htm
 
 			(*fcppt::math::vector::atan2(forward)) - (*fcppt::math::vector::atan2(to_nugget))
-
-			/*
-			std::acos(
-				fcppt::math::vector::dot(
-					to_nugget,
-					forward)
-
-				/
-
-				(length(to_nugget)*length(forward)))
-			*/
-
-			/*
-			 (*fcppt::math::vector::angle_between<graphics::scalar>(
-				to_nugget,
-				forward))*/
-
-		)
-		/*
-		fcppt::math::matrix::rotation_y(
-			static_cast<graphics::scalar>(
-				std::acos(
-					fcppt::math::vector::dot(
-						fcppt::math::vector::structure_cast<physics::vec3>(
-							camera_.gizmo().forward()),
-						fcppt::math::vector::normalize(
-							fcppt::math::vector::structure_cast<physics::vec3>(
-								camera_.gizmo().position()) - 
-						nuggets_.closest_nugget(
-							fcppt::math::vector::structure_cast<physics::vec3>(
-								camera_.gizmo().position())))))))*/);
+));
 
 	model_.render();
 }

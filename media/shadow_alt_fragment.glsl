@@ -26,26 +26,41 @@ void main()
 	//frag_color = vec4(vec3(texture2D(depth_texture,coord)),1.0);
 	//frag_color = vec4(vec3(texture2D(depth_texture,texcoord_out)),1.0);
 	//frag_color = texture2D(depth_texture,texcoord_out);
-	float value = texture2D(depth_texture,texcoord_out).r;
-	value = LinearizeDepth(value) * 3;
+	//float value = texture2D(depth_texture,texcoord_out).r;
+	//value = LinearizeDepth(value) * 5;
 	//value = (value - border) / (1.0 - border);
-	frag_color = vec4(value,value,value,1.0);
+	//frag_color = vec4(value,value,value,1.0);
 	//vec4 shadowCoordinateWdivide = shadow_coord / shadow_coord.w ;
 		
-	/*
 	// Used to lower moiré pattern and self-shadowing
-	shadowCoordinateWdivide.z += 0.0005;
+	//shadowCoordinateWdivide.z += 0.0005;
 
+	/*
 	float distanceFromLight = 
 		texture2D(
 			depth_texture,
-			shadowCoordinateWdivide.st).z;
+			coord).r;
 
 	float shadow = 1.0;
 	if (shadow_coord.w > 0.0)
 		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
-	*/
 	  	
-	//frag_color = shadow * vec4(1.0,1.0,1.0,1.0);
+	frag_color = shadow * vec4(1.0,1.0,1.0,1.0);
+	*/
 	//frag_color = texture2D(depth_texture,shadowCoordinateWdivide.st).z * vec4(1.0,1.0,1.0,1.0);
+	vec4 shadowCoordinateWdivide = shadow_coord / shadow_coord.w;
+		
+		// Used to lower moiré pattern and self-shadowing
+		shadowCoordinateWdivide.z += 0.0005;
+		
+		
+		float distanceFromLight = 
+			texture2D(depth_texture,shadowCoordinateWdivide.st).r;
+		
+	 	float shadow = 1.0;
+	 	if (shadow_coord.w > 0.0)
+	 		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
+		
+		frag_color =	shadow * vec4(0.0,1.0,0.0,1.0) + texcoord_out.r;
+
 }

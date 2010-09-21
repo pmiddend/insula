@@ -8,18 +8,19 @@
 #include "../graphics/shader/object.hpp"
 #include "../graphics/box.hpp"
 #include "parameters_fwd.hpp"
+#include "vec3_array.hpp"
 #include "vec2.hpp"
 #include "render_mode.hpp"
 #include "array.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
 #include <sge/renderer/index_buffer_ptr.hpp>
-#include <sge/renderer/texture_ptr.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
 #include <sge/image/file_ptr.hpp>
 #include <sge/console/object_fwd.hpp>
 #include <fcppt/optional.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
+#include <fcppt/container/grid/object_impl.hpp>
 
 namespace insula
 {
@@ -88,30 +89,14 @@ public:
 private:
 	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr const renderer_;
-	sge::renderer::vertex_buffer_ptr vb_;
-	sge::renderer::index_buffer_ptr ib_;
+	graphics::scalar const cell_size_;
+	graphics::scalar const height_scaling_;
+	sge::renderer::vertex_buffer_ptr const vb_;
+	sge::renderer::index_buffer_ptr const ib_;
 	graphics::shader::object shader_;
-	sge::renderer::texture_ptr lower_texture_,upper_texture_,gradient_texture_;
-	graphics::box extents_;
-	array heights_,gradient_;
-	graphics::scalar cell_size_;
-	graphics::scalar height_scaling_;
-
-	/// This function gets the input height map (from a file or
-	/// procedurally generated, whatever) and calculates the neccesary
-	/// "sub-heightmaps" for the textures and the vertices, as well as
-	/// the gradient. It then continues to call regenerate_buffers
-	void
-	regenerate(
-		graphics::scalar const &cell_size,
-		graphics::scalar const height_scaling,
-		array const &raw);
-
-	void 
-	regenerate_buffers(
-		graphics::scalar const &cell_size,
-		graphics::scalar const height_scaling,
-		array const &stretched);
+	graphics::box const extents_;
+	array const heights_,gradient_;
+	vec3_array points_,normals_;
 };
 }
 }

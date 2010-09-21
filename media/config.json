@@ -52,7 +52,7 @@
 		"texture" : "beacon.png",
 		"flatness_range" : [0.0,0.2],
 		"floating_height" : 1.0,
-		"count" : 3
+		"count" : 10
  },
 
 	"props" :

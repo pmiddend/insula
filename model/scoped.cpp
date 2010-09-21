@@ -8,7 +8,8 @@
 
 insula::model::scoped::scoped(
 	sge::renderer::device_ptr const _renderer,
-	object &o)
+	object &o,
+	sge::renderer::state::cull_mode::type const cm)
 :
 	renderer_(
 		_renderer),
@@ -18,7 +19,7 @@ insula::model::scoped::scoped(
 	scoped_state_(
 		renderer_,
 		sge::renderer::state::list
-			(sge::renderer::state::cull_mode::off)
+			(cm)	
 			(sge::renderer::state::depth_func::less))
 {
 }
