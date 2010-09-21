@@ -225,7 +225,11 @@ insula::height_map::object::object(
 	gradient_(
 		stdlib::normalize(
 			stdlib::grid::sobel_operator(
-				heights_)))
+				heights_))),
+	points_(
+		params.array.dimension()),
+	normals_(
+		params.array.dimension())
 {
 	// We need the stretched values for the texture layers (_before_ the
 	// convolution!)
@@ -247,35 +251,60 @@ insula::height_map::object::object(
 	vf::vertex_view::iterator vb_it(
 		vertices.begin());
 
+	// Calculate just the points
 	for (array::size_type y = 0; y < heights_.dimension().h(); ++y)
 	{
 		for (array::size_type x = 0; x < heights_.dimension().w(); ++x)
 		{
-			vf::packed_position p(
-				static_cast<graphics::scalar>(
-					static_cast<scalar>(
-						x) * 
-					cell_size_),
-				static_cast<graphics::scalar>(
-					static_cast<scalar>(
-						height_scaling_) * 
-					heights_[array::dim(x,y)]),
-				static_cast<graphics::scalar>(
-					static_cast<scalar>(
-						y) * 
-					cell_size_));
-			// Just to be safe, we put the 0 here
+			points_[vec3_array::dim(x,y)] = 
+				vec3(
+					static_cast<scalar>(x) * cell_size_,
+					height_scaling_ * heights_[array::dim(x,y)],
+					static_cast<scalar>(y) * cell_size_);
+		}
+	}
+
+	std::fill(
+		normals_.begin(),
+		normals_.end(),
+		vec3::null());
+
+	// Calculate the averaged normals
+	for (array::size_type y = 1; y < static_cast<array::size_type>(heights_.dimension().h()-1); ++y)
+	{
+		for (array::size_type x = 1; x < static_cast<array::size_type>(heights_.dimension().w()-1); ++x)
+		{
+			vec3 const point = 
+				points_[vec3_array::dim(x,y)];
+
+			normals_[vec3_array::dim(x,y)] = 
+				normalize(
+					(cross(
+						points_[vec3_array::dim(x+1,y)] - point,
+						points_[vec3_array::dim(x,y-1)] - point) + 
+					cross(
+						points_[vec3_array::dim(x,y-1)] - point,
+						points_[vec3_array::dim(x-1,y)] - point) + 
+					cross(
+						points_[vec3_array::dim(x-1,y)] - point,
+						points_[vec3_array::dim(x,y+1)] - point) + 
+					cross(
+						points_[vec3_array::dim(x,y+1)] - point,
+						points_[vec3_array::dim(x+1,y)] - point))/
+					static_cast<scalar>(4));
+		}
+	}
+
+	// And fill the vertex buffer
+	for (array::size_type y = 0; y < heights_.dimension().h(); ++y)
+	{
+		for (array::size_type x = 0; x < heights_.dimension().w(); ++x)
+		{
 			(*vb_it).set<vf::position>(
-				p);
+				points_[vec3_array::dim(x,y)]);
 
 			(*vb_it).set<vf::normal>(
-				normalize(
-					calculate_normal(
-						heights_,
-						height_scaling_,
-						cell_size_,
-						x,
-						y)));
+				normals_[vec3_array::dim(x,y)]);
 
 			(*vb_it).set<vf::height_and_gradient>(
 				vf::packed_height_and_gradient(
