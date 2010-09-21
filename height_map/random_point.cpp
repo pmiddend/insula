@@ -1,5 +1,4 @@
 #include "random_point.hpp"
-#include "height_for_point.hpp"
 #include "object.hpp"
 #include <fcppt/container/grid/object.hpp>
 
@@ -60,7 +59,7 @@ insula::height_map::random_point(
 		}
 	} 
 	while(
-		height_for_point(o.heights(),o.cell_size(),result) < water_level ||
+		o.project(result) < water_level ||
 		!inside_range(
 			o.gradient()[
 				array::dim(

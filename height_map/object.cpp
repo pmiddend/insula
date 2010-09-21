@@ -1,11 +1,4 @@
 #include "object.hpp"
-#include "vf/packed_normal.hpp"
-#include "vf/packed_position.hpp"
-#include "vf/format.hpp"
-#include "vf/height_and_gradient.hpp"
-#include "vf/packed_height_and_gradient.hpp"
-#include "vf/normal.hpp"
-#include "vf/vertex_view.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../graphics/shader/vf_to_string.hpp"
@@ -14,14 +7,24 @@
 #include "../graphics/rect.hpp"
 #include "../media_path.hpp"
 #include "../graphics/vec4.hpp"
-#include "scalar.hpp"
-#include "array.hpp"
-#include "vec2.hpp"
-#include "calculate_index_cell.hpp"
-#include "calculate_normal.hpp"
 #include "../stdlib/normalize.hpp"
 #include "../stdlib/grid/sobel_operator.hpp"
 #include "../stdlib/grid/average_convolve.hpp"
+#include "../math/triangle/to_plane.hpp"
+#include "vf/packed_normal.hpp"
+#include "vf/packed_position.hpp"
+#include "vf/format.hpp"
+#include "vf/height_and_gradient.hpp"
+#include "vf/packed_height_and_gradient.hpp"
+#include "vf/normal.hpp"
+#include "vf/vertex_view.hpp"
+#include "scalar.hpp"
+#include "array.hpp"
+#include "vec2.hpp"
+#include "dim2.hpp"
+#include "rect.hpp"
+#include "plane.hpp"
+#include "calculate_index_cell.hpp"
 #include "parameters.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
@@ -61,9 +64,14 @@
 #include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/box/contains_point.hpp>
+#include <fcppt/math/almost_zero.hpp>
 #include <fcppt/container/grid/object_impl.hpp>
+#include <fcppt/assert_message.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/assert_message.hpp>
+#include <fcppt/assert.hpp>
 #include <fcppt/variant/apply_unary.hpp>
 #include <boost/foreach.hpp>
 #include <type_traits>
@@ -382,6 +390,98 @@ insula::height_map::object::extents() const
 {
 	return 
 		extents_;
+}
+
+insula::height_map::scalar
+insula::height_map::object::project(
+	vec2 const &p) const
+{
+	if (!fcppt::math::box::contains_point(
+			rect(
+				vec2::null(),
+				fcppt::math::dim::structure_cast<dim2>(
+					static_cast<array::size_type>(cell_size_) * heights_.dimension())),
+			p))
+		return static_cast<scalar>(0);
+	
+	triangle const t = 
+		enclosing_triangle(
+			p);
+
+	plane const vec_plane = 
+		math::triangle::to_plane(
+			t);
+
+	return
+		(vec_plane.lambda() - vec_plane.normal()[0] * p[0] - vec_plane.normal()[2] * p[1]) / vec_plane.normal()[1];
+}
+
+insula::height_map::triangle const
+insula::height_map::object::enclosing_triangle(
+	vec2 const &p) const
+{
+	// This is too strict due to numerical inaccuracies
+	FCPPT_ASSERT_MESSAGE(
+		fcppt::math::box::contains_point(
+			rect(
+				vec2::null(),
+				fcppt::math::dim::structure_cast<dim2>(
+					static_cast<array::size_type>(cell_size_) * heights_.dimension())),
+			p),
+		FCPPT_TEXT("The point is not inside the height field"));
+
+	// Determine which grid cell we're talking about
+	array::dim const cell = 
+		fcppt::math::vector::structure_cast<array::dim>(
+			p / cell_size_);
+
+//	fcppt::io::cout << "cell size is " << cell_size << ", point is " << p << "\n";
+//	fcppt::io::cout << "calculated the cell: " << cell << "\n";
+
+	// Then, define a line through the top left and the bottom right
+	// corner of the quad (the diagonal line) in slope form: 
+	// f(x)=m*x+b
+	dim2 const 
+		topleft = 
+			fcppt::math::dim::structure_cast<dim2>(cell) * 
+			static_cast<scalar>(cell_size_),
+		bottomright = 
+			topleft + 
+			dim2(
+				cell_size_,
+				cell_size_);
+
+//	fcppt::io::cout << "cell's top left: " << topleft << ", cell's bottom right: " << bottomright << "\n";
+
+	// This should only happen if cell_size is zero.
+	FCPPT_ASSERT(
+		!fcppt::math::almost_zero(
+			topleft.w() - bottomright.w()));
+
+	scalar const 
+		denom = bottomright.w() - topleft.w(),
+		m = (bottomright.h() - topleft.h())/denom,
+		//b = cross(topleft,bottomright)/denom;
+		b = (bottomright.w() * topleft.h() - bottomright.h()*topleft.w())/denom;
+
+//	fcppt::io::cout << "m: " << m << ", b: " << b << "\n";
+
+	if (p.y() > (m * p.x() + b))
+		return 
+			triangle(
+				{
+					points_[vec3_array::dim(cell.w(),cell.h())],
+					points_[vec3_array::dim(cell.w()+1,cell.h()+1)],
+					points_[vec3_array::dim(cell.w()+1,cell.h())] 
+				});
+
+	return 
+		triangle(
+			{
+				points_[vec3_array::dim(cell.w(),cell.h())],
+				points_[vec3_array::dim(cell.w(),cell.h()+1)],
+				points_[vec3_array::dim(cell.w()+1,cell.h()+1)]
+			});
 }
 
 insula::height_map::array const &

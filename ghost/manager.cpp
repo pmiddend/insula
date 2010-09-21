@@ -21,7 +21,6 @@
 #include "../height_map/flatness_range.hpp"
 #include "../height_map/vec2.hpp"
 #include "../height_map/random_point.hpp"
-#include "../height_map/height_for_point.hpp"
 #include "../height_map/object.hpp"
 #include "../random_engine.hpp"
 #include "../random_seed.hpp"
@@ -184,11 +183,8 @@ insula::ghost::manager::parse_single(
 		physics::vec3 const origin(
 			static_cast<physics::scalar>(
 				point2.x()),
-			height_map::height_for_point(
-				params.height_map.heights(),
-				static_cast<height_map::scalar>(
-					params.height_map.cell_size()),
-				point2) * params.height_map.height_scaling() +
+			params.height_map.project(
+				point2) +
 			model->bounding_box().bottom() * scaling - 
 			penetration_depth * scaling,
 			static_cast<physics::scalar>(

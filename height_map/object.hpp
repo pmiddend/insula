@@ -8,6 +8,7 @@
 #include "../graphics/shader/object.hpp"
 #include "../graphics/box.hpp"
 #include "parameters_fwd.hpp"
+#include "triangle.hpp"
 #include "vec3_array.hpp"
 #include "vec2.hpp"
 #include "render_mode.hpp"
@@ -70,6 +71,17 @@ public:
 
 	graphics::box const
 	extents() const;
+
+	// Returns the height for the 2D point, or throws if it isn't
+	// contained in the height map
+	scalar
+	project(
+		vec2 const &) const;
+
+	// Throws is point isn't in height field
+	triangle const
+	enclosing_triangle(
+		vec2 const &) const;
 
 	// Those heights are in [0,1], they're not scaled according to height_scaling
 	array const &

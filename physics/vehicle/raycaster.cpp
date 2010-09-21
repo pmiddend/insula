@@ -1,6 +1,5 @@
 #include "raycaster.hpp"
 #include "../../height_map/object.hpp"
-#include "../../height_map/calculate_normal.hpp"
 #include <BulletDynamics/Dynamics/btDynamicsWorld.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 

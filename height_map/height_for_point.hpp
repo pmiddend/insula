@@ -13,7 +13,8 @@ scalar
 height_for_point(
 	array const &heights,
 	scalar cell_size,
-	vec2 const &point);
+	vec2 const &point,
+	vec2 const &);
 }
 }
 

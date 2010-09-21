@@ -3,7 +3,6 @@
 #include "instance.hpp"
 #include "instance_parameters.hpp"
 #include "../create_path.hpp"
-#include "../static_model_instance.hpp"
 #include "../exception.hpp"
 #include "../json/parse_vector.hpp"
 #include "../json/member_has_type.hpp"
@@ -15,7 +14,6 @@
 #include "../height_map/random_point.hpp"
 #include "../height_map/object.hpp"
 #include "../height_map/vec2.hpp"
-#include "../height_map/height_for_point.hpp"
 #include "../physics/shape_from_approximation.hpp"
 #include "../physics/triangle_mesh/shape_from_model.hpp"
 #include "../physics/approximation/string_to_cylinder_orientation.hpp"
@@ -227,11 +225,8 @@ insula::prop::manager::parse_single_prop(
 				physics::vec3(
 					static_cast<physics::scalar>(
 						point2.x()),
-					height_map::height_for_point(
-						params.height_map.heights(),
-						static_cast<height_map::scalar>(
-							params.height_map.cell_size()),
-						point2) * params.height_map.height_scaling() +
+					params.height_map.project(
+						point2) +
 					model->bounding_box().bottom() * scaling - 
 					penetration_depth * scaling,
 					static_cast<physics::scalar>(

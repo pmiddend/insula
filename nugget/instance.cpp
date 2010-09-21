@@ -63,6 +63,7 @@ insula::nugget::instance::instance(
 					r,
 					physics::mat3::identity(),
 					manager_.shape_,
+					//physics::solidity::nonsolid)));
 					physics::solidity::nonsolid)));
 
 		if (manager_.backend_.has_transparency())

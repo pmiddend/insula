@@ -25,7 +25,8 @@ insula::height_map::scalar
 insula::height_map::height_for_point(
 	array const &heights,
 	scalar cell_size,
-	vec2 const &p)
+	vec2 const &p,
+	vec2 const &)
 {
 	// This is too strict due to numerical inaccuracies
 	/*

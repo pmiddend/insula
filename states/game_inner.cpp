@@ -4,7 +4,6 @@
 #include "../media_path.hpp"
 #include "../height_map/object.hpp"
 #include "../height_map/vec2.hpp"
-#include "../height_map/height_for_point.hpp"
 #include "../physics/box.hpp"
 #include "../physics/vec3.hpp"
 #include "../physics/shape_from_model.hpp"
@@ -97,14 +96,11 @@ insula::states::game_inner::game_inner(
 				static_cast<physics::scalar>(
 					context<game_outer>().vehicle_position().x()),
 				static_cast<physics::scalar>(
-					height_map::height_for_point(
-						context<game_outer>().height_map().heights(),
-						context<game_outer>().height_map().cell_size(),
+					context<game_outer>().height_map().project(
 						fcppt::math::vector::structure_cast<height_map::vec2>(
-							context<game_outer>().vehicle_position())) * 
-						context<game_outer>().height_map().height_scaling() + 
+							context<game_outer>().vehicle_position())) + 
 						static_cast<height_map::scalar>(
-							10)),
+							3)),
 				static_cast<physics::scalar>(
 					context<game_outer>().vehicle_position().y())),
 			context<machine>().input_delegator(),
