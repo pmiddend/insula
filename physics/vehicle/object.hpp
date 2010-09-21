@@ -2,19 +2,16 @@
 #define INSULA_PHYSICS_VEHICLE_OBJECT_HPP_INCLUDED
 
 #include "wheel_info_sequence.hpp"
-#include "bullet_wrapper_fwd.hpp"
 #include "friction_constraint_fwd.hpp"
 #include "myvehicle_fwd.hpp"
+#include "parameters_fwd.hpp"
 #include "../gizmo.hpp"
 #include "../motion_state_fwd.hpp"
 #include "../scoped_body.hpp"
 #include "../scoped_action.hpp"
 #include "../scoped_constraint.hpp"
-#include "../../graphics/vec3.hpp"
 #include "../upright_constraint.hpp"
-#include "../vec3.hpp"
 #include "../mat4.hpp"
-#include "../box.hpp"
 #include "../mat4_sequence.hpp"
 #include "../world_fwd.hpp"
 #include "../object.hpp"
@@ -28,7 +25,6 @@ class btBoxShape;
 class btCompoundShape;
 class btCylinderShapeX;
 class btTransform;
-class btVehicleRaycaster;
 
 namespace insula
 {
@@ -46,18 +42,7 @@ public:
 	
 	explicit
 	object(
-		world &,
-		shared_shape_ptr chassis_shape,
-		scalar mass,
-		scalar chassis_position,
-		scalar steering_clamp,
-		vec3 const &position,
-		scalar max_engine_force,
-		scalar max_breaking_force,
-		scalar max_speed,
-		scalar track_connection,
-		box const &wheel_bb,
- 		wheel_info_sequence const &);
+		parameters const &);
 
 	void
 	update();
@@ -101,8 +86,6 @@ private:
 	std::unique_ptr<btCompoundShape> compound_;
 	std::unique_ptr<btRigidBody> car_body_;
 	std::unique_ptr<btCylinderShapeX> wheel_shape_;
-	std::unique_ptr<btVehicleRaycaster> raycaster_; 
-	//std::unique_ptr<bullet_wrapper> vehicle_;
 	std::unique_ptr<myvehicle> vehicle_;
 	std::unique_ptr<motion_state> motion_state_;
 	wheel_info_sequence const wheels_;

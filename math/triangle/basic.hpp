@@ -41,6 +41,23 @@ public:
 			_points.end(),
 			points.begin());
 	}
+
+	explicit
+	basic(
+		std::initializer_list<vector> const &_points,
+		std::initializer_list<vector> const &_normals)
+	{
+		FCPPT_ASSERT(
+			_points.size() == 3 && _normals.size() == 3);
+		std::copy(
+			_points.begin(),
+			_points.end(),
+			points.begin());
+		std::copy(
+			_normals.begin(),
+			_normals.end(),
+			normals.begin());
+	}
 };
 }
 }

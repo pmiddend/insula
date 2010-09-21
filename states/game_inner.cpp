@@ -104,7 +104,8 @@ insula::states::game_inner::game_inner(
 				static_cast<physics::scalar>(
 					context<game_outer>().vehicle_position().y())),
 			context<machine>().input_delegator(),
-			context<machine>().console())),
+			context<machine>().console(),
+			context<game_outer>().height_map())),
 	props_(
 		context<game_outer>().prop_manager().instantiate(
 			physics_world_))

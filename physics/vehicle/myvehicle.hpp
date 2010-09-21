@@ -1,6 +1,7 @@
 #ifndef INSULA_PHYSICS_VEHICLE_MYVEHICLE_HPP_INCLUDED
 #define INSULA_PHYSICS_VEHICLE_MYVEHICLE_HPP_INCLUDED
 
+#include "shared_raycaster_ptr.hpp"
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <BulletDynamics/ConstraintSolver/btTypedConstraint.h>
 #include <BulletDynamics/Vehicle/btVehicleRaycaster.h>
@@ -56,7 +57,7 @@ private:
 
 	btScalar	m_tau;
 	btScalar	m_damping;
-	btVehicleRaycaster*	m_vehicleRaycaster;
+	shared_raycaster_ptr	m_vehicleRaycaster;
 	btScalar		m_pitchControl;
 	btScalar	m_steeringValue; 
 	btScalar m_currentVehicleSpeedKmHour;
@@ -72,7 +73,10 @@ private:
 public:
 
 	//constructor to create a car from an existing rigidbody
-	myvehicle(const btVehicleTuning& tuning,btRigidBody* chassis,	btVehicleRaycaster* raycaster );
+	myvehicle(
+		btVehicleTuning const & tuning,
+		btRigidBody* chassis,	
+		shared_raycaster_ptr raycaster );
 
 	virtual ~myvehicle() ;
 

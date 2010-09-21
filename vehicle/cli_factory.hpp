@@ -9,6 +9,7 @@
 #include "../physics/vec3.hpp"
 #include "../input_delegator_fwd.hpp"
 #include "../console/object_fwd.hpp"
+#include "../height_map/object_fwd.hpp"
 #include <sge/systems/instance_fwd.hpp>
 #include <boost/program_options/variables_map.hpp>
 
@@ -26,7 +27,8 @@ cli_factory(
 	physics::world &physics_world,
 	physics::vec3 const &position,
 	input_delegator &input_delegator_,
-	console::object &console);
+	console::object &console,
+	height_map::object &);
 }
 }
 

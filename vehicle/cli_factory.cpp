@@ -20,7 +20,8 @@ insula::vehicle::cli_factory(
 	physics::world &physics_world,
 	physics::vec3 const &position,
 	input_delegator &input_delegator_,
-	console::object &console)
+	console::object &console,
+	height_map::object &height_map)
 {
 	return 
 		json::parse_vehicle(
@@ -38,5 +39,6 @@ insula::vehicle::cli_factory(
 			console,
 			get_option<graphics::scalar>(vm,"vehicle-camera-distance"),
 			fcppt::math::deg_to_rad( 
-				get_option<graphics::scalar>(vm,"vehicle-camera-angle")));
+				get_option<graphics::scalar>(vm,"vehicle-camera-angle")),
+			height_map);
 }

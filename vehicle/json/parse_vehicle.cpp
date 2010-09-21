@@ -31,7 +31,8 @@ insula::vehicle::json::parse_vehicle(
 	input_delegator &input_delegator_,
 	console::object &console,
 	graphics::scalar const camera_distance,
-	graphics::scalar const camera_angle)
+	graphics::scalar const camera_angle,
+	height_map::object &height_map)
 {
 	physics::vehicle::wheel_info const default_wheel = 
 		parse_wheel(
@@ -130,5 +131,6 @@ insula::vehicle::json::parse_vehicle(
 						FCPPT_TEXT("sounds")))),
 			sys.audio_player()->create_buffer(
 				sys.audio_loader().load(
-					media_path()/FCPPT_TEXT("sounds")/FCPPT_TEXT("skid.wav"))));
+					media_path()/FCPPT_TEXT("sounds")/FCPPT_TEXT("skid.wav"))),
+			height_map);
 }

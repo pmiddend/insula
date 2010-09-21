@@ -1,4 +1,5 @@
 #include "myvehicle.hpp"
+#include "raycaster.hpp"
 #include <LinearMath/btVector3.h>
 
 #include <BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.h>
@@ -15,7 +16,7 @@
 btScalar const magic_zero_constant = static_cast<btScalar>(0.0001);
 
 
-insula::physics::vehicle::myvehicle::myvehicle(const btVehicleTuning& tuning,btRigidBody* chassis,	btVehicleRaycaster* raycaster )
+insula::physics::vehicle::myvehicle::myvehicle(const btVehicleTuning& tuning,btRigidBody* chassis,	shared_raycaster_ptr raycaster )
 :m_vehicleRaycaster(raycaster),
 m_pitchControl(btScalar(0.))
 {

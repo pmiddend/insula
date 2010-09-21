@@ -8,6 +8,7 @@
 #include "../physics/vehicle/wheel_info_sequence.hpp"
 #include "../physics/scalar.hpp"
 #include "../physics/vec3.hpp"
+#include "../height_map/object_fwd.hpp"
 #include "../input_delegator_fwd.hpp"
 #include "../console/object_fwd.hpp"
 #include "../scene/manager_fwd.hpp"
@@ -53,6 +54,7 @@ public:
 	sge::audio::player_ptr audio_player;
 	sge::audio::buffer_ptr engine_buffer;
 	sge::audio::buffer_ptr skid_buffer;
+	height_map::object &height_map;
 
 	explicit 
 	parameters(
@@ -81,7 +83,8 @@ public:
 		graphics::scalar camera_angle,
 		sge::audio::player_ptr audio_player,
 		sge::audio::buffer_ptr engine_buffer,
-		sge::audio::buffer_ptr skid_buffer)
+		sge::audio::buffer_ptr skid_buffer,
+		height_map::object &height_map)
 	:
 		scene_manager(scene_manager),
 		chassis_model(chassis_model),
@@ -108,7 +111,8 @@ public:
 		camera_angle(camera_angle),
 		audio_player(audio_player),
 		engine_buffer(engine_buffer),
-		skid_buffer(skid_buffer)
+		skid_buffer(skid_buffer),
+		height_map(height_map)
 	{
 	}
 };

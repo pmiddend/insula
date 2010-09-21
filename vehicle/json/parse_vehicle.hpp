@@ -9,6 +9,7 @@
 #include "../../physics/world_fwd.hpp"
 #include "../../physics/vec3.hpp"
 #include "../../console/object_fwd.hpp"
+#include "../../height_map/object_fwd.hpp"
 #include "../../input_delegator_fwd.hpp"
 #include <sge/parse/json/object_fwd.hpp>
 #include <sge/systems/instance_fwd.hpp>
@@ -33,7 +34,8 @@ parse_vehicle(
 	input_delegator &,
 	console::object &,
 	graphics::scalar camera_distance,
-	graphics::scalar camera_angle);
+	graphics::scalar camera_angle,
+	height_map::object &);
 }
 }
 }

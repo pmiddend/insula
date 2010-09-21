@@ -96,6 +96,9 @@ noch überlegen.
 ** TODO Mehr Musik
 ** TODO Persistente Konsolenhistory
 ** TODO Partikelsystem
+** TODO vehiclecode kompakter machen
+Momentan hat man mit =vehicle::parameters= eine riesige Klasse und in
+=json::parse_vehicle= wird auch viel zu viel rumgereicht
 ** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
 ** TODO Autoverbesserungen

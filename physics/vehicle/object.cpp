@@ -1,6 +1,7 @@
 #include "object.hpp"
 #include "myvehicle.hpp"
 #include "friction_constraint.hpp"
+#include "parameters.hpp"
 #include "../../timed_output.hpp"
 #include "../dim3_to_bullet.hpp"
 #include "../vec3_to_bullet.hpp"
@@ -62,37 +63,26 @@ create_tuning(
 }
 
 insula::physics::vehicle::object::object(
-	world &_world,
-	shared_shape_ptr const _chassis_shape,
-	scalar const mass,
-	scalar const chassis_position,
-	scalar const _steering_clamp,
-	vec3 const &_position,
-	scalar const _max_engine_force,
-	scalar const _max_breaking_force,
-	scalar const _max_speed,
-	scalar const _track_connection,
-	box const &_wheel_bb,
-	wheel_info_sequence const &_wheels)
+	parameters const &params)
 :
 	physics::object(
 		object_type::vehicle),
 	world_(
-		_world),
+		params.world_),
 	chassis_shape_(
-		_chassis_shape),
+		params.chassis_shape),
 	motion_state_(
 		new motion_state(
-			_position,
+			params.position,
 			mat3::identity())),
 	wheels_(
-		_wheels),
+		params.wheel_infos),
 	max_engine_force_(
-		_max_engine_force),
+		params.max_engine_force),
 	max_breaking_force_(
-		_max_breaking_force),
+		params.max_breaking_force),
 	max_speed_(
-		_max_speed),
+		params.max_speed),
 	current_engine_force_(
 		0),
 	current_breaking_force_(
@@ -100,7 +90,7 @@ insula::physics::vehicle::object::object(
 	current_steering_(
 		0),
 	steering_clamp_(
-		_steering_clamp),
+		params.steering_clamp),
 	is_skidding_(
 		false),
 	world_vehicle_scope_(
@@ -114,20 +104,20 @@ insula::physics::vehicle::object::object(
 			btMatrix3x3::getIdentity(),
 			btVector3(
 				0,
-				chassis_position,
+				params.chassis_position,
 				0)),
 		chassis_shape_.get());
 
 	// I don't know if initializing to zero is neccessary
 	btVector3 local_inertia(0,0,0);
 	compound_->calculateLocalInertia(
-		mass,
+		params.mass,
 		local_inertia);
 
 	car_body_.reset(
 		new btRigidBody(
 			btRigidBody::btRigidBodyConstructionInfo(
-				mass,
+				params.mass,
 				motion_state_.get(),
 				compound_.get(),
 				local_inertia)));
@@ -170,10 +160,10 @@ insula::physics::vehicle::object::object(
 	scalar const 
 		wheel_halfwidth = 
 			static_cast<scalar>(
-				_wheel_bb.w()/2),
+				params.wheel_bb.w()/2),
 		wheel_radius = 
 			static_cast<scalar>(
-				_wheel_bb.h()/2);
+				params.wheel_bb.h()/2);
 
 	wheel_shape_.reset(
 		new btCylinderShapeX(
@@ -182,23 +172,11 @@ insula::physics::vehicle::object::object(
 				wheel_radius,
 				wheel_radius)));
 
-	raycaster_.reset(
-		new btDefaultVehicleRaycaster(
-			&(world_.handle())));
-
 	vehicle_.reset(
 		new myvehicle(
 			myvehicle::btVehicleTuning(),
 			car_body_.get(),
-			raycaster_.get())
-		/*
-		new bullet_wrapper(
-			// bullet doesn't need this structure here, it's probably there for
-			// historical reasons
-			btRaycastVehicle::btVehicleTuning(),
-			car_body_.get(),
-			raycaster_.get(),
-			_track_connection)*/);
+			params.raycaster_));
 
 	world_vehicle_scope_.set(
 		*vehicle_);

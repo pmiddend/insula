@@ -1,6 +1,7 @@
 #ifndef INSULA_PHYSICS_VEHICLE_PARAMETERS_HPP_INCLUDED
 #define INSULA_PHYSICS_VEHICLE_PARAMETERS_HPP_INCLUDED
 
+#include "shared_raycaster_ptr.hpp"
 #include "../world_fwd.hpp"
 #include "../scalar.hpp"
 #include "../shared_shape_ptr.hpp"
@@ -31,6 +32,7 @@ public:
 	scalar track_connection;
 	box const &wheel_bb;
 	wheel_info_sequence const &wheel_infos;
+	shared_raycaster_ptr raycaster_;
 
 	explicit
 	parameters(
@@ -45,7 +47,8 @@ public:
 		scalar max_speed,
 		scalar track_connection,
 		box const &wheel_bb,
-		wheel_info_sequence const &wheel_infos)
+		wheel_info_sequence const &wheel_infos,
+		shared_raycaster_ptr raycaster_)
 	:
 		world_(world_),
 		chassis_shape(chassis_shape),
@@ -58,7 +61,8 @@ public:
 		max_speed(max_speed),
 		track_connection(track_connection),
 		wheel_bb(wheel_bb),
-		wheel_infos(wheel_infos)
+		wheel_infos(wheel_infos),
+		raycaster_(raycaster_)
 	{
 	}
 };

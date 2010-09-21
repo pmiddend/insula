@@ -10,7 +10,10 @@
 #include "../gizmo/lock_to.hpp"
 #include "../physics/shape_from_model.hpp"
 #include "../physics/gizmo.hpp"
+#include "../physics/world.hpp"
+#include "../physics/vehicle/parameters.hpp"
 #include "../physics/vehicle/object.hpp"
+#include "../physics/vehicle/raycaster.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../graphics/shader/scoped.hpp"
@@ -79,21 +82,25 @@ insula::vehicle::object::object(
 				params.wheel_model,
 				params.renderer))),
 	physics_(
-		params.physics_world,
-		physics::shape_from_model(
-			chassis_backend_.model(),
-			physics::approximation::numeric_value::box),
-		params.mass,
-		params.chassis_position,
-		params.steering_clamp,
-		params.position,
-		params.max_engine_force,
-		params.max_breaking_force,
-		params.max_speed,
-		params.track_connection,
-		fcppt::math::box::structure_cast<physics::box>(
-			wheel_backend_.model().bounding_box()),
-		params.wheel_infos),
+		physics::vehicle::parameters(
+			params.physics_world,
+			physics::shape_from_model(
+				chassis_backend_.model(),
+				physics::approximation::numeric_value::box),
+			params.mass,
+			params.chassis_position,
+			params.steering_clamp,
+			params.position,
+			params.max_engine_force,
+			params.max_breaking_force,
+			params.max_speed,
+			params.track_connection,
+			fcppt::math::box::structure_cast<physics::box>(
+				wheel_backend_.model().bounding_box()),
+			params.wheel_infos,
+			std::make_shared<physics::vehicle::raycaster>(
+				params.physics_world.handle(),
+				params.height_map))),
 	input_(
 		params.input_delegator_,
 		physics_),

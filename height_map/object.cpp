@@ -473,6 +473,11 @@ insula::height_map::object::enclosing_triangle(
 					points_[vec3_array::dim(cell.w(),cell.h())],
 					points_[vec3_array::dim(cell.w()+1,cell.h()+1)],
 					points_[vec3_array::dim(cell.w()+1,cell.h())] 
+				},
+				{
+					normals_[vec3_array::dim(cell.w(),cell.h())],
+					normals_[vec3_array::dim(cell.w()+1,cell.h()+1)],
+					normals_[vec3_array::dim(cell.w()+1,cell.h())] 
 				});
 
 	return 
@@ -481,7 +486,13 @@ insula::height_map::object::enclosing_triangle(
 				points_[vec3_array::dim(cell.w(),cell.h())],
 				points_[vec3_array::dim(cell.w(),cell.h()+1)],
 				points_[vec3_array::dim(cell.w()+1,cell.h()+1)]
+			},
+			{
+				normals_[vec3_array::dim(cell.w(),cell.h())],
+				normals_[vec3_array::dim(cell.w(),cell.h()+1)],
+				normals_[vec3_array::dim(cell.w()+1,cell.h()+1)]
 			});
+			
 }
 
 insula::height_map::array const &

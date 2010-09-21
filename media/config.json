@@ -82,7 +82,7 @@
 			"physics_offset_old" : [-3.73,-3.48,-0.36],
 			"physics_offset" : [0.0,0.0,0.0],
 			"approximation" : "exact",
-			"count" : 1000
+			"count" : 10
 		},
 		{
 			"model" : "statue.md3",
