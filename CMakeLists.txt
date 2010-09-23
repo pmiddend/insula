@@ -1,6 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-PROJECT (load_image_to_array)
+PROJECT (insula)
+
+SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
 
 SET (CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 
@@ -8,13 +10,11 @@ IF(${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files that cmake just created:\nrm -rf CMakeCache.txt CMakeFiles")
 ENDIF()
 
-INCLUDE (FindPkgConfig)
-
 OPTION(ENABLE_OPTIMIZATIONS "Enable -O3" ON)
 
 #SET (CMAKE_VERBOSE_MAKEFILE ON)
 
-SET (Boost_ADDITIONAL_VERSIONS "1.44.0")
+SET (Boost_ADDITIONAL_VERSIONS "1.44.0" "1.44")
 
 IF(MSVC)
 	SET(Boost_USE_STATIC_LIBS ON)
@@ -22,35 +22,49 @@ ENDIF()
 
 FIND_PACKAGE(
 	Boost 1.44.0 REQUIRED COMPONENTS
-	iostreams
 	program_options
-	system
-	thread
 )
 
 INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR})
+
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-PKG_CHECK_MODULES(SGE spacegameengine)
-LINK_DIRECTORIES(${SGE_LIBRARY_DIRS})
+
+FIND_PACKAGE(
+	Fcppt REQUIRED
+)
+
+INCLUDE_DIRECTORIES(${FCPPT_INCLUDE_DIRS})
+
+LINK_DIRECTORIES(${FCPPT_LIBRARY_DIR})
+
+FIND_PACKAGE(
+	Mizuiro REQUIRED
+)
+
+INCLUDE_DIRECTORIES(${MIZUIRO_INCLUDE_DIRS})
+
+FIND_PACKAGE(
+	SGE REQUIRED
+)
+
+INCLUDE_DIRECTORIES(${SGE_INCLUDE_DIRS})
 
 IF (${CMAKE_COMPILER_IS_GNUCXX})
-	ADD_DEFINITIONS("-fvisibility=hidden -ansi -pedantic-errors -Wall"
-	"-Wextra -Wconversion -Wfloat-equal -Wredundant-decls"
-	"-Wstrict-null-sentinel -Winit-self -Woverloaded-virtual"
-	"-Wold-style-cast -Wnon-virtual-dtor -Wctor-dtor-privacy -Wsign-promo"
-	"-Wstrict-aliasing=1 -Wmissing-declarations -Wno-long-long"
-	"-ggdb"
-	"-std=c++0x")
+	ADD_DEFINITIONS("
+		-fvisibility=hidden -std=c++0x -pedantic-errors -Wall"
+		"-Wextra -Wconversion -Wfloat-equal -Wredundant-decls"
+		"-Wstrict-null-sentinel -Winit-self -Woverloaded-virtual"
+		"-Wold-style-cast -Wnon-virtual-dtor -Wctor-dtor-privacy -Wsign-promo"
+		"-Wstrict-aliasing=1 -Wmissing-declarations"
+	)
 
 	IF (ENABLE_OPTIMIZATIONS)
 		ADD_DEFINITIONS("-O3")
 	ENDIF()
-	# we don't use long long but boost does :(
 
-	ADD_DEFINITIONS(-D BOOST_FILESYSTEM_NO_DEPRECATED)
 	ADD_DEFINITIONS(-D BOOST_HAS_GCC_TR1)
 ELSEIF (MSVC)
-	ADD_DEFINITIONS ("/W3 /wd4512 /wd4355 /wd4800 /wd4996 /wd4714 /EHa /D_BIND_TO_CURRENT_VCLIBS_VERSION=1")
+	ADD_DEFINITIONS ("/W4 /wd4996 /EHa /D_BIND_TO_CURRENT_VCLIBS_VERSION=1")
 ENDIF ()
 
 ADD_DEFINITIONS(${SGE_CFLAGS})
@@ -90,7 +104,14 @@ ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files
 
 FUNCTION(CREATE_INSULA_EXE name)
 	ADD_EXECUTABLE(${name} ${name}.cpp)
-	TARGET_LINK_LIBRARIES(${name} insula_library fcppt sgecore ${Boost_LIBRARIES} ${BULLET_LIBRARIES})
+	TARGET_LINK_LIBRARIES(
+		${name}
+		insula_library
+		${FCPPT_LIBRARIES}
+		${SGE_CORE_LIBRARY}
+		${Boost_LIBRARIES}
+		${BULLET_LIBRARIES}
+	)
 ENDFUNCTION(CREATE_INSULA_EXE)
 
 CREATE_INSULA_EXE(load_image_to_array)
