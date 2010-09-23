@@ -141,7 +141,10 @@ Verbesserungen:
   =debug_drawer= rausfinden, ob es an der Shape liegt (bzw. gucken, ob
   es da Kollisionen Chassis-Terrain gibt).
 - Man kann nicht gleichzeitig Gas geben und bremsen.
-- Das Chassis hängt sehr tief, berührt den Boden teilweise bei Drehungen.
+
+- Die Vorderräder bleiben auf der Stelle der Hinterteil des Autos
+  bleibt so
+- http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=9&t=2047
 
 Rigid-Body:
 - Wie siehts bei Bullet mit Friction aus, inwiefern kann man $F \leq

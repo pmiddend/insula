@@ -9,6 +9,7 @@
 #include <BulletDynamics/ConstraintSolver/btJacobianEntry.h>
 #include <LinearMath/btQuaternion.h>
 #include <BulletDynamics/Dynamics/btDynamicsWorld.h>
+
 #include <BulletDynamics/Vehicle/btVehicleRaycaster.h>
 #include <BulletDynamics/Vehicle/btWheelInfo.h>
 #include <LinearMath/btMinMax.h>
@@ -18,17 +19,129 @@
 
 #include <boost/foreach.hpp>
 #include <fcppt/math/clamp.hpp>
+#include <fcppt/assert.hpp>
 #include <cmath>
 #include <iostream>
 
 
 namespace
 {
+struct btWheelContactPoint
+{
+	btRigidBody* m_body0;
+	btRigidBody* m_body1;
+	btVector3	m_frictionPositionWorld;
+	btVector3	m_frictionDirectionWorld;
+	btScalar	m_jacDiagABInv;
+	btScalar	m_maxImpulse;
+
+
+	btWheelContactPoint(btRigidBody* body0,btRigidBody* body1,const btVector3& frictionPosWorld,const btVector3& frictionDirectionWorld, btScalar maxImpulse)
+		:m_body0(body0),
+		m_body1(body1),
+		m_frictionPositionWorld(frictionPosWorld),
+		m_frictionDirectionWorld(frictionDirectionWorld),
+		m_maxImpulse(maxImpulse)
+	{
+		btScalar denom0 = body0->computeImpulseDenominator(frictionPosWorld,frictionDirectionWorld);
+		btScalar denom1 = body1->computeImpulseDenominator(frictionPosWorld,frictionDirectionWorld);
+		btScalar	relaxation = 1.f;
+		m_jacDiagABInv = relaxation/(denom0+denom1);
+	}
+};
+
 bool
 is_zero(btScalar const s)
 {
 	btScalar const magic_zero_constant = static_cast<btScalar>(0.0001);
 	return std::abs(s) < magic_zero_constant;
+}
+
+// bilateral constraint between two dynamic objects
+btScalar 
+myresolveSingleBilateral(
+	btRigidBody const &body1,
+	btVector3 const &pos1,
+	btRigidBody const &body2, 
+	btVector3 const &pos2,
+	btVector3 const& normal,
+	btScalar const slippyness)
+{
+	// We need those twice
+	btVector3 const 
+		rel_pos1 = 
+			pos1 - body1.getCenterOfMassPosition(),
+		rel_pos2 = 
+			pos2 - body2.getCenterOfMassPosition();
+
+	// this jacobian entry could be re-used for all iterations
+	btVector3 const 
+		vel1 = 
+			body1.getVelocityInLocalPoint(rel_pos1),
+		vel2 = 
+			body2.getVelocityInLocalPoint(rel_pos2),
+		vel = 
+			vel1 - vel2;
+
+	btJacobianEntry jac(
+		// world2A
+		body1.getCenterOfMassTransform().getBasis().transpose(),
+		// world2B
+		body2.getCenterOfMassTransform().getBasis().transpose(),
+		// Relative positions
+		rel_pos1,
+		rel_pos2,
+		// jointAxis (which is the wheel axle in our case)
+		normal,
+		body1.getInvInertiaDiagLocal(),
+		body1.getInvMass(),
+		body2.getInvInertiaDiagLocal(),
+		body2.getInvMass());
+
+	btScalar const 
+		jacDiagAB = 
+			jac.getDiagonal(),
+		jacDiagABInv = 
+			static_cast<btScalar>(1) / 
+			jacDiagAB;
+	
+	btScalar const rel_vel = 
+		normal.dot(
+			vel);
+	
+	btScalar const 
+ 		velocityImpulse = 
+			-slippyness * rel_vel * jacDiagABInv;
+
+	return velocityImpulse;
+}
+
+// This is strikingly similar to resolveSingleBilateral (above)
+btScalar 
+calcRollingFriction(
+	btWheelContactPoint& contactPoint)
+{
+	btScalar j1=0.f;
+
+	const btVector3& contactPosWorld = contactPoint.m_frictionPositionWorld;
+
+	btVector3 rel_pos1 = contactPosWorld - contactPoint.m_body0->getCenterOfMassPosition(); 
+	btVector3 rel_pos2 = contactPosWorld - contactPoint.m_body1->getCenterOfMassPosition();
+	
+	btScalar maxImpulse  = contactPoint.m_maxImpulse;
+	
+	btVector3 vel1 = contactPoint.m_body0->getVelocityInLocalPoint(rel_pos1);
+	btVector3 vel2 = contactPoint.m_body1->getVelocityInLocalPoint(rel_pos2);
+	btVector3 vel = vel1 - vel2;
+
+	btScalar vrel = contactPoint.m_frictionDirectionWorld.dot(vel);
+
+	// calculate j that moves us to zero relative velocity
+	j1 = -vrel * contactPoint.m_jacDiagABInv;
+	btSetMin(j1, maxImpulse);
+	btSetMax(j1, -maxImpulse);
+
+	return j1;
 }
 }
 
@@ -328,7 +441,8 @@ insula::physics::vehicle::myvehicle::myvehicle::updateAction(
 	
 	}
 	
-	update_friction( step);
+	update_friction(
+		step);
 
 	
 	// Updates the wheel rotation (not important)
@@ -431,66 +545,6 @@ insula::physics::vehicle::myvehicle::myvehicle::update_suspension(
 }
 
 
-struct btWheelContactPoint
-{
-	btRigidBody* m_body0;
-	btRigidBody* m_body1;
-	btVector3	m_frictionPositionWorld;
-	btVector3	m_frictionDirectionWorld;
-	btScalar	m_jacDiagABInv;
-	btScalar	m_maxImpulse;
-
-
-	btWheelContactPoint(btRigidBody* body0,btRigidBody* body1,const btVector3& frictionPosWorld,const btVector3& frictionDirectionWorld, btScalar maxImpulse)
-		:m_body0(body0),
-		m_body1(body1),
-		m_frictionPositionWorld(frictionPosWorld),
-		m_frictionDirectionWorld(frictionDirectionWorld),
-		m_maxImpulse(maxImpulse)
-	{
-		btScalar denom0 = body0->computeImpulseDenominator(frictionPosWorld,frictionDirectionWorld);
-		btScalar denom1 = body1->computeImpulseDenominator(frictionPosWorld,frictionDirectionWorld);
-		btScalar	relaxation = 1.f;
-		m_jacDiagABInv = relaxation/(denom0+denom1);
-	}
-
-
-
-};
-
-// Uhm...?
-btScalar calcRollingFriction(btWheelContactPoint& contactPoint);
-// This is strikingly similar to resolveSingleBilateral (somewhere
-// above)
-btScalar calcRollingFriction(btWheelContactPoint& contactPoint)
-{
-
-	btScalar j1=0.f;
-
-	const btVector3& contactPosWorld = contactPoint.m_frictionPositionWorld;
-
-	btVector3 rel_pos1 = contactPosWorld - contactPoint.m_body0->getCenterOfMassPosition(); 
-	btVector3 rel_pos2 = contactPosWorld - contactPoint.m_body1->getCenterOfMassPosition();
-	
-	btScalar maxImpulse  = contactPoint.m_maxImpulse;
-	
-	btVector3 vel1 = contactPoint.m_body0->getVelocityInLocalPoint(rel_pos1);
-	btVector3 vel2 = contactPoint.m_body1->getVelocityInLocalPoint(rel_pos2);
-	btVector3 vel = vel1 - vel2;
-
-	btScalar vrel = contactPoint.m_frictionDirectionWorld.dot(vel);
-
-	// calculate j that moves us to zero relative velocity
-	j1 = -vrel * contactPoint.m_jacDiagABInv;
-	btSetMin(j1, maxImpulse);
-	btSetMax(j1, -maxImpulse);
-
-	return j1;
-}
-
-
-
-
 void	
 insula::physics::vehicle::myvehicle::myvehicle::update_friction(
 	btScalar const timeStep)
@@ -499,17 +553,11 @@ insula::physics::vehicle::myvehicle::myvehicle::update_friction(
 		return;
 
 	typedef
-	std::vector
-	<
-		btScalar
-	>
+	std::vector<btScalar>
 	impulse_array;
 
 	typedef
-	std::vector
-	<
-		btVector3
-	>
+	std::vector<btVector3>
 	vector_array;
 
 	impulse_array 
@@ -558,33 +606,36 @@ insula::physics::vehicle::myvehicle::myvehicle::update_friction(
 		//          axle
 		btVector3 const &surfNormalWS = 
 			wheelInfo.m_raycastInfo.m_contactNormalWS;
+		// Projection of axle to surface normal (or the other way round?)
+		// Is likely to be near zero.
 		btScalar const proj = 
 			m_axle[i].dot(
 				surfNormalWS);
+		// Consequently, most times, nothing is subtracted here.
 		m_axle[i] -= surfNormalWS * proj;
+		// We _probably_ end up with axle here
 		m_axle[i] = m_axle[i].normalize();
-					
+
 		m_forwardWS[i] = 
 			surfNormalWS.cross(
 				m_axle[i]).normalize();
 
 		// This takes both bodies' velocities and calculates the
 		// magnitude of the side impulse
-		resolveSingleBilateral(
-			*m_chassisBody, 
-			wheelInfo.m_raycastInfo.m_contactPointWS,
-			*groundObject, wheelInfo.m_raycastInfo.m_contactPointWS,
-			// Distance
-			static_cast<btScalar>(0),
-			// Normal (which is the axle, because it points down, see above, WTF?)
-			m_axle[i],
-			// This is the "out" variable, all the other variables are untouched
-			m_sideImpulse[i],
-			timeStep);
+		m_sideImpulse[i] = 
+			myresolveSingleBilateral(
+				*m_chassisBody, 
+				wheelInfo.m_raycastInfo.m_contactPointWS,
+				*groundObject, 
+				wheelInfo.m_raycastInfo.m_contactPointWS,
+				// Normal (which is the axle, WTF?)
+				m_axle[i],
+				static_cast<btScalar>(0.2));
 	}
 
 	// The sliding constant is global. One wheel slides => sliding = true
 	bool sliding = false;
+
 	// This loop is for rolling friction. 
 	// If the vehicle is braking, this will calculate a negative force,
 	// if it's accelerating, this will be a positive force,
@@ -592,7 +643,9 @@ insula::physics::vehicle::myvehicle::myvehicle::update_friction(
 	// later user-controllable magnitude)
 	for (wheel_info_sequence::size_type wheel = 0; wheel < m_wheelInfo.size(); wheel++)
 	{
-		btWheelInfo &wheelInfo = m_wheelInfo[wheel];
+		btWheelInfo &wheelInfo = 
+			m_wheelInfo[wheel];
+
 		btRigidBody *groundObject = 
 			static_cast<btRigidBody *>(
 				wheelInfo.m_raycastInfo.m_groundObject);
@@ -600,9 +653,11 @@ insula::physics::vehicle::myvehicle::myvehicle::update_friction(
 		btScalar rollingFriction = 
 			static_cast<btScalar>(0);
 
+		// No else here
 		if (groundObject)
 		{
-			if (!is_zero(wheelInfo.m_engineForce))
+			// Braking force will override engine force
+			if (!is_zero(wheelInfo.m_engineForce) && is_zero(wheelInfo.m_brake))
 			{
 				// Set the rolling friction (the force that resists the
 				// wheel going forward) to the engine force (making it an
@@ -650,59 +705,72 @@ insula::physics::vehicle::myvehicle::myvehicle::update_friction(
 			static_cast<btScalar>(
 				1);
 
+		// No else here
 		if (groundObject)
 		{
-			m_wheelInfo[wheel].m_skidInfo= btScalar(1.);
+			btScalar 
+				// Maximum in the sense that if it's higher than that, we'll skid
+				maximp = 
+					wheelInfo.m_wheelsSuspensionForce 
+						* timeStep 
+						* wheelInfo.m_frictionSlip,
+				maximpSquared = 
+					maximp 
+						* maximp; 
 
-			btScalar maximp = wheelInfo.m_wheelsSuspensionForce * timeStep * wheelInfo.m_frictionSlip;
-			btScalar maximpSide = maximp;
+			m_forwardImpulse[wheel] = 
+				rollingFriction;
 
-			btScalar maximpSquared = maximp * maximpSide;
+			// Why this?
+			btScalar const 
+				sideFactor = 
+					static_cast<btScalar>(1),
+				fwdFactor = 
+					//static_cast<btScalar>(0.5);
+					static_cast<btScalar>(1.0);
 
+			btScalar const 
+				x = 
+					m_forwardImpulse[wheel] * fwdFactor,
+				y = 
+					m_sideImpulse[wheel] * sideFactor;
 
-			m_forwardImpulse[wheel] = rollingFriction;//wheelInfo.m_engineForce* timeStep;
-		// Why this?
-		btScalar const 
-			sideFactor = 
-				static_cast<btScalar>(1),
-			fwdFactor = 
-				static_cast<btScalar>(0.5);
-
-
-			btScalar x = (m_forwardImpulse[wheel] ) * fwdFactor;
-			btScalar y = (m_sideImpulse[wheel] ) * sideFactor;
-
-			btScalar impulseSquared = (x*x + y*y);
+			btScalar const impulseSquared = 
+				x*x + y*y;
 
 			if (impulseSquared > maximpSquared)
 			{
 				sliding = true;
-
-				btScalar factor = maximp / btSqrt(impulseSquared);
-
-				m_wheelInfo[wheel].m_skidInfo *= factor;
+				m_wheelInfo[wheel].m_skidInfo *= maximp / std::sqrt(impulseSquared);
 			}
 		} 
+	}
 
-		}
-
-	
-
-
-		if (sliding)
+	if (sliding)
+	//if (false)
+	{
+		for (int wheel = 0;wheel < getNumWheels(); wheel++)
 		{
-			for (int wheel = 0;wheel < getNumWheels(); wheel++)
+			if (!is_zero(m_sideImpulse[wheel]))
 			{
-				if (m_sideImpulse[wheel] != btScalar(0.))
+				if (m_wheelInfo[wheel].m_skidInfo< btScalar(1.))
 				{
-					if (m_wheelInfo[wheel].m_skidInfo< btScalar(1.))
-					{
-						m_forwardImpulse[wheel] *=	m_wheelInfo[wheel].m_skidInfo;
-						m_sideImpulse[wheel] *= m_wheelInfo[wheel].m_skidInfo;
-					}
+					m_forwardImpulse[wheel] *=	m_wheelInfo[wheel].m_skidInfo;
+					//m_sideImpulse[wheel] *= m_wheelInfo[wheel].m_skidInfo;
+					m_sideImpulse[wheel] = 
+						myresolveSingleBilateral(
+							*m_chassisBody, 
+							m_wheelInfo[wheel].m_raycastInfo.m_contactPointWS,
+							*static_cast<btRigidBody *>(
+								m_wheelInfo[wheel].m_raycastInfo.m_groundObject), 
+							m_wheelInfo[wheel].m_raycastInfo.m_contactPointWS,
+							// Normal (which is the axle, WTF?)
+							m_axle[wheel],
+							static_cast<btScalar>(0.01));
 				}
 			}
 		}
+	}
 
 		// apply the impulses
 		{
