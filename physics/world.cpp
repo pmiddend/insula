@@ -1,6 +1,7 @@
 #include "world.hpp"
 #include "vec3_to_bullet.hpp"
 #include "object.hpp"
+#include "height_map.hpp"
 #include "broadphase/manager.hpp"
 #include "../graphics/frustum.hpp"
 #include "vehicle/object.hpp"
@@ -69,9 +70,9 @@ insula::physics::world::update(
 		// Maximum simulation substeps: The fixed time step is 1/60. We
 		// have to choose the substep count so that time_delta is _just_
 		// less than the fixed time.
-		3);
-	//	100,
-	//	static_cast<btScalar>(1.0/240.0));
+	//	3);
+			100,
+			static_cast<btScalar>(1.0/240.0));
 
 	process_collisions();
 }
@@ -175,6 +176,38 @@ insula::physics::world::tick_callback(
 	}
 }
 
+template<typename A,typename B,typename Base,typename SignalMap>
+bool
+try_combination(
+	Base *a,
+	Base *b,
+	SignalMap &signals)
+{
+	A *ca = dynamic_cast<A *>(a);
+	B *cb = dynamic_cast<B *>(b);
+
+	if (ca && cb)
+	{
+		signals[std::minmax(ca->type(),cb->type())](
+			std::ref(*ca),
+			std::ref(*cb));
+		return true;
+	}
+
+	ca = dynamic_cast<A *>(b);
+	cb = dynamic_cast<B *>(a);
+
+	if (ca && cb)
+	{
+		signals[std::minmax(ca->type(),cb->type())](
+			std::ref(*ca),
+			std::ref(*cb));
+		return true;
+	}
+
+	return false;
+}
+
 void
 insula::physics::world::process_collisions()
 {
@@ -182,6 +215,13 @@ insula::physics::world::process_collisions()
 		contact_set::const_reference contact,
 		contacts_)
 	{
+		if (try_combination<vehicle::object,static_model>(contact.first,contact.second,signals_))
+			continue;
+
+		if (try_combination<vehicle::object,height_map>(contact.first,contact.second,signals_))
+			continue;
+		/*
+		// vehicle <-> static model
 		vehicle::object *v = dynamic_cast<vehicle::object *>(contact.first);
 		static_model *sm = dynamic_cast<static_model *>(contact.second);
 
@@ -203,5 +243,6 @@ insula::physics::world::process_collisions()
 				std::ref(*sm));
 			continue;
 		}
+		*/
 	}
 }

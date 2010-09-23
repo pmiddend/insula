@@ -7,7 +7,7 @@
 		"camera-fov" : "90",
 		"camera-near" : "1",
 		"camera-far" : "10000",
-		"camera-speed" : "200",
+		"camera-speed" : "5",
 
 		"terrain-cell-size" : "5",
 		"terrain-height-scaling" : "250",
@@ -33,14 +33,14 @@
 		"skydome-color0" : "(0.765,0.87,1)",
 		"skydome-color1" : "(0,0,1)",
 
-		"vehicle-camera-distance" : "10",
+		"vehicle-camera-distance" : "8",
 		"vehicle-flatness-range" : "(0.0,0.2)",
 		"vehicle-camera-angle" : "30",
 		"vehicle-file" : "van.json",
 
 		"graphics-screen-size" : "(1024,768)",
 
-		"physics-gravity" : "(0,-10,0)",
+		"physics-gravity" : "(0,-20,0)",
 
 		"camera-move-inverse-speed" : "0.4",
 		"camera-move-threshold" : "0.1"
@@ -52,7 +52,7 @@
 		"texture" : "beacon.png",
 		"flatness_range" : [0.0,0.2],
 		"floating_height" : 0.0,
-		"count" : 10
+		"count" : 1
  },
 
 	"props" :
@@ -70,7 +70,7 @@
 				"type" : "sphere",
 				"radius" : 1.0
 			},
-			"count" : 100
+			"count" : 0
 		},
 		{
 			"model" : "palmtree.md3",
@@ -82,7 +82,7 @@
 			"physics_offset_old" : [-3.73,-3.48,-0.36],
 			"physics_offset" : [0.0,0.0,0.0],
 			"approximation" : "exact",
-			"count" : 10
+			"count" : 0
 		},
 		{
 			"model" : "statue.md3",
@@ -94,7 +94,7 @@
 			"physics_offset_old" : [-3.73,-3.48,-0.36],
 			"physics_offset" : [0.0,0.0,0.0],
 			"approximation" : "exact",
-			"count" : 1
+			"count" : 0
 		}
 	],
 
@@ -146,7 +146,8 @@
 			"camera_swoosh" : "swoosh.wav",
 			"plop" : "plop.wav",
 			"honk" : "honk.wav",
-			"clap" : "clapping.wav"
+			"clap" : "clapping.wav",
+			"crash" : "crash.ogg"
 		}
 	}
 }

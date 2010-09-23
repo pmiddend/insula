@@ -1,8 +1,10 @@
 #ifndef INSULA_VEHICLE_INPUT_HPP_INCLUDED
 #define INSULA_VEHICLE_INPUT_HPP_INCLUDED
 
+#include "parameters_fwd.hpp"
 #include "../physics/vehicle/object_fwd.hpp"
-#include "../input_delegator_fwd.hpp"
+#include "../physics/scalar.hpp"
+#include "../time_delta.hpp"
 #include <sge/input/key_pair_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <map>
@@ -19,8 +21,8 @@ public:
 
 	explicit
 	input(
-		input_delegator &,
-		physics::vehicle::object &);
+		physics::vehicle::object &,
+		parameters const &);
 
 	void
 	is_active(
@@ -28,20 +30,33 @@ public:
 
 	bool 
 	is_active() const;
-private:
-	physics::vehicle::object &vehicle_;
-	bool is_active_;
 
-	fcppt::signal::scoped_connection input_connection_;
+	void
+	update(
+		time_delta);
+private:
+	enum action_type
+	{
+		action_accelerate,
+		action_reverse,
+		action_brake,
+		action_left,
+		action_right
+	};
 
 	typedef
 	std::map
 	<
-		char,
+		action_type,
 		bool
 	>
 	key_map;
 
+	physics::vehicle::object &vehicle_;
+	bool is_active_;
+	fcppt::signal::scoped_connection input_connection_;
+	physics::scalar const steering_speed_,braking_speed_,engine_speed_;
+	physics::scalar steering_,brake_,engine_;
 	key_map key_pressed_;
 	
 	void

@@ -68,8 +68,12 @@ public:
 	steering(
 		scalar);
 
-	scalar
+	// DEBUG
+	bool
+	wheel_on_ground(
+		unsigned);
 
+	scalar
 	speed_kmh() const;
 
 	// The camera needs this

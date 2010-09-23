@@ -174,7 +174,6 @@ insula::physics::vehicle::object::object(
 
 	vehicle_.reset(
 		new myvehicle(
-			myvehicle::btVehicleTuning(),
 			car_body_.get(),
 			params.raycaster_));
 
@@ -222,7 +221,9 @@ insula::physics::vehicle::object::object(
 		// ourselves
 		vehicle_->getWheelInfo(wheel_id).m_raycastInfo.m_suspensionLength = 
 			w.suspension_rest_length();
-		vehicle_->updateWheelTransform(wheel_id,true);
+		vehicle_->update_wheel_transform(
+			vehicle_->m_wheelInfo[wheel_id],
+			true);
 
 		/*
 		fcppt::io::cout 
@@ -290,9 +291,10 @@ insula::physics::vehicle::object::update()
 				static_cast<int>(
 					i));
 
-		vehicle_->updateWheelTransform(
-			static_cast<int>(
-				i),
+		vehicle_->update_wheel_transform(
+			vehicle_->m_wheelInfo[
+				static_cast<int>(
+					i)],
 			true);
 
 		is_skidding_ = 
@@ -376,3 +378,11 @@ insula::physics::vehicle::object::is_skidding() const
 }
 
 insula::physics::vehicle::object::~object() {}
+
+// DEBUG
+bool
+insula::physics::vehicle::object::wheel_on_ground(
+	unsigned i)
+{
+	return vehicle_->wheel_on_ground(i);
+}

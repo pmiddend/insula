@@ -25,6 +25,7 @@ insula::physics::shape_from_model(
 				insula::physics::shared_shape_ptr(
 					new btBoxShape(
 						dim3_to_bullet(
+							static_cast<scalar>(0.8)*
 							// btBoxShape gets half extents, so muliply by 0.5 here
 							static_cast<scalar>(0.5)*
 							fcppt::math::dim::structure_cast<dim3>(

@@ -21,6 +21,9 @@
 #include <fcppt/text.hpp>
 #include <functional>
 
+#include "../physics/height_map.hpp"
+#include "../physics/vehicle/object.hpp"
+
 insula::states::running::running(
 	my_context ctx)
 :
@@ -36,7 +39,19 @@ insula::states::running::running(
 				FCPPT_TEXT("arrow")),
 			context<game_outer>().model_shader(),
 			context<machine>().camera(),
-			context<game_inner>().nugget_instance()))
+			context<game_inner>().nugget_instance())),
+	vehicle_crash_connection_(
+		context<game_inner>().physics_world().register_callback
+		<
+			physics::vehicle::object,
+			physics::height_map
+		>(
+			physics::object_type::vehicle,
+			physics::object_type::height_map,
+			[this](physics::vehicle::object &,physics::height_map &)
+			{
+				this->context<machine>().sounds().play(FCPPT_TEXT("crash"));
+			}))
 {
 	context<machine>().sounds().play(
 		FCPPT_TEXT("honk"));
@@ -59,7 +74,8 @@ insula::states::running::react(
 	context<game_inner>().physics_world().update(
 		t.delta());
 
-	context<game_inner>().vehicle().update();
+	context<game_inner>().vehicle().update(
+		t.delta());
 
 	context<game_inner>().vehicle().update_camera();
 
@@ -94,6 +110,8 @@ insula::states::running::react(
 		sge::font::align_h::center,
 		sge::font::align_v::center,
 		sge::font::flags::none);
+
+	context<game_inner>().vehicle().render();
 
 	return discard_event();
 }

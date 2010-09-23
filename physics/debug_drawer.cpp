@@ -228,7 +228,7 @@ insula::physics::debug_drawer::render()
 	sge::renderer::state::scoped const sstate(
 		renderer_,
 		sge::renderer::state::list
-			(sge::renderer::state::depth_func::off));
+			(sge::renderer::state::depth_func::less));
 
 	graphics::shader::scoped scoped_shader_(
 		shader_);

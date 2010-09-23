@@ -15,8 +15,11 @@
 	"chassis_center_of_mass_shift" : 0.0,
 	"scaling" : 1.0,
 	"max_engine_force" : 3000.0,
-	"max_breaking_force" : 50.0,
+	"max_breaking_force" : 500.0,
 	"steering_clamp" : 0.2,
+	"steering_speed" : 3.0,
+	"braking_speed" : 1.0,
+	"engine_speed" : 1.0,
 	"max_speed" : 100.0,
 	"track_connection" : 2.0,
 
@@ -27,7 +30,7 @@
 			"suspension_compression" : 0.3,
 			"suspension_relaxation" : 0.5,
 			"suspension_travel_cm" : 30.0,
-			"suspension_rest_length" : 0.1,
+			"suspension_rest_length" : 0.3,
 			"friction_slip" : 5.0,
 			"roll_influence" : 0.05
 		},

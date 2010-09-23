@@ -8,6 +8,7 @@
 #include <LinearMath/btAlignedObjectArray.h>
 #include <BulletDynamics/Vehicle/btWheelInfo.h>
 #include <BulletDynamics/Dynamics/btActionInterface.h>
+#include <vector>
 
 class btVehicleTuning;
 class btDynamicsWorld;
@@ -22,14 +23,6 @@ class myvehicle
 : 
 	public btActionInterface
 {
-		btAlignedObjectArray<btVector3>	m_forwardWS;
-		btAlignedObjectArray<btVector3>	m_axle;
-		btAlignedObjectArray<btScalar>	m_forwardImpulse;
-		btAlignedObjectArray<btScalar>	m_sideImpulse;
-	
-		///backwards compatibility
-		int	m_userConstraintType;
-		int	m_userConstraintId;
 
 public:
 	class btVehicleTuning
@@ -58,7 +51,6 @@ private:
 	btScalar	m_tau;
 	btScalar	m_damping;
 	shared_raycaster_ptr	m_vehicleRaycaster;
-	btScalar		m_pitchControl;
 	btScalar	m_steeringValue; 
 	btScalar m_currentVehicleSpeedKmHour;
 
@@ -67,26 +59,18 @@ private:
 	int m_indexRightAxis;
 	int m_indexUpAxis;
 	int	m_indexForwardAxis;
-
-	void defaultInit(const btVehicleTuning& tuning);
-
 public:
-
-	//constructor to create a car from an existing rigidbody
+	explicit
 	myvehicle(
-		btVehicleTuning const & tuning,
 		btRigidBody* chassis,	
-		shared_raycaster_ptr raycaster );
+		shared_raycaster_ptr raycaster);
 
-	virtual ~myvehicle() ;
+	~myvehicle();
 
-
-	///btActionInterface interface
-	virtual void updateAction( btCollisionWorld* collisionWorld, btScalar step)
-	{
-        (void) collisionWorld;
-		updateVehicle(step);
-	}
+	void 
+	updateAction(
+		btCollisionWorld*, 
+		btScalar step);
 	
 
 	///btActionInterface interface
@@ -95,8 +79,6 @@ public:
 	const btTransform& getChassisWorldTransform() const;
 	
 	btScalar rayCast(btWheelInfo& wheel);
-
-	virtual void updateVehicle(btScalar step);
 	
 	
 	void resetSuspension();
@@ -110,7 +92,10 @@ public:
 
 	const btTransform&	getWheelTransformWS( int wheelIndex ) const;
 
-	void	updateWheelTransform( int wheelIndex, bool interpolatedTransform = true );
+	void
+	update_wheel_transform(
+		btWheelInfo &, 
+		bool interpolatedTransform = true);
 	
 	void	setRaycastWheelInfo( int wheelIndex , bool isInContact, const btVector3& hitPoint, const btVector3& hitNormal,btScalar depth);
 
@@ -120,7 +105,15 @@ public:
 		return int (m_wheelInfo.size());
 	}
 	
-	btAlignedObjectArray<btWheelInfo>	m_wheelInfo;
+	typedef
+	std::vector
+	<
+		btWheelInfo
+	>
+	wheel_info_sequence;
+
+	wheel_info_sequence m_wheelInfo;
+	//btAlignedObjectArray<btWheelInfo>	m_wheelInfo;
 
 
 	const btWheelInfo&	getWheelInfo(int index) const;
@@ -132,14 +125,9 @@ public:
 	
 	void setBrake(btScalar brake,int wheelIndex);
 
-	void	setPitchControl(btScalar pitch)
-	{
-		m_pitchControl = pitch;
-	}
-	
-	void	updateSuspension(btScalar deltaTime);
-
-	virtual void	updateFriction(btScalar	timeStep);
+	void	
+	update_friction(
+		btScalar);
 
 
 
@@ -193,46 +181,27 @@ public:
 		m_indexUpAxis = upIndex;
 		m_indexForwardAxis = forwardIndex;
 	}
+private:
+	void	
+	update_suspension(
+		btScalar deltaTime);
 
+	void
+	update_speed();
 
-	///backwards compatibility
-	int getUserConstraintType() const
-	{
-		return m_userConstraintType ;
-	}
+	btScalar
+	calculate_suspension_force(
+		btWheelInfo const &);
 
-	void	setUserConstraintType(int userConstraintType)
-	{
-		m_userConstraintType = userConstraintType;
-	};
-
-	void	setUserConstraintId(int uid)
-	{
-		m_userConstraintId = uid;
-	}
-
-	int getUserConstraintId() const
-	{
-		return m_userConstraintId;
-	}
-
-};
-}
-}
-}
-
-class btDefaultVehicleRaycaster : public btVehicleRaycaster
-{
-	btDynamicsWorld*	m_dynamicsWorld;
 public:
-	btDefaultVehicleRaycaster(btDynamicsWorld* world)
-		:m_dynamicsWorld(world)
-	{
-	}
-
-	virtual void* castRay(const btVector3& from,const btVector3& to, btVehicleRaycasterResult& result);
-
+	// DEBUG
+	bool
+	wheel_on_ground(
+		unsigned);
 };
+}
+}
+}
 
 
 #endif //RAYCASTVEHICLE_H

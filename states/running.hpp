@@ -9,6 +9,7 @@
 #include "../events/key.hpp"
 #include "../vehicle/scoped.hpp"
 #include "../arrow.hpp"
+#include <fcppt/signal/scoped_connection.hpp>
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
@@ -54,6 +55,7 @@ public:
 private:
 	vehicle::scoped scoped_vehicle_;
 	arrow arrow_;
+	fcppt::signal::scoped_connection vehicle_crash_connection_;
 };
 }
 }

@@ -98,6 +98,18 @@ insula::vehicle::json::parse_vehicle(
 			static_cast<physics::scalar>(
 				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
 					json_file.members,
+					FCPPT_TEXT("steering_speed"))),
+			static_cast<physics::scalar>(
+				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+					json_file.members,
+					FCPPT_TEXT("braking_speed"))),
+			static_cast<physics::scalar>(
+				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+					json_file.members,
+					FCPPT_TEXT("engine_speed"))),
+			static_cast<physics::scalar>(
+				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+					json_file.members,
 					FCPPT_TEXT("max_engine_force"))),
 			static_cast<physics::scalar>(
 				sge::parse::json::find_member_exn<sge::parse::json::float_type>(

@@ -3,6 +3,9 @@
 
 #include "input.hpp"
 #include "parameters_fwd.hpp"
+#include "sprite/system.hpp"
+#include "sprite/object.hpp"
+#include "../time_delta.hpp"
 #include "../model/backend.hpp"
 #include "../model/instance.hpp"
 #include "../physics/vehicle/object.hpp"
@@ -59,7 +62,11 @@ public:
 	update_camera();
 
 	void
-	update();
+	update(
+		time_delta);
+
+	void
+	render();
 
 	physics::scalar 
 	speed_kmh() const;
@@ -92,6 +99,13 @@ private:
 	sge::audio::buffer_ptr skid_buffer_;
 	sge::audio::sound::positional_ptr skid_source_;
 	bool active_;
+
+	typedef
+	std::vector<sprite::object>
+	sprite_sequence;
+
+	sprite::system sprite_system_;
+	sprite_sequence sprites_;
 };
 }
 }

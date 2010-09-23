@@ -1,10 +1,8 @@
 #ifndef INSULA_PHYSICS_VEHICLE_RAYCASTER_HPP_INCLUDED
 #define INSULA_PHYSICS_VEHICLE_RAYCASTER_HPP_INCLUDED
 
-#include "../../height_map/object_fwd.hpp"
-#include <BulletDynamics/Vehicle/btVehicleRaycaster.h>
-
-class btDynamicsWorld;
+#include <LinearMath/btVector3.h>
+#include "raycast_results.hpp"
 
 namespace insula
 {
@@ -13,23 +11,14 @@ namespace physics
 namespace vehicle
 {
 class raycaster
-:
-	public btVehicleRaycaster
 {
 public:
-	explicit
-	raycaster(
-		btDynamicsWorld &,
-		height_map::object const &);
-
-	void* 
-	castRay(
+	virtual raycast_results const 
+	cast_ray(
 		btVector3 const &from,
-		btVector3 const &to, 
-		btVehicleRaycasterResult &result);
-private:
-	btDynamicsWorld &world_;
-	height_map::object const &height_map_;
+		btVector3 const &to) = 0;
+
+	virtual ~raycaster();
 };
 }
 }

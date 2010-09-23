@@ -102,17 +102,51 @@ Momentan hat man mit =vehicle::parameters= eine riesige Klasse und in
 ** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
 ** TODO Autoverbesserungen
-- Normaleninterpolation einbauen
-	- Man braucht an jedem diskreten Punkt die Normale.
-	- Für die Normale an einem Punkt benötigt man jeden diskreten Punkt.
-	- Für =height_for_point= benötigt man das Dreieck zu einem
-    nichtdiskreten Punkt
-	- Für den Raycast braucht man das Dreieck und die Normalen zu einem
-    nichtdiskreten Punkt
-	-> Lösung: height_map::object speichert ein Array von Punkten und
-             ein Array von Normalen. Zu einem nichtdiskreten Punkt kann man sich
-						 das Dreieck mit Punkten und normalen zurückgeben lassen.
+
+Physik-Notizen:
+- Wenn ein Reifen eine zu starke Kraft erfährt (bis zu einer Grenze
+  $m$), dann gleitet er statt zu haften.
+- Die Kraft $m$ ist proportional zum Gewicht, das der Reifen
+  trägt. Mehr Gewicht am Reifen, mehr "adhesion", es wird mehr Kraft
+  benötigt um ihm zum sliden zu bringen.
+- Es gilt: $F \leq \mu W$, wobei $\mu$ der "Stiction-Koeffizient" ist
+  und $W$ das Gewicht am Reifen.
+- Um zu gucken ob ein Reifen slidet muss man also gucken, ob die
+  Kraft, die auf ihn wirkt, größer oder gleich $\mu$ mal der Kraft
+  ist, die ihn nach unten zieht.
+- Die _Beschleunigung_, die ein Reifen maximal erfahren kann, ist $\mu
+  g$, eine Konstante: $|a_{\textrm{max}}| = \mu \cdot g$
+
+Verbesserungen:
+- Wenn die Hinterräder auf dem Boden sind, ab er die Vorderräder
+  nicht. Was passiert dann? Haben die Vorderräder dann trotzdem noch einen Seitwärtsimpuls?
+- Momentan ist "sliding" nicht pro Rad, sondern global definiert. Das ändern?
 - Engineforce wegnehmen, sobald ein Rad in der Luft ist
+- Wo setzt die Bremskraft an? In einem echten Auto am Reifen (eher am
+  Boden des Reifens)
+- Ist die Kraft, die ihn nach unten zieht, die Suspension Force? Ist
+  in der Suspension Force die Masse enthalten?
+- Inwiefern ist Forward- und Sidewaysimpuls verbunden? Kann ein Reifen
+  beides haben?
+- Ist es umgesetzt, dass die Innenräder beim Kurvedrehen weniger
+  Stiction haben und die Außenräder mehr?
+- Bei Allradantrieb hat man keine/weniger Weighttransfer beim
+  Beschleunigen/Bremsen
+- Was passiert, wenn beide Hinterräder, aber nur ein Vorderrad auf dem
+  Boden ist und man einlenkt? Muss man da korrigieren?
+- Man könnte den Reifen selber eine Masse geben. Die müsste in die
+  Suspension Force eingerechnet werden (=update_suspension= ganz am
+  Anfang der Schleife)
+- Das Auto "knickt" um, wenn man eine Kurve dreht. Ursache? Per
+  =debug_drawer= rausfinden, ob es an der Shape liegt (bzw. gucken, ob
+  es da Kollisionen Chassis-Terrain gibt).
+- Man kann nicht gleichzeitig Gas geben und bremsen.
+- Das Chassis hängt sehr tief, berührt den Boden teilweise bei Drehungen.
+
+Rigid-Body:
+- Wie siehts bei Bullet mit Friction aus, inwiefern kann man $F \leq
+  \mu W$ umsetzen?
+- Gibt es eine Feder mit Dämpfung für die Aufhängung?
 ** DONE Nuggets aus game_inner rausziehen
 	 CLOSED: [2010-09-17 Fri 19:40]
 ** DONE "Nugget-Indikatoren" einbauen

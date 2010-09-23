@@ -177,5 +177,4 @@ insula::states::game_inner::nugget_instance() const
 
 insula::states::game_inner::~game_inner()
 {
-	fcppt::io::cout << "~game_inner\n";
 }

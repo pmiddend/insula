@@ -13,7 +13,7 @@
 #include "../physics/world.hpp"
 #include "../physics/vehicle/parameters.hpp"
 #include "../physics/vehicle/object.hpp"
-#include "../physics/vehicle/raycaster.hpp"
+#include "../physics/vehicle/interpolating_raycaster.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../graphics/shader/scoped.hpp"
@@ -39,6 +39,18 @@
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/text.hpp>
 #include <cmath>
+
+#include "sprite/parameters.hpp"
+#include "sprite/vector.hpp"
+#include "sprite/dim.hpp"
+#include <sge/image/colors.hpp>
+#include <sge/renderer/state/scoped.hpp>
+#include <sge/renderer/state/list.hpp>
+#include <sge/renderer/state/depth_func.hpp>
+#include <sge/renderer/state/trampoline.hpp>
+#include <sge/sprite/default_equal.hpp>
+#include <mizuiro/color/init.hpp>
+#include <iostream>
 
 insula::vehicle::object::object(
 	parameters const &params)
@@ -98,12 +110,12 @@ insula::vehicle::object::object(
 			fcppt::math::box::structure_cast<physics::box>(
 				wheel_backend_.model().bounding_box()),
 			params.wheel_infos,
-			std::make_shared<physics::vehicle::raycaster>(
+			std::make_shared<physics::vehicle::interpolating_raycaster>(
 				params.physics_world.handle(),
 				params.height_map))),
 	input_(
-		params.input_delegator_,
-		physics_),
+		physics_,
+		params),
 	camera_(
 		params.camera),
 	lock_camera_(
@@ -140,7 +152,9 @@ insula::vehicle::object::object(
 				.position(
 					fcppt::math::vector::structure_cast<sge::audio::vector>(
 						params.position)))),
-	active_(false)
+	active_(false),
+	sprite_system_(
+		params.renderer)
 {
 	params.scene_manager.insert(
 		chassis_backend_,
@@ -158,6 +172,71 @@ insula::vehicle::object::object(
 			wheel_backend_,
 			wheel_instances_.back());
 	}
+
+	sprites_.push_back(
+		sprite::object(
+			sprite::parameters()
+				.system(&sprite_system_)
+				.order(0u)
+				.pos(
+					sprite::vector(10,10))
+				.size(
+					sprite::dim(
+						30,60))
+				.color(
+					(mizuiro::color::init::red %= 1.0)
+					(mizuiro::color::init::green %= 0.0)
+					(mizuiro::color::init::blue %= 0.0)
+					(mizuiro::color::init::alpha %= 1.0))
+				.elements()));
+	sprites_.push_back(
+		sprite::object(
+			sprite::parameters()
+				.system(&sprite_system_)
+				.order(0u)
+				.pos(
+					sprite::vector(60,10))
+				.size(
+					sprite::dim(
+						30,60))
+				.color(
+					(mizuiro::color::init::red %= 0.0)
+					(mizuiro::color::init::green %= 0.0)
+					(mizuiro::color::init::blue %= 1.0)
+					(mizuiro::color::init::alpha %= 1.0))
+				.elements()));
+	sprites_.push_back(
+		sprite::object(
+			sprite::parameters()
+				.system(&sprite_system_)
+				.order(0u)
+				.pos(
+					sprite::vector(10,100))
+				.size(
+					sprite::dim(
+						30,60))
+				.color(
+					(mizuiro::color::init::red %= 0.0)
+					(mizuiro::color::init::green %= 0.0)
+					(mizuiro::color::init::blue %= 1.0)
+					(mizuiro::color::init::alpha %= 1.0))
+				.elements()));
+	sprites_.push_back(
+		sprite::object(
+			sprite::parameters()
+				.system(&sprite_system_)
+				.order(0u)
+				.pos(
+					sprite::vector(60,100))
+				.size(
+					sprite::dim(
+						30,60))
+				.color(
+					(mizuiro::color::init::red %= 0.0)
+					(mizuiro::color::init::green %= 0.0)
+					(mizuiro::color::init::blue %= 1.0)
+					(mizuiro::color::init::alpha %= 1.0))
+				.elements()));
 }
 
 insula::graphics::gizmo const
@@ -182,9 +261,12 @@ insula::vehicle::object::update_camera()
 }
 
 void
-insula::vehicle::object::update()
+insula::vehicle::object::update(
+	time_delta const delta)
 {
 	physics_.update();
+	input_.update(
+		delta);
 	
 	chassis_instance_.transformation(
 		physics_.chassis_transform());
@@ -199,7 +281,26 @@ insula::vehicle::object::update()
 		wheel_instances_[i++].transformation(
 			fcppt::math::matrix::structure_cast<graphics::mat4>(
 				r));
+
 	
+	
+	for (unsigned i = 0; i < 4; ++i)
+	{
+		//if (!physics_.wheel_on_ground(i))
+		//	std::cout << "omg not on ground!\n";
+		sprites_[i].color(
+			physics_.wheel_on_ground(i)
+			?
+				(mizuiro::color::init::red %= 0.0)
+				(mizuiro::color::init::green %= 1.0)
+				(mizuiro::color::init::blue %= 0.0)
+				(mizuiro::color::init::alpha %= 1.0)
+			:
+				(mizuiro::color::init::red %= 1.0)
+				(mizuiro::color::init::green %= 0.0)
+				(mizuiro::color::init::blue %= 0.0)
+				(mizuiro::color::init::alpha %= 1.0));
+	}
 
 	// Sound stuff
 	if (!active_)
@@ -231,6 +332,18 @@ insula::vehicle::object::update()
 		speed_to_pitch(
 			std::abs(
 				physics_.speed_kmh())));
+}
+
+void
+insula::vehicle::object::render()
+{
+	sge::renderer::state::scoped scoped_state(
+		sprite_system_.renderer(),
+		sge::renderer::state::list
+			(sge::renderer::state::depth_func::off));
+	sprite_system_.render_all(
+		sge::sprite::default_equal());
+
 }
 
 insula::physics::scalar

@@ -18,6 +18,8 @@
 #include <sge/renderer/glsl/scoped_program.hpp>
 #include <sge/renderer/vf/dynamic/make_format.hpp>
 #include <sge/renderer/size_type.hpp>
+#include <sge/renderer/pixel_pos.hpp>
+#include <sge/renderer/viewport.hpp>
 #include <sge/renderer/scoped_vertex_lock.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
 #include <sge/renderer/resource_flags_field.hpp>
@@ -43,6 +45,7 @@
 #include <sge/image/file.hpp>
 #include <sge/time/second.hpp>
 #include <fcppt/math/dim/basic_impl.hpp>
+#include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
 #include <fcppt/math/matrix/arithmetic.hpp>
@@ -177,9 +180,16 @@ insula::water::object::update_reflection(
 	sge::renderer::scoped_target const starget(
 		renderer_,
 		target_);
+	renderer_->viewport(
+		sge::renderer::viewport(
+			sge::renderer::pixel_pos::null(),
+			fcppt::math::dim::structure_cast<sge::renderer::screen_size>(
+				target_texture_->dim())));
+
 
 	sge::renderer::scoped_block const sblock(
 		renderer_); 
+
 
 	graphics::camera::scoped cam(
 		camera_,
@@ -194,7 +204,7 @@ insula::water::object::update_reflection(
 
 		shader_.set_uniform(
 			FCPPT_TEXT("mvp_mirror"),
-			camera_.perspective() * camera_.rotation() * camera_.translation());
+			camera_.mvp());
 	}
 
 	render_callback();
