@@ -2,7 +2,6 @@
 #define INSULA_TURN_TIMER_HPP_INCLUDED
 
 #include <fcppt/string.hpp>
-#include <fcppt/optional.hpp>
 #include <chrono>
 
 namespace insula
@@ -17,19 +16,21 @@ class turn_timer
 {
 public:
 	explicit 
-	turn_timer();
-
-	fcppt::string const
-	string();
+	turn_timer(
+		std::chrono::milliseconds const &remaining_time);
 
 	void
-	start();
-
-	void 
-	stop();
+	add_to_remaining(
+		std::chrono::milliseconds const &);
 
 	std::chrono::milliseconds const
-	milliseconds() const;
+	milliseconds_total() const;
+
+	std::chrono::milliseconds const
+	milliseconds_remaining() const;
+
+	bool
+	expired() const;
 private:
 	typedef 
 	std::chrono::high_resolution_clock 
@@ -43,7 +44,7 @@ private:
 	clock::duration
 	duration;
 	
-	fcppt::optional<time_point> start_,end_;
+	time_point start_,end_;
 };
 }
 

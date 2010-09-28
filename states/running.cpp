@@ -5,7 +5,6 @@
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
 #include "../events/key.hpp"
-#include "../vehicle/object.hpp"
 #include "../physics/world.hpp"
 #include "../sound_controller.hpp"
 #include "../music_controller.hpp"
@@ -22,13 +21,12 @@
 #include <functional>
 
 #include "../physics/height_map.hpp"
-#include "../physics/vehicle/object.hpp"
 
 insula::states::running::running(
 	my_context ctx)
 :
 	my_base(
-		ctx),
+		ctx)/*,
 	scoped_vehicle_(
 		context<game_inner>().vehicle()),
 	arrow_(
@@ -51,14 +49,14 @@ insula::states::running::running(
 			[this](physics::vehicle::object &,physics::height_map &)
 			{
 				this->context<machine>().sounds().play(FCPPT_TEXT("crash"));
-			}))
+			}))*/
 {
 	context<machine>().sounds().play(
 		FCPPT_TEXT("honk"));
 
 	//context<machine>().music().play_random();
 
-	context<game_inner>().turn_timer().start();
+	//context<game_inner>().turn_timer().start();
 }
 
 boost::statechart::result
@@ -74,10 +72,12 @@ insula::states::running::react(
 	context<game_inner>().physics_world().update(
 		t.delta());
 
+	/*
 	context<game_inner>().vehicle().update(
 		t.delta());
 
 	context<game_inner>().vehicle().update_camera();
+	*/
 
 	return discard_event();
 }
@@ -92,6 +92,7 @@ insula::states::running::react(
 	context<game_inner>().react(
 		r);
 
+/*
 	arrow_.render();
 
 	sge::font::draw_text(
@@ -112,6 +113,7 @@ insula::states::running::react(
 		sge::font::flags::none);
 
 	context<game_inner>().vehicle().render();
+*/
 
 	return discard_event();
 }
@@ -120,10 +122,12 @@ boost::statechart::result
 insula::states::running::react(
 	events::nuggets_empty const &)
 {
+	/*
 	context<game_inner>().turn_timer().stop();
 	context<game_outer>().place_time(
 		context<game_inner>().current_player(),
 	context<game_inner>().turn_timer().milliseconds());
+	*/
 	return transit<finished>();
 }
 

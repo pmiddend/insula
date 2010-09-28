@@ -11,12 +11,12 @@ insula::physics::scoped_constraint::scoped_constraint(
 	constraint_(
 		_constraint)
 {
-	world_.handle().addConstraint(
-		&constraint_);
+	world_.add(
+		constraint_);
 }
 
 insula::physics::scoped_constraint::~scoped_constraint()
 {
-	world_.handle().removeConstraint(
-		&constraint_);
+	world_.remove(
+		constraint_);
 }

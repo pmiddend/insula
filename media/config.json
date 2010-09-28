@@ -33,17 +33,19 @@
 		"skydome-color0" : "(0.765,0.87,1)",
 		"skydome-color1" : "(0,0,1)",
 
-		"vehicle-camera-distance" : "8",
-		"vehicle-flatness-range" : "(0.0,0.2)",
-		"vehicle-camera-angle" : "30",
-		"vehicle-file" : "van.json",
-
 		"graphics-screen-size" : "(1024,768)",
 
 		"physics-gravity" : "(0,-20,0)",
 
 		"camera-move-inverse-speed" : "0.4",
 		"camera-move-threshold" : "0.1"
+	},
+
+	"player" :
+	{
+		"flatness-range" : [0.0,0.2],
+		"width" : 2.0,
+		"height" : 4.0
 	},
 
 	"nuggets" : 

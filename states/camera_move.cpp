@@ -5,10 +5,10 @@
 #include "../events/tick.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera/object.hpp"
-#include "../vehicle/object.hpp"
 #include "../gizmo/orthogonalize_simple.hpp"
 #include "../gizmo/orthogonalize_keep_axis.hpp"
 #include "../events/render.hpp"
+#include "../player/object.hpp"
 #include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/vector/length.hpp>
 #include <fcppt/math/vector/dot.hpp>
@@ -23,7 +23,7 @@ insula::states::camera_move::camera_move(
 		ctx),
 	pan_(
 		context<machine>().camera().gizmo(),
-		context<game_inner>().vehicle().lock_to_gizmo(),
+		context<game_inner>().player().gizmo(),
 		get_option<graphics::scalar>(
 			context<machine>().cli_variables(),
 			"camera-move-inverse-speed"),

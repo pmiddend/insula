@@ -165,13 +165,6 @@ insula::ghost::manager::parse_single(
 
 	for (std::size_t i = 0; i < count; ++i)
 	{
-		height_map::vec2 const point2 = 
-			height_map::random_point(
-				params.height_map,
-				params.water_level,
-				rng_engine,
-				flatness);
-
 		physics::scalar const 
 			rotation_angle = 
 				twopi_rng(
@@ -180,15 +173,19 @@ insula::ghost::manager::parse_single(
 				scale_rng(
 					rng_engine);
 
-		physics::vec3 const origin(
-			static_cast<physics::scalar>(
-				point2.x()),
-			params.height_map.project(
-				point2) +
-			model->bounding_box().bottom() * scaling - 
-			penetration_depth * scaling,
-			static_cast<physics::scalar>(
-				point2.y()));
+		physics::vec3 const origin = 
+			fcppt::math::vector::structure_cast<physics::vec3>(
+				height_map::random_point(
+					params.height_map,
+					params.water_level,
+					rng_engine,
+					flatness))
+			+
+			physics::vec3(
+				0,
+				model->bounding_box().bottom() * scaling
+					- penetration_depth * scaling,
+				0);
 
 		FCPPT_ASSERT(model);
 

@@ -5,7 +5,6 @@
 #include "../static_model_instance.hpp"
 #include "../physics/static_model_parameters.hpp"
 #include "../physics/static_model.hpp"
-#include "../physics/vehicle/object.hpp"
 #include "../physics/object_type.hpp"
 #include "../physics/mat3.hpp"
 #include "../physics/solidity.hpp"
@@ -29,20 +28,7 @@ insula::nugget::instance::instance(
 	manager_(
 		_manager),
 	world_(
-		_world),
-	connection_(
-		world_.register_callback
-		<
-			physics::vehicle::object,
-			physics::static_model
-		>(
-			physics::object_type::vehicle,
-			physics::object_type::nugget,
-			std::bind(
-				&instance::physics_callback,
-				this,
-				std::placeholders::_1,
-				std::placeholders::_2)))
+		_world)
 {
 	BOOST_FOREACH(
 		manager::position_sequence::const_reference r,
@@ -77,12 +63,14 @@ insula::nugget::instance::instance(
 	}
 }
 
+/*
 fcppt::signal::auto_connection
 insula::nugget::instance::register_empty_callback(
 	empty_callback const &e)
 {
 	return empty_signal_.connect(e);
 }
+*/
 
 void
 insula::nugget::instance::update()
@@ -98,30 +86,6 @@ insula::nugget::instance::update()
 			FCPPT_TEXT("score"));
 	}
 	to_delete_.clear();
-}
-
-void
-insula::nugget::instance::physics_callback(
-	physics::vehicle::object &,
-	physics::static_model &s)
-{
-	model_sequence::const_iterator i = 
-		std::find_if(
-			models_.begin(),
-			models_.end(),
-			[&s](static_model_instance const &m) 
-			{
-				return &m.physics_model() == &s;
-			});
-
-	// It's not a nugget model
-	if (i == models_.end())
-		return;
-
-	to_delete_.insert(&(*i));
-
-	if (models_.size() == 1)
-		empty_signal_();
 }
 
 insula::physics::vec3 const

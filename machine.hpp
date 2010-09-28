@@ -76,7 +76,6 @@ public:
 	sound_controller &
 	sounds();
 
-	// The vehicle needs this
 	insula::input_delegator &
 	input_delegator();
 

@@ -18,7 +18,6 @@ namespace object_type
 enum type
 {
 	height_map,
-	vehicle,
 	prop,
 	nugget,
 	ghost

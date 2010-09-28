@@ -1,0 +1,22 @@
+* Quellen
+- https://docs.google.com/Doc?docid=0AXVUZ5xw6XpKZGNuZG56a3FfMzU0Z2NyZnF4Zmo&hl=en&pli=1
+- ODE-Code für diverse dinge http://blogs.wefrag.com/Xfennec/2009/11/12/pacejka-magic-formula-and-ode-open-dynamics-engine/
+- http://en.wikipedia.org/wiki/Slip_ratio
+- http://www.racer.nl/reference/pacejka.htm
+
+* Vorgehen
+
+- Slip Angle und Slip Ratio berechnen
+- Fx und Fy berechnen (Pacejka)
+- Kraft weitergeben als Forward/Sidewaysforce
+
+* Brainstorming
+
+- Problem: Hängt die Sidewaysforce vom Slip-Angle ab? Sollte sie es?
+- Problem: Hängt die Forwardforce vom Slipratio ab? Sollte sie es?
+- Idee: Man fasst die beiden Hinterräder zusammen, was die skidInfo
+  angeht. Eigentlich wären die ja durch eine Achse verbunden, das muss
+  irgendwie zum Ausdruck kommen.
+- Idee: Man verändert die skidInfo nicht "ruckartig", sondern
+  langsam. So kann man Reifen modellieren, sie sich langsam vom
+  Durchdrehen erholen.

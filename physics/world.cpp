@@ -4,7 +4,6 @@
 #include "height_map.hpp"
 #include "broadphase/manager.hpp"
 #include "../graphics/frustum.hpp"
-#include "vehicle/object.hpp"
 #include "static_model.hpp"
 #include "../math/extract_frustum.hpp"
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
@@ -99,8 +98,6 @@ insula::physics::world::add(
 {
 	world_->addAction(
 		&b);
-	world_->addVehicle(
-		&b);
 }
 
 void
@@ -111,7 +108,23 @@ insula::physics::world::remove(
 		&b);
 }
 
-btDynamicsWorld &
+void
+insula::physics::world::add(
+	btTypedConstraint &b)
+{
+	world_->addConstraint(
+		&b);
+}
+
+void
+insula::physics::world::remove(
+	btTypedConstraint &b)
+{
+	world_->removeConstraint(
+		&b);
+}
+
+btDiscreteDynamicsWorld &
 insula::physics::world::handle()
 {
 	return *world_;
@@ -215,11 +228,11 @@ insula::physics::world::process_collisions()
 		contact_set::const_reference contact,
 		contacts_)
 	{
-		if (try_combination<vehicle::object,static_model>(contact.first,contact.second,signals_))
-			continue;
+	//	if (try_combination<vehicle::object,static_model>(contact.first,contact.second,signals_))
+	//		continue;
 
-		if (try_combination<vehicle::object,height_map>(contact.first,contact.second,signals_))
-			continue;
+	//	if (try_combination<vehicle::object,height_map>(contact.first,contact.second,signals_))
+	//		continue;
 		/*
 		// vehicle <-> static model
 		vehicle::object *v = dynamic_cast<vehicle::object *>(contact.first);

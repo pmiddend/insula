@@ -3,8 +3,6 @@
 
 #include "manager_fwd.hpp"
 #include "../physics/world_fwd.hpp"
-#include "../physics/vehicle/object_fwd.hpp"
-#include "../physics/static_model_fwd.hpp"
 #include "../static_model_instance.hpp"
 #include "../physics/vec3.hpp"
 #include "empty_callback.hpp"
@@ -24,10 +22,6 @@ public:
 	instance(
 		manager &,
 		physics::world &);
-
-	fcppt::signal::auto_connection
-	register_empty_callback(
-		empty_callback const &);
 
 	void
 	update();
@@ -49,13 +43,6 @@ private:
 	physics::world &world_;
 	model_sequence models_;
 	deletion_set to_delete_;
-	fcppt::signal::auto_connection connection_;
-	fcppt::signal::object<void ()> empty_signal_;
-
-	void
-	physics_callback(
-		physics::vehicle::object &,
-		physics::static_model &);
 };
 }
 }

@@ -4,7 +4,6 @@
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
 #include "../events/key.hpp"
-#include "../vehicle/object.hpp"
 #include "../sound_controller.hpp"
 #include <sge/font/draw_text.hpp>
 #include <sge/font/text_part.hpp>
@@ -39,7 +38,7 @@ insula::states::pregame::react(
 	context<game_inner>().react(
 		t);
 
-	context<game_inner>().vehicle().update_camera();
+	//context<game_inner>().vehicle().update_camera();
 
 	return discard_event();
 }
@@ -58,7 +57,7 @@ insula::states::pregame::react(
 		context<game_outer>().large_font(),
 		context<game_outer>().font_drawer(),
 		FCPPT_TEXT("Player ")+
-		context<game_inner>().current_player()+
+		context<game_inner>().current_player_name()+
 		FCPPT_TEXT(", get ready\nPress return to continue"),
 		sge::font::pos::null(),
 		fcppt::math::dim::structure_cast<sge::font::dim>(
@@ -67,6 +66,7 @@ insula::states::pregame::react(
 		sge::font::align_v::center,
 		sge::font::flags::none);
 
+	/*
 	sge::font::draw_text(
 		context<game_outer>().large_font(),
 		context<game_outer>().font_drawer(),
@@ -83,6 +83,7 @@ insula::states::pregame::react(
 		sge::font::align_h::center,
 		sge::font::align_v::center,
 		sge::font::flags::none);
+	*/
 
 	return discard_event();
 }

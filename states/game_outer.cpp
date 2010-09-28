@@ -4,6 +4,7 @@
 #include "../create_path.hpp"
 #include "../media_path.hpp"
 #include "../get_option.hpp"
+#include "../random_seed.hpp"
 #include "../ghost/manager_parameters.hpp"
 #include "../height_map/cli_factory.hpp"
 #include "../stdlib/map.hpp"
@@ -82,16 +83,6 @@ insula::states::game_outer::game_outer(
 			fcppt::math::box::structure_cast<graphics::box>(
 				height_map_->extents()),
 			context<machine>().systems().image_loader())),
-	vehicle_position_engine_(
-		random_seed()),
-	vehicle_position_(
-		height_map::random_point(
-			*height_map_,
-			water_->water_level(),
-			vehicle_position_engine_,
-			get_option<height_map::flatness_range>(
-				context<machine>().cli_variables(),
-				"vehicle-flatness-range"))),
 	large_font_(
 		json::parse_font(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
@@ -111,7 +102,7 @@ insula::states::game_outer::game_outer(
 			get_option<player_sequence>(
 				context<machine>().cli_variables(),
 				"player"),
-			[](player const &p)
+			[](fcppt::string const &p)
 			{
 				return 
 					player_time_map::value_type(
@@ -120,6 +111,7 @@ insula::states::game_outer::game_outer(
 			})),
 	broadphase_manager_(
 		context<machine>().camera()),
+/*
 	nugget_manager_(
 		nugget::parameters(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
@@ -132,7 +124,7 @@ insula::states::game_outer::game_outer(
 			context<machine>().camera(),
 			model_shader_,
 			scene_manager_,
-			broadphase_manager_)),
+			broadphase_manager_)),*/
 	prop_manager_(
 		prop::parameters(
 			context<machine>().config_file(),
@@ -155,12 +147,12 @@ insula::states::game_outer::game_outer(
 			model_shader_,
 			*height_map_,
 			static_cast<height_map::scalar>(
-				water_->water_level())))
+				water_->water_level()))),
+	player_position_rng_(
+		random_seed())
 {
 	if (player_times_.empty())
-		throw exception(FCPPT_TEXT("You have to specify at least one player (two would be even better!)"));
-
-	fcppt::io::cout << "Ok, we've got " << player_times_.size() << " players\n";
+		throw exception(FCPPT_TEXT("You have to specify at least one player"));
 }
 
 insula::height_map::object &
@@ -201,12 +193,6 @@ insula::states::game_outer::react(
 	water_->render();
 }
 
-insula::graphics::vec2 const &
-insula::states::game_outer::vehicle_position() const
-{
-	return vehicle_position_;
-}
-
 sge::font::metrics_ptr const 
 insula::states::game_outer::large_font() const
 {
@@ -219,7 +205,7 @@ insula::states::game_outer::font_drawer() const
 	return font_drawer_;
 }
 
-insula::player const 
+fcppt::string const 
 insula::states::game_outer::next_player() const
 {
 	return
@@ -247,11 +233,12 @@ insula::states::game_outer::players_left() const
 
 void
 insula::states::game_outer::place_time(
-	player const &p,
+	fcppt::string const &p,
 	std::chrono::milliseconds const &m)
 {
 	// Time wasn't placed yet
-	FCPPT_ASSERT(!player_times_.find(p)->second);
+	FCPPT_ASSERT(
+		!player_times_.find(p)->second);
 
 	player_times_.find(p)->second = 
 		m;
@@ -275,11 +262,13 @@ insula::states::game_outer::scene_manager()
 	return scene_manager_;
 }
 
+/*
 insula::nugget::manager &
 insula::states::game_outer::nugget_manager()
 {
 	return nugget_manager_;
 }
+*/
 
 insula::prop::manager &
 insula::states::game_outer::prop_manager()
@@ -291,6 +280,18 @@ insula::physics::broadphase::manager &
 insula::states::game_outer::broadphase_manager()
 {
 	return broadphase_manager_;
+}
+
+insula::random_engine &
+insula::states::game_outer::player_position_rng()
+{
+	return player_position_rng_;
+}
+
+insula::graphics::scalar
+insula::states::game_outer::water_level() const
+{
+	return water_->water_level();
 }
 
 insula::states::game_outer::~game_outer()

@@ -44,7 +44,7 @@
 #include <fcppt/text.hpp>
 #include <fcppt/from_std_string.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
-#include <BulletDynamics/Dynamics/btDynamicsWorld.h>
+#include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 
 namespace
 {

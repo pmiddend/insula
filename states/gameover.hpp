@@ -3,7 +3,6 @@
 
 // _fwd is not enough
 #include "game_inner.hpp"
-#include "../player.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
 #include <boost/statechart/state.hpp>
@@ -44,7 +43,7 @@ public:
 	~gameover();
 private:
 	typedef
-	std::multimap<std::chrono::milliseconds,player>
+	std::multimap<std::chrono::milliseconds,fcppt::string>
 	time_table;
 
 	time_table times_;

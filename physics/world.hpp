@@ -24,9 +24,11 @@ class btDispatcher;
 //class btBroadphaseInterface;
 class btDbvtBroadphase;
 class btConstraintSolver;
+class btDiscreteDynamicsWorld;
 class btDynamicsWorld;
 class btRigidBody;
 class btActionInterface;
+class btTypedConstraint;
 
 namespace insula
 {
@@ -64,16 +66,23 @@ public:
 	remove(
 		btActionInterface &);
 
-	// The raycast vehicle needs this in the constructor
-	btDynamicsWorld &
-	handle();
+	void
+	add(
+		btTypedConstraint &);
 
+	void
+	remove(
+		btTypedConstraint &);
+
+	// The debug drawer needs this (might be replaced by a better
+	// function)
+	btDiscreteDynamicsWorld &
+	handle();
 	/**
 		Some explanation is needed here:
 		
 		The physics itself offers several different types of objects:
 
-		- vehicle
 		- terrain
 		- static_model
 
@@ -125,7 +134,7 @@ private:
 	std::unique_ptr<btDispatcher> dispatcher_;
 	broadphase::shared_object_ptr broadphase_;
 	std::unique_ptr<btConstraintSolver> constraint_solver_;
-	std::unique_ptr<btDynamicsWorld> world_;
+	std::unique_ptr<btDiscreteDynamicsWorld> world_;
 	filter_callback filter_callback_;
 	contact_set contacts_;
 

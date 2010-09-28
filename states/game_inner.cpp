@@ -13,20 +13,16 @@
 #include "../graphics/camera/object.hpp"
 #include "../model/scoped.hpp"
 #include "../model/vf/format.hpp"
+#include "../player/parameters.hpp"
 #include "../nugget/instance.hpp"
 #include "../events/nuggets_empty.hpp"
-// vehicle begin
-#include "../vehicle/cli_factory.hpp"
-#include "../vehicle/object.hpp"
-#include "../height_map/height_for_point.hpp"
-#include "../height_map/vec2.hpp"
-// vehicle end
 #include <sge/console/object.hpp>
 #include <sge/image/create_texture.hpp>
 #include <sge/renderer/filter/linear.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
 #include <sge/model/loader.hpp>
 #include <sge/renderer/texture.hpp>
+#include <sge/parse/json/find_member_exn.hpp>
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/matrix/structure_cast.hpp>
@@ -44,7 +40,7 @@ insula::states::game_inner::game_inner(
 	my_context ctx)
 :
 	my_base(ctx),
-	current_player_(
+	current_player_name_(
 		context<game_outer>().next_player()),
 	physics_world_(
 		fcppt::math::box::structure_cast<physics::box>(
@@ -74,41 +70,17 @@ insula::states::game_inner::game_inner(
 				physics_debug_ = !physics_debug_;
 			},
 			FCPPT_TEXT("Toggle the physics debug drawer"))),
-	nuggets_(
-		context<game_outer>().nugget_manager().instantiate(
-			physics_world_)),
-	nugget_empty_connection_(
-		nuggets_->register_empty_callback(
-			[this]() 
-			{
-				this->post_event(
-					events::nuggets_empty());
-			})),
-	vehicle_(
-		insula::vehicle::cli_factory(
-			context<machine>().cli_variables(),
-			context<game_outer>().scene_manager(),
-			context<machine>().systems(),
-			context<machine>().camera(),
-			context<game_outer>().model_shader(),
-			physics_world_,
-			physics::vec3(
-				static_cast<physics::scalar>(
-					context<game_outer>().vehicle_position().x()),
-				static_cast<physics::scalar>(
-					context<game_outer>().height_map().project(
-						fcppt::math::vector::structure_cast<height_map::vec2>(
-							context<game_outer>().vehicle_position())) + 
-						static_cast<height_map::scalar>(
-							3)),
-				static_cast<physics::scalar>(
-					context<game_outer>().vehicle_position().y())),
-			context<machine>().input_delegator(),
-			context<machine>().console(),
-			context<game_outer>().height_map())),
 	props_(
 		context<game_outer>().prop_manager().instantiate(
-			physics_world_))
+			physics_world_)),
+	player_(
+		player::parameters(
+			sge::parse::json::find_member_exn<sge::parse::json::object>(
+				context<machine>().config_file().members,
+				FCPPT_TEXT("player")),
+			context<game_outer>().height_map(),
+			context<game_outer>().water_level(),
+			context<game_outer>().player_position_rng()))
 {
 }
 
@@ -116,7 +88,7 @@ void
 insula::states::game_inner::react(
 	events::tick const &)
 {
-	nuggets_->update();
+	//nuggets_->update();
 }
 
 void
@@ -133,28 +105,10 @@ insula::states::game_inner::react(
 	}
 }
 
-insula::vehicle::object &
-insula::states::game_inner::vehicle()
+fcppt::string const &
+insula::states::game_inner::current_player_name() const
 {
-	return vehicle_;
-}
-
-insula::player const &
-insula::states::game_inner::current_player() const
-{
-	return current_player_;
-}
-
-insula::turn_timer &
-insula::states::game_inner::turn_timer()
-{
-	return turn_timer_;
-}
-
-insula::turn_timer const &
-insula::states::game_inner::turn_timer() const
-{
-	return turn_timer_;
+	return current_player_name_;
 }
 
 insula::physics::world &
@@ -163,6 +117,7 @@ insula::states::game_inner::physics_world()
 	return physics_world_;
 }
 
+/*
 insula::nugget::instance &
 insula::states::game_inner::nugget_instance()
 {
@@ -173,6 +128,19 @@ insula::nugget::instance const &
 insula::states::game_inner::nugget_instance() const
 {
 	return *nuggets_;
+}
+*/
+
+insula::player::object &
+insula::states::game_inner::player()
+{
+	return player_;
+}
+
+insula::player::object const &
+insula::states::game_inner::player() const
+{
+	return player_;
 }
 
 insula::states::game_inner::~game_inner()

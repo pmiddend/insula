@@ -6,6 +6,8 @@
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
 #include "../events/key.hpp"
+#include "../model/backend.hpp"
+#include "../model/instance.hpp"
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
@@ -45,6 +47,9 @@ public:
 		events::key const &);
 
 	~freelook();
+private:
+	model::backend player_backend_;
+	model::instance player_instance_;
 };
 }
 }

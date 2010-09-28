@@ -3,89 +3,41 @@
 #include <fcppt/assert.hpp>
 #include <chrono>
 
-insula::turn_timer::turn_timer()
+insula::turn_timer::turn_timer(
+	std::chrono::milliseconds const &remaining_time)
 :
-	start_(),
-	end_()
+	start_(
+		clock::now()),
+	end_(
+		start_ + remaining_time)
 {
 }
 
-fcppt::string const
-insula::turn_timer::string()
+bool
+insula::turn_timer::expired() const
 {
-	// Due to the asserts below, there must be either
-	// - no start, no end
-	// - start, but no end
-	// - start and end
-	std::chrono::milliseconds const d = 
-		std::chrono::duration_cast<std::chrono::milliseconds>(
-			start_ 
-			?
-				end_
-				?
-					*end_ - *start_
-				:
-					clock::now() - *start_
-			:
-				duration());
-
-	return 
-		milliseconds_to_string(
-			d);
-	/*
-	typedef duration::rep rep;
-	typedef std::make_unsigned<duration::rep>::type urep;
-
-	rep const 
-		minutes = 
-			static_cast<rep>(
-				d.count() / static_cast<rep>(1000*60)),
-		residue =
-			static_cast<rep>(
-				fcppt::math::mod(
-					static_cast<urep>(
-						d.count()),
-					static_cast<urep>(
-						1000*60))),
-		seconds = 
-			static_cast<rep>(
-				residue / static_cast<rep>(1000)),
-		milliseconds = 
-			static_cast<rep>(
-				fcppt::math::mod(
-					static_cast<urep>(residue),
-					static_cast<urep>(1000)));
-			
-	return 
-		(fcppt::format(FCPPT_TEXT("%1$u:%2$02u:%3$02u")) 
-			% minutes
-			% seconds
-			% static_cast<rep>(milliseconds/static_cast<rep>(10))).str();
-	*/
+	return (clock::now() - end_).count() >= 0;
 }
 
 void
-insula::turn_timer::start()
+insula::turn_timer::add_to_remaining(
+	std::chrono::milliseconds const &ms)
 {
-	FCPPT_ASSERT(
-		!start_);
-	start_ = clock::now();
-}
-
-void 
-insula::turn_timer::stop()
-{
-	FCPPT_ASSERT(
-		start_ && !end_);
-	end_ = clock::now();
+	end_ += ms;
 }
 
 std::chrono::milliseconds const
-insula::turn_timer::milliseconds() const
+insula::turn_timer::milliseconds_total() const
 {
-	FCPPT_ASSERT(
-		end_ && start_);
 	return 
 		std::chrono::duration_cast<std::chrono::milliseconds>(
-			(*end_) - (*start_));
+			clock::now() - start_);
+}
+
+std::chrono::milliseconds const
+insula::turn_timer::milliseconds_remaining() const
+{
+	return 
+		std::chrono::duration_cast<std::chrono::milliseconds>(
+			end_ - clock::now());
 }

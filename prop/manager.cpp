@@ -193,13 +193,6 @@ insula::prop::manager::parse_single_prop(
 
 	for (std::size_t i = 0; i < count; ++i)
 	{
-		height_map::vec2 const point2 = 
-			height_map::random_point(
-				params.height_map,
-				params.water_level,
-				rng_engine,
-				flatness);
-
 		physics::scalar const scaling = 
 			scale_rng(
 				rng_engine);
@@ -222,15 +215,20 @@ insula::prop::manager::parse_single_prop(
 				twopi_rng(
 					rng_engine),
 				scaling,
-				physics::vec3(
-					static_cast<physics::scalar>(
-						point2.x()),
-					params.height_map.project(
-						point2) +
-					model->bounding_box().bottom() * scaling - 
-					penetration_depth * scaling,
-					static_cast<physics::scalar>(
-						point2.y())),
+				fcppt::math::vector::structure_cast<physics::vec3>(
+					height_map::random_point(
+						params.height_map,
+						params.water_level,
+						rng_engine,
+						flatness))
+					+ 
+					physics::vec3(
+						static_cast<physics::scalar>(
+							0),
+						model->bounding_box().bottom() * scaling - 
+						penetration_depth * scaling,
+						static_cast<physics::scalar>(
+							0)),
 				physics_offset));
 	}
 }

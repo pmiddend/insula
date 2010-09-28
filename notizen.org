@@ -27,6 +27,9 @@ Hierzu z.B. cgal
 ** TODO fcppt::assign durch initializer_list ersetzen
 ** TODO height_map und water mit parameters-Klassen ausstatten
 ** TODO Die Nuggets sollten sich schön drehen
+** TODO scene von intrusive auf was besseres umstellen
+Eine instance trägt sich selber ein und aus und kriegt das Backend im
+Konstruktor.
 * Aktivitäten
 ** TODO Shadow Maps [1/5]
 *** DONE Neues uniform-System aufsetzen

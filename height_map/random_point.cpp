@@ -1,5 +1,6 @@
 #include "random_point.hpp"
 #include "object.hpp"
+#include "vec2.hpp"
 #include <fcppt/container/grid/object.hpp>
 
 #include <fcppt/io/cerr.hpp>
@@ -20,7 +21,7 @@ inside_range(
 unsigned long const iteration_threshold = 1000000;
 }
 
-insula::height_map::vec2 const
+insula::height_map::vec3 const
 insula::height_map::random_point(
 	object const &o,
 	scalar const water_level,
@@ -71,5 +72,9 @@ insula::height_map::random_point(
 			f.y()));
 
 	return 
-		result;
+		vec3(
+			result.x(),
+			o.project(
+				result),
+			result.y());
 }

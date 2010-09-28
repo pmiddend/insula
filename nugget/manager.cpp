@@ -13,7 +13,6 @@
 #include "../height_map/flatness_range.hpp"
 #include "../height_map/scalar.hpp"
 #include "../height_map/vec2.hpp"
-#include "../height_map/random_point.hpp"
 #include "../height_map/object.hpp"
 #include "../json/parse_vector.hpp"
 #include <sge/image/create_texture.hpp>
@@ -98,6 +97,7 @@ insula::nugget::manager::manager(
 	random_engine rng_engine(
 		random_seed());
 
+	/*
 	for (std::size_t i = 0; i < count; ++i)
 	{
 		height_map::vec2 const point2 = 
@@ -118,6 +118,7 @@ insula::nugget::manager::manager(
 				static_cast<physics::scalar>(
 					point2.y())));
 	}
+	*/
 }
 
 insula::nugget::shared_instance_ptr const

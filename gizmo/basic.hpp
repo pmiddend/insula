@@ -3,6 +3,7 @@
 
 #include "size_type.hpp"
 #include <fcppt/math/vector/static.hpp>
+#include <fcppt/math/vector/basic_impl.hpp>
 #include <array>
 
 namespace insula
