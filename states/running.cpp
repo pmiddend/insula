@@ -54,9 +54,7 @@ insula::states::running::running(
 	context<machine>().sounds().play(
 		FCPPT_TEXT("honk"));
 
-	//context<machine>().music().play_random();
-
-	//context<game_inner>().turn_timer().start();
+	context<machine>().music().play_random();
 }
 
 boost::statechart::result
@@ -72,12 +70,8 @@ insula::states::running::react(
 	context<game_inner>().physics_world().update(
 		t.delta());
 
-	/*
-	context<game_inner>().vehicle().update(
+	context<game_inner>().player().update(
 		t.delta());
-
-	context<game_inner>().vehicle().update_camera();
-	*/
 
 	return discard_event();
 }

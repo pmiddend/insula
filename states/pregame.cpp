@@ -38,8 +38,6 @@ insula::states::pregame::react(
 	context<game_inner>().react(
 		t);
 
-	//context<game_inner>().vehicle().update_camera();
-
 	return discard_event();
 }
 
@@ -93,7 +91,10 @@ insula::states::pregame::react(
 	events::key const &r)
 {
 	if (r.pair().key().code() == sge::input::kc::key_return)
+	{
+		fcppt::io::cout << FCPPT_TEXT("Return pressed, now switching to running\n");
 		return transit<running>();
+	}
 
 	return discard_event();
 }

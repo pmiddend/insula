@@ -6,6 +6,7 @@
 #include <sge/audio/player_ptr.hpp>
 #include <sge/audio/file_ptr.hpp>
 #include <sge/audio/buffer_ptr.hpp>
+#include <sge/audio/scalar.hpp>
 #include <sge/audio/sound/base_ptr.hpp>
 #include <sge/parse/json/object_fwd.hpp>
 // Why do we need this?
@@ -57,6 +58,7 @@ private:
 	std::vector<sge::audio::file_ptr>
 	file_set;
 
+	sge::audio::scalar volume_;
 	file_map event_sounds_;
 	file_set random_sounds_;
 	sge::time::timer crossfade_;

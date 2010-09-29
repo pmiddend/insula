@@ -31,6 +31,8 @@ insula::states::camera_move::camera_move(
 			context<machine>().cli_variables(),
 			"camera-move-threshold"))
 {
+	context<machine>().camera().movement(
+		false);
 	context<machine>().sounds().play(
 		FCPPT_TEXT("camera_swoosh"));
 }

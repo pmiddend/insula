@@ -80,7 +80,10 @@ insula::states::game_inner::game_inner(
 				FCPPT_TEXT("player")),
 			context<game_outer>().height_map(),
 			context<game_outer>().water_level(),
-			context<game_outer>().player_position_rng()))
+			context<game_outer>().player_position_rng(),
+			context<machine>().camera(),
+			context<machine>().input_delegator(),
+			physics_world_))
 {
 }
 

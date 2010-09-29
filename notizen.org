@@ -5,11 +5,13 @@
 - http://vdrift.net/Forum/viewtopic.php?p=10332&sid=ce7581e8f6c9da3b93eec41440a4d776
 - Shadow Mapping: http://www.fabiensanglard.net/shadowmapping/index.php
 - Viele Paper: http://nis-lab.is.s.u-tokyo.ac.jp/~nis//abs_cgi.html#pas95
+- Besserer Charactercontroller: http://code.google.com/p/bullet/issues/detail?id=198
 * Ideen für später
 ** TODO Terrain zufallsgenerieren
 ** TODO Farben statt Texturen bei Höhenfeld verwenden
 Motivation hierzu: [[http://simblob.blogspot.com/2010/09/polygon-map-generation-part-1.html][von hier]]
 ** TODO LOD für Models
+** TODO Steuerung konfigurierbar machen
 ** TODO Pfeil einbauen, der die Richtung weist
 Dieser Pfeil könnte z.B. in die "durchschnittliche" Richtung zeigen,
 wo noch viele Nuggets zu finden sind.
@@ -107,55 +109,6 @@ Momentan hat man mit =vehicle::parameters= eine riesige Klasse und in
 =json::parse_vehicle= wird auch viel zu viel rumgereicht
 ** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
-** TODO Autoverbesserungen
-
-Physik-Notizen:
-- Wenn ein Reifen eine zu starke Kraft erfährt (bis zu einer Grenze
-  $m$), dann gleitet er statt zu haften.
-- Die Kraft $m$ ist proportional zum Gewicht, das der Reifen
-  trägt. Mehr Gewicht am Reifen, mehr "adhesion", es wird mehr Kraft
-  benötigt um ihm zum sliden zu bringen.
-- Es gilt: $F \leq \mu W$, wobei $\mu$ der "Stiction-Koeffizient" ist
-  und $W$ das Gewicht am Reifen.
-- Um zu gucken ob ein Reifen slidet muss man also gucken, ob die
-  Kraft, die auf ihn wirkt, größer oder gleich $\mu$ mal der Kraft
-  ist, die ihn nach unten zieht.
-- Die _Beschleunigung_, die ein Reifen maximal erfahren kann, ist $\mu
-  g$, eine Konstante: $|a_{\textrm{max}}| = \mu \cdot g$
-
-Verbesserungen:
-- Wenn die Hinterräder auf dem Boden sind, ab er die Vorderräder
-  nicht. Was passiert dann? Haben die Vorderräder dann trotzdem noch einen Seitwärtsimpuls?
-- Momentan ist "sliding" nicht pro Rad, sondern global definiert. Das ändern?
-- Engineforce wegnehmen, sobald ein Rad in der Luft ist
-- Wo setzt die Bremskraft an? In einem echten Auto am Reifen (eher am
-  Boden des Reifens)
-- Ist die Kraft, die ihn nach unten zieht, die Suspension Force? Ist
-  in der Suspension Force die Masse enthalten?
-- Inwiefern ist Forward- und Sidewaysimpuls verbunden? Kann ein Reifen
-  beides haben?
-- Ist es umgesetzt, dass die Innenräder beim Kurvedrehen weniger
-  Stiction haben und die Außenräder mehr?
-- Bei Allradantrieb hat man keine/weniger Weighttransfer beim
-  Beschleunigen/Bremsen
-- Was passiert, wenn beide Hinterräder, aber nur ein Vorderrad auf dem
-  Boden ist und man einlenkt? Muss man da korrigieren?
-- Man könnte den Reifen selber eine Masse geben. Die müsste in die
-  Suspension Force eingerechnet werden (=update_suspension= ganz am
-  Anfang der Schleife)
-- Das Auto "knickt" um, wenn man eine Kurve dreht. Ursache? Per
-  =debug_drawer= rausfinden, ob es an der Shape liegt (bzw. gucken, ob
-  es da Kollisionen Chassis-Terrain gibt).
-- Man kann nicht gleichzeitig Gas geben und bremsen.
-
-- Die Vorderräder bleiben auf der Stelle der Hinterteil des Autos
-  bleibt so
-- http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=9&t=2047
-
-Rigid-Body:
-- Wie siehts bei Bullet mit Friction aus, inwiefern kann man $F \leq
-  \mu W$ umsetzen?
-- Gibt es eine Feder mit Dämpfung für die Aufhängung?
 ** DONE Nuggets aus game_inner rausziehen
 	 CLOSED: [2010-09-17 Fri 19:40]
 ** DONE "Nugget-Indikatoren" einbauen

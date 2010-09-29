@@ -7,6 +7,7 @@
 #include <sge/audio/sound/repeat.hpp>
 #include <sge/audio/sound/base.hpp>
 #include <sge/audio/player.hpp>
+#include <sge/audio/scalar.hpp>
 #include <sge/audio/multi_loader.hpp>
 #include <sge/audio/buffer.hpp>
 #include <sge/time/second.hpp>
@@ -23,6 +24,11 @@ insula::music_controller::music_controller(
 	sge::audio::multi_loader &ml,
 	sge::audio::player_ptr const _player)
 :
+	volume_(
+		static_cast<sge::audio::scalar>(
+			sge::parse::json::find_member_exn<sge::parse::json::float_type>(
+				o.members,
+				FCPPT_TEXT("volume")))),
 	event_sounds_(
 		stdlib::map<file_map>(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
@@ -93,12 +99,15 @@ insula::music_controller::update()
 		else
 		{
 			current_source_->gain(
-				static_cast<sge::audio::scalar>(1) - 
-				static_cast<sge::audio::scalar>(
-					crossfade_.elapsed_frames()));
+				//static_cast<sge::audio::scalar>(1) - 
+				volume_ 
+					- static_cast<sge::audio::scalar>(
+						crossfade_.elapsed_frames()) 
+					* volume_);
 			new_source_->gain(
 				static_cast<sge::audio::scalar>(
-					crossfade_.elapsed_frames()));
+					crossfade_.elapsed_frames())
+					* volume_);
 
 			new_source_->update();
 		}

@@ -18,6 +18,7 @@ namespace object_type
 enum type
 {
 	height_map,
+	character,
 	prop,
 	nugget,
 	ghost
