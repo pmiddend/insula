@@ -466,13 +466,13 @@ try
 		sys.input_system(),
 		console);
 	
-	graphics::camera::object_ptr cam = 
+	graphics::camera::object cam(
 		graphics::camera::cli_factory(
 			vm,
 			input_delegator_,
 			sge::renderer::aspect<graphics::scalar>(
 				sys.renderer()->screen_size()),
-			graphics::vec3::null());
+			graphics::vec3::null()));
 
 	sge::model::object_ptr const model_object = 
 		sys.md3_loader()->load(
@@ -561,8 +561,8 @@ try
 			insula::graphics::vec2(-5,-5),
 			insula::graphics::dim2(10,10)),
 		sys.renderer(),
-		*cam,
-		cam->perspective() * 
+		cam,
+		cam.perspective() * 
 		insula::gizmo::rotation_to_mat4(
 			sun_gizmo) *
 		fcppt::math::matrix::translation(
@@ -625,9 +625,9 @@ try
 
 	{
 			insula::graphics::gizmo const old_gizmo = 
-				cam->gizmo();
+				cam.gizmo();
 
-			cam->gizmo() = sun_gizmo;
+			cam.gizmo() = sun_gizmo;
 
 			sge::renderer::scoped_target const starget(
 				sys.renderer(),
@@ -654,22 +654,20 @@ try
 
 				model_shader.set_uniform(
 					"mvp",
-					cam->perspective() * 
-					cam->world());
+					cam.mvp());
 
 				model.render();
 
 				model_shader.set_uniform(
 					"mvp",
-					cam->perspective() * 
-					cam->world() * 
+					cam.mvp() * 
 					fcppt::math::matrix::translation(
 						insula::graphics::vec3(
 							0,-4,0)));
 
 				model.render();
 			}
-			cam->gizmo() = old_gizmo;
+			cam.gizmo() = old_gizmo;
 		}
 			sys.renderer()->viewport(
 				sge::renderer::viewport(
@@ -682,7 +680,7 @@ try
 	{
 		sge::mainloop::dispatch();
 
-		cam->update(
+		cam.update(
 			frame_timer.reset());
 
 	//	insula::timed_output() << "cam_pos: " << cam->gizmo().position() << ", forward: " << cam->gizmo().forward() << ", right: " << cam->gizmo().right() << ", up: " << cam->gizmo().up() << "\n";
@@ -704,15 +702,13 @@ try
 					model);
 				model_shader.set_uniform(
 					"mvp",
-					cam->perspective() * 
-					cam->world());
+					cam.mvp());
 
 				model.render();
 
 				model_shader.set_uniform(
 					"mvp",
-					cam->perspective() * 
-					cam->world() *
+					cam.mvp() *
 					fcppt::math::matrix::translation(
 						insula::graphics::vec3(
 							0,-4,0)));

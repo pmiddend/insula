@@ -224,13 +224,13 @@ try
 		sys.input_system(),
 		console);
 	
-	graphics::camera::object_ptr cam = 
+	graphics::camera::object cam(
 		graphics::camera::cli_factory(
 			vm,
 			input_delegator_,
 			sge::renderer::aspect<graphics::scalar>(
 				sys.renderer()->screen_size()),
-			graphics::vec3::null());
+			graphics::vec3::null()));
 
 	if (!vm.count("texture"))
 	{
@@ -367,7 +367,7 @@ try
 	{
 		sge::mainloop::dispatch();
 
-		cam->update(
+		cam.update(
 			frame_timer.reset());
 
 		sge::renderer::scoped_block const block_(
@@ -379,7 +379,7 @@ try
 
 			point_shader.set_uniform(
 				FCPPT_TEXT("mvp"),
-				cam->perspective() * cam->world());
+				cam.mvp());
 
 			sys.renderer()->state(
 				sge::renderer::state::list

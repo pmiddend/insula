@@ -6,7 +6,7 @@
 #include "../vec3.hpp"
 #include "../vec4.hpp"
 #include "../gizmo.hpp"
-#include "../../input_delegator_fwd.hpp"
+#include "parameters_fwd.hpp"
 #include <sge/input/system_ptr.hpp>
 #include <sge/input/key_pair_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
@@ -33,14 +33,7 @@ public:
 
 	explicit
 	object(
-		input_delegator &,
-		scalar aspect,
-		scalar fov,
-		scalar near,
-		scalar far,
-		scalar movement_speed,
-		scalar rotation_speed,
-		vec3 const &position);
+		parameters const &);
 	
 	void
 	update(
@@ -72,12 +65,17 @@ public:
 
 	graphics::scalar 
 	fov() const;
+
+	void
+	movement(
+		bool);
 private:
 	fcppt::signal::scoped_connection input_connection_;
 	scalar aspect_,fov_,near_,far_;
 	scalar movement_speed_,rotation_speed_;
 	vec3 dirs_;
 	insula::graphics::gizmo gizmo_;
+	bool movement_;
 
 	void
 	input_callback(

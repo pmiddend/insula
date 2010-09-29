@@ -243,13 +243,13 @@ try
 			graphics::mat4())),
 		graphics::shader::sampler_sequence());
 	
-	graphics::camera::object_ptr cam = 
+	graphics::camera::object cam(
 		graphics::camera::cli_factory(
 			vm,
 			input_delegator_,
 			sge::renderer::aspect<graphics::scalar>(
 				sys.renderer()->screen_size()),
-			graphics::vec3::null());
+			graphics::vec3::null()));
 
 	bool running = 
 		true;
@@ -320,7 +320,7 @@ try
 	{
 		sge::mainloop::dispatch();
 
-		cam->update(
+		cam.update(
 			frame_timer.reset());
 
 		sge::renderer::scoped_block const block_(
@@ -336,7 +336,7 @@ try
 
 		shader_.set_uniform(
 			FCPPT_TEXT("mvp"),
-			cam->perspective() * cam->world());
+			cam.mvp());
 
 		sge::renderer::vertex_buffer_ptr vb_ = 
 			sys.renderer()->create_vertex_buffer(

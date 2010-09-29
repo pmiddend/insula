@@ -217,7 +217,7 @@ insula::machine::tick(
 {
 	sge::mainloop::dispatch();
 
-	camera_->update(
+	camera_.update(
 		time_delta);
 
 	process_event(
@@ -254,7 +254,7 @@ insula::machine::cli_variables() const
 insula::graphics::camera::object &
 insula::machine::camera()
 {
-	return *camera_;
+	return camera_;
 }
 
 sge::systems::instance const &

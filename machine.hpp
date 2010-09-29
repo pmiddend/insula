@@ -4,7 +4,7 @@
 #include "states/game_outer_fwd.hpp"
 #include "input_delegator.hpp"
 #include "console/object.hpp"
-#include "graphics/camera/object_ptr.hpp"
+#include "graphics/camera/object.hpp"
 #include "graphics/stats.hpp"
 #include "music_controller.hpp"
 #include "sound_controller.hpp"
@@ -93,7 +93,7 @@ private:
 	insula::console::object console_;
 	insula::input_delegator input_delegator_;
 	// This is a ptr because the cli_factory returns a ptr
-	graphics::camera::object_ptr camera_;
+	graphics::camera::object camera_;
 	fcppt::signal::scoped_connection exit_callback_;
 	fcppt::signal::scoped_connection wireframe_callback_;
 	fcppt::signal::scoped_connection input_callback_,input_repeat_callback_;

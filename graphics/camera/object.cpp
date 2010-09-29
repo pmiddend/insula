@@ -4,6 +4,7 @@
 #include "../vec4.hpp"
 #include "../mat3.hpp"
 #include "../../input_delegator.hpp"
+#include "parameters.hpp"
 #include <sge/input/key_pair.hpp>
 #include <sge/input/system.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
@@ -31,45 +32,39 @@
 #include <cmath>
 
 insula::graphics::camera::object::object(
-	input_delegator &input_delegator_,
-	scalar _aspect,
-	scalar _fov,
-	scalar _near,
-	scalar _far,
-	scalar _movement_speed,
-	scalar _rotation_speed,
-	vec3 const &_position)
+	parameters const &params)
 :
 	input_connection_(
-		input_delegator_.register_callback(
+		params.input_delegator.register_callback(
 			std::bind(
 				&object::input_callback,
 				this,
 				std::placeholders::_1))),
 	aspect_(
-		_aspect),
+		params.aspect),
 	fov_(
-		_fov),
+		params.fov),
 	near_(
-		_near),
+		params.near),
 	far_(
-		_far),
+		params.far),
 	movement_speed_(
-		_movement_speed),
+		params.movement_speed),
 	rotation_speed_(
-		_rotation_speed),
+		params.rotation_speed),
 	dirs_(
 		vec3::null()),
 	gizmo_(
 		insula::graphics::gizmo::init()
 			.position(
-				_position)
+				params.position)
 			.forward(
 				vec3(0,0,1))
 			.right(
 				vec3(1,0,0))
 			.up(
-				vec3(0,1,0)))
+				vec3(0,1,0))),
+	movement_(true)
 {
 }
 
@@ -77,15 +72,16 @@ void
 insula::graphics::camera::object::update(
 	scalar const t)
 {
-	gizmo_.position( 
-		gizmo_.position() + 
-		movement_speed_ * 
-		t * 
-		std::inner_product(
-			gizmo_.array().begin(),
-			gizmo_.array().end(),
-			dirs_.data(),
-			vec3::null()));
+	if (movement_)
+		gizmo_.position( 
+			gizmo_.position() + 
+			movement_speed_ * 
+			t * 
+			std::inner_product(
+				gizmo_.array().begin(),
+				gizmo_.array().end(),
+				dirs_.data(),
+				vec3::null()));
 }
 
 insula::graphics::mat4 const
@@ -154,6 +150,13 @@ insula::graphics::scalar
 insula::graphics::camera::object::fov() const
 {
 	return fov_;
+}
+
+void
+insula::graphics::camera::object::movement(
+	bool const _movement)
+{
+	movement_ = _movement;
 }
 
 void

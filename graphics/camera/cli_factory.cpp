@@ -3,7 +3,7 @@
 #include "../../get_option.hpp"
 #include <fcppt/math/deg_to_rad.hpp>
 
-insula::graphics::camera::object_ptr const
+insula::graphics::camera::parameters const
 insula::graphics::camera::cli_factory(
 	boost::program_options::variables_map const &vm,
 	input_delegator &input_delegator_,
@@ -11,7 +11,7 @@ insula::graphics::camera::cli_factory(
 	vec3 const &position)
 {
 	return 
-		std::make_shared<object>(
+		parameters(
 			input_delegator_,
 			aspect,
 			fcppt::math::deg_to_rad(

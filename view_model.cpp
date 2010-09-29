@@ -166,13 +166,13 @@ try
 		sys.input_system(),
 		console);
 	
-	graphics::camera::object_ptr cam = 
+	graphics::camera::object cam(
 		graphics::camera::cli_factory(
 			vm,
 			input_delegator_,
 			sge::renderer::aspect<graphics::scalar>(
 				sys.renderer()->screen_size()),
-			graphics::vec3::null());
+			graphics::vec3::null()));
 
 	sge::model::object_ptr const model_object = 
 		sys.md3_loader()->load(
@@ -291,7 +291,7 @@ try
 	{
 		sge::mainloop::dispatch();
 
-		cam->update(
+		cam.update(
 			frame_timer.reset());
 
 		sge::renderer::scoped_block const block_(
@@ -307,8 +307,7 @@ try
 
 		model_shader.set_uniform(
 			"mvp",
-			cam->perspective() * 
-			cam->world());
+			cam.mvp());
 
 		model.render();
 		}
