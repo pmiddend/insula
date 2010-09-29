@@ -1,44 +1,69 @@
 {
 	"cli" :
 	{
-		"console-redirect" : "true",
+		"console" : 
+		{ 
+			"redirect" : true 
+		},
 
-		"camera-roll-speed" : "0.78",
-		"camera-fov" : "90",
-		"camera-near" : "1",
-		"camera-far" : "10000",
-		"camera-speed" : "5",
+		"camera" : 
+		{
+			"fov" : 90,
+			"near" : 1,
+			"far" : 10000,
+			"movement-speed" : 200,
+			"rotation-speed" : 500
+		},
 
-		"terrain-cell-size" : "5",
-		"terrain-height-scaling" : "250",
-		"terrain-height-map" : "test_256.png",
-		"terrain-gradient-texture" : "rock_512.png",
-		"terrain-height-texture-1" : "sand_512.png",
-		"terrain-height-texture-2" : "grass_512.png",
-		"terrain-ambient-light" : "0.4",
-		"terrain-sun-direction" : "(100,100,100)",
-		"terrain-texture-scaling" : "20",
+		"terrain" :
+		{
+			"cell-size" : 5,
+			"height-scaling" : 250,
+			"height-map" : "test_256.png",
+			"gradient-texture" : "rock_512.png",
+			"height-texture-1" : "sand_512.png",
+			"height-texture-2" : "grass_512.png",
+			"ambient-light" : 0.4,
+			"sun-direction" : [100,100,100],
+			"texture-scaling" : 20
+		},
 
-		"water-level" : "0.125",
-		"water-reflection-size" : "(512,512)",
-		"water-bump-map" : "bumps.png",
-		"water-bump-scaling" : "20",
-		"water-wave-height" : "0.5",
-		"water-wind-speed" : "0.125",
-		"water-stretching" : "2",
+		"water" :
+		{
+			"level" : 0.125,
+			"reflection-size" : [512,512],
+			"bump-map" : "bumps.png",
+			"bump-scaling" : 20,
+			"wave-height" : 0.5,
+			"wind-speed" : 0.125,
+			"stretching" : 2
+		},
 
-		"skydome-latitudes" : "8",
-		"skydome-longitudes" : "8",
-		"skydome-angle" : "90",
-		"skydome-color0" : "(0.765,0.87,1)",
-		"skydome-color1" : "(0,0,1)",
+		"skydome" : 
+		{
+			"latitudes" : 8,
+			"longitudes" : 8,
+			"angle" : 90,
+			"color0" : [0.765,0.87,1],
+			"color1" : [0,0,1]
+		},
 
-		"graphics-screen-size" : "(1024,768)",
+		"graphics" : 
+		{
+			"screen-size" : [1024,768]
+		},
 
-		"physics-gravity" : "(0,-20,0)",
+		"physics" : 
+		{
+			"gravity" : [0,-20,0]
+		},
 
-		"camera-move-inverse-speed" : "0.4",
-		"camera-move-threshold" : "0.1"
+		
+		"camera-move" : 
+		{
+			"inverse-speed" : 0.4,
+			"threshold" : 0.1
+		}
 	},
 
 	"player" :
@@ -72,7 +97,7 @@
 				"type" : "sphere",
 				"radius" : 1.0
 			},
-			"count" : 0
+			"count" : 10
 		},
 		{
 			"model" : "palmtree.md3",
@@ -84,7 +109,7 @@
 			"physics_offset_old" : [-3.73,-3.48,-0.36],
 			"physics_offset" : [0.0,0.0,0.0],
 			"approximation" : "exact",
-			"count" : 0
+			"count" : 10
 		},
 		{
 			"model" : "statue.md3",
@@ -110,7 +135,7 @@
 			"scale_range" : [4.0,6.0],
 			"rotation_axis" : [0.0,1.0,0.0],
 			"physics_offset" : [0.0,0.0,0.0],
-			"count" : 0
+			"count" : 100
 		}
 	],
 	

@@ -30,6 +30,9 @@ Hierzu z.B. cgal
 ** TODO scene von intrusive auf was besseres umstellen
 Eine instance trägt sich selber ein und aus und kriegt das Backend im
 Konstruktor.
+** TODO Die Kamera fixen
+Eine Egoshooterkamera funktioniert so: wenn die Maus auf der x-Achse
+bewegt wird, werden alle drei Gizmovektoren um $(0,1,0)$ gedreht
 * Aktivitäten
 ** TODO Shadow Maps [1/5]
 *** DONE Neues uniform-System aufsetzen

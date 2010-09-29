@@ -9,7 +9,7 @@
 #include "height_map/cli_options.hpp"
 #include "physics/cli_options.hpp"
 #include "help_needed.hpp"
-#include "parse_json_config.hpp"
+#include "json/parse_config.hpp"
 #include "media_path.hpp"
 #include <sge/parse/json/parse_file_exn.hpp>
 #include <sge/parse/json/find_member_exn.hpp>
@@ -87,7 +87,7 @@ insula::create_variables_map(
 	if (fcppt::filesystem::exists(media_path()/FCPPT_TEXT("user_config.json")))
 	{
 		boost::program_options::store(
-			parse_json_config(
+			json::parse_config(
 				sge::parse::json::parse_file_exn(
 					media_path()/FCPPT_TEXT("user_config.json")),
 				desc),
@@ -100,7 +100,7 @@ insula::create_variables_map(
 	}
 
 	boost::program_options::store(
-		parse_json_config(
+		json::parse_config(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
 				config_file.members,
 				FCPPT_TEXT("cli")),

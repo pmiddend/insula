@@ -38,8 +38,8 @@ public:
 		scalar fov,
 		scalar near,
 		scalar far,
-		scalar camera_speed,
-		scalar roll_speed,
+		scalar movement_speed,
+		scalar rotation_speed,
 		vec3 const &position);
 	
 	void
@@ -75,10 +75,9 @@ public:
 private:
 	fcppt::signal::scoped_connection input_connection_;
 	scalar aspect_,fov_,near_,far_;
-	scalar speed_;
+	scalar movement_speed_,rotation_speed_;
 	vec3 dirs_;
 	insula::graphics::gizmo gizmo_;
-	scalar do_roll_,roll_speed_;
 
 	void
 	input_callback(

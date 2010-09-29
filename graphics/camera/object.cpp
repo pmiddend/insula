@@ -36,8 +36,8 @@ insula::graphics::camera::object::object(
 	scalar _fov,
 	scalar _near,
 	scalar _far,
-	scalar _speed,
-	scalar _roll_speed,
+	scalar _movement_speed,
+	scalar _rotation_speed,
 	vec3 const &_position)
 :
 	input_connection_(
@@ -54,8 +54,10 @@ insula::graphics::camera::object::object(
 		_near),
 	far_(
 		_far),
-	speed_(
-		_speed),
+	movement_speed_(
+		_movement_speed),
+	rotation_speed_(
+		_rotation_speed),
 	dirs_(
 		vec3::null()),
 	gizmo_(
@@ -67,11 +69,7 @@ insula::graphics::camera::object::object(
 			.right(
 				vec3(1,0,0))
 			.up(
-				vec3(0,1,0))),
-	do_roll_(
-		static_cast<scalar>(0)),
-	roll_speed_(
-		_roll_speed)
+				vec3(0,1,0)))
 {
 }
 
@@ -79,37 +77,9 @@ void
 insula::graphics::camera::object::update(
 	scalar const t)
 {
-	if (!fcppt::math::almost_zero(do_roll_))
-	{
-		using fcppt::math::matrix::rotation_axis;
-		using fcppt::math::vector::narrow_cast;
-		using fcppt::math::vector::construct;
-
-		vec3 
-			up = 
-				narrow_cast<vec3>(
-					rotation_axis(
-						-do_roll_ * roll_speed_ * t,
-						gizmo_.forward()) *
-					construct(
-						gizmo_.up(),
-						static_cast<scalar>(0))),
-			right = 
-				cross(up,gizmo_.forward()),
-			forward = 
-				cross(right,up); 
-
-		gizmo_ = 
-			insula::graphics::gizmo::init()
-				.position(gizmo_.position())
-				.forward(normalize(forward))
-				.up(normalize(up))
-				.right(normalize(right));
-	}
-
 	gizmo_.position( 
 		gizmo_.position() + 
-		speed_ * 
+		movement_speed_ * 
 		t * 
 		std::inner_product(
 			gizmo_.array().begin(),
@@ -190,35 +160,36 @@ void
 insula::graphics::camera::object::input_callback(
 	sge::input::key_pair const &k)
 {
-	scalar const mouse_inverse_speed = 
-		static_cast<scalar>(
-			1000);
-
 	scalar const angle = 
-		static_cast<scalar>(k.value())/mouse_inverse_speed;
+		static_cast<scalar>(k.value())/rotation_speed_;
 
 	switch (k.key().code())
 	{
 		case sge::input::kc::mouse_x_axis:
 		{
-
 		using fcppt::math::matrix::rotation_axis;
 		using fcppt::math::vector::narrow_cast;
 		using fcppt::math::vector::construct;
+		using fcppt::math::vector::normalize;
 
 		vec3 
 			forward = 
 				narrow_cast<vec3>(
 					rotation_axis(
 						-angle,
-						gizmo_.up()) *
+						vec3(0,1,0)) *
 					construct(
 						gizmo_.forward(),
+						// Cast neccesary here
 						static_cast<scalar>(0))),
 			right = 
-				cross(gizmo_.up(),forward),
+				cross(
+					vec3(0,1,0),
+					forward),
 			up = 
-				cross(forward,right); 
+				cross(
+					forward,
+					right); 
 
 		gizmo_ = 
 			gizmo::init()
@@ -274,12 +245,6 @@ insula::graphics::camera::object::input_callback(
 
 			if (k.key().code() == sge::input::kc::key_right)
 				dirs_[0] = !k.value() ? 0 : 1;
-
-			if (k.key().char_code() == FCPPT_TEXT('q'))
-				do_roll_ = !k.value() ? 0 : -1;
-
-			if (k.key().char_code() == FCPPT_TEXT('e'))
-				do_roll_ = !k.value() ? 0 : 1;
 			break;
 	}
 }

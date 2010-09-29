@@ -23,8 +23,10 @@
 #include <sge/renderer/filter/trilinear.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
+#include <fcppt/io/cout.hpp>
 #include <fcppt/math/pi.hpp>
 #include <fcppt/text.hpp>
 #include <cmath>
@@ -56,7 +58,8 @@ insula::states::freelook::freelook(
 			context<machine>().systems().md3_loader()->load(
 				create_path(
 					FCPPT_TEXT("player.md3"),
-					FCPPT_TEXT("models"))),
+					FCPPT_TEXT("models")),
+				sge::model::load_flags::switch_yz),
 			context<machine>().systems().renderer())),
 	player_instance_(
 		fcppt::math::matrix::translation(

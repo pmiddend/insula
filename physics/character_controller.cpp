@@ -1,6 +1,7 @@
 #include "character_controller.hpp"
 #include "transform_to_gizmo.hpp"
 #include "vec3_to_bullet.hpp"
+#include <fcppt/math/vector/arithmetic.hpp>
 
 insula::physics::character_controller::character_controller(
 	scalar width,
@@ -22,8 +23,11 @@ insula::physics::character_controller::character_controller(
 	ghost_object_.setWorldTransform(
 		btTransform(
 			btMatrix3x3::getIdentity(),
+			// NOTE: We "correct" the player's position manually here. I
+			// don't know if this is better done outside this class
 			vec3_to_bullet(
-				position)));
+				position + 
+				physics::vec3(0,height/2,0))));
 	ghost_object_.setCollisionShape(
 		&shape_);
 	// I don't know what this is for

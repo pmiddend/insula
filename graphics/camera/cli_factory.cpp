@@ -18,7 +18,7 @@ insula::graphics::camera::cli_factory(
 				get_option<graphics::scalar>(vm,"camera-fov")),
 			get_option<graphics::scalar>(vm,"camera-near"),
 			get_option<graphics::scalar>(vm,"camera-far"),
-			get_option<graphics::scalar>(vm,"camera-speed"),
-			get_option<graphics::scalar>(vm,"camera-roll-speed"),
+			get_option<graphics::scalar>(vm,"camera-movement-speed"),
+			get_option<graphics::scalar>(vm,"camera-rotation-speed"),
 			position);
 }
