@@ -13,6 +13,8 @@
 #include <sge/input/key_code.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/normalize.hpp>
+#include <fcppt/math/vector/comparison.hpp>
 #include <fcppt/text.hpp>
 #include <functional>
 
@@ -66,13 +68,16 @@ insula::player::object::update(
 {
 	physics::vec3 walk = physics::vec3::null();
 	if (action_execute_[action::forward])
-		walk = -camera_.gizmo().forward() * walk_speed_;
+		walk += physics::vec3(-camera_.gizmo().forward().x(),0,-camera_.gizmo().forward().z());
 	if (action_execute_[action::backward])
-		walk += camera_.gizmo().forward() * walk_speed_;
+		walk += physics::vec3(camera_.gizmo().forward().x(),0,camera_.gizmo().forward().z());
+		//walk += camera_.gizmo().forward();
 	if (action_execute_[action::left])
-		walk += -camera_.gizmo().right() * walk_speed_;
+		walk += -camera_.gizmo().right();
 	if (action_execute_[action::right])
-		walk += camera_.gizmo().right() * walk_speed_;
+		walk += camera_.gizmo().right();
+	if (walk != physics::vec3::null())
+		walk = fcppt::math::vector::normalize(walk) * walk_speed_;
 	
 	character_controller_.walk_vector(
 		walk);
