@@ -2,13 +2,13 @@
 #include "instance_parameters.hpp"
 #include "manager.hpp"
 #include "../scene/manager.hpp"
-#include "../static_model_instance.hpp"
-#include "../physics/static_model_parameters.hpp"
 #include "../physics/object_type.hpp"
 #include "../physics/scalar.hpp"
+#include "../physics/rigid/parameters.hpp"
 #include "../graphics/vec3.hpp"
 #include "../graphics/vec4.hpp"
 #include "../graphics/mat4.hpp"
+#include "../rigid_model.hpp"
 #include "../math/uniform_scaling_matrix.hpp"
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/rotation_axis.hpp>
@@ -44,21 +44,28 @@ insula::prop::instance::instance(
 		manager::blueprint_sequence::const_reference r,
 		params.manager_.blueprints_)
 	{
-		graphics::mat4 const model_matrix = 
-			fcppt::math::matrix::translation(
+		graphics::mat4 const 
+			model_matrix = 
+				fcppt::math::matrix::translation(
 					fcppt::math::vector::structure_cast<graphics::vec3>(
 						r.origin)) *
-			fcppt::math::matrix::rotation_axis(
-				r.rotation_angle,
-				r.rotation_axis) *
-			math::uniform_scaling_matrix(
-				r.scaling);
+				fcppt::math::matrix::rotation_axis(
+					r.rotation_angle,
+					r.rotation_axis) *
+				math::uniform_scaling_matrix(
+					r.scaling),
+			physics_to_model = 
+				fcppt::math::matrix::translation(
+					fcppt::math::vector::structure_cast<graphics::vec3>(
+						-r.offset))
+				 * math::uniform_scaling_matrix(
+						r.scaling);
 
 		instances_.push_back(
-			new static_model_instance(
-				model_matrix,
+			new rigid_model(
+				physics_to_model,
 				params.manager_.broadphase_manager_,
-				physics::static_model_parameters(
+				physics::rigid::parameters(
 					params.world,
 					physics::object_type::prop,
 					// Let's find out what the origin of the "child" shape is in
@@ -80,7 +87,7 @@ insula::prop::instance::instance(
 							r.rotation_angle,
 							r.rotation_axis)),
 					r.shape,
-					physics::solidity::solid)));
+					physics::rigid::solidity::solid)));
 
 		if (r.backend.has_transparency())
 			params.manager_.scene_manager_.insert_transparent(

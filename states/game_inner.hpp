@@ -3,7 +3,6 @@
 
 #include "game_outer.hpp"
 #include "freelook_fwd.hpp"
-#include "../static_model_instance.hpp"
 #include "../player/object.hpp"
 #include "../prop/instance_sequence.hpp"
 #include "../physics/world.hpp"

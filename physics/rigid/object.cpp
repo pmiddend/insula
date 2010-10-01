@@ -1,20 +1,20 @@
-#include "static_model.hpp"
-#include "dim3_to_bullet.hpp"
-#include "transform_to_mat4.hpp"
-#include "bullet_to_vec3.hpp"
-#include "dim3.hpp"
-#include "scalar.hpp"
-#include "motion_state.hpp"
-#include "static_model_parameters.hpp"
-#include "../model/object.hpp"
+#include "object.hpp"
+#include "parameters.hpp"
+#include "../dim3_to_bullet.hpp"
+#include "../transform_to_mat4.hpp"
+#include "../bullet_to_vec3.hpp"
+#include "../dim3.hpp"
+#include "../scalar.hpp"
+#include "../motion_state.hpp"
+#include "../../model/object.hpp"
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <fcppt/io/cout.hpp>
 #include <iostream>
 
-insula::physics::static_model::static_model(
-	static_model_parameters const &params)
+insula::physics::rigid::object::object(
+	parameters const &params)
 :
-	object(
+	physics::object(
 		params.type),
 	motion_state_(
 		new motion_state(
@@ -25,9 +25,11 @@ insula::physics::static_model::static_model(
 	body_(
 		new btRigidBody(
 			btRigidBody::btRigidBodyConstructionInfo(
+				// mass
 				static_cast<btScalar>(0),
 				motion_state_.get(),
 				shape_.get(),
+				// Local inertia
 				btVector3(0,0,0))))
 {
 	// It's important that we _first_ set the user pointer and _then_
@@ -36,9 +38,10 @@ insula::physics::static_model::static_model(
 	body_->setUserPointer(
 		this);
 
-
 	world_scope_.reset(
-		new scoped_body(params.world_,*body_));
+		new scoped_body(
+			params.world_,
+			*body_));
 
 	switch (params.solidity)
 	{
@@ -50,11 +53,10 @@ insula::physics::static_model::static_model(
 				btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			break;
 	}
-
 }
 
 insula::physics::vec3 const
-insula::physics::static_model::position() const
+insula::physics::rigid::object::position() const
 {
 	return 
 		bullet_to_vec3(
@@ -62,13 +64,13 @@ insula::physics::static_model::position() const
 }
 
 insula::physics::mat4 const
-insula::physics::static_model::world_transform() const
+insula::physics::rigid::object::world_transform() const
 {
 	return 
 		transform_to_mat4(
 			motion_state_->transform());
 }
 
-insula::physics::static_model::~static_model()
+insula::physics::rigid::object::~object()
 {
 }

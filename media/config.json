@@ -136,7 +136,7 @@
 			"scale_range" : [4.0,6.0],
 			"rotation_axis" : [0.0,1.0,0.0],
 			"physics_offset" : [0.0,0.0,0.0],
-			"count" : 10000
+			"count" : 100
 		}
 	],
 	

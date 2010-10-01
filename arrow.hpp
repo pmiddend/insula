@@ -33,7 +33,7 @@ private:
 	graphics::shader::object &model_shader_;
 	sge::renderer::device_ptr renderer_;
 	graphics::camera::object &camera_;
-	nugget::instance const &nuggets_;
+	//nugget::instance const &nuggets_;
 	graphics::vec3 const offset_;
 };
 }

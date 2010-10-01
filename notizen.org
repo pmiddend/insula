@@ -6,6 +6,7 @@
 - Shadow Mapping: http://www.fabiensanglard.net/shadowmapping/index.php
 - Viele Paper: http://nis-lab.is.s.u-tokyo.ac.jp/~nis//abs_cgi.html#pas95
 - Besserer Charactercontroller: http://code.google.com/p/bullet/issues/detail?id=198
+- Weiterer CC: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=5712
 - Landschaftsgenerierung http://www.dungeonleague.com/page/2/
 * Ideen für später
 ** TODO Terrain zufallsgenerieren

@@ -1,6 +1,8 @@
 #ifndef INSULA_NUGGET_INSTANCE_HPP_INCLUDED
 #define INSULA_NUGGET_INSTANCE_HPP_INCLUDED
 
+#if 0
+
 #include "manager_fwd.hpp"
 #include "../physics/world_fwd.hpp"
 #include "../static_model_instance.hpp"
@@ -46,5 +48,7 @@ private:
 };
 }
 }
+
+#endif
 
 #endif

@@ -4,7 +4,6 @@
 #include "height_map.hpp"
 #include "broadphase/manager.hpp"
 #include "../graphics/frustum.hpp"
-#include "static_model.hpp"
 #include "../math/extract_frustum.hpp"
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
 #include <BulletCollision/CollisionDispatch/btCollisionDispatcher.h>
