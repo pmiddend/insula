@@ -9,6 +9,7 @@
 #include "../shared_shape_ptr.hpp"
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/matrix/basic_impl.hpp>
+#include <fcppt/optional.hpp>
 
 namespace insula
 {
@@ -25,6 +26,7 @@ public:
 	mat3 transformation;
 	shared_shape_ptr shape;
 	solidity::type solidity;
+	fcppt::optional<scalar> mass;
 
 	explicit
 	parameters(
@@ -33,14 +35,16 @@ public:
 		vec3 position,
 		mat3 transformation,
 		shared_shape_ptr shape,
-		solidity::type solidity)
+		solidity::type solidity,
+		fcppt::optional<scalar> mass)
 	:
 		world_(world_),
 		type(type),
 		position(position),
 		transformation(transformation),
 		shape(shape),
-		solidity(solidity)
+		solidity(solidity),
+		mass(mass)
 	{
 	}
 };

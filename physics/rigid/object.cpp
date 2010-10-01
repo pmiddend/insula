@@ -25,8 +25,11 @@ insula::physics::rigid::object::object(
 	body_(
 		new btRigidBody(
 			btRigidBody::btRigidBodyConstructionInfo(
-				// mass
-				static_cast<btScalar>(0),
+				params.mass 
+				? 
+					*params.mass 
+				: 
+					static_cast<btScalar>(0),
 				motion_state_.get(),
 				shape_.get(),
 				// Local inertia

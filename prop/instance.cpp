@@ -87,7 +87,9 @@ insula::prop::instance::instance(
 							r.rotation_angle,
 							r.rotation_axis)),
 					r.shape,
-					physics::rigid::solidity::solid)));
+					physics::rigid::solidity::solid,
+					// mass
+					fcppt::optional<physics::scalar>())));
 
 		if (r.backend.has_transparency())
 			params.manager_.scene_manager_.insert_transparent(

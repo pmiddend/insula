@@ -92,7 +92,7 @@ FILE(GLOB_RECURSE physics_files physics/*)
 FILE(GLOB_RECURSE nugget_files nugget/*)
 FILE(GLOB_RECURSE model_files model/*)
 FILE(GLOB_RECURSE json_files json/*)
-FILE(GLOB base_files media_path.cpp input_delegator.cpp create_path.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp help_needed.cpp create_variables_map.cpp random_flat_point.cpp game_cli_options.cpp random_seed.cpp scoped_machine.cpp timed_output.cpp turn_timer.cpp milliseconds_to_string.cpp model_backend.cpp model_instance.cpp rigid_model.cpp ghost_instance.cpp parse_json_config.cpp arrow.cpp)
+SET(base_files media_path.cpp input_delegator.cpp create_path.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp help_needed.cpp create_variables_map.cpp game_cli_options.cpp random_seed.cpp scoped_machine.cpp timed_output.cpp turn_timer.cpp milliseconds_to_string.cpp rigid_model.cpp arrow.cpp)
 
 SET_SOURCE_FILES_PROPERTIES(
 	media_path.cpp
