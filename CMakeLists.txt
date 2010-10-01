@@ -76,23 +76,98 @@ INCLUDE_DIRECTORIES(${BULLET_INCLUDE_DIRS})
 
 SET(media_path ${CMAKE_SOURCE_DIR}/media)
 
-FILE(GLOB_RECURSE height_map_files height_map/*)
-FILE(GLOB_RECURSE graphics_files graphics/*)
-FILE(GLOB_RECURSE texture_files textures/*)
-FILE(GLOB_RECURSE console_files console/*)
-FILE(GLOB_RECURSE skydome_files skydome/*)
-FILE(GLOB_RECURSE water_files water/*)
-FILE(GLOB_RECURSE scene_files scene/*)
-FILE(GLOB_RECURSE prop_files prop/*)
-FILE(GLOB_RECURSE ghost_files ghost/*)
-FILE(GLOB_RECURSE events_files events/*)
-FILE(GLOB_RECURSE states_files states/*)
-FILE(GLOB_RECURSE player_files player/*)
-FILE(GLOB_RECURSE physics_files physics/*)
-FILE(GLOB_RECURSE projectile_files projectile/*)
-FILE(GLOB_RECURSE nugget_files nugget/*)
-FILE(GLOB_RECURSE model_files model/*)
-FILE(GLOB_RECURSE json_files json/*)
+SET(height_map_files height_map/random_point.cpp
+height_map/image_to_array.cpp
+height_map/cli_options.cpp
+height_map/cli_factory.cpp
+height_map/object.cpp
+height_map/array_to_image.cpp
+height_map/height_for_point.cpp)
+SET(graphics_files graphics/shader/sampler.cpp
+graphics/shader/object.cpp
+graphics/shader/scoped.cpp
+graphics/shader/variable.cpp
+graphics/stats.cpp
+graphics/cli_options.cpp
+graphics/camera/pan.cpp
+graphics/camera/cli_options.cpp
+graphics/camera/cli_factory.cpp
+graphics/camera/object.cpp
+graphics/camera/scoped.cpp)
+SET(texture_files textures/interpolators/bernstein_polynomial.cpp
+textures/weights.cpp
+textures/blend.cpp) 
+SET(console_files console/streambuf.cpp
+console/object.cpp)
+SET(skydome_files skydome/cli_options.cpp
+skydome/cli_factory.cpp
+skydome/object.cpp
+skydome/sphere_point.cpp
+skydome/color_to_vec3.cpp
+skydome/vec3_to_color.cpp)
+SET(water_files water/cli_options.cpp
+water/cli_factory.cpp
+water/object.cpp)
+SET(scene_files scene/transparent_instance.cpp
+scene/instance.cpp
+scene/backend.cpp
+scene/manager.cpp
+scene/scoped_backend.cpp)
+SET(prop_files prop/instance.cpp
+prop/manager.cpp)
+SET(ghost_files ghost/instance.cpp
+ghost/manager.cpp)
+SET(events_files events/tick.cpp
+events/key_repeat.cpp
+events/render.cpp
+events/key.cpp)
+SET(states_files states/camera_move.cpp
+states/game_inner.cpp
+states/freelook.cpp
+states/gameover.cpp
+states/running.cpp
+states/game_outer.cpp
+states/finished.cpp
+states/pregame.cpp)
+SET(player_files player/object.cpp)
+SET(physics_files physics/transform_from_vec3.cpp
+physics/shape_from_approximation.cpp
+physics/bullet_to_mat3.cpp
+physics/scoped_constraint.cpp
+physics/dim3_to_bullet.cpp
+physics/character_controller.cpp
+physics/height_map.cpp
+physics/bullet_to_vec3.cpp
+physics/vec3_to_bullet.cpp
+physics/world.cpp
+physics/model_approximation.cpp
+physics/broadphase/manager.cpp
+physics/broadphase/culler.cpp
+physics/scoped_action.cpp
+physics/shape_from_model.cpp
+physics/ghost.cpp
+physics/filter_callback.cpp
+physics/debug_drawer.cpp
+physics/cli_options.cpp
+physics/object.cpp
+physics/triangle_mesh/shape.cpp
+physics/triangle_mesh/shape_from_model.cpp
+physics/transform_to_gizmo.cpp
+physics/rigid/object.cpp
+physics/motion_state.cpp
+physics/bullet_to_mat4.cpp
+physics/mat3_to_bullet.cpp
+physics/upright_constraint.cpp
+physics/transform_to_mat4.cpp
+physics/scoped_body.cpp)
+SET(projectile_files projectile/manager.cpp)
+SET(nugget_files nugget/manager.cpp)
+SET(model_files model/instance.cpp
+model/backend.cpp
+model/object.cpp
+model/scoped.cpp)
+SET(json_files json/parse_config.cpp
+json/parse_font.cpp)
 SET(base_files media_path.cpp input_delegator.cpp create_path.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp help_needed.cpp create_variables_map.cpp game_cli_options.cpp random_seed.cpp scoped_machine.cpp timed_output.cpp turn_timer.cpp milliseconds_to_string.cpp rigid_model.cpp arrow.cpp)
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -101,7 +176,7 @@ SET_SOURCE_FILES_PROPERTIES(
 	COMPILE_FLAGS
 	-DMEDIA_PATH="\\\"${media_path}\\\"")
 
-ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files} ${player_files} ${projectile_files})
+ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files} ${player_files} ${projectile_files} ${nugget_files})
 
 FUNCTION(CREATE_INSULA_EXE name)
 	ADD_EXECUTABLE(${name} ${name}.cpp)

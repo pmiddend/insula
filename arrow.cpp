@@ -1,7 +1,6 @@
 #include "arrow.hpp"
 #include "create_path.hpp"
 #include "timed_output.hpp"
-//#include "nugget/instance.hpp"
 #include "arrow_parameters.hpp"
 #include "graphics/shader/scoped.hpp"
 #include "graphics/shader/object.hpp"
@@ -64,10 +63,8 @@ insula::arrow::arrow(
 		params.systems.renderer()),
 	camera_(
 		params.camera),
-/*
-	nuggets_(
-		params.nuggets),
-*/
+	position_callback_(
+		params.callback),
 	offset_(
 		json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
 			sge::parse::json::find_member_exn<sge::parse::json::array>(
@@ -79,7 +76,6 @@ insula::arrow::arrow(
 void
 insula::arrow::render()
 {
-#if 0
 	model_shader_.update_texture(
 		"texture",
 		texture_);
@@ -97,11 +93,14 @@ insula::arrow::render()
 			camera_.gizmo().forward().z());
 
 	physics::vec3 const diff = 
+		position_callback_();
+		/*
 		nuggets_.closest_nugget(
 			fcppt::math::vector::structure_cast<physics::vec3>(
 				camera_.gizmo().position())) - 
 		fcppt::math::vector::structure_cast<physics::vec3>(
 			camera_.gizmo().position());
+		*/
 
 	physics::vec2 const
 		to_nugget(
@@ -125,7 +124,6 @@ insula::arrow::render()
 ));
 
 	model_.render();
-#endif
 }
 
 insula::arrow::~arrow() {}

@@ -71,16 +71,15 @@
 		"flatness-range" : [0.0,0.2],
 		"width" : 2.0,
 		"height" : 4.0,
-		"walk-speed" : 10.0
+		"walk-speed" : 100.0
 	},
 
-	"nuggets" : 
+	"nugget" : 
 	{
 		"model" : "beacon.md3",
 		"texture" : "beacon.png",
 		"flatness_range" : [0.0,0.2],
-		"floating_height" : 0.0,
-		"count" : 1
+		"floating_height" : 1.0
  },
 
 	"props" :

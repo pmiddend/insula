@@ -52,8 +52,7 @@ public:
 	react(
 		events::key const &);
 private:
-	//vehicle::scoped scoped_vehicle_;
-	//arrow arrow_;
+	arrow arrow_;
 	//fcppt::signal::scoped_connection vehicle_crash_connection_;
 };
 }

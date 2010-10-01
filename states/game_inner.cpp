@@ -15,7 +15,7 @@
 #include "../model/vf/format.hpp"
 #include "../player/parameters.hpp"
 #include "../projectile/manager_parameters.hpp"
-#include "../nugget/instance.hpp"
+#include "../nugget/parameters.hpp"
 #include "../events/nuggets_empty.hpp"
 #include <sge/console/object.hpp>
 #include <sge/image/create_texture.hpp>
@@ -97,7 +97,21 @@ insula::states::game_inner::game_inner(
 			context<machine>().camera(),
 			context<machine>().input_delegator(),
 			physics_world_,
-			projectiles_))
+			projectiles_)),
+	nuggets_(
+		nugget::parameters(
+			sge::parse::json::find_member_exn<sge::parse::json::object>(
+				context<machine>().config_file().members,
+				FCPPT_TEXT("nugget")),
+			context<game_outer>().height_map(),
+			context<game_outer>().water_level(),
+			context<machine>().sounds(),
+			context<machine>().systems(),
+			context<machine>().camera(),
+			context<game_outer>().model_shader(),
+			context<game_outer>().scene_manager(),
+			context<game_outer>().broadphase_manager(),
+			physics_world_))
 {
 }
 
@@ -105,7 +119,7 @@ void
 insula::states::game_inner::react(
 	events::tick const &)
 {
-	//nuggets_->update();
+	nuggets_.update();
 }
 
 void
@@ -158,6 +172,12 @@ insula::player::object const &
 insula::states::game_inner::player() const
 {
 	return player_;
+}
+
+insula::nugget::manager const &
+insula::states::game_inner::nuggets() const
+{
+	return nuggets_;
 }
 
 insula::states::game_inner::~game_inner()

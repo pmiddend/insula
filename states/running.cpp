@@ -17,6 +17,7 @@
 #include <sge/parse/json/object.hpp>
 #include <sge/renderer/device.hpp>
 #include <fcppt/io/cout.hpp>
+#include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/text.hpp>
 #include <functional>
 
@@ -26,9 +27,7 @@ insula::states::running::running(
 	my_context ctx)
 :
 	my_base(
-		ctx)/*,
-	scoped_vehicle_(
-		context<game_inner>().vehicle()),
+		ctx),
 	arrow_(
 		arrow_parameters(
 			context<machine>().systems(),
@@ -37,7 +36,14 @@ insula::states::running::running(
 				FCPPT_TEXT("arrow")),
 			context<game_outer>().model_shader(),
 			context<machine>().camera(),
-			context<game_inner>().nugget_instance())),
+			[this]()
+			{
+				return 
+					this->context<game_inner>().nuggets().closest_nugget(
+						this->context<machine>().camera().gizmo().position()) 
+						- this->context<machine>().camera().gizmo().position();
+			}))
+	/*
 	vehicle_crash_connection_(
 		context<game_inner>().physics_world().register_callback
 		<
@@ -86,8 +92,8 @@ insula::states::running::react(
 	context<game_inner>().react(
 		r);
 
-/*
 	arrow_.render();
+/*
 
 	sge::font::draw_text(
 		context<game_outer>().large_font(),

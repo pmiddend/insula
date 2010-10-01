@@ -6,6 +6,7 @@
 #include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/shader/object_fwd.hpp"
 #include "../physics/world_fwd.hpp"
+#include "../physics/broadphase/manager_fwd.hpp"
 #include "../scene/manager_fwd.hpp"
 #include "../sound_controller.hpp"
 #include <sge/systems/instance_fwd.hpp>
@@ -27,6 +28,7 @@ public:
 	graphics::shader::object &model_shader;
 	scene::manager &scene_manager;
 	physics::broadphase::manager &broadphase_manager;
+	physics::world &world;
 	
 	explicit
 	parameters(
@@ -38,7 +40,8 @@ public:
 		graphics::camera::object &camera,
 		graphics::shader::object &model_shader,
 		scene::manager &scene_manager,
-		physics::broadphase::manager &broadphase_manager)
+		physics::broadphase::manager &broadphase_manager,
+		physics::world &world)
 	:
 		json(json),
 		height_map(height_map),
@@ -48,7 +51,8 @@ public:
 		camera(camera),
 		model_shader(model_shader),
 		scene_manager(scene_manager),
-		broadphase_manager(broadphase_manager)
+		broadphase_manager(broadphase_manager),
+		world(world)
 	{
 	}
 };

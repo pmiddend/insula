@@ -12,6 +12,7 @@
 #include "../events/tick_fwd.hpp"
 #include "../events/render_fwd.hpp"
 #include "../projectile/manager.hpp"
+#include "../nugget/manager.hpp"
 #include <fcppt/signal/scoped_connection.hpp>
 #include <boost/statechart/state.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -43,19 +44,14 @@ public:
 	physics::world &
 	physics_world();
 
-/*
-	nugget::instance &
-	nugget_instance();
-
-	nugget::instance const &
-	nugget_instance() const;
-*/
-
 	player::object &
 	player();
 
 	player::object const &
 	player() const;
+
+	nugget::manager const &
+	nuggets() const;
 
 	~game_inner();
 private:
@@ -68,6 +64,7 @@ private:
 	prop::shared_instance_ptr props_;
 	projectile::manager projectiles_;
 	player::object player_;
+	nugget::manager nuggets_;
 };
 }
 }

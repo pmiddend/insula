@@ -1,10 +1,11 @@
 #ifndef INSULA_ARROW_PARAMETERS_HPP_INCLUDED
 #define INSULA_ARROW_PARAMETERS_HPP_INCLUDED
 
-#include "nugget/instance_fwd.hpp"
 #include "graphics/shader/object_fwd.hpp"
+#include "physics/vec3.hpp"
 #include <sge/systems/instance_fwd.hpp>
 #include <sge/parse/json/object.hpp>
+#include <functional>
 
 namespace insula
 {
@@ -15,7 +16,7 @@ public:
 	sge::parse::json::object json;
 	graphics::shader::object &model_shader;
 	graphics::camera::object &camera;
-	nugget::instance const &nuggets;
+	std::function<physics::vec3()> callback;
 
 	explicit
 	arrow_parameters(
@@ -23,13 +24,13 @@ public:
 		sge::parse::json::object const &json,
 		graphics::shader::object &model_shader,
 		graphics::camera::object &camera,
-		nugget::instance const &nuggets)
+		std::function<physics::vec3()> const &callback)
 	:
 		systems(systems),
 		json(json),
 		model_shader(model_shader),
 		camera(camera),
-		nuggets(nuggets)
+		callback(callback)
 	{
 	}
 };

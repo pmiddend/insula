@@ -3,6 +3,7 @@
 #include "object.hpp"
 #include "height_map.hpp"
 #include "broadphase/manager.hpp"
+#include "rigid/object.hpp"
 #include "../graphics/frustum.hpp"
 #include "../math/extract_frustum.hpp"
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
@@ -227,8 +228,8 @@ insula::physics::world::process_collisions()
 		contact_set::const_reference contact,
 		contacts_)
 	{
-	//	if (try_combination<vehicle::object,static_model>(contact.first,contact.second,signals_))
-	//		continue;
+		if (try_combination<rigid::object,rigid::object>(contact.first,contact.second,signals_))
+			continue;
 
 	//	if (try_combination<vehicle::object,height_map>(contact.first,contact.second,signals_))
 	//		continue;
