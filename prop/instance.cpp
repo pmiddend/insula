@@ -89,7 +89,9 @@ insula::prop::instance::instance(
 					r.shape,
 					physics::rigid::solidity::solid,
 					// mass
-					fcppt::optional<physics::scalar>())));
+					fcppt::optional<physics::scalar>(),
+					// linear velocity
+					physics::vec3::null())));
 
 		if (r.backend.has_transparency())
 			params.manager_.scene_manager_.insert_transparent(

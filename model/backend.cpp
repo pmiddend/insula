@@ -17,7 +17,7 @@
 insula::model::backend::backend(
 	bool _has_transparency,
 	sge::renderer::device_ptr _renderer,
-	graphics::camera::object &_camera,
+	graphics::camera::object const &_camera,
 	graphics::shader::object &_shader,
 	texture_map const &_textures,
 	model::shared_object_ptr _model)
@@ -96,7 +96,7 @@ insula::model::backend::end()
 	shader_.deactivate();
 }
 
-insula::graphics::camera::object &
+insula::graphics::camera::object const &
 insula::model::backend::camera() const
 {
 	return camera_;

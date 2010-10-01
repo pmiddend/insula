@@ -7,6 +7,7 @@
 #include "../input_delegator_fwd.hpp"
 #include "../graphics/camera/object_fwd.hpp"
 #include "../physics/world_fwd.hpp"
+#include "../projectile/manager_fwd.hpp"
 #include <sge/parse/json/object.hpp>
 
 namespace insula
@@ -23,6 +24,7 @@ public:
 	graphics::camera::object &camera;
 	insula::input_delegator &input_delegator;
 	physics::world &physics_world;
+	projectile::manager &projectiles;
 
 	explicit
 	parameters(
@@ -32,7 +34,8 @@ public:
 		random_engine &rng_engine,
 		graphics::camera::object &camera,
 		insula::input_delegator &input_delegator,
-		physics::world &physics_world)
+		physics::world &physics_world,
+		projectile::manager &projectiles)
 	:
 		config_file(config_file),
 		height_map(height_map),
@@ -40,7 +43,8 @@ public:
 		rng_engine(rng_engine),
 		camera(camera),
 		input_delegator(input_delegator),
-		physics_world(physics_world)
+		physics_world(physics_world),
+		projectiles(projectiles)
 	{
 	}
 };

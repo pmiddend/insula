@@ -14,6 +14,7 @@
 #include "../model/scoped.hpp"
 #include "../model/vf/format.hpp"
 #include "../player/parameters.hpp"
+#include "../projectile/manager_parameters.hpp"
 #include "../nugget/instance.hpp"
 #include "../events/nuggets_empty.hpp"
 #include <sge/console/object.hpp>
@@ -23,6 +24,7 @@
 #include <sge/model/loader.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/parse/json/find_member_exn.hpp>
+#include <sge/parse/json/object.hpp>
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/matrix/structure_cast.hpp>
@@ -73,6 +75,17 @@ insula::states::game_inner::game_inner(
 	props_(
 		context<game_outer>().prop_manager().instantiate(
 			physics_world_)),
+	projectiles_(
+		projectile::manager_parameters(
+			sge::parse::json::find_member_exn<sge::parse::json::object>(
+				context<machine>().config_file().members,
+				FCPPT_TEXT("projectile")),
+			context<machine>().systems(),
+			context<machine>().camera(),
+			context<game_outer>().model_shader(),
+			context<game_outer>().scene_manager(),
+			context<game_outer>().broadphase_manager(),
+			physics_world_)),
 	player_(
 		player::parameters(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
@@ -83,7 +96,8 @@ insula::states::game_inner::game_inner(
 			context<game_outer>().player_position_rng(),
 			context<machine>().camera(),
 			context<machine>().input_delegator(),
-			physics_world_))
+			physics_world_,
+			projectiles_))
 {
 }
 

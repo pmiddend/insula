@@ -6,6 +6,7 @@
 #include "../graphics/camera/object.hpp"
 #include "../json/parse_vector.hpp"
 #include "../physics/vec3.hpp"
+#include "../projectile/manager.hpp"
 #include <sge/parse/json/array.hpp>
 #include <sge/parse/json/find_member_exn.hpp>
 #include <sge/parse/json/float_type.hpp>
@@ -51,7 +52,9 @@ insula::player::object::object(
 			std::bind(
 				&object::input_callback,
 				this,
-				std::placeholders::_1)))
+				std::placeholders::_1))),
+	projectiles_(
+		params.projectiles)
 {
 }
 
@@ -104,6 +107,15 @@ insula::player::object::input_callback(
 			break;
 		case sge::input::kc::key_d:
 			action_execute_[action::right] = k.value();
+			break;
+		case sge::input::kc::mouse_l:
+			if (k.value())
+			{
+				projectiles_.spawn(
+					camera_.gizmo().position() - 
+						4.0f * camera_.gizmo().forward(),
+					-camera_.gizmo().forward() * 20.0f);
+			}
 			break;
 		default:
 			break;

@@ -11,6 +11,7 @@
 #include "../physics/broadphase/manager.hpp"
 #include "../events/tick_fwd.hpp"
 #include "../events/render_fwd.hpp"
+#include "../projectile/manager.hpp"
 #include <fcppt/signal/scoped_connection.hpp>
 #include <boost/statechart/state.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -65,6 +66,7 @@ private:
 	bool physics_debug_;
 	fcppt::signal::scoped_connection toggle_physics_debug_; 
 	prop::shared_instance_ptr props_;
+	projectile::manager projectiles_;
 	player::object player_;
 };
 }

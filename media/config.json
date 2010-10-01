@@ -153,6 +153,13 @@
 		"offset" : [0.0,2.0,-3.0]
 	},
 
+	"projectile" :
+	{
+		"model" : "arrow.md3",
+		"texture" : "arrow.png",
+		"mass" : 50.0
+	},
+
 	"music" : 
 	{  
 		"volume" : 0.25,

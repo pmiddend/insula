@@ -34,7 +34,7 @@ public:
 	backend(
 		bool has_transparency,
 		sge::renderer::device_ptr,
-		graphics::camera::object &,
+		graphics::camera::object const &,
 		graphics::shader::object &,
 		texture_map const &,
 		model::shared_object_ptr);
@@ -48,7 +48,7 @@ public:
 	void 
 	end();
 
-	graphics::camera::object &
+	graphics::camera::object const &
 	camera() const;
 
 	graphics::shader::object &
@@ -65,7 +65,7 @@ private:
 	/// See has_transparency_ for the reason that's here
 	sge::renderer::device_ptr renderer_;
 	/// This is here so the model_instances can get the mvp matrix
-	graphics::camera::object &camera_;
+	graphics::camera::object const &camera_;
 	graphics::shader::object &shader_;
 	/// Usually we want the same shader for multiple backends, but with
 	/// different textures

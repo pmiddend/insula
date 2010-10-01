@@ -3,13 +3,41 @@
 #include "../dim3_to_bullet.hpp"
 #include "../transform_to_mat4.hpp"
 #include "../bullet_to_vec3.hpp"
+#include "../vec3_to_bullet.hpp"
 #include "../dim3.hpp"
 #include "../scalar.hpp"
 #include "../motion_state.hpp"
 #include "../../model/object.hpp"
 #include <BulletDynamics/Dynamics/btRigidBody.h>
+#include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <fcppt/io/cout.hpp>
 #include <iostream>
+
+namespace
+{
+btRigidBody::btRigidBodyConstructionInfo const
+create_construction_info(
+	btMotionState *motion_state,
+	btCollisionShape *shape,
+	fcppt::optional<insula::physics::scalar> const &mass)
+{
+	btVector3 inertia(0,0,0);
+	if (mass)
+		shape->calculateLocalInertia(
+			*mass,
+			inertia);
+	return 
+		btRigidBody::btRigidBodyConstructionInfo(
+				mass 
+				? 
+					*mass 
+				: 
+					static_cast<btScalar>(0),
+				motion_state,
+				shape,
+				inertia);
+}
+}
 
 insula::physics::rigid::object::object(
 	parameters const &params)
@@ -24,16 +52,10 @@ insula::physics::rigid::object::object(
 		params.shape),
 	body_(
 		new btRigidBody(
-			btRigidBody::btRigidBodyConstructionInfo(
-				params.mass 
-				? 
-					*params.mass 
-				: 
-					static_cast<btScalar>(0),
+			create_construction_info(
 				motion_state_.get(),
 				shape_.get(),
-				// Local inertia
-				btVector3(0,0,0))))
+				params.mass)))
 {
 	// It's important that we _first_ set the user pointer and _then_
 	// add the body because the constructor (indirectly) calls the
@@ -56,6 +78,10 @@ insula::physics::rigid::object::object(
 				btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			break;
 	}
+
+	body_->setLinearVelocity(
+		vec3_to_bullet(
+			params.linear_velocity));
 }
 
 insula::physics::vec3 const

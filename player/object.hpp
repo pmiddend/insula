@@ -1,13 +1,14 @@
 #ifndef INSULA_PLAYER_OBJECT_HPP_INCLUDED
 #define INSULA_PLAYER_OBJECT_HPP_INCLUDED
 
+#include "parameters_fwd.hpp"
+#include "action.hpp"
 #include "../physics/character_controller.hpp"
 #include "../physics/gizmo.hpp"
 #include "../physics/scalar.hpp"
 #include "../time_delta.hpp"
 #include "../graphics/camera/object_fwd.hpp"
-#include "parameters_fwd.hpp"
-#include "action.hpp"
+#include "../projectile/manager_fwd.hpp"
 #include <sge/input/key_pair_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <map>
@@ -47,6 +48,7 @@ private:
 	fcppt::signal::scoped_connection input_connection_;
 	// Tells me if the given action should be executed currently
 	action_map action_execute_;
+	projectile::manager &projectiles_;
 
 	void
 	input_callback(

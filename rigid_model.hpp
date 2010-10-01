@@ -14,6 +14,25 @@
 
 namespace insula
 {
+/**
+	This class connects a physics::rigid::object to a model::object. The
+	physics object can have an offset relative to the model. However,
+	both have to be synchronized because the rigid object might be
+	moving and/or rotating. Let me elaborate: Each vertex 'v' of the
+	model can be transformed in the following way:
+
+	v_{new} = translation(origin) * rotation(angle,axis) * scaling(factor) * v
+
+	The physics object's points 'v' (or center of mass), are transformed in
+	the following way:
+
+	v_{new} = translation(origin) * rotation(angle,axis) * translation(offset) * v
+
+	The physics world regularly updates origin, angle and axis and gives
+	us a new position and rotation matrix. To calculate the new _model_
+	transformation, we supply a "physics to model" transition matrix,
+	which consists of a backtranslation by -offset and a scaling matrix.
+ */
 class rigid_model
 :
 	public scene::transparent_instance

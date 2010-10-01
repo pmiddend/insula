@@ -27,6 +27,7 @@ public:
 	shared_shape_ptr shape;
 	solidity::type solidity;
 	fcppt::optional<scalar> mass;
+	vec3 linear_velocity;
 
 	explicit
 	parameters(
@@ -36,7 +37,8 @@ public:
 		mat3 transformation,
 		shared_shape_ptr shape,
 		solidity::type solidity,
-		fcppt::optional<scalar> mass)
+		fcppt::optional<scalar> mass,
+		vec3 const &linear_velocity)
 	:
 		world_(world_),
 		type(type),
@@ -44,7 +46,8 @@ public:
 		transformation(transformation),
 		shape(shape),
 		solidity(solidity),
-		mass(mass)
+		mass(mass),
+		linear_velocity(linear_velocity)
 	{
 	}
 };

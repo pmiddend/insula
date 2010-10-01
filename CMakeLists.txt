@@ -89,6 +89,7 @@ FILE(GLOB_RECURSE events_files events/*)
 FILE(GLOB_RECURSE states_files states/*)
 FILE(GLOB_RECURSE player_files player/*)
 FILE(GLOB_RECURSE physics_files physics/*)
+FILE(GLOB_RECURSE projectile_files projectile/*)
 FILE(GLOB_RECURSE nugget_files nugget/*)
 FILE(GLOB_RECURSE model_files model/*)
 FILE(GLOB_RECURSE json_files json/*)
@@ -100,7 +101,7 @@ SET_SOURCE_FILES_PROPERTIES(
 	COMPILE_FLAGS
 	-DMEDIA_PATH="\\\"${media_path}\\\"")
 
-ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files} ${player_files})
+ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files} ${player_files} ${projectile_files})
 
 FUNCTION(CREATE_INSULA_EXE name)
 	ADD_EXECUTABLE(${name} ${name}.cpp)
