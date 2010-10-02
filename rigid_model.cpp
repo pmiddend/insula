@@ -50,9 +50,8 @@ insula::rigid_model::render(
 		dynamic_cast<model::backend &>(
 			back);
 
-	realback.shader().set_uniform(
-		"mvp",
-		realback.camera().mvp() 
+	realback.modelview(
+		realback.camera().world() 
 			* fcppt::math::matrix::structure_cast<graphics::mat4>(
 				physics_model().world_transform())
 			* physics_to_model_);

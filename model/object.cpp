@@ -2,6 +2,8 @@
 #include "vf/format.hpp"
 #include "vf/vertex_view.hpp"
 #include "vf/position.hpp"
+#include "vf/normal.hpp"
+#include "vf/packed_normal.hpp"
 #include "vf/packed_position.hpp"
 #include "vf/texcoord.hpp"
 #include "vf/packed_texcoord.hpp"
@@ -121,16 +123,15 @@ insula::model::object::object(
 	sge::model::texcoord_sequence const texcoords = 
 		*(model->texcoords(part));
 
-	static_assert(
-		std::is_same
-		<
-			sge::model::vertex_sequence::size_type,
-			sge::model::texcoord_sequence::size_type
-		>::value,
-		"vertex_sequence und texcoord_sequence have to have the same size_type");
+	FCPPT_ASSERT(
+		model->normals(
+			part));
+
+	sge::model::normal_sequence const normals = 
+		*(model->normals(part));
 
 	FCPPT_ASSERT(
-		vertices.size() == texcoords.size());
+		vertices.size() == texcoords.size() && texcoords.size() == normals.size());
 
 	vb_ = 
 		renderer_->create_vertex_buffer(
@@ -177,6 +178,10 @@ insula::model::object::object(
 		vb_it->set<vf::texcoord>(
 			fcppt::math::vector::structure_cast<vf::packed_texcoord>(
 				texcoords[i]));
+
+		vb_it->set<vf::normal>(
+			fcppt::math::vector::structure_cast<vf::packed_normal>(
+				normals[i]));
 		vb_it++;
 	}
 

@@ -22,10 +22,9 @@ insula::model::instance::render(
 		dynamic_cast<model::backend &>(
 			back);
 
-	realback.shader().set_uniform(
-		"mvp",
-		realback.camera().mvp() * 
-		transformation_);
+	realback.modelview(
+		realback.camera().world() 
+			* transformation_);
 
 	realback.model().render();
 }

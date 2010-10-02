@@ -1,6 +1,7 @@
 #include "backend.hpp"
 #include "object.hpp"
 #include "../graphics/shader/object.hpp"
+#include "../graphics/camera/object.hpp"
 #include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/scoped.hpp>
@@ -11,6 +12,9 @@
 #include <sge/renderer/state/dest_blend_func.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
+#include <fcppt/math/matrix/inverse.hpp>
+#include <fcppt/math/matrix/transpose.hpp>
+#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/assert.hpp>
 #include <boost/foreach.hpp>
 
@@ -102,10 +106,29 @@ insula::model::backend::camera() const
 	return camera_;
 }
 
+/*
 insula::graphics::shader::object &
 insula::model::backend::shader() const
 {
 	return shader_;
+}
+*/
+void
+insula::model::backend::modelview(
+	graphics::mat4 const &m)
+{
+	shader_.set_uniform(
+		"mvp",
+		camera().perspective() *
+		m);
+	shader_.set_uniform(
+		"mv",
+ 		m);
+	shader_.set_uniform(
+		"normal_matrix",
+ 		fcppt::math::matrix::transpose(
+			fcppt::math::matrix::inverse(
+				m)));
 }
 
 insula::model::object &

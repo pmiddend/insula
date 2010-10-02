@@ -1,14 +1,16 @@
 #version 140
 
 $$$HEADER$$$
-out vec2 texcoord_out;
+out vec2 texcoord_interp;
+out vec4 eye_space_interp;
+out vec3 normal_interp;
 
 void main()
 {
-	vec4 result = 
-		mvp * 
-		vec4(position,1.0);
-
-	gl_Position = result;
-	texcoord_out = texcoord;
+	gl_Position = 
+		mvp 
+			* vec4(position,1.0);
+	texcoord_interp = texcoord;
+	normal_interp = vec3(normal_matrix * vec4(normal,0.0));
+	eye_space_interp = mv * vec4(position,1.0);
 }

@@ -23,10 +23,10 @@
 #include "../water/cli_factory.hpp"
 #include "../water/object.hpp"
 #include "../json/parse_font.hpp"
+#include "../json/parse_vector.hpp"
 #include "../exception.hpp"
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/make_shared_ptr.hpp>
-#include <fcppt/assign/make_container.hpp>
 #include <fcppt/text.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
 #include <sge/font/drawer_3d.hpp>
@@ -51,17 +51,32 @@ insula::states::game_outer::game_outer(
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"),
 		graphics::shader::vf_to_string<model::vf::format>(),
-		fcppt::assign::make_container<graphics::shader::variable_sequence>
-		(
+		{
 			graphics::shader::variable(
 				"mvp",
 				graphics::shader::variable_type::uniform,
-				graphics::mat4())),
-		fcppt::assign::make_container<graphics::shader::sampler_sequence>
-		(
-		graphics::shader::sampler(
-			"texture",
-			sge::renderer::texture_ptr()))),
+				graphics::mat4()),
+			graphics::shader::variable(
+				"mv",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4()),
+			graphics::shader::variable(
+				"normal_matrix",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4()), 
+			graphics::shader::variable(
+				"light_source",
+				graphics::shader::variable_type::const_,
+				json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
+					sge::parse::json::find_member_exn<sge::parse::json::array>(
+						context<machine>().config_file().members,
+						FCPPT_TEXT("light-source")))) 
+		},
+		{
+			graphics::shader::sampler(
+				"texture",
+				sge::renderer::texture_ptr())
+		}),
 	scene_manager_(
 		context<machine>().camera()),
 	height_map_(
@@ -111,20 +126,6 @@ insula::states::game_outer::game_outer(
 			})),
 	broadphase_manager_(
 		context<machine>().camera()),
-/*
-	nugget_manager_(
-		nugget::parameters(
-			sge::parse::json::find_member_exn<sge::parse::json::object>(
-				context<machine>().config_file().members,
-				FCPPT_TEXT("nuggets")),
-			*height_map_,
-			water_->water_level(),
-			context<machine>().sounds(),
-			context<machine>().systems(),
-			context<machine>().camera(),
-			model_shader_,
-			scene_manager_,
-			broadphase_manager_)),*/
 	prop_manager_(
 		prop::parameters(
 			context<machine>().config_file(),

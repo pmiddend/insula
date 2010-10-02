@@ -8,6 +8,7 @@
 - Besserer Charactercontroller: http://code.google.com/p/bullet/issues/detail?id=198
 - Weiterer CC: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=5712
 - Landschaftsgenerierung http://www.dungeonleague.com/page/2/
+- Neue AA-Methode: http://www.gamedev.net/community/forums/topic.asp?topic_id=580517
 * Ideen für später
 ** TODO Terrain zufallsgenerieren
 ** TODO Farben statt Texturen bei Höhenfeld verwenden
@@ -34,7 +35,9 @@ Hierzu z.B. cgal
 ** TODO scene von intrusive auf was besseres umstellen
 Eine instance trägt sich selber ein und aus und kriegt das Backend im
 Konstruktor.
-** TODO Die Kamera fixen
+** TODO =camera::perspective= in =camera::projection= umbenennen
+** DONE Die Kamera fixen
+	 CLOSED: [2010-10-02 Sat 16:52]
 Eine Egoshooterkamera funktioniert so: wenn die Maus auf der x-Achse
 bewegt wird, werden alle drei Gizmovektoren um $(0,1,0)$ gedreht
 * Aktivitäten
@@ -106,6 +109,8 @@ noch überlegen.
 ** TODO Mehr Musik
 ** TODO Persistente Konsolenhistory
 ** TODO Partikelsystem
+** TODO cli_options weitestgehend loswerden
+Das meiste kann durch json ersetzt werden
 ** TODO vehiclecode kompakter machen
 Momentan hat man mit =vehicle::parameters= eine riesige Klasse und in
 =json::parse_vehicle= wird auch viel zu viel rumgereicht

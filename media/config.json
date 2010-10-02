@@ -83,6 +83,7 @@
  },
 
 	"remaining-time" : 20000,
+	"light-source" : [1000.0,1000.0,1000.0],
 
 	"props" :
 	[

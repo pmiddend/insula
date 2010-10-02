@@ -3,6 +3,7 @@
 
 #include "../scene/backend.hpp"
 #include "../graphics/shader/object_fwd.hpp"
+#include "../graphics/mat4.hpp"
 #include "../graphics/camera/object_fwd.hpp"
 #include "shared_object_ptr.hpp"
 #include <sge/renderer/glsl/string.hpp>
@@ -51,8 +52,13 @@ public:
 	graphics::camera::object const &
 	camera() const;
 
+	void
+	modelview(
+		graphics::mat4 const &);
+	/*
 	graphics::shader::object &
 	shader() const;
+	*/
 
 	insula::model::object &
 	model() const;
