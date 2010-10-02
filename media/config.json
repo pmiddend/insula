@@ -82,6 +82,8 @@
 		"floating_height" : 1.0
  },
 
+	"remaining-time" : 20000,
+
 	"props" :
 	[
 		{

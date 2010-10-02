@@ -5,6 +5,7 @@
 #include "../events/render.hpp"
 #include "../events/key.hpp"
 #include "../sound_controller.hpp"
+#include "../milliseconds_to_string.hpp"
 #include <sge/font/draw_text.hpp>
 #include <sge/font/text_part.hpp>
 #include <sge/font/align_h.hpp>
@@ -14,6 +15,10 @@
 #include <sge/input/key_code.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/font/pos.hpp>
+#include <sge/parse/json/find_member_exn.hpp>
+#include <sge/parse/json/object.hpp>
+#include <sge/parse/json/array.hpp>
+#include <sge/parse/json/int_type.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/text.hpp>
@@ -22,7 +27,12 @@ insula::states::pregame::pregame(
 	my_context ctx)
 :
 	my_base(
-		ctx)
+		ctx),
+	remaining_time_(
+		static_cast<std::chrono::milliseconds::rep>(
+			sge::parse::json::find_member_exn<sge::parse::json::int_type>(
+				context<machine>().config_file().members,
+				FCPPT_TEXT("remaining-time"))))
 {
 	context<machine>().sounds().play(
 		FCPPT_TEXT("plop"));
@@ -64,11 +74,11 @@ insula::states::pregame::react(
 		sge::font::align_v::center,
 		sge::font::flags::none);
 
-	/*
 	sge::font::draw_text(
 		context<game_outer>().large_font(),
 		context<game_outer>().font_drawer(),
-		context<game_inner>().turn_timer().string(),
+		milliseconds_to_string(
+			remaining_time_),
 		sge::font::pos::null(),
 		sge::font::dim(
 			static_cast<sge::font::unit>(
@@ -81,7 +91,6 @@ insula::states::pregame::react(
 		sge::font::align_h::center,
 		sge::font::align_v::center,
 		sge::font::flags::none);
-	*/
 
 	return discard_event();
 }
@@ -93,7 +102,9 @@ insula::states::pregame::react(
 	if (r.pair().key().code() == sge::input::kc::key_return)
 	{
 		fcppt::io::cout << FCPPT_TEXT("Return pressed, now switching to running\n");
-		return transit<running>();
+		return 
+			transit<running>(
+				remaining_time_);
 	}
 
 	return discard_event();

@@ -3,15 +3,17 @@
 
 // _fwd is not enough
 #include "game_inner.hpp"
+#include "../turn_timer.hpp"
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
-#include "../events/nuggets_empty.hpp"
+#include "../events/timer_expired.hpp"
 #include "../events/key.hpp"
 #include "../arrow.hpp"
 #include <fcppt/signal/scoped_connection.hpp>
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
+#include <chrono>
 
 namespace insula
 {
@@ -27,14 +29,15 @@ public:
 	<
 		boost::statechart::custom_reaction<events::tick>,
 		boost::statechart::custom_reaction<events::render>,
-		boost::statechart::custom_reaction<events::nuggets_empty>,
+		boost::statechart::custom_reaction<events::timer_expired>,
 		boost::statechart::custom_reaction<events::key>
 	> 
 	reactions;
 
 	explicit
 	running(
-		my_context);
+		my_context,
+		std::chrono::milliseconds remaining_time);
 
 	boost::statechart::result
 	react(
@@ -46,14 +49,20 @@ public:
 
 	boost::statechart::result
 	react(
-		events::nuggets_empty const &);
+		events::timer_expired const &);
 
 	boost::statechart::result
 	react(
 		events::key const &);
 private:
 	arrow arrow_;
-	//fcppt::signal::scoped_connection vehicle_crash_connection_;
+	turn_timer timer_;
+	fcppt::signal::scoped_connection nugget_callback_;
+
+	void
+	nugget_callback(
+		physics::rigid::object &,
+		physics::rigid::object &);
 };
 }
 }

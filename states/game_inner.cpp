@@ -16,7 +16,6 @@
 #include "../player/parameters.hpp"
 #include "../projectile/manager_parameters.hpp"
 #include "../nugget/parameters.hpp"
-#include "../events/nuggets_empty.hpp"
 #include <sge/console/object.hpp>
 #include <sge/image/create_texture.hpp>
 #include <sge/renderer/filter/linear.hpp>
@@ -147,20 +146,6 @@ insula::states::game_inner::physics_world()
 {
 	return physics_world_;
 }
-
-/*
-insula::nugget::instance &
-insula::states::game_inner::nugget_instance()
-{
-	return *nuggets_;
-}
-
-insula::nugget::instance const &
-insula::states::game_inner::nugget_instance() const
-{
-	return *nuggets_;
-}
-*/
 
 insula::player::object &
 insula::states::game_inner::player()

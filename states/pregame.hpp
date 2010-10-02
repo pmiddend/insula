@@ -9,14 +9,15 @@
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list/list10.hpp>
+#include <chrono>
 
 namespace insula
 {
 namespace states
 {
 /**
-	In this state, the camera is locked on to the vehicle and we are
-	just waiting for the current player to press the start button
+	In this state, the camera is in the first person perspective and we
+	are just waiting for the current player to press the start button.
  */
 class pregame
 :
@@ -48,6 +49,7 @@ public:
 	react(
 		events::key const &);
 private:
+	std::chrono::milliseconds remaining_time_;
 };
 }
 }

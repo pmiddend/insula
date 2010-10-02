@@ -8,6 +8,7 @@
 #include "../physics/world.hpp"
 #include "../sound_controller.hpp"
 #include "../music_controller.hpp"
+#include "../milliseconds_to_string.hpp"
 #include <sge/font/draw_text.hpp>
 #include <sge/font/text_part.hpp>
 #include <sge/font/align_h.hpp>
@@ -24,7 +25,8 @@
 #include "../physics/height_map.hpp"
 
 insula::states::running::running(
-	my_context ctx)
+	my_context ctx,
+	std::chrono::milliseconds const remaining_time)
 :
 	my_base(
 		ctx),
@@ -42,20 +44,22 @@ insula::states::running::running(
 					this->context<game_inner>().nuggets().closest_nugget(
 						this->context<machine>().camera().gizmo().position()) 
 						- this->context<machine>().camera().gizmo().position();
-			}))
-	/*
-	vehicle_crash_connection_(
+			})),
+	timer_(
+		remaining_time),
+	nugget_callback_(
 		context<game_inner>().physics_world().register_callback
 		<
-			physics::vehicle::object,
-			physics::height_map
+			physics::rigid::object,
+			physics::rigid::object
 		>(
-			physics::object_type::vehicle,
-			physics::object_type::height_map,
-			[this](physics::vehicle::object &,physics::height_map &)
-			{
-				this->context<machine>().sounds().play(FCPPT_TEXT("crash"));
-			}))*/
+			physics::object_type::nugget,
+			physics::object_type::projectile,
+			std::bind(
+				&running::nugget_callback,
+				this,
+				std::placeholders::_1,
+				std::placeholders::_2)))
 {
 	context<machine>().sounds().play(
 		FCPPT_TEXT("honk"));
@@ -79,6 +83,10 @@ insula::states::running::react(
 	context<game_inner>().player().update(
 		t.delta());
 
+	if (timer_.expired())
+		post_event(
+			events::timer_expired());
+
 	return discard_event();
 }
 
@@ -93,12 +101,12 @@ insula::states::running::react(
 		r);
 
 	arrow_.render();
-/*
 
 	sge::font::draw_text(
 		context<game_outer>().large_font(),
 		context<game_outer>().font_drawer(),
-		context<game_inner>().turn_timer().string(),
+		milliseconds_to_string(
+			timer_.milliseconds_remaining()),
 		sge::font::pos::null(),
 		sge::font::dim(
 			static_cast<sge::font::unit>(
@@ -112,15 +120,12 @@ insula::states::running::react(
 		sge::font::align_v::center,
 		sge::font::flags::none);
 
-	context<game_inner>().vehicle().render();
-*/
-
 	return discard_event();
 }
 
 boost::statechart::result
 insula::states::running::react(
-	events::nuggets_empty const &)
+	events::timer_expired const &)
 {
 	/*
 	context<game_inner>().turn_timer().stop();
@@ -136,4 +141,14 @@ insula::states::running::react(
 	events::key const &)
 {
 	return discard_event();
+}
+
+void
+insula::states::running::nugget_callback(
+	physics::rigid::object &,
+	physics::rigid::object &)
+{
+	timer_.add_to_remaining(
+		std::chrono::milliseconds(
+			2000));
 }
