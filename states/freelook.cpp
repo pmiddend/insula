@@ -37,6 +37,7 @@ insula::states::freelook::freelook(
 	my_base(
 		ctx),
 	player_backend_(
+		context<game_outer>().scene_manager(),
 		false,
 		context<machine>().systems().renderer(),
 		context<machine>().camera(),

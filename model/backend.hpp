@@ -2,6 +2,7 @@
 #define INSULA_MODEL_BACKEND_HPP_INCLUDED
 
 #include "../scene/backend.hpp"
+#include "../scene/manager_fwd.hpp"
 #include "../graphics/shader/object_fwd.hpp"
 #include "../graphics/mat4.hpp"
 #include "../graphics/camera/object_fwd.hpp"
@@ -33,6 +34,7 @@ public:
 
 	explicit
 	backend(
+		scene::manager &,
 		bool has_transparency,
 		sge::renderer::device_ptr,
 		graphics::camera::object const &,

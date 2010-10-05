@@ -39,15 +39,6 @@
 			"stretching" : 2
 		},
 
-		"skydome" : 
-		{
-			"latitudes" : 8,
-			"longitudes" : 8,
-			"angle" : 90,
-			"color0" : [0.765,0.87,1],
-			"color1" : [0,0,1]
-		},
-
 		"graphics" : 
 		{
 			"screen-size" : [1024,768]
@@ -147,6 +138,16 @@
 		"metrics" : "default.ttf",
 		"size" : 30 
 	},
+
+	"skydome" : 
+	{
+		"lats" : 8,
+		"lons" : 8,
+		"angle" : 90.0,
+		"color0" : [0.765,0.87,1.0],
+		"color1" : [0.0,0.0,1.0]
+	},
+
 
 	"arrow" : 
 	{

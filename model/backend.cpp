@@ -19,6 +19,7 @@
 #include <boost/foreach.hpp>
 
 insula::model::backend::backend(
+	scene::manager &manager,
 	bool _has_transparency,
 	sge::renderer::device_ptr _renderer,
 	graphics::camera::object const &_camera,
@@ -26,6 +27,8 @@ insula::model::backend::backend(
 	texture_map const &_textures,
 	model::shared_object_ptr _model)
 :
+	scene::backend(
+		manager),
 	has_transparency_(
 		_has_transparency),
 	renderer_(

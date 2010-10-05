@@ -2,9 +2,9 @@
 #define INSULA_SKYDOME_OBJECT_HPP_INCLUDED
 
 #include "size_type.hpp"
-#include "gradient.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../graphics/shader/object.hpp"
+#include "parameters_fwd.hpp"
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
@@ -24,22 +24,10 @@ public:
 
 	explicit
 	object(
-		graphics::camera::object const &,
-		sge::renderer::device_ptr,
-		graphics::scalar angle_in_degrees,
-		// von oben nach unten
-		size_type iterations_latitude,
-		size_type iterations_longitude,
-		insula::skydome::gradient const &);
+		parameters const &);
 	
 	void
 	render();
-
-	void
-	regenerate_buffer(
-		graphics::scalar,
-		size_type,
-		size_type);
 
 	~object();
 private:
@@ -49,7 +37,6 @@ private:
 	sge::renderer::index_buffer_ptr ib_;
 	graphics::shader::object shader_;
 	graphics::mat4 const perspective_;
-	insula::skydome::gradient gradient_;
 };
 }
 }

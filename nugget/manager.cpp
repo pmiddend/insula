@@ -48,6 +48,7 @@ insula::nugget::manager::manager(
 	height_map_(
 		params.height_map),
 	backend_(
+		params.scene_manager,
 		// transparency is removed for now
 		false,
 		params.systems.renderer(),

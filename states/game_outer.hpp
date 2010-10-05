@@ -6,7 +6,7 @@
 #include "../machine.hpp"
 #include "../height_map/object_ptr.hpp"
 #include "../height_map/object_fwd.hpp"
-#include "../skydome/object_ptr.hpp"
+#include "../skydome/object.hpp"
 #include "../water/object_ptr.hpp"
 #include "../scene/manager.hpp"
 #include "../graphics/shader/shared_object_ptr.hpp"
@@ -130,7 +130,7 @@ private:
 	graphics::shader::shared_object_ptr model_shader_;
 	scene::manager scene_manager_;
 	insula::height_map::object_ptr height_map_;
-	skydome::object_ptr skydome_;
+	skydome::object skydome_;
 	insula::water::object_ptr water_;
 	// This could also be in the machine, it's arbitrarily placed here
 	sge::font::metrics_ptr large_font_;

@@ -95,6 +95,7 @@ insula::ghost::manager::parse_single(
 	// This is the same as with nuggets and props
 	backends_.push_back(
 		new model::backend(
+			params.scene_manager,
 			// ghosts are not transparent right now
 			false,
 			params.systems.renderer(),

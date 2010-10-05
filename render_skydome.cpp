@@ -4,9 +4,7 @@
 #include "graphics/camera/object.hpp"
 #include "graphics/camera/cli_options.hpp"
 #include "graphics/camera/cli_factory.hpp"
-#include "skydome/cli_options.hpp"
 #include "skydome/object.hpp"
-#include "skydome/cli_factory.hpp"
 #include "console/object.hpp"
 #include "input_delegator.hpp"
 #include <sge/log/global.hpp>

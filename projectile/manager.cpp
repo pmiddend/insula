@@ -23,6 +23,7 @@ insula::projectile::manager::manager(
 	manager_parameters const &params)
 :
 	backend_(
+		params.scene_manager,
 		// transparency
 		false,
 		params.systems.renderer(),

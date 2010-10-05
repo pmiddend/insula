@@ -6,8 +6,8 @@
 #include "../height_map/cli_factory.hpp"
 #include "../stdlib/map.hpp"
 #include "../height_map/object.hpp"
-#include "../skydome/cli_factory.hpp"
 #include "../skydome/object.hpp"
+#include "../skydome/parameters.hpp"
 #include "../nugget/parameters.hpp"
 #include "../prop/parameters.hpp"
 #include "../water/cli_factory.hpp"
@@ -52,10 +52,12 @@ insula::states::game_outer::game_outer(
 			context<machine>().systems().renderer(),
 			context<machine>().systems().image_loader())),
 	skydome_(
-		skydome::cli_factory(
-			context<machine>().cli_variables(),
+		skydome::parameters(
+			sge::parse::json::find_member_exn<sge::parse::json::object>(
+				context<machine>().config_file().members,
+				FCPPT_TEXT("skydome")),
 			context<machine>().camera(),
-			context<machine>().systems().renderer())),
+			context<machine>().systems())),
 	water_(
 		insula::water::cli_factory(
 			context<machine>().cli_variables(),
@@ -141,7 +143,7 @@ insula::states::game_outer::react(
 	water_->update_reflection(
 		[&skydome_,&height_map_,&water_]()
 		{
-			skydome_->render();
+			skydome_.render();
 			height_map_->render(
 				sge::renderer::state::cull_mode::off,
 				water_->water_level());
@@ -154,7 +156,7 @@ void
 insula::states::game_outer::react(
 	events::render const &)
 {
-	skydome_->render();
+	skydome_.render();
 	height_map_->render(
 		sge::renderer::state::cull_mode::back);
 	water_->render();

@@ -43,6 +43,8 @@ public:
 
 	~manager();
 private:
+	friend class backend;
+
 	typedef
 	boost::intrusive::list
 	<
@@ -92,6 +94,14 @@ private:
 
 	void
 	render_transparent();
+
+	void
+	add(
+		backend &);
+
+	void
+	remove(
+		backend &);
 };
 }
 }

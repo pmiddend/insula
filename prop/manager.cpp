@@ -105,6 +105,7 @@ insula::prop::manager::parse_single_prop(
 
 	backends_.push_back(
 		new model::backend(
+			params.scene_manager,
 			// transparency is removed for now
 			false,
 			params.systems.renderer(),

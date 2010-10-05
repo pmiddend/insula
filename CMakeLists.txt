@@ -101,12 +101,9 @@ textures/weights.cpp
 textures/blend.cpp) 
 SET(console_files console/streambuf.cpp
 console/object.cpp)
-SET(skydome_files skydome/cli_options.cpp
-skydome/cli_factory.cpp
+SET(skydome_files
 skydome/object.cpp
-skydome/sphere_point.cpp
-skydome/color_to_vec3.cpp
-skydome/vec3_to_color.cpp)
+skydome/sphere_point.cpp)
 SET(water_files water/cli_options.cpp
 water/cli_factory.cpp
 water/object.cpp)
@@ -199,7 +196,6 @@ CREATE_INSULA_EXE(shadow_map)
 CREATE_INSULA_EXE(render_height_map)
 CREATE_INSULA_EXE(point_sprite_test)
 #CREATE_INSULA_EXE(render_scene)
-CREATE_INSULA_EXE(render_skydome)
 CREATE_INSULA_EXE(generate_height_texture)
 CREATE_INSULA_EXE(motor_sounds)
 CREATE_INSULA_EXE(music_test)

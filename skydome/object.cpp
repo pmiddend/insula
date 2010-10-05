@@ -1,9 +1,10 @@
 #include "sphere_point.hpp"
 #include "object.hpp"
-#include "color_to_vec3.hpp"
+#include "parameters.hpp"
 #include "vf/packed_position.hpp"
 #include "vf/format.hpp"
 #include "vf/vertex_view.hpp"
+#include "../json/parse_vector.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../graphics/shader/scoped.hpp"
@@ -39,6 +40,14 @@
 #include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/scoped_index_lock.hpp>
 #include <sge/renderer/lock_mode.hpp>
+#include <sge/parse/json/object.hpp>
+#include <sge/parse/json/array.hpp>
+#include <sge/parse/json/find_member_exn.hpp>
+#include <sge/parse/json/float_type.hpp>
+#include <sge/parse/json/int_type.hpp>
+#include <sge/image/color/init.hpp>
+#include <sge/image/color/rgba32f.hpp>
+#include <sge/systems/instance.hpp>
 #include <sge/image/file.hpp>
 #include <fcppt/math/matrix/transpose.hpp>
 #include <fcppt/math/vector/arithmetic.hpp>
@@ -56,7 +65,6 @@
 #include <fcppt/assert.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
-#include <fcppt/assign/make_container.hpp>
 
 #include <fcppt/math/matrix/perspective.hpp>
 
@@ -177,29 +185,22 @@ public:
 }
 
 insula::skydome::object::object(
-	graphics::camera::object const &_camera,
-	sge::renderer::device_ptr const _renderer,
-	graphics::scalar const angle,
-	size_type const iterations_lat,
-	size_type const iterations_long,
-	insula::skydome::gradient const &_gradient)
+	parameters const &params)
 :
 	camera_(
-		_camera),
+		params.camera),
 	renderer_(
-		_renderer),
+		params.systems.renderer()),
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("skydome_vertex.glsl"),
 		media_path()/FCPPT_TEXT("skydome_fragment.glsl"),
 		graphics::shader::vf_to_string<vf::format>(),
-		fcppt::assign::make_container<graphics::shader::variable_sequence>
-		(
+		{
 			graphics::shader::variable(
 				"mvp",
 				graphics::shader::variable_type::uniform,
-				graphics::mat4()))
-		(
+				graphics::mat4()),
 			graphics::shader::variable(
 				"sun_position",
 				graphics::shader::variable_type::const_,
@@ -208,97 +209,69 @@ insula::skydome::object::object(
 					fcppt::math::deg_to_rad(
 						static_cast<graphics::scalar>(20)),
 					fcppt::math::deg_to_rad(
-						static_cast<graphics::scalar>(0)))))
-		(
+						static_cast<graphics::scalar>(0)))),
 			graphics::shader::variable(
 				"color0",
 				graphics::shader::variable_type::const_,
-				color_to_vec3(
-					std::get<0>(
-						_gradient))))
-		(
+				json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
+					sge::parse::json::find_member_exn<sge::parse::json::array>(
+						params.config_file.members,
+						FCPPT_TEXT("color0")))),
 			graphics::shader::variable(
 				"color1",
 				graphics::shader::variable_type::const_,
-				color_to_vec3(
-					std::get<1>(
-						_gradient)))),
+				json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
+					sge::parse::json::find_member_exn<sge::parse::json::array>(
+						params.config_file.members,
+						FCPPT_TEXT("color1"))))
+		},
 		graphics::shader::sampler_sequence()),
 	perspective_(
 		fcppt::math::matrix::perspective(
 			camera_.aspect(),
 			camera_.fov(),
 			0.1f,
-			3.0f)),
-	gradient_(
-		_gradient)
+			3.0f))
 {
+	graphics::vec3 const color0 = 	
+		json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
+			sge::parse::json::find_member_exn<sge::parse::json::array>(
+				params.config_file.members,
+				FCPPT_TEXT("color0")));
+
 	// _Permanently_ change the renderer's clear color (this could be a
 	// scoped_state, too)
 	renderer_->state(
 		sge::renderer::state::list
-			(sge::renderer::state::color::clear_color = std::get<0>(gradient_)));
+			(sge::renderer::state::color::clear_color = 
+				sge::image::color::rgba32f(
+					(sge::image::color::init::red %= color0[0])
+					(sge::image::color::init::green %= color0[1])
+					(sge::image::color::init::blue %= color0[2])
+					(sge::image::color::init::alpha %= 1.0))));
 
-	regenerate_buffer(
-		angle,
-		iterations_lat,
-		iterations_long);
-
-}
-
-void
-insula::skydome::object::render()
-{
-	// FIRST the shader, THEN the vertex buffer
-	graphics::shader::scoped scoped_shader_(
-		shader_);
-
-	sge::renderer::scoped_vertex_buffer const scoped_vb_(
-		renderer_,
-		vb_);
-
-	// We have to set our own perspective matrix here because near and far
-	// might be ill-chosen by the user (at least for the skydome)
-	shader_.set_uniform(
-		FCPPT_TEXT("mvp"),
-		perspective_ * camera_.rotation());
-
-	sge::renderer::state::scoped scoped_state(
-		renderer_,
-		sge::renderer::state::list
-		 	(sge::renderer::state::cull_mode::off)
-		 	(sge::renderer::state::depth_func::off));
-
-	renderer_->render(
-		ib_,
-		sge::renderer::first_vertex(
-			0),
-		sge::renderer::vertex_count(
-			vb_->size()),
-		sge::renderer::indexed_primitive_type::triangle,
-		sge::renderer::primitive_count(
-			ib_->size() / 3),
-		sge::renderer::first_index(
-			0));
-}
-
-void
-insula::skydome::object::regenerate_buffer(
-	graphics::scalar,
-	size_type const lats,
-	size_type const lons)
-{
 	using graphics::scalar; 
+
+	scalar const radius = 
+		static_cast<scalar>(
+			1);
+
+	size_type const 
+		lats = 
+			sge::parse::json::find_member_exn<sge::parse::json::int_type>(
+				params.config_file.members,
+				FCPPT_TEXT("lats")),
+		lons = 
+			sge::parse::json::find_member_exn<sge::parse::json::int_type>(
+				params.config_file.members,
+				FCPPT_TEXT("lons"));
+
 
 	// We have to activate the shader here because we want to fill the
 	// vertex buffer with "custom" attributes.
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
-
-	scalar const radius = 
-		static_cast<scalar>(
-			1);
 
 	vb_ = 
 		renderer_->create_vertex_buffer(
@@ -399,6 +372,42 @@ insula::skydome::object::regenerate_buffer(
 		sge::renderer::scoped_index_lock(
 			ib_,
 			sge::renderer::lock_mode::writeonly).value().any());
+}
+
+void
+insula::skydome::object::render()
+{
+	// FIRST the shader, THEN the vertex buffer
+	graphics::shader::scoped scoped_shader_(
+		shader_);
+
+	sge::renderer::scoped_vertex_buffer const scoped_vb_(
+		renderer_,
+		vb_);
+
+	// We have to set our own perspective matrix here because near and far
+	// might be ill-chosen by the user (at least for the skydome)
+	shader_.set_uniform(
+		FCPPT_TEXT("mvp"),
+		perspective_ * camera_.rotation());
+
+	sge::renderer::state::scoped scoped_state(
+		renderer_,
+		sge::renderer::state::list
+		 	(sge::renderer::state::cull_mode::off)
+		 	(sge::renderer::state::depth_func::off));
+
+	renderer_->render(
+		ib_,
+		sge::renderer::first_vertex(
+			0),
+		sge::renderer::vertex_count(
+			vb_->size()),
+		sge::renderer::indexed_primitive_type::triangle,
+		sge::renderer::primitive_count(
+			ib_->size() / 3),
+		sge::renderer::first_index(
+			0));
 }
 
 insula::skydome::object::~object() {}

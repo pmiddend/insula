@@ -52,15 +52,9 @@ insula::scene::manager::render()
 		backend_instance_map::value_type const &r,
 		backend_instance_map_)
 	{
-		// This is neccesary since a backend could have been destroyed and
-		// still lingers in the map. backends do not auto-unlink (for technical
-		// reasons, really; this might be fixed in the future)
+		// This is simply a performance enhancement
 		if (r.second->empty())
-		{
-			to_erase.push_back(
-				r.first);
 			continue;
-		}
 
 		scoped_backend scoped_backend_(
 			r.first);
@@ -83,6 +77,8 @@ insula::scene::manager::render()
 
 	render_transparent();
 }
+
+insula::scene::manager::~manager() {}
 
 void
 insula::scene::manager::render_transparent()
@@ -122,4 +118,20 @@ insula::scene::manager::render_transparent()
 	}
 }
 
-insula::scene::manager::~manager() {}
+void
+insula::scene::manager::add(
+	backend &b)
+{
+	backend_ptr bptr = &b;
+	backend_instance_map_.insert(
+		bptr,
+		new instance_list());
+}
+
+void
+insula::scene::manager::remove(
+	backend &b)
+{
+	backend_instance_map_.erase(
+		&b);
+}
