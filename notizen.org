@@ -1,3 +1,97 @@
+* Neues Konzept
+
+Objekte und Eigenschaften:
+
+- Models
+	- Normale mvp-Matrix der Kamera
+	- Entweder
+		- Normalmatrix
+	- Alternativ
+		- Shadowmap
+		- Shadow-mvp
+	- Eine Textur
+	- Doublesideculling
+- Skydome 
+	- Rotationsmatrix der Kamera
+	- Eigene Projektion (near und far müssen angepasst werden)
+	- Frontculling, Depthbuffer aus
+	- Muss zuerst gezeichnet werden
+	- Keine Textur
+- Terrain
+	- Normale mvp-Matrix der Kamera
+	- Mehrere Texturen
+	- Shadowmap
+- Partikel
+	- Normale mvp-Matrix der Kamera
+	- Alphablending
+	- Eine Textur
+- Wasser
+	- Normale mvp-Matrix der Kamera
+	- Spiegel-mvp
+	- Eine Textur
+
+Anforderungen:
+
+1. Das Terrain und der Skydome (und ggf. noch andere Komponenten)
+   werden aus der Unterwassersicht in das Wassertarget gerendert
+   (dabei muss bei einigen Komponenten das Culling korrigiert werden
+   und die Heightmap muss Clipping aktivieren)
+2. Alle statischen Komponenten werden mit einem Shadow-Shader in die
+   Shadowmap gerendert (dabei muss das Culling angepasst werden).
+3. Alle Komponenten werden in den Framebuffer gerendert
+4. Der Framebuffer wird mit einem PP-Filter als Quad gerendert (das
+   ist unabhängig von allem vorhergehenden)
+5. Das "Overlay" wird gerendert, d.h. die Schrift, die Konsole, usw.
+
+Ideen:
+
+- Klasse =scene::backend= hat die Methoden =begin/end=. Diese bekommen
+  jetzt ein Argument =pass= was den Renderpass angibt (=normal=,
+  =water=, =shadow=). Die können daraufhin den entsprechenden Shader
+  laden und die richtigen Flags setzen.
+- Ein Backend benötigt einen =int=, der seine Priorität angibt. So
+  kann man erzwingen, dass der Skydome als erstes gerendert wird.
+- Ein Backend kann auch einen Namen kriegen, damit man es einfacher
+  deaktivieren kann.
+- Ein Backend kann deaktiviert werden und wird dann übergangen.
+- Eine Instance kann auch deaktiviert werden und wird dann übergangen.
+- Ein *Pass* könnte jetzt eine Funktion sein, die bestimmte
+  Backends/Instanzen deaktiviert und danach
+  =scene::manager::render(pass)= aufruft. Oder eine Klasse mit begin/end
+
+- Wasser-Pass: 
+	- Deaktiviere Wasserbackend
+	- Ggf. deaktiviere Modelbackend
+	- Setze Target auf interne Textur
+	- Setze Unterwasserkamera
+	- =scene::render(passes::water)=
+		- Die Heightmap setzt Clippingplane und wechselt das Culling (zu
+      =both=)
+		- Skydome reagiert nicht darauf und rendert sich ganz normal
+		- Alles andere ist deaktiviert (Models könnten auch gezeichnet werden)
+- Shadow-Pass:
+	- Deaktiviere ggf. Nuggets (einzeln?)
+	- Setze Target auf Shadowtextur
+	- Setze Sonnenkamera, Projektion auf Orthogonal?
+	- =scene::render(passes::shadow)=
+		- Terrain setzt Shadowshader
+
+Probleme:
+- Wie behandelt man die beiden Shader "normal" und "shadow"? Simple
+  Lösung: Jedes Backend erstellt zwei Shader. Aber dann müsste man den
+  kompletten "Prelude" zweimal erstellen mit Variablen und Samplern.
+
+* Vorgehen
+- Shadowmaps einbauen. Auf die Weise spart man es sich vielleicht,
+  sich über die zentrale Speicherstelle für die Beleuchtungsvariablen
+  zu kümmern.
+- Gucken ob Shadowmaps jedes Frame generiert werden können. Falls
+  nein, über Blob Shadows informieren.
+- Nebel einbauen
+- Postprocessingeffekt einbauen - aber nur zum Test. Wenn's nicht gut
+  aussieht, wieder wegnehmen.
+- Terrain-Autogenerierung oder einfach Ersetzung der Texturen durch
+  Farben angehen
 * Links
 - Zwei Fixes für raycastvehicle: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
 - Frustum/Occlusion culling: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
@@ -15,20 +109,12 @@
 Motivation hierzu: [[http://simblob.blogspot.com/2010/09/polygon-map-generation-part-1.html][von hier]]
 ** TODO LOD für Models
 ** TODO Steuerung konfigurierbar machen
-** TODO Pfeil einbauen, der die Richtung weist
-Dieser Pfeil könnte z.B. in die "durchschnittliche" Richtung zeigen,
-wo noch viele Nuggets zu finden sind.
 ** TODO Terrainvereinfachung
 Hierzu z.B. cgal
 * Kleinere Sachen
-** DONE cout/cerr zu Konsole weiterleiten
-	 CLOSED: [2010-09-11 Sat 01:01]
-** TODO foldl in gameover durch accumulate ersetzen
-** TODO height_map/calculate_point etc. dokumentieren und ggf. verbessern
 ** TODO gizmo in math verfrachten
 ** TODO orthonormalize_gram_schmidt hinzufügen und gucken wie's läuft
 ** TODO machine::input_repeat_callback fixen
-** TODO Präfixe in config.json auf Sektionen in json abbilden
 ** TODO fcppt::assign durch initializer_list ersetzen
 ** TODO height_map und water mit parameters-Klassen ausstatten
 ** TODO Die Nuggets sollten sich schön drehen
@@ -36,6 +122,14 @@ Hierzu z.B. cgal
 Eine instance trägt sich selber ein und aus und kriegt das Backend im
 Konstruktor.
 ** TODO =camera::perspective= in =camera::projection= umbenennen
+** DONE Präfixe in config.json auf Sektionen in json abbilden
+	 CLOSED: [2010-10-03 Sun 18:31]
+** DONE foldl in gameover durch accumulate ersetzen
+	 CLOSED: [2010-10-03 Sun 18:29]
+** DONE cout/cerr zu Konsole weiterleiten
+	 CLOSED: [2010-09-11 Sat 01:01]
+** DONE height_map/calculate_point etc. dokumentieren und ggf. verbessern
+	 CLOSED: [2010-10-02 Sat 18:36]
 ** DONE Die Kamera fixen
 	 CLOSED: [2010-10-02 Sat 16:52]
 Eine Egoshooterkamera funktioniert so: wenn die Maus auf der x-Achse
@@ -65,7 +159,6 @@ bewegt wird, werden alle drei Gizmovektoren um $(0,1,0)$ gedreht
   wie beim Wasser)
 - Vergleiche den z-Wert von vp mit dem z-Wert in der Shadowmap, setze
   entsprechend die Pixel
-** TODO Diffuses Modelshading
 ** TODO Neues Fontsystem
 Ziele:
 
@@ -105,17 +198,18 @@ Man könnte die Stats verallgemeinern: Ein "stat" ist eine textuelle
 Informationseinheit (z.B. Geschwindigkeit des Vehikels), die scoped
 beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
-** TODO Musiklautstärke muss einstellbar sein
 ** TODO Mehr Musik
 ** TODO Persistente Konsolenhistory
 ** TODO Partikelsystem
+** TODO Props/Ghosts sollen sich Normale anpassen können
 ** TODO cli_options weitestgehend loswerden
 Das meiste kann durch json ersetzt werden
-** TODO vehiclecode kompakter machen
-Momentan hat man mit =vehicle::parameters= eine riesige Klasse und in
-=json::parse_vehicle= wird auch viel zu viel rumgereicht
 ** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
+** DONE Diffuses Modelshading
+	 CLOSED: [2010-10-02 Sat 18:34]
+** DONE Musiklautstärke muss einstellbar sein
+	 CLOSED: [2010-10-02 Sat 18:34]
 ** DONE Nuggets aus game_inner rausziehen
 	 CLOSED: [2010-09-17 Fri 19:40]
 ** DONE "Nugget-Indikatoren" einbauen

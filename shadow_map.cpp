@@ -1,3 +1,4 @@
+#if 0
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/vec2.hpp"
@@ -10,6 +11,7 @@
 #include "graphics/shader/scoped.hpp"
 #include "graphics/cli_options.hpp"
 #include "graphics/rect.hpp"
+#include "model/create_shader.hpp"
 #include "console/object.hpp"
 #include "gizmo/rotation_to_mat4.hpp"
 #include "timed_output.hpp"
@@ -199,8 +201,7 @@ public:
 		insula::graphics::rect const &extents,
 		sge::renderer::device_ptr _renderer,
 		insula::graphics::camera::object &_camera,
-		insula::graphics::mat4 const &mvp_sun,
-		sge::renderer::texture_ptr test_texture)
+		insula::graphics::mat4 const &mvp_sun)
 	:
 		renderer_(
 			_renderer),
@@ -219,9 +220,11 @@ public:
 			},
 			{}),
 		depth_texture_(
-			renderer_->create_depth_stencil_texture(
-				sge::renderer::dim_type(512,512),
-				sge::renderer::depth_stencil_format::d32)),
+			renderer_->create_texture(
+				sge::renderer::dim_type(2048,2048),
+				sge::image::color::format::rgb32f,
+				sge::renderer::filter::linear,
+				sge::renderer::resource_flags::none)),
 		alt_shader_(
 			renderer_,
 			insula::media_path()/FCPPT_TEXT("shadow_alt_vertex.glsl"),
@@ -380,7 +383,7 @@ public:
 	sge::renderer::device_ptr renderer_;
 	insula::graphics::camera::object &camera_;
 	insula::graphics::shader::object shader_;
-	sge::renderer::depth_stencil_texture_ptr depth_texture_;
+	sge::renderer::texture_ptr depth_texture_;
 	insula::graphics::shader::object alt_shader_;
 	sge::renderer::vertex_buffer_ptr vb_;
 };
@@ -508,22 +511,10 @@ try
 				sge::renderer::filter::linear,
 				sge::renderer::resource_flags::none);
 
-	graphics::shader::object model_shader(
-		sys.renderer(),
-		media_path()/FCPPT_TEXT("model_vertex.glsl"),
-		media_path()/FCPPT_TEXT("model_fragment.glsl"),
-		graphics::shader::vf_to_string<model::vf::format>(),
-		fcppt::assign::make_container<graphics::shader::variable_sequence>
-		(
-			graphics::shader::variable(
-				"mvp",
-				graphics::shader::variable_type::uniform,
-				graphics::mat4())),
-		fcppt::assign::make_container<graphics::shader::sampler_sequence>
-		(
-			graphics::shader::sampler(
-				"texture",
-				model_texture)));
+	graphics::shader::shared_object_ptr model_shader = 
+		model::create_shader(
+			sys.renderer(),
+			graphics::vec3(1,1,1));
 
 	model::object model(
 		model_object,
@@ -558,8 +549,8 @@ try
 
 	quad ground_object(
 		insula::graphics::rect(
-			insula::graphics::vec2(-5,-5),
-			insula::graphics::dim2(10,10)),
+			insula::graphics::vec2(-500,-500),
+			insula::graphics::dim2(1000,1000)),
 		sys.renderer(),
 		cam,
 		cam.perspective() * 
@@ -614,7 +605,7 @@ try
 	sys.renderer()->state(
 		sge::renderer::state::list
 		 	(sge::renderer::state::bool_::clear_backbuffer = true)
-			(sge::renderer::state::color::clear_color = sge::image::colors::black())
+			(sge::renderer::state::color::clear_color = sge::image::colors::white())
 			(sge::renderer::state::bool_::clear_zbuffer = true)
 		 	(sge::renderer::state::float_::zbuffer_clear_val = 1.0f)
 		 	(sge::renderer::state::bool_::write_to_zbuffer = true)
@@ -636,7 +627,7 @@ try
 			sys.renderer()->viewport(
 				sge::renderer::viewport(
 					sge::renderer::pixel_pos::null(),
-					sge::renderer::screen_size(512,512)));
+					sge::renderer::screen_size(2048,2048)));
 
 			sge::renderer::scoped_block const block_(
 				sys.renderer());
@@ -646,19 +637,19 @@ try
 
 			{
 				graphics::shader::scoped scoped_shader(
-					model_shader);
+					*model_shader);
 
 				model::scoped scoped_model(
 					sys.renderer(),
 					model);
 
-				model_shader.set_uniform(
+				model_shader->set_uniform(
 					"mvp",
 					cam.mvp());
 
 				model.render();
 
-				model_shader.set_uniform(
+				model_shader->set_uniform(
 					"mvp",
 					cam.mvp() * 
 					fcppt::math::matrix::translation(
@@ -695,18 +686,18 @@ try
 
 			{
 				graphics::shader::scoped scoped_shader(
-					model_shader);
+					*model_shader);
 
 				model::scoped scoped_model(
 					sys.renderer(),
 					model);
-				model_shader.set_uniform(
+				model_shader->set_uniform(
 					"mvp",
 					cam.mvp());
 
 				model.render();
 
-				model_shader.set_uniform(
+				model_shader->set_uniform(
 					"mvp",
 					cam.mvp() *
 					fcppt::math::matrix::translation(
@@ -736,3 +727,6 @@ catch(std::exception const &e)
 	std::cerr << e.what() << '\n';
 	return EXIT_FAILURE;
 }
+#endif
+
+int main() {}

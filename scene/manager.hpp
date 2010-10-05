@@ -37,6 +37,10 @@ public:
 	void
 	render();
 
+	void
+	register_pass(
+		);
+
 	~manager();
 private:
 	typedef
@@ -55,6 +59,24 @@ private:
 	>
 	backend_instance_map;
 
+/*
+	typedef
+	boost::intrusive::list
+	<
+		render_pass_base,
+		boost::intrusive::constant_time_size<false>
+	>
+	render_pass_list;
+
+	typedef
+	boost::ptr_map
+	<
+		render_pass::type,
+		render_pass_list
+	>
+	render_pass_map;
+*/
+
 	typedef
 	boost::intrusive::list
 	<
@@ -66,6 +88,7 @@ private:
 	graphics::camera::object &camera_;
 	backend_instance_map backend_instance_map_;
 	transparent_instance_list transparent_instances_;
+	//render_pass_map render_pass_map_;
 
 	void
 	render_transparent();

@@ -1,24 +1,14 @@
 #include "game_outer.hpp"
 #include "../random_seed.hpp"
-#include "../height_map/random_point.hpp"
-#include "../create_path.hpp"
-#include "../media_path.hpp"
+#include "../model/create_shader.hpp"
 #include "../get_option.hpp"
-#include "../random_seed.hpp"
 #include "../ghost/manager_parameters.hpp"
 #include "../height_map/cli_factory.hpp"
 #include "../stdlib/map.hpp"
 #include "../height_map/object.hpp"
 #include "../skydome/cli_factory.hpp"
 #include "../skydome/object.hpp"
-#include "../graphics/shader/variable_sequence.hpp"
-#include "../graphics/shader/variable.hpp"
-#include "../graphics/shader/variable_type.hpp"
-#include "../graphics/shader/sampler.hpp"
-#include "../graphics/shader/sampler_sequence.hpp"
-#include "../graphics/shader/vf_to_string.hpp"
 #include "../nugget/parameters.hpp"
-#include "../model/vf/format.hpp"
 #include "../prop/parameters.hpp"
 #include "../water/cli_factory.hpp"
 #include "../water/object.hpp"
@@ -47,36 +37,12 @@ insula::states::game_outer::game_outer(
 	my_base(
 		ctx),
 	model_shader_(
-		context<machine>().systems().renderer(),
-		media_path()/FCPPT_TEXT("model_vertex.glsl"),
-		media_path()/FCPPT_TEXT("model_fragment.glsl"),
-		graphics::shader::vf_to_string<model::vf::format>(),
-		{
-			graphics::shader::variable(
-				"mvp",
-				graphics::shader::variable_type::uniform,
-				graphics::mat4()),
-			graphics::shader::variable(
-				"mv",
-				graphics::shader::variable_type::uniform,
-				graphics::mat4()),
-			graphics::shader::variable(
-				"normal_matrix",
-				graphics::shader::variable_type::uniform,
-				graphics::mat4()), 
-			graphics::shader::variable(
-				"light_source",
-				graphics::shader::variable_type::const_,
-				json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
-					sge::parse::json::find_member_exn<sge::parse::json::array>(
-						context<machine>().config_file().members,
-						FCPPT_TEXT("light-source")))) 
-		},
-		{
-			graphics::shader::sampler(
-				"texture",
-				sge::renderer::texture_ptr())
-		}),
+		model::create_shader(
+			context<machine>().systems().renderer(),
+			json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
+				sge::parse::json::find_member_exn<sge::parse::json::array>(
+					context<machine>().config_file().members,
+					FCPPT_TEXT("light-source"))))),
 	scene_manager_(
 		context<machine>().camera()),
 	height_map_(
@@ -131,7 +97,7 @@ insula::states::game_outer::game_outer(
 			context<machine>().config_file(),
 			context<machine>().systems(),
 			context<machine>().camera(),
-			model_shader_,
+			*model_shader_,
 			*height_map_,
 			water_->water_level(),
 			scene_manager_,
@@ -145,7 +111,7 @@ insula::states::game_outer::game_outer(
 				FCPPT_TEXT("ghosts")),
 			context<machine>().systems(),
 			context<machine>().camera(),
-			model_shader_,
+			*model_shader_,
 			*height_map_,
 			static_cast<height_map::scalar>(
 				water_->water_level()))),
@@ -254,7 +220,7 @@ insula::states::game_outer::player_times() const
 insula::graphics::shader::object &
 insula::states::game_outer::model_shader()
 {
-	return model_shader_;
+	return *model_shader_;
 }
 
 insula::scene::manager &

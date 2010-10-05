@@ -121,9 +121,11 @@ insula::model::backend::modelview(
 		"mvp",
 		camera().perspective() *
 		m);
+	/*
 	shader_.set_uniform(
 		"mv",
  		m);
+	*/
 	shader_.set_uniform(
 		"normal_matrix",
  		fcppt::math::matrix::transpose(

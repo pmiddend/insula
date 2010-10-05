@@ -18,7 +18,7 @@
 		"terrain" :
 		{
 			"cell-size" : 5,
-			"height-scaling" : 250,
+			"height-scaling" : 500,
 			"height-map" : "test_256.png",
 			"gradient-texture" : "rock_512.png",
 			"height-texture-1" : "sand_512.png",
@@ -83,7 +83,7 @@
  },
 
 	"remaining-time" : 20000,
-	"light-source" : [1000.0,1000.0,1000.0],
+	"light-source" : [100.0,100.0,100.0],
 
 	"props" :
 	[

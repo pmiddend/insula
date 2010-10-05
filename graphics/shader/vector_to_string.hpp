@@ -3,6 +3,7 @@
 
 #include <sge/renderer/vf/vertex_size.hpp>
 #include <sge/renderer/glsl/string.hpp>
+#include <fcppt/lexical_cast.hpp>
 
 namespace insula
 {

@@ -3,7 +3,6 @@
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
 #include "../stdlib/map.hpp"
-#include "../stdlib/foldl.hpp"
 #include "../milliseconds_to_string.hpp"
 #include <sge/font/draw_text.hpp>
 #include <sge/font/text_part.hpp>
@@ -63,7 +62,10 @@ insula::states::gameover::react(
 	sge::font::draw_text(
 		context<game_outer>().large_font(),
 		context<game_outer>().font_drawer(),
-		stdlib::foldl(
+		std::accumulate(
+			times_.begin(),
+			times_.end(),
+			fcppt::string(FCPPT_TEXT("Score board: \n")),
 			[&place](
 				fcppt::string const &s,
 				time_table::value_type const &v)
@@ -74,9 +76,7 @@ insula::states::gameover::react(
 						% (place++)
 						% milliseconds_to_string(v.first)
 						% v.second).str();
-			},
-			fcppt::string(FCPPT_TEXT("Score board: \n")),
-			times_),
+			}),
 		sge::font::pos::null(),
 		fcppt::math::dim::structure_cast<sge::font::dim>(
 			context<machine>().systems().renderer()->screen_size()),

@@ -9,7 +9,7 @@
 #include "../skydome/object_ptr.hpp"
 #include "../water/object_ptr.hpp"
 #include "../scene/manager.hpp"
-#include "../graphics/shader/object.hpp"
+#include "../graphics/shader/shared_object_ptr.hpp"
 #include "../physics/broadphase/manager.hpp"
 #include "../nugget_sequence.hpp"
 // If this is omitted, insula.cpp complains about incomplete tick
@@ -127,7 +127,7 @@ private:
 	std::vector<fcppt::string>
 	player_sequence;
 
-	graphics::shader::object model_shader_;
+	graphics::shader::shared_object_ptr model_shader_;
 	scene::manager scene_manager_;
 	insula::height_map::object_ptr height_map_;
 	skydome::object_ptr skydome_;
