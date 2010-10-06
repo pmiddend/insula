@@ -12,6 +12,8 @@ namespace backend_priority
 /// disable z buffer. So it gets high priority, whereas everything
 /// else gets normal priority. I haven't got a use case for something
 /// else (low priority for example) yet.
+/// Note that higher priorities have lower numbers in this enum, see
+/// backend_comparator for an explanation
 enum type
 {
 	high,

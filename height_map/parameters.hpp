@@ -4,6 +4,7 @@
 #include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/vec3.hpp"
+#include "../scene/manager_fwd.hpp"
 #include "array.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/image/file_ptr.hpp>
@@ -27,6 +28,7 @@ public:
 	sge::image::file_ptr gradient_texture_image;
 	sge::image::file_ptr lower_texture_image;
 	sge::image::file_ptr upper_texture_image;
+	scene::manager &scene_manager;
 
 	explicit
 	parameters(
@@ -40,7 +42,8 @@ public:
 		graphics::scalar const texture_scaling,
 		sge::image::file_ptr const &gradient_texture_image,
 		sge::image::file_ptr const &lower_texture_image,
-		sge::image::file_ptr const &upper_texture_image)
+		sge::image::file_ptr const &upper_texture_image,
+		scene::manager &scene_manager)
 	:
 		camera(camera),
 		renderer(renderer),
@@ -52,7 +55,8 @@ public:
 		texture_scaling(texture_scaling),
 		gradient_texture_image(gradient_texture_image),
 		lower_texture_image(lower_texture_image),
-		upper_texture_image(upper_texture_image)
+		upper_texture_image(upper_texture_image),
+		scene_manager(scene_manager)
 	{
 	}
 };

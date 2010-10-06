@@ -22,7 +22,8 @@ insula::water::cli_factory(
 	sge::renderer::device_ptr const renderer,
 	graphics::camera::object &camera,
 	graphics::box const &extents,
-	sge::image::multi_loader &image_loader)
+	sge::image::multi_loader &image_loader,
+	scene::manager &scene_manager)
 {
 	return 
 		std::make_shared<object>(
@@ -43,5 +44,6 @@ insula::water::cli_factory(
 				media_path()/get_option<fcppt::string>(vm,"water-bump-map")),
 			get_option<graphics::scalar>(vm,"water-bump-scaling"),
 			get_option<graphics::scalar>(vm,"water-wave-height"),
-			get_option<graphics::scalar>(vm,"water-wind-speed"));
+			get_option<graphics::scalar>(vm,"water-wind-speed"),
+			scene_manager);
 }

@@ -5,6 +5,8 @@
 #include "../graphics/camera/object.hpp"
 #include "../graphics/shader/object.hpp"
 #include "parameters_fwd.hpp"
+#include "../scene/backend.hpp"
+#include "parameters_fwd.hpp"
 #include <fcppt/math/matrix/basic_impl.hpp>
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/vertex_buffer_ptr.hpp>
@@ -15,6 +17,8 @@ namespace insula
 namespace skydome
 {
 class object
+:
+	public scene::backend
 {
 public:
 	object(
@@ -25,9 +29,12 @@ public:
 	explicit
 	object(
 		parameters const &);
-	
+
 	void
-	render();
+	begin();
+
+	void 
+	end();
 
 	~object();
 private:

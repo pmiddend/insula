@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include "index_visitor.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../graphics/shader/vf_to_string.hpp"
@@ -24,7 +25,6 @@
 #include "dim2.hpp"
 #include "rect.hpp"
 #include "plane.hpp"
-#include "calculate_index_cell.hpp"
 #include "parameters.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
@@ -78,62 +78,11 @@
 #include <cmath>
 #include <algorithm>
 
-namespace
-{
-struct index_visitor
-{
-public:
-	typedef 
-	void 
-	result_type;
-
-	typedef 
-	insula::height_map::array::size_type
-	size_type;
-
-	explicit
-	index_visitor(
-		insula::height_map::array::dim const &_dim)
-	:
-		dim_(
-			_dim)
-	{
-	}
-
-	template<typename T>
-	result_type
-	operator()(
-		T const &t) const
-	{
-		typedef typename 
-		T::value_type 
-		value_type;
-
-		typename T::iterator it = t.begin();
-
-		for (size_type y = 0; y < static_cast<size_type>(dim_.h()-1); ++y)
-			for (size_type x = 0; x < static_cast<size_type>(dim_.w()-1); ++x)
-				BOOST_FOREACH(
-					value_type const i,
-					insula::height_map::calculate_index_cell<value_type>(
-						static_cast<value_type>(
-							x),
-						static_cast<value_type>(
-							y),
-						static_cast<value_type>(
-							dim_.w()),
-						static_cast<value_type>(
-							dim_.h())))
-					*it++ = i;
-	}
-private:
-	insula::height_map::array::dim dim_;
-};
-}
-
 insula::height_map::object::object(
 	parameters const &params)
 :
+	scene::backend(
+		params.scene_manager),
 	camera_(
 		params.camera),
 	renderer_(
@@ -332,9 +281,10 @@ insula::height_map::object::object(
 }
 
 void
-insula::height_map::object::render(
+insula::height_map::object::begin(
+	/*
 	sge::renderer::state::cull_mode::type const culling,
-	fcppt::optional<graphics::scalar> const &clip_height)
+	fcppt::optional<graphics::scalar> const &clip_height*/)
 {
 	graphics::shader::scoped scoped_shader_(
 		shader_);
@@ -343,12 +293,15 @@ insula::height_map::object::render(
 		renderer_,
 		vb_);
 
+	shader_.set_uniform("do_clip",0);
+	/*
 	shader_.set_uniform(
 		FCPPT_TEXT("do_clip"),
 		// There is no overload for booleans
 		static_cast<int>(
-			clip_height ? 1 : 0));
+			clip_height ? 1 : 0));*/
 
+	/*
 	if (clip_height)
 	{
 		shader_.set_uniform(
@@ -361,6 +314,7 @@ insula::height_map::object::render(
 		static_cast<sge::renderer::clip_plane_index>(
 			0),
 		clip_height);
+	*/
 	
 	shader_.set_uniform(
 		FCPPT_TEXT("mvp"),
@@ -369,7 +323,8 @@ insula::height_map::object::render(
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
 		sge::renderer::state::list
-		 	(culling)
+		 	//(culling)
+		 	(sge::renderer::state::cull_mode::back)
 		 	(sge::renderer::state::depth_func::less));
 
 	renderer_->render(
@@ -383,6 +338,11 @@ insula::height_map::object::render(
 			ib_->size() / 3),
 		sge::renderer::first_index(
 			0));
+}
+
+void
+insula::height_map::object::end()
+{
 }
 
 insula::graphics::box const

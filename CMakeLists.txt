@@ -111,7 +111,9 @@ SET(scene_files scene/transparent_instance.cpp
 scene/instance.cpp
 scene/backend.cpp
 scene/manager.cpp
-scene/scoped_backend.cpp)
+scene/scoped_backend.cpp
+scene/render_pass_impl.cpp
+)
 SET(prop_files prop/instance.cpp
 prop/manager.cpp)
 SET(ghost_files ghost/instance.cpp
@@ -193,7 +195,6 @@ ENDFUNCTION(CREATE_INSULA_EXE)
 CREATE_INSULA_EXE(load_image_to_array)
 CREATE_INSULA_EXE(view_model)
 CREATE_INSULA_EXE(shadow_map)
-CREATE_INSULA_EXE(render_height_map)
 CREATE_INSULA_EXE(point_sprite_test)
 #CREATE_INSULA_EXE(render_scene)
 CREATE_INSULA_EXE(generate_height_texture)

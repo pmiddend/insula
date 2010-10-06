@@ -3,6 +3,7 @@
 
 #include "object_ptr.hpp"
 #include "../graphics/camera/object_fwd.hpp"
+#include "../scene/manager_fwd.hpp"
 #include "../graphics/box.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/image/multi_loader_fwd.hpp>
@@ -18,7 +19,8 @@ cli_factory(
 	sge::renderer::device_ptr,
 	graphics::camera::object &,
 	graphics::box const &,
-	sge::image::multi_loader &);
+	sge::image::multi_loader &,
+	scene::manager &);
 }
 }
 

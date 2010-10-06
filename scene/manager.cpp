@@ -1,10 +1,15 @@
 #include "manager.hpp"
+#include "render_pass_impl.hpp"
+#include "backend.hpp"
 #include "transparency_comparator.hpp"
 #include "scoped_backend.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../timed_output.hpp"
+#include "../stdlib/keys_to_sequence.hpp"
+#include "../stdlib/sort.hpp"
 #include <boost/foreach.hpp>
 #include <fcppt/io/cout.hpp>
+#include <fcppt/assert.hpp>
 #include <set>
 
 insula::scene::manager::manager(
@@ -38,44 +43,58 @@ insula::scene::manager::insert_transparent(
 void
 insula::scene::manager::render()
 {
-	typedef
-	std::vector<backend_ptr>
-	erase_sequence;
+	typedef 
+	std::vector<backend_ptr> 
+	backend_sequence;
 
-	erase_sequence to_erase;
-
-	// Iteration of a ptr_map is done with value_type (const_reference
-	// is something odd). The value_type _has to be const_!
-	// - first will be key_type, 
-	// - second will be value_type* (not a reference, sadly)
+	// We want the backends sorted by priority, but we cannot use the
+	// map comparator because that would make backends with the same
+	// priority equal and thus "discard" new backends on insertion
 	BOOST_FOREACH(
-		backend_instance_map::value_type const &r,
-		backend_instance_map_)
+		backend_ptr b,
+		stdlib::sort(
+			stdlib::keys_to_sequence<backend_sequence>(
+				backend_instance_map_),
+			[](
+				backend_ptr const a,
+				backend_ptr const b) 
+			{
+				return a->priority() < b->priority();
+			}))
 	{
-		// This is simply a performance enhancement
-		if (r.second->empty())
-			continue;
+		instance_list &instances = 
+			backend_instance_map_[b];
+
+		// This cannot be here anymore since we might have backends with
+		// no instances (like the skydome)
+		//if (instances.empty())
+		//	continue;
 
 		scoped_backend scoped_backend_(
-			r.first);
+			b);
 
 		BOOST_FOREACH(
 			instance_list::reference instance_ref,
-			*r.second)
+			instances)
 			if (instance_ref.is_visible())
 				instance_ref.render(
-					*r.first);
+					*b);
 	}
 
-	BOOST_FOREACH(
-		erase_sequence::const_reference r,
-		to_erase)
-		backend_instance_map_.erase(
-			r);
-
-	to_erase.clear();
-
 	render_transparent();
+}
+
+insula::scene::scoped_render_pass const
+insula::scene::manager::register_pass(
+	render_pass::type const type,
+	render_pass_callback const &rp)
+{
+	return 
+		scoped_render_pass(
+			new render_pass_impl(
+				*this,
+				type,
+				rp));
 }
 
 insula::scene::manager::~manager() {}
@@ -134,4 +153,25 @@ insula::scene::manager::remove(
 {
 	backend_instance_map_.erase(
 		&b);
+}
+
+void 
+insula::scene::manager::add(
+	render_pass::type const type,
+	render_pass_callback const &rp)
+{
+	FCPPT_ASSERT(
+		render_pass_map_.find(type) == render_pass_map_.end());
+	render_pass_map_.insert(
+		render_pass_map::value_type(
+			type,
+			rp));
+}
+
+void 
+insula::scene::manager::remove(
+	render_pass::type const rp)
+{
+	render_pass_map_.erase(
+		rp);
 }

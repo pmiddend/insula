@@ -5,6 +5,8 @@ namespace insula
 {
 namespace scene
 {
+namespace render_pass
+{
 enum type
 {
 	water,
@@ -14,6 +16,7 @@ enum type
 	overlay,
 	size
 };
+}
 }
 }
 

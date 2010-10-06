@@ -50,14 +50,16 @@ insula::states::game_outer::game_outer(
 			context<machine>().cli_variables(),
 			context<machine>().camera(),
 			context<machine>().systems().renderer(),
-			context<machine>().systems().image_loader())),
+			context<machine>().systems().image_loader(),
+			scene_manager_)),
 	skydome_(
 		skydome::parameters(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
 				context<machine>().config_file().members,
 				FCPPT_TEXT("skydome")),
 			context<machine>().camera(),
-			context<machine>().systems())),
+			context<machine>().systems(),
+			scene_manager_)),
 	water_(
 		insula::water::cli_factory(
 			context<machine>().cli_variables(),
@@ -65,7 +67,8 @@ insula::states::game_outer::game_outer(
 			context<machine>().camera(),
 			fcppt::math::box::structure_cast<graphics::box>(
 				height_map_->extents()),
-			context<machine>().systems().image_loader())),
+			context<machine>().systems().image_loader(),
+			scene_manager_)),
 	large_font_(
 		json::parse_font(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
@@ -143,10 +146,11 @@ insula::states::game_outer::react(
 	water_->update_reflection(
 		[&skydome_,&height_map_,&water_]()
 		{
-			skydome_.render();
-			height_map_->render(
+			skydome_.begin();
+			height_map_->begin(
+				/*
 				sge::renderer::state::cull_mode::off,
-				water_->water_level());
+				water_->water_level()*/);
 		});
 
 	broadphase_manager_.update();
@@ -156,10 +160,6 @@ void
 insula::states::game_outer::react(
 	events::render const &)
 {
-	skydome_.render();
-	height_map_->render(
-		sge::renderer::state::cull_mode::back);
-	water_->render();
 }
 
 sge::font::metrics_ptr const 

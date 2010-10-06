@@ -18,7 +18,8 @@ insula::height_map::cli_factory(
 	boost::program_options::variables_map const &vm,
 	graphics::camera::object &camera,
 	sge::renderer::device_ptr const renderer,
-	sge::image::multi_loader &image_loader)
+	sge::image::multi_loader &image_loader,
+	scene::manager &scene_manager)
 {
 	return 
 		std::make_shared<object>(
@@ -46,5 +47,6 @@ insula::height_map::cli_factory(
 				image_loader.load(
 					create_path(
 						get_option<fcppt::string>(vm,"terrain-height-texture-2"),
-						FCPPT_TEXT("textures")))));
+						FCPPT_TEXT("textures"))),
+				scene_manager));
 }

@@ -63,9 +63,12 @@ insula::water::object::object(
 	sge::image::file_ptr const _bump_texture,
 	graphics::scalar const texture_scaling,
 	graphics::scalar const wave_height,
-	graphics::scalar const wind_speed
+	graphics::scalar const wind_speed,
+	scene::manager &scene_manager
 )
 :
+	scene::backend(
+		scene_manager),
 	renderer_(
 		_renderer),
 	bump_texture_(
@@ -129,7 +132,7 @@ insula::water::object::object(
 
 
 void
-insula::water::object::render()
+insula::water::object::begin()
 {
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
@@ -163,6 +166,11 @@ insula::water::object::render()
 		sge::renderer::vertex_count(
 			vb_->size()),
 		sge::renderer::nonindexed_primitive_type::triangle);
+}
+
+void
+insula::water::object::end()
+{
 }
 
 insula::graphics::scalar

@@ -7,6 +7,7 @@
 #include "../graphics/scalar.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../graphics/box.hpp"
+#include "../scene/backend.hpp"
 #include "parameters_fwd.hpp"
 #include "triangle.hpp"
 #include "vec3_array.hpp"
@@ -51,6 +52,8 @@ namespace height_map
 	fields.
  */
 class object
+:
+	public scene::backend
 {
 public:
 	explicit
@@ -64,10 +67,14 @@ public:
 		object const &) = delete;
 	
 	void
-	render(
+	begin(
+		/*
 		sge::renderer::state::cull_mode::type,
 		fcppt::optional<graphics::scalar> const &clip_height = 
-			fcppt::optional<graphics::scalar>());
+			fcppt::optional<graphics::scalar>()*/);
+
+	void
+	end();
 
 	graphics::box const
 	extents() const;

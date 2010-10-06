@@ -5,6 +5,8 @@
 #include "../graphics/scalar.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../graphics/rect.hpp"
+#include "../scene/backend.hpp"
+#include "../scene/manager_fwd.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/target_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
@@ -19,6 +21,8 @@ namespace insula
 namespace water
 {
 class object
+:
+	public scene::backend
 {
 public:
 	object(object const &) = delete;
@@ -34,14 +38,18 @@ public:
 		sge::image::file_ptr bump_texture,
 		graphics::scalar texture_scaling,
 		graphics::scalar wave_height,
-		graphics::scalar wind_speed);
+		graphics::scalar wind_speed,
+		scene::manager &);
 
 	void
 	update_reflection(
 		std::function<void ()> const &render_callback);
 
 	void 
-	render();
+	begin();
+
+	void
+	end();
 
 	graphics::scalar
 	water_level() const;
