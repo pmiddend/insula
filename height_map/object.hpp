@@ -68,11 +68,7 @@ public:
 	
 	void
 	begin(
-		scene::render_pass::object const &
-		/*
-		sge::renderer::state::cull_mode::type,
-		fcppt::optional<graphics::scalar> const &clip_height = 
-			fcppt::optional<graphics::scalar>()*/);
+		scene::render_pass::object const &);
 
 	void
 	end(

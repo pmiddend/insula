@@ -12,6 +12,7 @@
 #include "../stdlib/grid/sobel_operator.hpp"
 #include "../stdlib/grid/average_convolve.hpp"
 #include "../math/triangle/to_plane.hpp"
+#include "../scene/render_pass/object.hpp"
 #include "vf/packed_normal.hpp"
 #include "vf/packed_position.hpp"
 #include "vf/format.hpp"
@@ -139,7 +140,7 @@ insula::height_map::object::object(
 			graphics::shader::variable(
 				"water_level",
 				graphics::shader::variable_type::uniform,
-				static_cast<graphics::scalar>(0)),
+				params.water_height),
 			graphics::shader::variable(
 				"mvp",
 				graphics::shader::variable_type::uniform,
@@ -283,10 +284,7 @@ insula::height_map::object::object(
 
 void
 insula::height_map::object::begin(
-	scene::render_pass::object const &
-	/*
-	sge::renderer::state::cull_mode::type const culling,
-	fcppt::optional<graphics::scalar> const &clip_height*/)
+	scene::render_pass::object const &rp)
 {
 	graphics::shader::scoped scoped_shader_(
 		shader_);
@@ -295,38 +293,38 @@ insula::height_map::object::begin(
 		renderer_,
 		vb_);
 
-	shader_.set_uniform("do_clip",0);
-	/*
-	shader_.set_uniform(
-		FCPPT_TEXT("do_clip"),
-		// There is no overload for booleans
-		static_cast<int>(
-			clip_height ? 1 : 0));*/
-
-	/*
-	if (clip_height)
+	sge::renderer::state::cull_mode::type cull_mode;
+	if (rp.name == FCPPT_TEXT("water"))
 	{
 		shader_.set_uniform(
-			FCPPT_TEXT("water_level"),
-			// There is no overload for booleans
-			*clip_height);
+			FCPPT_TEXT("do_clip"),
+			1);
+		renderer_->enable_clip_plane(
+			static_cast<sge::renderer::clip_plane_index>(
+				0),
+			true);
+		cull_mode = sge::renderer::state::cull_mode::off;
+	}
+	else
+	{
+		shader_.set_uniform(
+			FCPPT_TEXT("do_clip"),
+			0);
+		renderer_->enable_clip_plane(
+			static_cast<sge::renderer::clip_plane_index>(
+				0),
+			false);
+		cull_mode = sge::renderer::state::cull_mode::back;
 	}
 
-	renderer_->enable_clip_plane(
-		static_cast<sge::renderer::clip_plane_index>(
-			0),
-		clip_height);
-	*/
-	
 	shader_.set_uniform(
 		FCPPT_TEXT("mvp"),
-		camera_.perspective() * camera_.rotation() * camera_.translation());
+		camera_.mvp());
 	
 	sge::renderer::state::scoped scoped_state(
 		renderer_,
 		sge::renderer::state::list
-		 	//(culling)
-		 	(sge::renderer::state::cull_mode::back)
+		 	(cull_mode)
 		 	(sge::renderer::state::depth_func::less));
 
 	renderer_->render(

@@ -48,5 +48,6 @@ insula::height_map::cli_factory(
 					create_path(
 						get_option<fcppt::string>(vm,"terrain-height-texture-2"),
 						FCPPT_TEXT("textures"))),
-				scene_manager));
+				scene_manager,
+				get_option<graphics::scalar>(vm,"water-level")));
 }

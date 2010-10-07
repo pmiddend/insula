@@ -29,6 +29,7 @@ public:
 	sge::image::file_ptr lower_texture_image;
 	sge::image::file_ptr upper_texture_image;
 	scene::manager &scene_manager;
+	graphics::scalar water_height;
 
 	explicit
 	parameters(
@@ -43,7 +44,8 @@ public:
 		sge::image::file_ptr const &gradient_texture_image,
 		sge::image::file_ptr const &lower_texture_image,
 		sge::image::file_ptr const &upper_texture_image,
-		scene::manager &scene_manager)
+		scene::manager &scene_manager,
+		graphics::scalar water_height)
 	:
 		camera(camera),
 		renderer(renderer),
@@ -56,7 +58,8 @@ public:
 		gradient_texture_image(gradient_texture_image),
 		lower_texture_image(lower_texture_image),
 		upper_texture_image(upper_texture_image),
-		scene_manager(scene_manager)
+		scene_manager(scene_manager),
+		water_height(water_height)
 	{
 	}
 };
