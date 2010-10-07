@@ -41,15 +41,13 @@ public:
 		graphics::scalar wind_speed,
 		scene::manager &);
 
-	void
-	update_reflection(
-		std::function<void ()> const &render_callback);
-
 	void 
-	begin();
+	begin(
+		scene::render_pass::object const &);
 
 	void
-	end();
+	end(
+		scene::render_pass::object const &);
 
 	graphics::scalar
 	water_level() const;
@@ -65,12 +63,6 @@ private:
 	sge::renderer::vertex_buffer_ptr vb_;
 	sge::time::timer wave_timer_;
 	graphics::scalar current_time_;
-
-	void
-	regenerate(
-		graphics::rect const &,
-		sge::renderer::dim_type const &,
-		graphics::scalar texture_scaling);
 };
 }
 }

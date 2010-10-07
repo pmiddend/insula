@@ -227,22 +227,15 @@ insula::machine::tick(
 	music_.update();
 	sounds_.update();
 
-	// FIXME: This is a hack for a bug in renderer
-	systems_.renderer()->viewport(
-		sge::renderer::viewport(
-			sge::renderer::pixel_pos::null(),
-			systems_.renderer()->screen_size()));
-
-	sge::renderer::scoped_block scoped(
-		systems_.renderer());
-
 	process_event(
 		events::render());
 
+	/*
 	if (show_stats_)
 		stats_.update_and_render();
 
 	console_.render();
+	*/
 }
 
 boost::program_options::variables_map const &

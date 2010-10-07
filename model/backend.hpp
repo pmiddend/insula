@@ -46,10 +46,12 @@ public:
 	has_transparency() const;
 
 	void
-	begin();
+	begin(
+		scene::render_pass::object const &);
 
 	void 
-	end();
+	end(
+		scene::render_pass::object const &);
 
 	graphics::camera::object const &
 	camera() const;

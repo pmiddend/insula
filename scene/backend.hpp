@@ -3,6 +3,9 @@
 
 #include "manager_fwd.hpp"
 #include "backend_priority.hpp"
+#include "render_pass/object_fwd.hpp"
+#include "render_pass/identifier.hpp"
+#include <set>
 
 namespace insula
 {
@@ -17,16 +20,27 @@ public:
 	backend(backend const &) = delete;
 	backend &operator=(backend const &) = delete;
 
+	typedef
+	std::set<render_pass::identifier>
+	render_pass_set;
+
 	explicit
 	backend(
 		manager &,
+		render_pass_set const &,
 		backend_priority::type = backend_priority::normal);
 
-	virtual void
-	begin() = 0;
+	bool
+	takes_part_in(
+		render_pass::identifier const &) const;
 
 	virtual void
-	end() = 0;
+	begin(
+		render_pass::object const &) = 0;
+
+	virtual void
+	end(
+		render_pass::object const &) = 0;
 
 	backend_priority::type
 	priority() const;
@@ -35,6 +49,7 @@ public:
 	~backend();
 private:
 	manager &manager_;
+	render_pass_set const render_passes_;
 	backend_priority::type const priority_;
 };
 }

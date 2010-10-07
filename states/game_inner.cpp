@@ -127,12 +127,14 @@ insula::states::game_inner::react(
 {
 	context<game_outer>().scene_manager().render();
 	
+	/*
 	if (physics_debug_)
 	{
 		physics_debug_drawer_.setDebugMode(
 			btIDebugDraw::DBG_DrawWireframe);
 		physics_debug_drawer_.render(); 
 	}
+	*/
 }
 
 fcppt::string const &

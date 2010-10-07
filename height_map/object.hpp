@@ -68,13 +68,15 @@ public:
 	
 	void
 	begin(
+		scene::render_pass::object const &
 		/*
 		sge::renderer::state::cull_mode::type,
 		fcppt::optional<graphics::scalar> const &clip_height = 
 			fcppt::optional<graphics::scalar>()*/);
 
 	void
-	end();
+	end(
+		scene::render_pass::object const &);
 
 	graphics::box const
 	extents() const;

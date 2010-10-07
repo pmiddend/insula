@@ -1,21 +1,30 @@
 #include "manager.hpp"
-#include "render_pass_impl.hpp"
 #include "backend.hpp"
 #include "transparency_comparator.hpp"
 #include "scoped_backend.hpp"
+#include "render_pass/scoped.hpp"
+#include "../exception.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../timed_output.hpp"
 #include "../stdlib/keys_to_sequence.hpp"
 #include "../stdlib/sort.hpp"
+#include "../stdlib/filter.hpp"
 #include <boost/foreach.hpp>
+#include <boost/graph/topological_sort.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/assert.hpp>
 #include <set>
+#include <deque>
+#include <iterator>
 
 insula::scene::manager::manager(
+	sge::renderer::device_ptr const _renderer,
 	graphics::camera::object &_camera)
 :
-	camera_(_camera)
+	renderer_(
+		_renderer),
+	camera_(
+		_camera)
 {
 }
 
@@ -44,6 +53,68 @@ void
 insula::scene::manager::render()
 {
 	typedef 
+	boost::graph_traits<render_pass_graph>::vertex_descriptor
+	vertex;
+
+	std::deque<vertex> render_deque;
+
+	boost::topological_sort(
+		render_pass_graph_,
+		std::front_inserter(
+			render_deque));
+
+	BOOST_FOREACH(vertex const &v,render_deque)
+		render(
+			render_passes_[v]);
+}
+
+void
+insula::scene::manager::add(
+	render_pass::object const &rp,
+	render_pass::dependency_set const &deps)
+{
+	render_passes_.push_back(
+		rp);
+	boost::add_vertex(
+		render_pass_graph_);
+
+	BOOST_FOREACH(
+		render_pass::identifier const &dep,
+		deps)
+	{
+		render_pass_sequence::const_iterator depi = 
+			std::find_if(
+				render_passes_.begin(),
+				render_passes_.end(),
+				[&dep](render_pass::object const &ref) { return ref.name == dep; });
+
+		if (depi == render_passes_.end())
+			throw insula::exception(
+				FCPPT_TEXT("Renderpass dependency \"")+
+				dep+
+				FCPPT_TEXT("\" not found!"));
+			
+		boost::add_edge(
+			std::distance(
+				render_pass_sequence::const_iterator(render_passes_.begin()),
+				depi),
+			render_passes_.size()-1,
+			render_pass_graph_);
+	}
+}
+
+insula::scene::manager::~manager() {}
+
+void
+insula::scene::manager::render(
+	render_pass::object const &rp)
+{
+	render_pass::scoped scoped_render(
+		renderer_,
+		camera_,
+		rp);
+	
+	typedef 
 	std::vector<backend_ptr> 
 	backend_sequence;
 
@@ -52,14 +123,19 @@ insula::scene::manager::render()
 	// priority equal and thus "discard" new backends on insertion
 	BOOST_FOREACH(
 		backend_ptr b,
-		stdlib::sort(
-			stdlib::keys_to_sequence<backend_sequence>(
-				backend_instance_map_),
-			[](
-				backend_ptr const a,
-				backend_ptr const b) 
+		stdlib::filter(
+			stdlib::sort(
+				stdlib::keys_to_sequence<backend_sequence>(
+					backend_instance_map_),
+				[](
+					backend_ptr const a,
+					backend_ptr const b) 
+				{
+					return a->priority() < b->priority();
+				}),
+			[&rp](backend_ptr const a) 
 			{
-				return a->priority() < b->priority();
+				return a->takes_part_in(rp.name);
 			}))
 	{
 		instance_list &instances = 
@@ -71,7 +147,8 @@ insula::scene::manager::render()
 		//	continue;
 
 		scoped_backend scoped_backend_(
-			b);
+			b,
+			rp);
 
 		BOOST_FOREACH(
 			instance_list::reference instance_ref,
@@ -81,26 +158,13 @@ insula::scene::manager::render()
 					*b);
 	}
 
-	render_transparent();
+	render_transparent(
+		rp);
 }
-
-insula::scene::scoped_render_pass const
-insula::scene::manager::register_pass(
-	render_pass::type const type,
-	render_pass_callback const &rp)
-{
-	return 
-		scoped_render_pass(
-			new render_pass_impl(
-				*this,
-				type,
-				rp));
-}
-
-insula::scene::manager::~manager() {}
 
 void
-insula::scene::manager::render_transparent()
+insula::scene::manager::render_transparent(
+	scene::render_pass::object const &rp)
 {
 	// We can't use a ptr_set here because the value_type is not const
 	// (we need to call render on the ordered primitives, which is
@@ -131,7 +195,8 @@ insula::scene::manager::render_transparent()
 		ordered_instances)
 	{
 		scoped_backend scoped_backend_(
-			v->backend());
+			v->backend(),
+			rp);
 		v->render(
 			*(v->backend()));
 	}
@@ -153,25 +218,4 @@ insula::scene::manager::remove(
 {
 	backend_instance_map_.erase(
 		&b);
-}
-
-void 
-insula::scene::manager::add(
-	render_pass::type const type,
-	render_pass_callback const &rp)
-{
-	FCPPT_ASSERT(
-		render_pass_map_.find(type) == render_pass_map_.end());
-	render_pass_map_.insert(
-		render_pass_map::value_type(
-			type,
-			rp));
-}
-
-void 
-insula::scene::manager::remove(
-	render_pass::type const rp)
-{
-	render_pass_map_.erase(
-		rp);
 }

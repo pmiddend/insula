@@ -82,7 +82,8 @@ insula::height_map::object::object(
 	parameters const &params)
 :
 	scene::backend(
-		params.scene_manager),
+		params.scene_manager,
+		{"water","normal"}),
 	camera_(
 		params.camera),
 	renderer_(
@@ -282,6 +283,7 @@ insula::height_map::object::object(
 
 void
 insula::height_map::object::begin(
+	scene::render_pass::object const &
 	/*
 	sge::renderer::state::cull_mode::type const culling,
 	fcppt::optional<graphics::scalar> const &clip_height*/)
@@ -341,7 +343,8 @@ insula::height_map::object::begin(
 }
 
 void
-insula::height_map::object::end()
+insula::height_map::object::end(
+	scene::render_pass::object const &)
 {
 }
 

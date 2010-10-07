@@ -75,6 +75,7 @@ insula::skydome::object::object(
 :
 	scene::backend(
 		params.scene_manager,
+		{"water","normal"},
 		scene::backend_priority::high),
 	camera_(
 		params.camera),
@@ -264,7 +265,8 @@ insula::skydome::object::object(
 }
 
 void
-insula::skydome::object::begin()
+insula::skydome::object::begin(
+	scene::render_pass::object const &)
 {
 	// FIRST the shader, THEN the vertex buffer
 	graphics::shader::scoped scoped_shader_(
@@ -300,7 +302,8 @@ insula::skydome::object::begin()
 }
 
 void
-insula::skydome::object::end()
+insula::skydome::object::end(
+	scene::render_pass::object const &)
 {
 }
 

@@ -112,7 +112,7 @@ scene/instance.cpp
 scene/backend.cpp
 scene/manager.cpp
 scene/scoped_backend.cpp
-scene/render_pass_impl.cpp
+scene/render_pass/scoped.cpp
 )
 SET(prop_files prop/instance.cpp
 prop/manager.cpp)

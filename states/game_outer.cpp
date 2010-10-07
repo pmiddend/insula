@@ -15,6 +15,7 @@
 #include "../json/parse_font.hpp"
 #include "../json/parse_vector.hpp"
 #include "../exception.hpp"
+#include "../scene/render_pass/object.hpp"
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/make_shared_ptr.hpp>
 #include <fcppt/text.hpp>
@@ -27,6 +28,13 @@
 #include <sge/image/color/rgb8.hpp>
 #include <sge/renderer/texture_ptr.hpp>
 #include <sge/renderer/texture.hpp>
+#include <sge/renderer/device.hpp>
+#include <sge/renderer/default_target.hpp>
+// Viewport hack begin
+#include <sge/renderer/viewport.hpp>
+#include <sge/renderer/pixel_pos.hpp>
+#include <fcppt/math/vector/basic_impl.hpp>
+// Viewport hack end
 #include <mizuiro/color/init.hpp>
 #include <boost/program_options/value_semantic.hpp>
 #include <algorithm>
@@ -44,6 +52,7 @@ insula::states::game_outer::game_outer(
 					context<machine>().config_file().members,
 					FCPPT_TEXT("light-source"))))),
 	scene_manager_(
+		context<machine>().systems().renderer(),
 		context<machine>().camera()),
 	height_map_(
 		insula::height_map::cli_factory(
@@ -125,6 +134,26 @@ insula::states::game_outer::game_outer(
 {
 	if (player_times_.empty())
 		throw exception(FCPPT_TEXT("You have to specify at least one player"));
+
+	scene_manager_.add(
+		scene::render_pass::object(
+			FCPPT_TEXT("normal"),
+			[this]() 
+			{ 
+				return this->context<machine>().camera().gizmo(); 
+			},
+			[this]() 
+			{ 
+				return 
+					sge::renderer::viewport(
+						sge::renderer::pixel_pos::null(),
+						this->context<machine>().systems().renderer()->screen_size()); 
+			},
+			[]() 
+			{ 
+				return sge::renderer::default_target(); 
+			}),
+			{"water"});
 }
 
 insula::height_map::object &
@@ -143,6 +172,7 @@ void
 insula::states::game_outer::react(
 	events::tick const &)
 {
+#if 0
 	water_->update_reflection(
 		[&skydome_,&height_map_,&water_]()
 		{
@@ -152,6 +182,7 @@ insula::states::game_outer::react(
 				sge::renderer::state::cull_mode::off,
 				water_->water_level()*/);
 		});
+#endif
 
 	broadphase_manager_.update();
 }

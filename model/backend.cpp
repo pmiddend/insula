@@ -28,7 +28,8 @@ insula::model::backend::backend(
 	model::shared_object_ptr _model)
 :
 	scene::backend(
-		manager),
+		manager,
+		{"water","normal"}),
 	has_transparency_(
 		_has_transparency),
 	renderer_(
@@ -51,7 +52,8 @@ insula::model::backend::has_transparency() const
 }
 
 void
-insula::model::backend::begin()
+insula::model::backend::begin(
+	scene::render_pass::object const &)
 {
 	// Update the shader textures (before scoping it)
 	BOOST_FOREACH(
@@ -94,7 +96,8 @@ insula::model::backend::begin()
 }
 
 void 
-insula::model::backend::end()
+insula::model::backend::end(
+	scene::render_pass::object const &)
 {
 	// Deactivate everything in reverse order of activation
 	state_scope_.reset();

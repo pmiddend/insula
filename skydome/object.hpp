@@ -31,10 +31,12 @@ public:
 		parameters const &);
 
 	void
-	begin();
+	begin(
+		scene::render_pass::object const &);
 
 	void 
-	end();
+	end(
+		scene::render_pass::object const &);
 
 	~object();
 private:

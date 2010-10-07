@@ -141,6 +141,7 @@ insula::states::freelook::react(
 	context<game_inner>().react(
 		r);
 
+	/*
 	sge::font::draw_text(
 		context<game_outer>().large_font(),
 		context<game_outer>().font_drawer(),
@@ -151,6 +152,7 @@ insula::states::freelook::react(
 		sge::font::align_h::center,
 		sge::font::align_v::center,
 		sge::font::flags::none);
+	*/
 
 	return discard_event();
 }
