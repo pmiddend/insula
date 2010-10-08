@@ -1,6 +1,7 @@
 #include "game_outer.hpp"
 #include "../random_seed.hpp"
 #include "../model/create_shader.hpp"
+#include "../model/create_shadow_shader.hpp"
 #include "../get_option.hpp"
 #include "../ghost/manager_parameters.hpp"
 #include "../height_map/cli_factory.hpp"
@@ -16,7 +17,13 @@
 #include "../json/parse_vector.hpp"
 #include "../exception.hpp"
 #include "../scene/render_pass/object.hpp"
+#include "../shadow/parameters.hpp"
+#include "../timed_output.hpp"
 #include <fcppt/math/box/structure_cast.hpp>
+#include <fcppt/math/vector/structure_cast.hpp>
+#include <fcppt/math/vector/output.hpp>
+#include <fcppt/math/dim/structure_cast.hpp>
+#include <fcppt/math/vector/dim.hpp>
 #include <fcppt/make_shared_ptr.hpp>
 #include <fcppt/text.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
@@ -51,16 +58,51 @@ insula::states::game_outer::game_outer(
 				sge::parse::json::find_member_exn<sge::parse::json::array>(
 					context<machine>().config_file().members,
 					FCPPT_TEXT("light-source"))))),
+	model_shadow_shader_(
+		model::create_shadow_shader(
+			context<machine>().systems().renderer())),
 	scene_manager_(
 		context<machine>().systems().renderer(),
 		context<machine>().camera()),
+	shadow_(
+		shadow::parameters(
+			context<machine>().systems(),
+			graphics::gizmo(
+				graphics::gizmo::init()
+					.position(
+						graphics::vec3(
+							303.661f,592.32f,376.59f))
+					.forward(
+						graphics::vec3(
+							-0.315495f,0.915277f,-0.250462f))
+					.right(
+						graphics::vec3(
+							-0.621763f,0.0f,0.783205f))
+					.up(
+						graphics::vec3(
+							0.71685f,0.402825f,0.569086f))),
+			fcppt::math::vector::structure_cast<sge::renderer::dim_type>(
+				json::parse_vector
+				<
+					sge::renderer::dim_type::value_type,
+					2,
+					sge::parse::json::int_type
+				>
+				(
+					sge::parse::json::find_member_exn<sge::parse::json::array>(
+						context<machine>().config_file().members,
+						FCPPT_TEXT("shadow-map-size")))),
+			scene_manager_)),
 	height_map_(
 		insula::height_map::cli_factory(
 			context<machine>().cli_variables(),
 			context<machine>().camera(),
 			context<machine>().systems().renderer(),
 			context<machine>().systems().image_loader(),
-			scene_manager_)),
+			scene_manager_,
+			shadow_.texture(),
+			shadow_.mvp(
+				context<machine>().camera().perspective()))),
 	skydome_(
 		skydome::parameters(
 			sge::parse::json::find_member_exn<sge::parse::json::object>(
@@ -90,15 +132,14 @@ insula::states::game_outer::game_outer(
 			sge::image::color::rgb8(
 				(mizuiro::color::init::red %= 1.0)
 				(mizuiro::color::init::green %= 1.0)
-				(mizuiro::color::init::blue %= 1.0))
-			/*sge::image::colors::white()*/)),
+				(mizuiro::color::init::blue %= 1.0)))),
 	player_times_(
 		stdlib::map<player_time_map>(
 			get_option<player_sequence>(
 				context<machine>().cli_variables(),
 				"player"),
 			[](fcppt::string const &p)
-			{
+		{
 				return 
 					player_time_map::value_type(
 						p,
@@ -112,6 +153,7 @@ insula::states::game_outer::game_outer(
 			context<machine>().systems(),
 			context<machine>().camera(),
 			*model_shader_,
+			*model_shadow_shader_,
 			*height_map_,
 			water_->water_level(),
 			scene_manager_,
@@ -126,6 +168,7 @@ insula::states::game_outer::game_outer(
 			context<machine>().systems(),
 			context<machine>().camera(),
 			*model_shader_,
+			*model_shadow_shader_,
 			*height_map_,
 			static_cast<height_map::scalar>(
 				water_->water_level()))),
@@ -172,17 +215,17 @@ void
 insula::states::game_outer::react(
 	events::tick const &)
 {
-#if 0
-	water_->update_reflection(
-		[&skydome_,&height_map_,&water_]()
-		{
-			skydome_.begin();
-			height_map_->begin(
-				/*
-				sge::renderer::state::cull_mode::off,
-				water_->water_level()*/);
-		});
-#endif
+	/*
+	timed_output() 
+		<< "p: " <<
+			context<machine>().camera().gizmo().position() 
+		<< ", f: " <<
+			context<machine>().camera().gizmo().forward() 
+		<< ", r: " <<
+			context<machine>().camera().gizmo().right() 
+		<< ", u: " <<
+			context<machine>().camera().gizmo().up() << "\n";
+	*/
 
 	broadphase_manager_.update();
 }
@@ -254,6 +297,12 @@ insula::graphics::shader::object &
 insula::states::game_outer::model_shader()
 {
 	return *model_shader_;
+}
+
+insula::graphics::shader::object &
+insula::states::game_outer::model_shadow_shader()
+{
+	return *model_shadow_shader_;
 }
 
 insula::scene::manager &

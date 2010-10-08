@@ -20,6 +20,7 @@ public:
 	sge::systems::instance const &systems;
 	graphics::camera::object &camera;
 	graphics::shader::object &model_shader;
+	graphics::shader::object &model_shadow_shader;
 	insula::height_map::object &height_map;
 	graphics::scalar water_level;
 	scene::manager &scene_manager;
@@ -31,6 +32,7 @@ public:
 		sge::systems::instance const &systems,
 		graphics::camera::object &camera,
 		graphics::shader::object &model_shader,
+		graphics::shader::object &model_shadow_shader,
 		insula::height_map::object &height_map,
 		graphics::scalar const water_level,
 		scene::manager &scene_manager,
@@ -40,6 +42,7 @@ public:
 		systems(systems),
 		camera(camera),
 		model_shader(model_shader),
+		model_shadow_shader(model_shadow_shader),
 		height_map(height_map),
 		water_level(water_level),
 		scene_manager(scene_manager),

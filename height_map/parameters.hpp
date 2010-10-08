@@ -4,11 +4,14 @@
 #include "../graphics/camera/object_fwd.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/vec3.hpp"
+#include "../graphics/mat4.hpp"
 #include "../scene/manager_fwd.hpp"
 #include "array.hpp"
 #include <sge/renderer/device_ptr.hpp>
+#include <sge/renderer/texture_ptr.hpp>
 #include <sge/image/file_ptr.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/matrix/basic_impl.hpp>
 
 namespace insula
 {
@@ -30,6 +33,8 @@ public:
 	sge::image::file_ptr upper_texture_image;
 	scene::manager &scene_manager;
 	graphics::scalar water_height;
+	sge::renderer::texture_ptr shadow_map;
+	graphics::mat4 shadow_mvp;
 
 	explicit
 	parameters(
@@ -45,7 +50,9 @@ public:
 		sge::image::file_ptr const &lower_texture_image,
 		sge::image::file_ptr const &upper_texture_image,
 		scene::manager &scene_manager,
-		graphics::scalar water_height)
+		graphics::scalar water_height,
+		sge::renderer::texture_ptr shadow_map,
+		graphics::mat4 const &shadow_mvp)
 	:
 		camera(camera),
 		renderer(renderer),
@@ -59,7 +66,9 @@ public:
 		lower_texture_image(lower_texture_image),
 		upper_texture_image(upper_texture_image),
 		scene_manager(scene_manager),
-		water_height(water_height)
+		water_height(water_height),
+		shadow_map(shadow_map),
+		shadow_mvp(shadow_mvp)
 	{
 	}
 };

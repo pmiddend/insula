@@ -111,9 +111,13 @@ private:
 	sge::renderer::vertex_buffer_ptr const vb_;
 	sge::renderer::index_buffer_ptr const ib_;
 	graphics::shader::object shader_;
+	graphics::shader::object shadow_shader_;
 	graphics::box const extents_;
 	array const heights_,gradient_;
 	vec3_array points_,normals_;
+
+	void
+	begin_shadow();
 };
 }
 }

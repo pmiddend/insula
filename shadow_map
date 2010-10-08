@@ -1,3 +1,0 @@
-#!/bin/bash
-
-build/shadow_map --graphics-screen-size='(1024,768)' --camera-movement-speed=5 --camera-rotation-speed=500 --camera-near=0.1 --camera-far=1000 --camera-fov=90 --model arrow.md3 --texture arrow.png "$@"

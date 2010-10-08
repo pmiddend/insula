@@ -111,6 +111,7 @@ insula::prop::manager::parse_single_prop(
 			params.systems.renderer(),
 			params.camera,
 			params.model_shader,
+			params.model_shadow_shader,
 			{
 				{
 					"texture",

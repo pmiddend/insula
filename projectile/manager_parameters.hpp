@@ -20,6 +20,7 @@ public:
 	sge::systems::instance const &systems;
 	graphics::camera::object const &camera;
 	graphics::shader::object &model_shader;
+	graphics::shader::object &model_shadow_shader;
 	scene::manager &scene_manager;
 	physics::broadphase::manager &broadphase;
 	physics::world &world;
@@ -30,6 +31,7 @@ public:
 		sge::systems::instance const &systems,
 		graphics::camera::object const &camera,
 		graphics::shader::object &model_shader,
+		graphics::shader::object &model_shadow_shader,
 		scene::manager &scene_manager,
 		physics::broadphase::manager &broadphase,
 		physics::world &world)
@@ -38,6 +40,7 @@ public:
 		systems(systems),
 		camera(camera),
 		model_shader(model_shader),
+		model_shadow_shader(model_shadow_shader),
 		scene_manager(scene_manager),
 		broadphase(broadphase),
 		world(world)

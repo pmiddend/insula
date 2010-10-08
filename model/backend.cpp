@@ -2,6 +2,7 @@
 #include "object.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../graphics/camera/object.hpp"
+#include "../scene/render_pass/object.hpp"
 #include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/scoped.hpp>
@@ -24,12 +25,13 @@ insula::model::backend::backend(
 	sge::renderer::device_ptr _renderer,
 	graphics::camera::object const &_camera,
 	graphics::shader::object &_shader,
+	graphics::shader::object &_shadow_shader,
 	texture_map const &_textures,
 	model::shared_object_ptr _model)
 :
 	scene::backend(
 		manager,
-		{"water","normal"}),
+		{"water","normal","shadow"}),
 	has_transparency_(
 		_has_transparency),
 	renderer_(
@@ -38,6 +40,8 @@ insula::model::backend::backend(
 		_camera),
 	shader_(
 		_shader),
+	shadow_shader_(
+		_shadow_shader),
 	textures_(
 		_textures),
 	model_(
@@ -53,17 +57,27 @@ insula::model::backend::has_transparency() const
 
 void
 insula::model::backend::begin(
-	scene::render_pass::object const &)
+	scene::render_pass::object const &rp)
 {
+	current_pass_ = rp.name;
+
+	graphics::shader::object &this_shader = 
+		rp.name == FCPPT_TEXT("shadow")
+		?
+			shadow_shader_
+		:
+			shader_;
+
 	// Update the shader textures (before scoping it)
 	BOOST_FOREACH(
 		texture_map::const_reference r,
 		textures_)
-		shader_.update_texture(
+		this_shader.update_texture(
 			r.first,
 			r.second);
 
-	shader_.activate();
+	this_shader.activate();
+
 	renderer_->set_vertex_buffer(
 		model_->vb());
 
@@ -97,13 +111,16 @@ insula::model::backend::begin(
 
 void 
 insula::model::backend::end(
-	scene::render_pass::object const &)
+	scene::render_pass::object const &rp)
 {
 	// Deactivate everything in reverse order of activation
 	state_scope_.reset();
 	renderer_->unset_vertex_buffer(
 		model_->vb());
-	shader_.deactivate();
+	if (rp.name == FCPPT_TEXT("shadow"))
+		shadow_shader_.deactivate();
+	else
+		shader_.deactivate();
 }
 
 insula::graphics::camera::object const &
@@ -123,20 +140,25 @@ void
 insula::model::backend::modelview(
 	graphics::mat4 const &m)
 {
-	shader_.set_uniform(
-		"mvp",
-		camera().perspective() *
-		m);
-	/*
-	shader_.set_uniform(
-		"mv",
- 		m);
-	*/
-	shader_.set_uniform(
-		"normal_matrix",
- 		fcppt::math::matrix::transpose(
-			fcppt::math::matrix::inverse(
-				m)));
+	if (current_pass_ == FCPPT_TEXT("shadow"))
+	{
+		shadow_shader_.set_uniform(
+			"mvp",
+			camera().perspective() *
+			m);
+	}
+	else
+	{
+		shader_.set_uniform(
+			"mvp",
+			camera().perspective() *
+			m);
+		shader_.set_uniform(
+			"normal_matrix",
+			fcppt::math::matrix::transpose(
+				fcppt::math::matrix::inverse(
+					m)));
+	}
 }
 
 insula::model::object &

@@ -109,6 +109,9 @@ void
 insula::scene::manager::render(
 	render_pass::object const &rp)
 {
+	// Debugging for the shadow maps
+	//if (rp.name == FCPPT_TEXT("normal"))
+	//	return;
 	render_pass::scoped scoped_render(
 		renderer_,
 		camera_,

@@ -101,6 +101,7 @@ insula::ghost::manager::parse_single(
 			params.systems.renderer(),
 			params.camera,
 			params.model_shader,
+			params.model_shadow_shader,
 			{
 				{
 					"texture",

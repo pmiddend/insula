@@ -220,22 +220,22 @@ insula::water::object::object(
 	scene_manager.add(
 		scene::render_pass::object(
 			FCPPT_TEXT("water"),
-			[this]()
+			[&camera_,&water_level_]()
 			{
 				return 
 					gizmo::mirror_at_plane<graphics::scalar>(
-						this->camera_.gizmo(),
-						this->water_level_);
+						camera_.gizmo(),
+						water_level_);
 			},
-			[this]()
+			[&target_texture_]()
 			{
 				return 
 					sge::renderer::viewport(
 						sge::renderer::pixel_pos::null(),
 						fcppt::math::dim::structure_cast<sge::renderer::screen_size>(
-							this->target_texture_->dim())); 
+							target_texture_->dim())); 
 			},
-			[this]()
+			[&target_]()
 			{
 				return target_;
 			}),

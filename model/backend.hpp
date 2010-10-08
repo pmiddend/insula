@@ -7,6 +7,7 @@
 #include "../graphics/mat4.hpp"
 #include "../graphics/camera/object_fwd.hpp"
 #include "shared_object_ptr.hpp"
+#include "../scene/render_pass/identifier.hpp"
 #include <sge/renderer/glsl/string.hpp>
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/state/scoped.hpp>
@@ -38,7 +39,8 @@ public:
 		bool has_transparency,
 		sge::renderer::device_ptr,
 		graphics::camera::object const &,
-		graphics::shader::object &,
+		graphics::shader::object &shader,
+		graphics::shader::object &shadow_shader,
 		texture_map const &,
 		model::shared_object_ptr);
 
@@ -77,11 +79,13 @@ private:
 	/// This is here so the model_instances can get the mvp matrix
 	graphics::camera::object const &camera_;
 	graphics::shader::object &shader_;
+	graphics::shader::object &shadow_shader_;
 	/// Usually we want the same shader for multiple backends, but with
 	/// different textures
 	texture_map textures_;
 	shared_object_ptr model_;
 	std::unique_ptr<sge::renderer::state::scoped> state_scope_;
+	scene::render_pass::identifier current_pass_;
 };
 }
 }

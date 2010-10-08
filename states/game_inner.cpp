@@ -82,6 +82,7 @@ insula::states::game_inner::game_inner(
 			context<machine>().systems(),
 			context<machine>().camera(),
 			context<game_outer>().model_shader(),
+			context<game_outer>().model_shadow_shader(),
 			context<game_outer>().scene_manager(),
 			context<game_outer>().broadphase_manager(),
 			physics_world_)),
@@ -108,6 +109,7 @@ insula::states::game_inner::game_inner(
 			context<machine>().systems(),
 			context<machine>().camera(),
 			context<game_outer>().model_shader(),
+			context<game_outer>().model_shadow_shader(),
 			context<game_outer>().scene_manager(),
 			context<game_outer>().broadphase_manager(),
 			physics_world_))

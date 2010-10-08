@@ -19,7 +19,9 @@ insula::height_map::cli_factory(
 	graphics::camera::object &camera,
 	sge::renderer::device_ptr const renderer,
 	sge::image::multi_loader &image_loader,
-	scene::manager &scene_manager)
+	scene::manager &scene_manager,
+	sge::renderer::texture_ptr const shadow_map,
+	graphics::mat4 const &shadow_mvp)
 {
 	return 
 		std::make_shared<object>(
@@ -49,5 +51,7 @@ insula::height_map::cli_factory(
 						get_option<fcppt::string>(vm,"terrain-height-texture-2"),
 						FCPPT_TEXT("textures"))),
 				scene_manager,
-				get_option<graphics::scalar>(vm,"water-level")));
+				get_option<graphics::scalar>(vm,"water-level"),
+				shadow_map,
+				shadow_mvp));
 }

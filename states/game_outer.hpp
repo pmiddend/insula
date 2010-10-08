@@ -7,9 +7,11 @@
 #include "../height_map/object_ptr.hpp"
 #include "../height_map/object_fwd.hpp"
 #include "../skydome/object.hpp"
+#include "../shadow/object.hpp"
 #include "../water/object_ptr.hpp"
 #include "../scene/manager.hpp"
 #include "../graphics/shader/shared_object_ptr.hpp"
+#include "../graphics/shader/object.hpp"
 #include "../physics/broadphase/manager.hpp"
 #include "../nugget_sequence.hpp"
 // If this is omitted, insula.cpp complains about incomplete tick
@@ -99,6 +101,9 @@ public:
 	graphics::shader::object &
 	model_shader();
 
+	graphics::shader::object &
+	model_shadow_shader();
+
 	scene::manager &
 	scene_manager();
 
@@ -115,6 +120,10 @@ public:
 	graphics::scalar
 	water_level() const;
 
+	// This is here just to test the camera in freelook
+	shadow::object const &
+	shadow_object() const { return shadow_; }
+
 	// Holds height_map, skydome and the water
 	~game_outer();
 
@@ -128,7 +137,9 @@ private:
 	player_sequence;
 
 	graphics::shader::shared_object_ptr model_shader_;
+	graphics::shader::shared_object_ptr model_shadow_shader_;
 	scene::manager scene_manager_;
+	shadow::object shadow_;
 	insula::height_map::object_ptr height_map_;
 	skydome::object skydome_;
 	insula::water::object_ptr water_;
@@ -137,7 +148,6 @@ private:
 	sge::font::drawer_ptr font_drawer_;
 	player_time_map player_times_; 
 	physics::broadphase::manager broadphase_manager_;
-	//nugget::manager nugget_manager_;
 	prop::manager prop_manager_;
 	ghost::manager ghost_manager_;
 	random_engine player_position_rng_;

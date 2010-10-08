@@ -71,6 +71,7 @@
 #include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/text.hpp>
+#include <fcppt/io/cout.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/assert.hpp>
 #include <fcppt/variant/apply_unary.hpp>
@@ -84,7 +85,7 @@ insula::height_map::object::object(
 :
 	scene::backend(
 		params.scene_manager,
-		{"water","normal"}),
+		{"water","normal","shadow"}),
 	camera_(
 		params.camera),
 	renderer_(
@@ -144,7 +145,12 @@ insula::height_map::object::object(
 			graphics::shader::variable(
 				"mvp",
 				graphics::shader::variable_type::uniform,
-				graphics::mat4())
+				graphics::mat4()),
+			// This could be const!
+			graphics::shader::variable(
+				"shadow_mvp",
+				graphics::shader::variable_type::uniform,
+				params.shadow_mvp)
 		},
 		{
 			graphics::shader::sampler(
@@ -153,6 +159,9 @@ insula::height_map::object::object(
 					params.gradient_texture_image->view(),
 					sge::renderer::filter::trilinear,
 					sge::renderer::resource_flags::none)),
+			graphics::shader::sampler(
+				"shadow_map",
+				params.shadow_map),
 			graphics::shader::sampler(
 				"grass",
 				renderer_->create_texture(
@@ -166,6 +175,19 @@ insula::height_map::object::object(
 					sge::renderer::filter::trilinear,
 					sge::renderer::resource_flags::none))
 		}),
+	shadow_shader_(
+		renderer_,
+		media_path()/FCPPT_TEXT("height_map_shadow_vertex.glsl"),
+		media_path()/FCPPT_TEXT("height_map_shadow_fragment.glsl"),
+		graphics::shader::vf_to_string<vf::format>(),
+		{
+			graphics::shader::variable(
+				"mvp",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4())
+		},
+		// Samplers
+		{}),
 	extents_(
 		graphics::vec3::null(),
 		graphics::dim3(
@@ -286,6 +308,11 @@ void
 insula::height_map::object::begin(
 	scene::render_pass::object const &rp)
 {
+	if (rp.name == FCPPT_TEXT("shadow"))
+	{
+		return begin_shadow();
+	}
+
 	graphics::shader::scoped scoped_shader_(
 		shader_);
 
@@ -485,3 +512,37 @@ insula::height_map::object::height_scaling() const
 }
 
 insula::height_map::object::~object() {}
+
+void
+insula::height_map::object::begin_shadow()
+{
+	graphics::shader::scoped scoped_shader_(
+		shadow_shader_);
+
+	sge::renderer::scoped_vertex_buffer const scoped_vb_(
+		renderer_,
+		vb_);
+
+	shadow_shader_.set_uniform(
+		FCPPT_TEXT("mvp"),
+		camera_.mvp());
+	
+	sge::renderer::state::scoped scoped_state(
+		renderer_,
+		sge::renderer::state::list
+			// sic!
+		 	(sge::renderer::state::cull_mode::front)
+		 	(sge::renderer::state::depth_func::less));
+
+	renderer_->render(
+		ib_,
+		sge::renderer::first_vertex(
+			0),
+		sge::renderer::vertex_count(
+			vb_->size()),
+		sge::renderer::indexed_primitive_type::triangle,
+		sge::renderer::primitive_count(
+			ib_->size() / 3),
+		sge::renderer::first_index(
+			0));
+}

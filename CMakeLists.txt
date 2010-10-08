@@ -116,6 +116,7 @@ scene/render_pass/scoped.cpp
 )
 SET(prop_files prop/instance.cpp
 prop/manager.cpp)
+SET(shadow_files shadow/object.cpp)
 SET(ghost_files ghost/instance.cpp
 ghost/manager.cpp)
 SET(events_files events/tick.cpp
@@ -165,6 +166,7 @@ SET(projectile_files projectile/manager.cpp)
 SET(nugget_files nugget/manager.cpp)
 SET(model_files model/instance.cpp
 model/backend.cpp
+model/create_shadow_shader.cpp
 model/object.cpp
 model/scoped.cpp
 model/create_shader.cpp)
@@ -178,7 +180,7 @@ SET_SOURCE_FILES_PROPERTIES(
 	COMPILE_FLAGS
 	-DMEDIA_PATH="\\\"${media_path}\\\"")
 
-ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files} ${player_files} ${projectile_files} ${nugget_files})
+ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files} ${player_files} ${projectile_files} ${nugget_files} ${shadow_files})
 
 FUNCTION(CREATE_INSULA_EXE name)
 	ADD_EXECUTABLE(${name} ${name}.cpp)
@@ -194,7 +196,6 @@ ENDFUNCTION(CREATE_INSULA_EXE)
 
 CREATE_INSULA_EXE(load_image_to_array)
 CREATE_INSULA_EXE(view_model)
-CREATE_INSULA_EXE(shadow_map)
 CREATE_INSULA_EXE(point_sprite_test)
 #CREATE_INSULA_EXE(render_scene)
 CREATE_INSULA_EXE(generate_height_texture)

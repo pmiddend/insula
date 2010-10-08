@@ -42,6 +42,7 @@ insula::states::freelook::freelook(
 		context<machine>().systems().renderer(),
 		context<machine>().camera(),
 		context<game_outer>().model_shader(),
+		context<game_outer>().model_shadow_shader(),
 		{
 			{
 				"texture",
@@ -77,6 +78,8 @@ insula::states::freelook::freelook(
 		context<game_outer>().height_map().extents();
 
 	context<machine>().camera().gizmo() = 
+		context<game_outer>().shadow_object().gizmo();
+		/*
 		insula::gizmo::lock_to(
 			insula::gizmo::orthogonalize_keep_axis(
 				graphics::gizmo(
@@ -116,7 +119,7 @@ insula::states::freelook::freelook(
 				static_cast<graphics::scalar>(
 					2),
 				fcppt::math::pi<graphics::scalar>()/
-				static_cast<graphics::scalar>(4));
+				static_cast<graphics::scalar>(4))*/;
 }
 
 boost::statechart::result

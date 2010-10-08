@@ -54,6 +54,7 @@ insula::nugget::manager::manager(
 		params.systems.renderer(),
 		params.camera,
 		params.model_shader,
+		params.model_shadow_shader,
 		{
 			{
 				"texture",
