@@ -47,8 +47,8 @@
 #include <sge/image/file.hpp>
 #include <sge/time/second.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
-#include <fcppt/assign/make_container.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
+#include <initializer_list>
 #include "../media_path.hpp"
 #include "object.hpp"
 
@@ -91,43 +91,38 @@ insula::water::object::object(
 		media_path()/FCPPT_TEXT("water_vertex.glsl"),
 		media_path()/FCPPT_TEXT("water_fragment.glsl"),
 		graphics::shader::vf_to_string<vf::format>(),
-		fcppt::assign::make_container<graphics::shader::variable_sequence>
-			(
+		{
 			graphics::shader::variable(
 				"wave_height",
 				graphics::shader::variable_type::const_,
-				wave_height))
-			(
+				wave_height),
 			graphics::shader::variable(
 				"wind_speed",
 				graphics::shader::variable_type::const_,
-				wind_speed))
-			(
+				wind_speed),
 			graphics::shader::variable(
 				"mvp",
 				graphics::shader::variable_type::uniform,
-				graphics::mat4()))
-			(
+				graphics::mat4()),
 			graphics::shader::variable(
 				"mvp_mirror",
 				graphics::shader::variable_type::uniform,
-				graphics::mat4()))
-			(
+				graphics::mat4()),
 			graphics::shader::variable(
 				"time",
 				graphics::shader::variable_type::uniform,
-				graphics::scalar())),
-		fcppt::assign::make_container<graphics::shader::sampler_sequence>
-			(
+				graphics::scalar())
+		},
+		{
 			graphics::shader::sampler(
 				"bump_texture",
 				renderer_->create_texture(
 					_bump_texture->view(),
 					sge::renderer::filter::linear,
-					sge::renderer::resource_flags::none)))
-			(
+					sge::renderer::resource_flags::none)),
 			graphics::shader::sampler(
-				"reflection_texture"))),
+				"reflection_texture")
+		}),
 	vb_(
 		renderer_->create_vertex_buffer(
 			sge::renderer::vf::dynamic::make_format<vf::format>(),

@@ -38,11 +38,11 @@
 #include <boost/foreach.hpp>
 #include <fcppt/math/matrix/matrix.hpp>
 #include <fcppt/io/cerr.hpp>
-#include <fcppt/assign/make_container.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/from_std_string.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <initializer_list>
 
 namespace
 {
@@ -111,12 +111,12 @@ insula::physics::debug_drawer::debug_drawer(
 		media_path()/FCPPT_TEXT("debug_vertex.glsl"),
 		media_path()/FCPPT_TEXT("debug_fragment.glsl"),
 		graphics::shader::vf_to_string<vertex_format>(),
-		fcppt::assign::make_container<graphics::shader::variable_sequence>
-		(
-		graphics::shader::variable(
-			"mvp",
-			graphics::shader::variable_type::uniform,
-			graphics::mat4())),
+		{
+			graphics::shader::variable(
+				"mvp",
+				graphics::shader::variable_type::uniform,
+				graphics::mat4())
+		},
 		graphics::shader::sampler_sequence()),
 	debug_mode_(
 		btIDebugDraw::DBG_NoDebug) // should be zero

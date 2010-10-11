@@ -90,8 +90,8 @@
 #include <fcppt/math/dim/input.hpp>
 #include <fcppt/math/almost_zero.hpp>
 #include <fcppt/math/vector/slerp.hpp>
-#include <fcppt/assign/make_container.hpp>
 #include <fcppt/io/cifstream.hpp>
+#include <initializer_list>
 #include <boost/program_options.hpp>
 #include <vector>
 #include <cstdlib>
@@ -230,12 +230,12 @@ try
 		media_path()/FCPPT_TEXT("debug_vertex.glsl"),
 		media_path()/FCPPT_TEXT("debug_fragment.glsl"),
 		graphics::shader::vf_to_string<vertex_format>(),
-		fcppt::assign::make_container<graphics::shader::variable_sequence>
-		(
+		{
 		graphics::shader::variable(
 			"mvp",
 			graphics::shader::variable_type::uniform,
-			graphics::mat4())),
+			graphics::mat4())
+		},
 		graphics::shader::sampler_sequence());
 	
 	graphics::camera::object cam(

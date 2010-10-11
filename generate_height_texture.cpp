@@ -30,7 +30,6 @@
 #include <sge/extension_set.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
-#include <fcppt/assign/make_container.hpp>
 #include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/log/activate_levels.hpp>
 #include <fcppt/log/level.hpp>
@@ -106,7 +105,7 @@ try
 		(
 			sge::systems::image_loader(
 				sge::image::capabilities_field::null(),
-				fcppt::assign::make_container<sge::extension_set>(FCPPT_TEXT("png")))));
+				{FCPPT_TEXT("png")})));
 
 	fcppt::io::cout << "Image loader created, loading height map\n";
 

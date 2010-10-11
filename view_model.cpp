@@ -73,7 +73,6 @@
 #include <fcppt/char_type.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
-#include <fcppt/assign/make_container.hpp>
 #include <fcppt/io/cifstream.hpp>
 #include <boost/program_options.hpp>
 #include <vector>
@@ -148,7 +147,7 @@ try
 		(
 			sge::systems::image_loader(
 				sge::image::capabilities_field::null(),
-				fcppt::assign::make_container<sge::extension_set>(FCPPT_TEXT("png")))));
+				{FCPPT_TEXT("png")})));
 
 	console::object console(
 		sys.input_system(),
@@ -198,14 +197,13 @@ try
 		media_path()/FCPPT_TEXT("model_vertex.glsl"),
 		media_path()/FCPPT_TEXT("model_fragment.glsl"),
 		graphics::shader::vf_to_string<model::vf::format>(),
-		fcppt::assign::make_container<graphics::shader::variable_sequence>
-		(
+		{
 			graphics::shader::variable(
 				"mvp",
 				graphics::shader::variable_type::uniform,
-				graphics::mat4())),
-		fcppt::assign::make_container<graphics::shader::sampler_sequence>
-		(
+				graphics::mat4())
+		},
+		{
 			graphics::shader::sampler(
 				"texture",
 				sge::image::create_texture(
@@ -215,7 +213,8 @@ try
 				sys.renderer(),
 				sys.image_loader(),
 				sge::renderer::filter::linear,
-				sge::renderer::resource_flags::none))));
+				sge::renderer::resource_flags::none))
+		});
 
 	model::object model(
 		model_object,

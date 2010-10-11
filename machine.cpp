@@ -60,7 +60,6 @@
 #include <sge/renderer/pixel_pos.hpp>
 // Viewport hack end
 #include <sge/mainloop/dispatch.hpp>
-#include <fcppt/assign/make_container.hpp>
 #include <functional>
 
 insula::machine::machine(
@@ -81,9 +80,7 @@ insula::machine::machine(
 		(
 			sge::systems::audio_loader(
 				sge::audio::loader_capabilities_field::null(),
-				fcppt::assign::make_container<sge::extension_set>
-					(FCPPT_TEXT("wav"))
-					(FCPPT_TEXT("ogg"))))
+				{FCPPT_TEXT("wav"),FCPPT_TEXT("ogg")}))
 		(sge::systems::audio_player_default())
 		(
 			sge::renderer::parameters(

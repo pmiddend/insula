@@ -18,7 +18,6 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/io/istringstream.hpp>
-#include <fcppt/assign/make_container.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/from_std_string.hpp>
 #include <fcppt/math/vector/basic_impl.hpp>
@@ -56,9 +55,7 @@ try
 		(
 			sge::systems::audio_loader(
 				sge::audio::loader_capabilities_field::null(),
-				fcppt::assign::make_container<sge::extension_set>
-					(FCPPT_TEXT("wav"))
-					(FCPPT_TEXT("ogg"))))
+				{FCPPT_TEXT("wav"),FCPPT_TEXT("ogg")}))
 		(sge::systems::audio_player_default()));
 
 	insula::sound_controller music(
