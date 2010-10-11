@@ -2,7 +2,7 @@
 #define INSULA_GRAPHICS_RECT_HPP_INCLUDED
 
 #include "scalar.hpp"
-#include <fcppt/math/box/basic_decl.hpp>
+#include <fcppt/math/box/box.hpp>
 
 namespace insula
 {

@@ -7,8 +7,6 @@
 #include "../vec3.hpp"
 #include "../mat3.hpp"
 #include "../shared_shape_ptr.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/optional.hpp>
 
 namespace insula

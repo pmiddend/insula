@@ -2,7 +2,7 @@
 #define INSULA_HEIGHT_MAP_ARRAY_HPP_INCLUDED
 
 #include "scalar.hpp"
-#include <fcppt/container/grid/object_decl.hpp>
+#include <fcppt/container/grid/object.hpp>
 
 namespace insula
 {

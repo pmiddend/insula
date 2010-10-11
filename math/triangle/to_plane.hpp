@@ -3,9 +3,7 @@
 
 #include "basic.hpp"
 #include "../plane/basic.hpp"
-#include <fcppt/math/vector/cross.hpp>
-#include <fcppt/math/vector/dot.hpp>
-#include <fcppt/math/vector/normalize.hpp>
+#include <fcppt/math/vector/vector.hpp>
 
 namespace insula
 {

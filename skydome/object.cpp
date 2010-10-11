@@ -52,13 +52,10 @@
 #include <sge/systems/instance.hpp>
 #include <sge/image/file.hpp>
 #include <fcppt/math/matrix/transpose.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/twopi.hpp>
-#include <fcppt/math/matrix/output.hpp>
 #include <fcppt/math/rad_to_deg.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/variant/apply_unary.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
 #include <boost/foreach.hpp>
 #include <type_traits>
 #include <cmath>

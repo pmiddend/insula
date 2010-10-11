@@ -46,13 +46,9 @@
 #include <sge/renderer/dim_type.hpp>
 #include <sge/image/file.hpp>
 #include <sge/time/second.hpp>
-#include <fcppt/math/dim/basic_impl.hpp>
-#include <fcppt/math/dim/structure_cast.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/box/basic_impl.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
 #include <fcppt/assign/make_container.hpp>
+#include <fcppt/math/dim/structure_cast.hpp>
 #include "../media_path.hpp"
 #include "object.hpp"
 

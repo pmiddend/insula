@@ -9,10 +9,6 @@
 #include "../gizmo/orthogonalize_keep_axis.hpp"
 #include "../events/render.hpp"
 #include "../player/object.hpp"
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/length.hpp>
-#include <fcppt/math/vector/dot.hpp>
-#include <fcppt/math/vector/output.hpp>
 #include <fcppt/io/cout.hpp>
 #include <boost/program_options/value_semantic.hpp>
 

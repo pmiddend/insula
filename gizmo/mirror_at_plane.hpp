@@ -4,8 +4,6 @@
 #include "mirror_point_at_plane.hpp"
 #include "orthogonalize_simple.hpp"
 #include "normalize.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
 
 // DEBUG BEGIN
 //#include <iostream>

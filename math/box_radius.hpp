@@ -3,9 +3,8 @@
 
 #include <fcppt/math/size_type.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
-#include <fcppt/math/vector/length.hpp>
-#include <fcppt/math/dim/structure_cast.hpp>
-#include <fcppt/math/dim/arithmetic.hpp>
+#include <fcppt/math/vector/vector.hpp>
+#include <fcppt/math/dim/dim.hpp>
 
 namespace insula
 {

@@ -1,6 +1,5 @@
 #include "sphere_point.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/vector.hpp>
 #include <cmath>
 
 insula::skydome::vf::packed_position

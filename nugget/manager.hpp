@@ -18,7 +18,6 @@
 #include "../physics/rigid/object_fwd.hpp"
 #include "../random_engine.hpp"
 #include "../rigid_model.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>

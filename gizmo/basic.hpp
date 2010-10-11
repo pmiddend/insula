@@ -2,8 +2,7 @@
 #define INSULA_GIZMO_BASIC_HPP_INCLUDED
 
 #include "size_type.hpp"
-#include <fcppt/math/vector/static.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/vector/vector.hpp>
 #include <array>
 
 namespace insula

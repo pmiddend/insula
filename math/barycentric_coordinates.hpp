@@ -1,10 +1,7 @@
 #ifndef INSULA_MATH_BARYCENTRIC_COORDINATES_HPP_INCLUDED
 #define INSULA_MATH_BARYCENTRIC_COORDINATES_HPP_INCLUDED
 
-#include <fcppt/math/vector/cross.hpp>
-#include <fcppt/math/vector/length_square.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/vector/vector.hpp>
 #include <cmath>
 
 namespace insula

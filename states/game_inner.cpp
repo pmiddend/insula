@@ -25,9 +25,7 @@
 #include <sge/parse/json/find_member_exn.hpp>
 #include <sge/parse/json/object.hpp>
 #include <fcppt/math/box/structure_cast.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/matrix/structure_cast.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/text.hpp>

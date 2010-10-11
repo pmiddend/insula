@@ -15,9 +15,7 @@
 #include <sge/renderer/default_target.hpp>
 #include <sge/image/color/format.hpp>
 #include <fcppt/math/matrix/translation.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
+// sge doesn't use the big headers
 #include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/dim/output.hpp>

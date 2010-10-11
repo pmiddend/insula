@@ -13,10 +13,6 @@
 #include <BulletCollision/NarrowPhaseCollision/btPersistentManifold.h>
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
-#include <fcppt/math/box/basic_impl.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/dim.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/range/iterator_range_core.hpp>

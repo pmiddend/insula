@@ -2,8 +2,7 @@
 #define INSULA_MATH_TRIANGLE_BASIC_HPP_INCLUDED
 
 #include <fcppt/math/size_type.hpp>
-#include <fcppt/math/vector/static.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/vector/vector.hpp>
 #include <fcppt/assert.hpp>
 #include <initializer_list>
 #include <array>

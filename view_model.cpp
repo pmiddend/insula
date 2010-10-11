@@ -67,17 +67,12 @@
 #include <fcppt/math/deg_to_rad.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/io/cout.hpp>
-#include <fcppt/math/vector/output.hpp>
-#include <fcppt/math/vector/input.hpp>
 #include <fcppt/math/twopi.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/char_type.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/text.hpp>
-#include <fcppt/math/dim/output.hpp>
-#include <fcppt/math/dim/input.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/io/cifstream.hpp>
 #include <boost/program_options.hpp>

@@ -4,7 +4,6 @@
 #include "../graphics/vec3.hpp"
 #include "../graphics/scalar.hpp"
 #include "transparent_instance.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
 
 namespace insula
 {

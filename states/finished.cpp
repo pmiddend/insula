@@ -22,8 +22,6 @@
 #include <sge/input/key_code.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/font/pos.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/math/pi.hpp>
 #include <fcppt/text.hpp>
 #include <cmath>

@@ -2,7 +2,6 @@
 #define INSULA_GIZMO_ORTHOGONALIZE_KEEP_AXIS_HPP_INCLUDED
 
 #include "size_type.hpp"
-#include <fcppt/math/vector/cross.hpp>
 
 namespace insula
 {

@@ -2,7 +2,7 @@
 #define INSULA_GRAPHICS_VEC4_HPP_INCLUDED
 
 #include "scalar.hpp"
-#include <fcppt/math/vector/static.hpp>
+#include <fcppt/math/vector/vector.hpp>
 
 namespace insula
 {

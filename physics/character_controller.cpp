@@ -5,8 +5,6 @@
 #include "bullet_to_vec3.hpp"
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/comparison.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/io/clog.hpp>
 #include <boost/foreach.hpp>

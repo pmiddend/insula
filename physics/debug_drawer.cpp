@@ -36,9 +36,7 @@
 #include <sge/renderer/state/depth_func.hpp>
 #include <boost/mpl/vector/vector10.hpp>
 #include <boost/foreach.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/matrix/matrix.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/assign/make_container.hpp>
 #include <fcppt/text.hpp>

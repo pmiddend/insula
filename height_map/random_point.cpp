@@ -1,10 +1,7 @@
 #include "random_point.hpp"
 #include "object.hpp"
 #include "vec2.hpp"
-#include <fcppt/container/grid/object.hpp>
-
 #include <fcppt/io/cerr.hpp>
-#include <fcppt/math/vector/output.hpp>
 
 namespace
 {

@@ -4,7 +4,7 @@
 #include "shape.hpp"
 #include "../../stdlib/map.hpp"
 #include <sge/model/object.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/vector/vector.hpp>
 #include <fcppt/io/cout.hpp>
 
 insula::physics::triangle_mesh::shape_auto_ptr

@@ -5,8 +5,6 @@
 #include "../physics/shared_shape_ptr.hpp"
 #include "../physics/mat4.hpp"
 #include "../physics/vec3.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
 
 namespace insula
 {

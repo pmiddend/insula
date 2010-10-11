@@ -20,10 +20,6 @@
 #include "../shadow/parameters.hpp"
 #include "../timed_output.hpp"
 #include <fcppt/math/box/structure_cast.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/vector/output.hpp>
-#include <fcppt/math/dim/structure_cast.hpp>
-#include <fcppt/math/vector/dim.hpp>
 #include <fcppt/make_shared_ptr.hpp>
 #include <fcppt/text.hpp>
 #include <sge/renderer/state/cull_mode.hpp>
@@ -40,7 +36,6 @@
 // Viewport hack begin
 #include <sge/renderer/viewport.hpp>
 #include <sge/renderer/pixel_pos.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
 // Viewport hack end
 #include <mizuiro/color/init.hpp>
 #include <boost/program_options/value_semantic.hpp>

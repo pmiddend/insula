@@ -10,7 +10,6 @@
 #include <sge/input/system_ptr.hpp>
 #include <sge/input/key_pair_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
 
 #include <fcppt/io/cout.hpp>
 

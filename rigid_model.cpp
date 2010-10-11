@@ -7,11 +7,8 @@
 #include "graphics/shader/object.hpp"
 #include "graphics/camera/object.hpp"
 #include "physics/bullet_to_vec3.hpp"
-#include <BulletCollision/CollisionShapes/btCollisionShape.h>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/length.hpp>
 #include <fcppt/math/matrix/structure_cast.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
+#include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <algorithm>
 
 insula::rigid_model::rigid_model(

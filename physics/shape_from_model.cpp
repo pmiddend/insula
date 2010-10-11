@@ -6,11 +6,6 @@
 #include <fcppt/math/dim/structure_cast.hpp>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
-#include <fcppt/math/dim/structure_cast.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/vector/length.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/dim/arithmetic.hpp>
 #include <fcppt/assert.hpp>
 
 insula::physics::shared_shape_ptr const

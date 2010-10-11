@@ -59,16 +59,8 @@
 #include <sge/renderer/scoped_texture.hpp>
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/image/file.hpp>
-#include <fcppt/math/vector/cross.hpp>
-#include <fcppt/math/vector/normalize.hpp>
-#include <fcppt/math/dim/arithmetic.hpp>
-#include <fcppt/math/dim/structure_cast.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
 #include <fcppt/math/box/contains_point.hpp>
 #include <fcppt/math/almost_zero.hpp>
-#include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/io/cout.hpp>

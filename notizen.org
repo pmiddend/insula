@@ -1,97 +1,3 @@
-* Neues Konzept
-
-Objekte und Eigenschaften:
-
-- Models
-	- Normale mvp-Matrix der Kamera
-	- Entweder
-		- Normalmatrix
-	- Alternativ
-		- Shadowmap
-		- Shadow-mvp
-	- Eine Textur
-	- Doublesideculling
-- Skydome 
-	- Rotationsmatrix der Kamera
-	- Eigene Projektion (near und far müssen angepasst werden)
-	- Frontculling, Depthbuffer aus
-	- Muss zuerst gezeichnet werden
-	- Keine Textur
-- Terrain
-	- Normale mvp-Matrix der Kamera
-	- Mehrere Texturen
-	- Shadowmap
-- Partikel
-	- Normale mvp-Matrix der Kamera
-	- Alphablending
-	- Eine Textur
-- Wasser
-	- Normale mvp-Matrix der Kamera
-	- Spiegel-mvp
-	- Eine Textur
-
-Anforderungen:
-
-1. Das Terrain und der Skydome (und ggf. noch andere Komponenten)
-   werden aus der Unterwassersicht in das Wassertarget gerendert
-   (dabei muss bei einigen Komponenten das Culling korrigiert werden
-   und die Heightmap muss Clipping aktivieren)
-2. Alle statischen Komponenten werden mit einem Shadow-Shader in die
-   Shadowmap gerendert (dabei muss das Culling angepasst werden).
-3. Alle Komponenten werden in den Framebuffer gerendert
-4. Der Framebuffer wird mit einem PP-Filter als Quad gerendert (das
-   ist unabhängig von allem vorhergehenden)
-5. Das "Overlay" wird gerendert, d.h. die Schrift, die Konsole, usw.
-
-Ideen:
-
-- Klasse =scene::backend= hat die Methoden =begin/end=. Diese bekommen
-  jetzt ein Argument =pass= was den Renderpass angibt (=normal=,
-  =water=, =shadow=). Die können daraufhin den entsprechenden Shader
-  laden und die richtigen Flags setzen.
-- Ein Backend benötigt einen =int=, der seine Priorität angibt. So
-  kann man erzwingen, dass der Skydome als erstes gerendert wird.
-- Ein Backend kann auch einen Namen kriegen, damit man es einfacher
-  deaktivieren kann.
-- Ein Backend kann deaktiviert werden und wird dann übergangen.
-- Eine Instance kann auch deaktiviert werden und wird dann übergangen.
-- Ein *Pass* könnte jetzt eine Funktion sein, die bestimmte
-  Backends/Instanzen deaktiviert und danach
-  =scene::manager::render(pass)= aufruft. Oder eine Klasse mit begin/end
-
-- Wasser-Pass: 
-	- Deaktiviere Wasserbackend
-	- Ggf. deaktiviere Modelbackend
-	- Setze Target auf interne Textur
-	- Setze Unterwasserkamera
-	- =scene::render(passes::water)=
-		- Die Heightmap setzt Clippingplane und wechselt das Culling (zu
-      =both=)
-		- Skydome reagiert nicht darauf und rendert sich ganz normal
-		- Alles andere ist deaktiviert (Models könnten auch gezeichnet werden)
-- Shadow-Pass:
-	- Deaktiviere ggf. Nuggets (einzeln?)
-	- Setze Target auf Shadowtextur
-	- Setze Sonnenkamera, Projektion auf Orthogonal?
-	- =scene::render(passes::shadow)=
-		- Terrain setzt Shadowshader
-
-Probleme:
-- Wie behandelt man die beiden Shader "normal" und "shadow"? Simple
-  Lösung: Jedes Backend erstellt zwei Shader. Aber dann müsste man den
-  kompletten "Prelude" zweimal erstellen mit Variablen und Samplern.
-
-* Vorgehen
-- Shadowmaps einbauen. Auf die Weise spart man es sich vielleicht,
-  sich über die zentrale Speicherstelle für die Beleuchtungsvariablen
-  zu kümmern.
-- Gucken ob Shadowmaps jedes Frame generiert werden können. Falls
-  nein, über Blob Shadows informieren.
-- Nebel einbauen
-- Postprocessingeffekt einbauen - aber nur zum Test. Wenn's nicht gut
-  aussieht, wieder wegnehmen.
-- Terrain-Autogenerierung oder einfach Ersetzung der Texturen durch
-  Farben angehen
 * Links
 - Zwei Fixes für raycastvehicle: http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=2047&hilit=rolling+friction
 - Frustum/Occlusion culling: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=3896
@@ -103,6 +9,18 @@ Probleme:
 - Weiterer CC: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=5712
 - Landschaftsgenerierung http://www.dungeonleague.com/page/2/
 - Neue AA-Methode: http://www.gamedev.net/community/forums/topic.asp?topic_id=580517
+* Stabilisierung
+** TODO Overlaypass
+Dazu gehören:
+- fps-Counter
+- Konsole
+** TODO PP-Pass
+Mit dem Paper von oben
+** TODO cli_factories entfernen
+** TODO Shadowmap blurren (Renderpass)
+** TODO Frustumculling für bestimmte Renderpässe deaktivieren, für andere nochmal ausführen
+Fürs Wasser nochmal ausführen, für Shadow deaktivieren
+** TODO Neues Backend-Framework
 * Ideen für später
 ** TODO Terrain zufallsgenerieren
 ** TODO Farben statt Texturen bei Höhenfeld verwenden
@@ -122,6 +40,7 @@ Hierzu z.B. cgal
 Eine instance trägt sich selber ein und aus und kriegt das Backend im
 Konstruktor.
 ** TODO =camera::perspective= in =camera::projection= umbenennen
+** TODO Persistente Konsolenhistory
 ** DONE Präfixe in config.json auf Sektionen in json abbilden
 	 CLOSED: [2010-10-03 Sun 18:31]
 ** DONE foldl in gameover durch accumulate ersetzen
@@ -135,30 +54,6 @@ Konstruktor.
 Eine Egoshooterkamera funktioniert so: wenn die Maus auf der x-Achse
 bewegt wird, werden alle drei Gizmovektoren um $(0,1,0)$ gedreht
 * Aktivitäten
-** TODO Shadow Maps [1/5]
-*** DONE Neues uniform-System aufsetzen
-		 CLOSED: [2010-09-05 Sun 14:44]
-*** TODO Teste orthografische Projektion aus Sicht der Sonne
-*** TODO Setze das Rendern der Shadowmap auf
-- Hierzu muss orthografisch projiziert werden aus sich der Sonne
-  (Position?)
-- Der Vertexshader sollte nur projizieren
-- Der Fragmentshader sollte nur einen float rausschreiben, die Tiefe
-  des Fragments
-- Die Szene muss in eine Textur gerendert werden
-*** TODO Per Kommandozeile die Tiefentextur in eine Datei schreiben
-*** TODO Den eigentlichen Tiefenalgorithmus implementieren
-
-
-- Der Heightmap-Vertexshader brauch dazu die mvp-Matrix des Lichtrenderns.
-- Für jeden Vertex v werden zwei Größen berechnet: 
-	1. vl = mvp_light * v
-	2. vp = mvp * v
-- Gib vp und vl an den Fragmentshader weiter
-- Berechne aus vl die Texturkoordinate in der Shadowmap (selbe Technik
-  wie beim Wasser)
-- Vergleiche den z-Wert von vp mit dem z-Wert in der Shadowmap, setze
-  entsprechend die Pixel
 ** TODO Neues Fontsystem
 Ziele:
 
@@ -198,14 +93,35 @@ Man könnte die Stats verallgemeinern: Ein "stat" ist eine textuelle
 Informationseinheit (z.B. Geschwindigkeit des Vehikels), die scoped
 beim "stats"-Objekt eingetragen werden kann. Details muss man sich
 noch überlegen.
-** TODO Mehr Musik
-** TODO Persistente Konsolenhistory
 ** TODO Partikelsystem
 ** TODO Props/Ghosts sollen sich Normale anpassen können
-** TODO cli_options weitestgehend loswerden
-Das meiste kann durch json ersetzt werden
 ** TODO Looping von Musik fixen
 Man kann bei Streamingsounds loop einstellen, das funzt aber nicht richtig
+** DONE Shadow Maps
+	 CLOSED: [2010-10-08 Fri 20:01]
+*** DONE Neues uniform-System aufsetzen
+		 CLOSED: [2010-09-05 Sun 14:44]
+*** TODO Teste orthografische Projektion aus Sicht der Sonne
+*** TODO Setze das Rendern der Shadowmap auf
+- Hierzu muss orthografisch projiziert werden aus sich der Sonne
+  (Position?)
+- Der Vertexshader sollte nur projizieren
+- Der Fragmentshader sollte nur einen float rausschreiben, die Tiefe
+  des Fragments
+- Die Szene muss in eine Textur gerendert werden
+*** TODO Per Kommandozeile die Tiefentextur in eine Datei schreiben
+*** TODO Den eigentlichen Tiefenalgorithmus implementieren
+
+
+- Der Heightmap-Vertexshader brauch dazu die mvp-Matrix des Lichtrenderns.
+- Für jeden Vertex v werden zwei Größen berechnet: 
+	1. vl = mvp_light * v
+	2. vp = mvp * v
+- Gib vp und vl an den Fragmentshader weiter
+- Berechne aus vl die Texturkoordinate in der Shadowmap (selbe Technik
+  wie beim Wasser)
+- Vergleiche den z-Wert von vp mit dem z-Wert in der Shadowmap, setze
+  entsprechend die Pixel
 ** DONE Diffuses Modelshading
 	 CLOSED: [2010-10-02 Sat 18:34]
 ** DONE Musiklautstärke muss einstellbar sein

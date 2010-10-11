@@ -3,8 +3,6 @@
 #include "../physics/bullet_to_vec3.hpp"
 #include "../physics/broadphase/manager.hpp"
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/length.hpp>
 #include <algorithm>
 
 insula::ghost::instance::instance(

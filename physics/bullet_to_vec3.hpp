@@ -2,7 +2,6 @@
 #define INSULA_PHYSICS_BULLET_TO_VEC3_HPP_INCLUDED
 
 #include "vec3.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
 
 class btVector3;
 

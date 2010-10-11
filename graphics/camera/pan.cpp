@@ -2,9 +2,7 @@
 #include "../../gizmo/orthogonalize_simple.hpp"
 #include "../scalar.hpp"
 #include "../../timed_output.hpp"
-#include <fcppt/math/vector/length.hpp>
 #include <fcppt/math/almost_zero.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/math/vector/slerp.hpp>
 
 insula::graphics::camera::pan::pan(

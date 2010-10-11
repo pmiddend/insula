@@ -38,14 +38,8 @@
 #include <sge/systems/instance.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/rotation_axis.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/output.hpp>
-#include <fcppt/math/vector/dim.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/twopi.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/assert.hpp>

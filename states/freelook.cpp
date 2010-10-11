@@ -22,10 +22,7 @@
 #include <sge/image/create_texture.hpp>
 #include <sge/renderer/filter/trilinear.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/output.hpp>
 #include <fcppt/math/matrix/translation.hpp>
-#include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/math/pi.hpp>
 #include <fcppt/text.hpp>

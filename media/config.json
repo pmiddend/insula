@@ -75,7 +75,7 @@
 
 	"remaining-time" : 20000,
 	"light-source" : [100.0,100.0,100.0],
-	"shadow-map-size" : [4096,4096],
+	"shadow-map-size" : [2048,2048],
 
 	"props" :
 	[
@@ -159,8 +159,8 @@
 
 	"projectile" :
 	{
-		"model" : "arrow.md3",
-		"texture" : "arrow.png",
+		"model" : "cannonball.md3",
+		"texture" : "cannonball.png",
 		"mass" : 50.0
 	},
 

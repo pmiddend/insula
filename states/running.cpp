@@ -18,7 +18,6 @@
 #include <sge/parse/json/object.hpp>
 #include <sge/renderer/device.hpp>
 #include <fcppt/io/cout.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
 #include <fcppt/text.hpp>
 #include <functional>
 

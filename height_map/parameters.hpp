@@ -10,8 +10,6 @@
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
 #include <sge/image/file_ptr.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
 
 namespace insula
 {

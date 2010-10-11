@@ -5,8 +5,8 @@
 #include "plane/from_vec4.hpp"
 #include "plane/normalize.hpp"
 #include "matrix_row.hpp"
-#include <fcppt/math/matrix/basic.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/matrix/matrix.hpp>
+#include <fcppt/math/vector/vector.hpp>
 
 namespace insula
 {

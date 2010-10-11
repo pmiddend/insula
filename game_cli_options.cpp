@@ -1,9 +1,6 @@
 #include "game_cli_options.hpp"
-#include "nugget_sequence.hpp"
 #include "height_map/flatness_range.hpp"
 #include <boost/program_options/value_semantic.hpp>
-#include <fcppt/math/vector/input.hpp>
-#include <fcppt/math/vector/output.hpp>
 #include <fcppt/string.hpp>
 #include <chrono>
 

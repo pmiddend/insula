@@ -1,7 +1,7 @@
 #ifndef INSULA_MATH_UNIFORM_SCALING_MATRIX_HPP_INCLUDED
 #define INSULA_MATH_UNIFORM_SCALING_MATRIX_HPP_INCLUDED
 
-#include <fcppt/math/matrix/static.hpp>
+#include <fcppt/math/matrix/matrix.hpp>
 #include <fcppt/math/matrix/scaling.hpp>
 
 namespace insula

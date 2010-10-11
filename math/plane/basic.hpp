@@ -1,9 +1,7 @@
 #ifndef INSULA_MATH_PLANE_BASIC_HPP_INCLUDED
 #define INSULA_MATH_PLANE_BASIC_HPP_INCLUDED
 
-#include <fcppt/math/vector/static.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/output.hpp>
+#include <fcppt/math/vector/vector.hpp>
 #include <fcppt/io/ostream.hpp>
 
 namespace insula

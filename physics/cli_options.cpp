@@ -1,8 +1,5 @@
 #include "cli_options.hpp"
 #include "vec3.hpp"
-#include <fcppt/math/vector/input.hpp>
-#include <fcppt/math/vector/output.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
 #include <vector>
 
 boost::program_options::options_description const

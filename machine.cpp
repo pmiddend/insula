@@ -58,11 +58,9 @@
 // Viewport hack begin
 #include <sge/renderer/viewport.hpp>
 #include <sge/renderer/pixel_pos.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
 // Viewport hack end
 #include <sge/mainloop/dispatch.hpp>
 #include <fcppt/assign/make_container.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
 #include <functional>
 
 insula::machine::machine(

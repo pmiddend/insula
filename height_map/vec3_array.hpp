@@ -1,7 +1,7 @@
 #ifndef INSULA_HEIGHT_MAP_VEC3_ARRAY_HPP_INCLUDED
 #define INSULA_HEIGHT_MAP_VEC3_ARRAY_HPP_INCLUDED
 
-#include <fcppt/container/grid/object_decl.hpp>
+#include <fcppt/container/grid/object.hpp>
 #include "vec3.hpp"
 
 namespace insula

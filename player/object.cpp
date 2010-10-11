@@ -12,10 +12,6 @@
 #include <sge/parse/json/float_type.hpp>
 #include <sge/input/key_pair.hpp>
 #include <sge/input/key_code.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/normalize.hpp>
-#include <fcppt/math/vector/comparison.hpp>
 #include <fcppt/text.hpp>
 #include <functional>
 

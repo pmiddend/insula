@@ -57,6 +57,6 @@ void main()
 			rock,
 			texcoord_interp);
 
-	frag_color = vec4((1.0 - shadow) * light_color.xyz,1.0);
+	frag_color = vec4(shadow * light_color.xyz,1.0);
 }
 

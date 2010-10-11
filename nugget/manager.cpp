@@ -28,11 +28,7 @@
 #include <sge/parse/json/int_type.hpp>
 #include <sge/parse/json/string.hpp>
 #include <sge/systems/instance.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/box/basic_impl.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
+#include <fcppt/math/box/box.hpp>
 #include <fcppt/algorithm/ptr_container_erase.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/assert.hpp>

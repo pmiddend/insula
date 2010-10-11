@@ -2,7 +2,7 @@
 #define INSULA_PHYSICS_DIM3_HPP_INCLUDED
 
 #include "scalar.hpp"
-#include <fcppt/math/dim/static.hpp>
+#include <fcppt/math/dim/dim.hpp>
 
 namespace insula
 {

@@ -1,8 +1,7 @@
 #ifndef INSULA_GIZMO_MIRROR_POINT_AT_PLANE_HPP_INCLUDED
 #define INSULA_GIZMO_MIRROR_POINT_AT_PLANE_HPP_INCLUDED
 
-#include <fcppt/math/vector/static.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
+#include <fcppt/math/vector/vector.hpp>
 
 namespace insula
 {

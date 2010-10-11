@@ -8,8 +8,6 @@
 #include <LinearMath/btVector3.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/container/grid/object_impl.hpp>
 #include <fcppt/io/cout.hpp>
 #include <algorithm>
 #include <type_traits>

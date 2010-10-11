@@ -13,7 +13,6 @@
 #include "../graphics/shader/shared_object_ptr.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../physics/broadphase/manager.hpp"
-#include "../nugget_sequence.hpp"
 // If this is omitted, insula.cpp complains about incomplete tick
 // events (!?)
 #include "../events/tick.hpp"

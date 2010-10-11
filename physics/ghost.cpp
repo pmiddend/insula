@@ -1,10 +1,6 @@
 #include "ghost.hpp"
 #include "ghost_parameters.hpp"
 #include "vec3_to_bullet.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/dim.hpp>
-#include <fcppt/math/box/basic_impl.hpp>
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
 
 namespace

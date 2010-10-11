@@ -2,7 +2,7 @@
 #define INSULA_PHYSICS_MAT3_HPP_INCLUDED
 
 #include "scalar.hpp"
-#include <fcppt/math/matrix/static.hpp>
+#include <fcppt/math/matrix/matrix.hpp>
 
 namespace insula
 {

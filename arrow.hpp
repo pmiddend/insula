@@ -9,7 +9,6 @@
 #include "physics/vec3.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
 #include <functional>
 
 namespace insula

@@ -12,8 +12,6 @@
 #include <sge/font/flags_none.hpp>
 #include <sge/font/text_part.hpp>
 #include <sge/image/colors.hpp>
-#include <fcppt/math/dim/basic_impl.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/make_shared_ptr.hpp>

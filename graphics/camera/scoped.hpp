@@ -3,7 +3,6 @@
 
 #include "object_fwd.hpp"
 #include "../gizmo.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
 
 namespace insula
 {

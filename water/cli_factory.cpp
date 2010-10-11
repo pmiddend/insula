@@ -11,8 +11,6 @@
 #include <sge/image/multi_loader.hpp>
 #include <fcppt/string.hpp>
 #include <fcppt/make_shared_ptr.hpp>
-#include <fcppt/math/dim/basic_impl.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/box/stretch.hpp>
 #include <functional>
 

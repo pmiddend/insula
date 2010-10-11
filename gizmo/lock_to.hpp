@@ -4,15 +4,8 @@
 #include "basic.hpp"
 #include "orthogonalize_keep_axis.hpp"
 #include "normalize.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/construct.hpp>
-#include <fcppt/math/vector/narrow_cast.hpp>
-#include <fcppt/math/vector/normalize.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
-#include <fcppt/math/matrix/vector.hpp>
 #include <fcppt/math/matrix/rotation_axis.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
+#include <fcppt/math/matrix/matrix.hpp>
 
 namespace insula
 {

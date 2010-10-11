@@ -37,10 +37,8 @@
 #include <sge/model/vertex_sequence.hpp>
 #include <sge/model/texcoord.hpp>
 #include <sge/model/texcoord_sequence.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
+#include <fcppt/math/vector/vector.hpp>
+#include <fcppt/math/matrix/matrix.hpp>
 #include <fcppt/math/box/basic_impl.hpp>
 #include <fcppt/math/box/extend_bounding_box.hpp>
 #include <fcppt/text.hpp>

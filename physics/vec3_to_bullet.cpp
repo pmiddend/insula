@@ -1,5 +1,4 @@
 #include "vec3_to_bullet.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
 
 btVector3 const
 insula::physics::vec3_to_bullet(

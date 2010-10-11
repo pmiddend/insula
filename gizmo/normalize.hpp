@@ -3,8 +3,6 @@
 
 #include "size_type.hpp"
 #include "basic.hpp"
-#include <fcppt/math/vector/normalize.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
 #include <algorithm>
 
 namespace insula

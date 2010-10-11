@@ -2,7 +2,7 @@
 #define INSULA_HEIGHT_MAP_DIM2_HPP_INCLUDED
 
 #include "scalar.hpp"
-#include <fcppt/math/dim/static.hpp>
+#include <fcppt/math/dim/dim.hpp>
 
 namespace insula
 {

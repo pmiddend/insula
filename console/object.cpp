@@ -15,8 +15,10 @@
 #include <sge/config/media_path.hpp>
 #include <sge/sprite/parameters_impl.hpp>
 #include <sge/sprite/object.hpp>
+// We need the impl here because sge doesn't use the big headers
 #include <fcppt/math/vector/basic_impl.hpp>
 #include <fcppt/math/almost_zero.hpp>
+// Same here
 #include <fcppt/math/dim/basic_impl.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/io/cerr.hpp>

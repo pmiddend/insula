@@ -2,7 +2,7 @@
 #define INSULA_HEIGHT_MAP_VEC3_HPP_INCLUDED
 
 #include "scalar.hpp"
-#include <fcppt/math/vector/static.hpp>
+#include <fcppt/math/vector/vector.hpp>
 
 namespace insula
 {

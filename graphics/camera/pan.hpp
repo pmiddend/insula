@@ -4,7 +4,6 @@
 #include "../scalar.hpp"
 #include "../gizmo.hpp"
 #include "../../time_delta.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
 
 namespace insula
 {

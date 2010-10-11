@@ -5,10 +5,6 @@
 #include <fcppt/variant/object_impl.hpp>
 #include <fcppt/lexical_cast.hpp>
 #include <fcppt/variant/apply_unary.hpp>
-#include <fcppt/math/vector/output.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/matrix/output.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
 #include <fcppt/format.hpp>
 #include <fcppt/io/ostringstream.hpp>
 #include <utility>

@@ -12,13 +12,6 @@
 #include "../math/uniform_scaling_matrix.hpp"
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/rotation_axis.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
-#include <fcppt/math/matrix/vector.hpp>
-#include <fcppt/math/matrix/basic_impl.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/vector/construct.hpp>
-#include <fcppt/math/vector/narrow_cast.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
 #include <boost/foreach.hpp>
 
 namespace

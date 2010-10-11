@@ -19,18 +19,9 @@
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/filter/trilinear.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
-#include <fcppt/math/matrix/arithmetic.hpp>
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/rotation_y.hpp>
-#include <fcppt/math/vector/length.hpp>
-#include <fcppt/math/vector/dot.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/vector/arithmetic.hpp>
-#include <fcppt/math/vector/structure_cast.hpp>
-#include <fcppt/math/vector/normalize.hpp>
-#include <fcppt/math/vector/output.hpp>
-#include <fcppt/math/vector/angle_between.hpp>
-#include <fcppt/math/vector/atan2.hpp>
+#include <fcppt/math/matrix/matrix.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/text.hpp>
 

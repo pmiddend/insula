@@ -4,7 +4,6 @@
 #include "../../input_delegator_fwd.hpp"
 #include "../scalar.hpp"
 #include "../vec3.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
 
 namespace insula
 {

@@ -19,8 +19,6 @@
 #include <sge/parse/json/object.hpp>
 #include <sge/parse/json/array.hpp>
 #include <sge/parse/json/int_type.hpp>
-#include <fcppt/math/vector/basic_impl.hpp>
-#include <fcppt/math/dim/structure_cast.hpp>
 #include <fcppt/text.hpp>
 
 insula::states::pregame::pregame(

@@ -2,7 +2,6 @@
 #include "graphics/vec2.hpp"
 #include "graphics/shader/variable.hpp"
 #include "graphics/shader/value_type_impl.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
 #include <sge/renderer/vf/make_unspecified_tag.hpp>
 #include <sge/renderer/vf/vector.hpp>
 #include <sge/renderer/vf/format.hpp>

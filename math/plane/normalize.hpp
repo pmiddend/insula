@@ -2,7 +2,7 @@
 #define INSULA_MATH_PLANE_NORMALIZE_HPP_INCLUDED
 
 #include "basic.hpp"
-#include <fcppt/math/vector/normalize.hpp>
+#include <fcppt/math/vector/vector.hpp>
 
 namespace insula
 {

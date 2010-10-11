@@ -6,7 +6,6 @@
 #include "flatness_range.hpp"
 #include "object_fwd.hpp"
 #include "../random_engine.hpp"
-#include <fcppt/math/vector/basic_impl.hpp>
 #include <utility>
 
 namespace insula
