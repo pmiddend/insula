@@ -13,24 +13,25 @@
 #include "../graphics/shader/shared_object_ptr.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../physics/broadphase/manager.hpp"
+#include "../overlay/object.hpp"
 // If this is omitted, insula.cpp complains about incomplete tick
 // events (!?)
 #include "../events/tick.hpp"
 #include "../events/render.hpp"
 #include <sge/font/metrics_ptr.hpp>
 #include <sge/font/drawer_ptr.hpp>
+#include <sge/renderer/texture_ptr.hpp>
 #include "game_inner_fwd.hpp"
 #include "../prop/manager.hpp"
 #include "../nugget/manager.hpp"
 #include "../ghost/manager.hpp"
 #include "../random_engine.hpp"
 
-// playermap begin
 #include <fcppt/optional.hpp>
 #include <unordered_map>
 #include <chrono>
 #include <boost/program_options/options_description.hpp>
-// playermap end
+#include <fcppt/signal/scoped_connection.hpp>
 
 namespace insula
 {
@@ -150,6 +151,7 @@ private:
 	prop::manager prop_manager_;
 	ghost::manager ghost_manager_;
 	random_engine player_position_rng_;
+	overlay::object overlay_;
 };
 }
 }

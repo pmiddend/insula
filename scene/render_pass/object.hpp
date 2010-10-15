@@ -5,6 +5,7 @@
 #include "callbacks/camera.hpp"
 #include "callbacks/viewport.hpp"
 #include "callbacks/target.hpp"
+#include <sge/renderer/state/list.hpp>
 
 namespace insula
 {
@@ -20,12 +21,14 @@ public:
 		identifier const &name,
 		callbacks::camera const &camera,
 		callbacks::viewport const &viewport,
-		callbacks::target const &target)
+		callbacks::target const &target,
+		sge::renderer::state::list const &state = sge::renderer::state::list())
 	:
 		name(name),
 		camera(camera),
 		viewport(viewport),
-		target(target)
+		target(target),
+		state(state)
 	{
 	}
 	
@@ -33,6 +36,7 @@ public:
 	callbacks::camera camera;
 	callbacks::viewport viewport;
 	callbacks::target target;
+	sge::renderer::state::list state;
 };
 }
 }

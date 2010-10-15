@@ -136,6 +136,18 @@ insula::graphics::camera::object::aspect() const
 }
 
 insula::graphics::scalar
+insula::graphics::camera::object::near() const
+{
+	return near_;
+}
+
+insula::graphics::scalar
+insula::graphics::camera::object::far() const
+{
+	return far_;
+}
+
+insula::graphics::scalar
 insula::graphics::camera::object::fov() const
 {
 	return fov_;

@@ -63,6 +63,12 @@ public:
 	aspect() const;
 
 	graphics::scalar 
+	near() const;
+
+	graphics::scalar 
+	far() const;
+
+	graphics::scalar 
 	fov() const;
 
 	void

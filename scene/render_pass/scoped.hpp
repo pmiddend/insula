@@ -6,6 +6,7 @@
 #include "../../graphics/camera/object_fwd.hpp"
 #include <sge/renderer/scoped_target.hpp>
 #include <sge/renderer/device_ptr.hpp>
+#include <sge/renderer/state/scoped.hpp>
 #include <sge/renderer/scoped_block.hpp>
 
 namespace insula
@@ -28,6 +29,7 @@ public:
 private:
 	graphics::camera::scoped camera_;
 	sge::renderer::scoped_target target_;
+	sge::renderer::state::scoped state_;
 	sge::renderer::scoped_block block_;
 };
 }

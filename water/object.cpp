@@ -121,7 +121,8 @@ insula::water::object::object(
 					sge::renderer::filter::linear,
 					sge::renderer::resource_flags::none)),
 			graphics::shader::sampler(
-				"reflection_texture")
+				"reflection_texture",
+				target_texture_)
 		}),
 	vb_(
 		renderer_->create_vertex_buffer(
@@ -139,10 +140,6 @@ insula::water::object::object(
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
 		shader_.program());
-
-	shader_.update_texture(
-		"reflection_texture",
-		target_texture_);
 
 	sge::renderer::scoped_vertex_lock const vblock(
 		vb_,

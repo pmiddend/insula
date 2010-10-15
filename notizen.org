@@ -41,6 +41,7 @@ Eine instance trägt sich selber ein und aus und kriegt das Backend im
 Konstruktor.
 ** TODO =camera::perspective= in =camera::projection= umbenennen
 ** TODO Persistente Konsolenhistory
+** TODO An allen Stellen auf functional_backend umsteigen
 ** DONE Präfixe in config.json auf Sektionen in json abbilden
 	 CLOSED: [2010-10-03 Sun 18:31]
 ** DONE foldl in gameover durch accumulate ersetzen

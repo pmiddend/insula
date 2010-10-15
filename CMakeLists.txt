@@ -99,6 +99,8 @@ graphics/camera/scoped.cpp)
 SET(texture_files textures/interpolators/bernstein_polynomial.cpp
 textures/weights.cpp
 textures/blend.cpp) 
+SET(overlay_files overlay/object.cpp
+overlay/function_backend.cpp) 
 SET(console_files console/streambuf.cpp
 console/object.cpp)
 SET(skydome_files
@@ -180,7 +182,7 @@ SET_SOURCE_FILES_PROPERTIES(
 	COMPILE_FLAGS
 	-DMEDIA_PATH="\\\"${media_path}\\\"")
 
-ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files} ${player_files} ${projectile_files} ${nugget_files} ${shadow_files})
+ADD_LIBRARY(insula_library STATIC ${base_files} ${texture_files} ${console_files} ${skydome_files} ${water_files} ${physics_files} ${model_files} ${graphics_files} ${height_map_files} ${states_files} ${events_files} ${json_files} ${scene_files} ${prop_files} ${ghost_files} ${player_files} ${projectile_files} ${nugget_files} ${shadow_files} ${overlay_files})
 
 FUNCTION(CREATE_INSULA_EXE name)
 	ADD_EXECUTABLE(${name} ${name}.cpp)

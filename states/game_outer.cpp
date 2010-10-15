@@ -6,6 +6,8 @@
 #include "../ghost/manager_parameters.hpp"
 #include "../height_map/cli_factory.hpp"
 #include "../stdlib/map.hpp"
+#include "../overlay/parameters.hpp"
+
 #include "../height_map/object.hpp"
 #include "../skydome/object.hpp"
 #include "../skydome/parameters.hpp"
@@ -22,7 +24,6 @@
 #include <fcppt/math/box/structure_cast.hpp>
 #include <fcppt/make_shared_ptr.hpp>
 #include <fcppt/text.hpp>
-#include <sge/renderer/state/cull_mode.hpp>
 #include <sge/font/drawer_3d.hpp>
 #include <sge/parse/json/find_member_exn.hpp>
 #include <sge/parse/json/array.hpp>
@@ -33,10 +34,11 @@
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/default_target.hpp>
-// Viewport hack begin
+#include <sge/renderer/state/bool.hpp>
+#include <sge/renderer/state/trampoline.hpp>
 #include <sge/renderer/viewport.hpp>
 #include <sge/renderer/pixel_pos.hpp>
-// Viewport hack end
+#include <sge/renderer/device.hpp>
 #include <mizuiro/color/init.hpp>
 #include <boost/program_options/value_semantic.hpp>
 #include <algorithm>
@@ -168,14 +170,20 @@ insula::states::game_outer::game_outer(
 			static_cast<height_map::scalar>(
 				water_->water_level()))),
 	player_position_rng_(
-		random_seed())
+		random_seed()),
+	overlay_(
+		overlay::parameters(
+			context<machine>().systems(),
+			scene_manager_,
+			context<machine>().camera()))
 {
 	if (player_times_.empty())
 		throw exception(FCPPT_TEXT("You have to specify at least one player"));
 
+	/*
 	scene_manager_.add(
 		scene::render_pass::object(
-			FCPPT_TEXT("normal"),
+			FCPPT_TEXT("overlay"),
 			[this]() 
 			{ 
 				return this->context<machine>().camera().gizmo(); 
@@ -190,8 +198,10 @@ insula::states::game_outer::game_outer(
 			[]() 
 			{ 
 				return sge::renderer::default_target(); 
-			}),
-			{"water"});
+			},
+			sge::renderer::state::list
+				(sge::renderer::state::bool_::clear_backbuffer = false)),
+			{"normal"});*/
 }
 
 insula::height_map::object &
