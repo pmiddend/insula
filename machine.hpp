@@ -96,7 +96,10 @@ private:
 	graphics::camera::object camera_;
 	fcppt::signal::scoped_connection exit_callback_;
 	fcppt::signal::scoped_connection wireframe_callback_;
-	fcppt::signal::scoped_connection input_callback_,input_repeat_callback_;
+	fcppt::signal::scoped_connection 
+		key_callback_,
+		mouse_axis_callback_,
+		mouse_button_callback_;
 	graphics::stats stats_;
 	bool show_stats_;
 	fcppt::signal::scoped_connection stats_callback_;

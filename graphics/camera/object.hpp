@@ -7,8 +7,8 @@
 #include "../vec4.hpp"
 #include "../gizmo.hpp"
 #include "parameters_fwd.hpp"
-#include <sge/input/system_ptr.hpp>
-#include <sge/input/key_pair_fwd.hpp>
+#include <sge/input/keyboard/key_event_fwd.hpp>
+#include <sge/input/mouse/axis_event_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 
 #include <fcppt/io/cout.hpp>
@@ -75,7 +75,7 @@ public:
 	movement(
 		bool);
 private:
-	fcppt::signal::scoped_connection input_connection_;
+	fcppt::signal::scoped_connection key_callback_,mouse_axis_callback_;
 	scalar aspect_,fov_,near_,far_;
 	scalar movement_speed_,rotation_speed_;
 	vec3 dirs_;
@@ -83,8 +83,12 @@ private:
 	bool movement_;
 
 	void
-	input_callback(
-		sge::input::key_pair const &);
+	key_callback(
+		sge::input::keyboard::key_event const &);
+
+	void
+	mouse_axis_callback(
+		sge::input::mouse::axis_event const &);
 };
 }
 }

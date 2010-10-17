@@ -83,7 +83,7 @@ boost::statechart::result
 insula::states::finished::react(
 	events::key const &r)
 {
-	if (r.pair().key().code() == sge::input::kc::key_return)
+	if (r.event().key().code() == sge::input::keyboard::key_code::return_)
 	{
 		if (context<game_outer>().players_left())
 			return transit<game_inner>();

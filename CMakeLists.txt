@@ -122,7 +122,8 @@ SET(shadow_files shadow/object.cpp)
 SET(ghost_files ghost/instance.cpp
 ghost/manager.cpp)
 SET(events_files events/tick.cpp
-events/key_repeat.cpp
+events/mouse_axis.cpp
+events/mouse_button.cpp
 events/render.cpp
 events/key.cpp)
 SET(states_files states/camera_move.cpp
@@ -173,7 +174,9 @@ model/object.cpp
 model/scoped.cpp
 model/create_shader.cpp)
 SET(json_files json/parse_config.cpp
-json/parse_font.cpp)
+json/parse_font.cpp
+json/string_to_value.cpp)
+#json/merge_trees.cpp)
 SET(base_files media_path.cpp input_delegator.cpp create_path.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp help_needed.cpp create_variables_map.cpp game_cli_options.cpp random_seed.cpp scoped_machine.cpp timed_output.cpp turn_timer.cpp milliseconds_to_string.cpp rigid_model.cpp arrow.cpp)
 
 SET_SOURCE_FILES_PROPERTIES(

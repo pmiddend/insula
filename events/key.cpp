@@ -1,15 +1,15 @@
 #include "key.hpp"
 
 insula::events::key::key(
-	sge::input::key_pair const &_k)
+	sge::input::keyboard::key_event const &_k)
 :
 	k_(
 		_k)
 {
 }
 
-sge::input::key_pair const &
-insula::events::key::pair() const
+sge::input::keyboard::key_event const &
+insula::events::key::event() const
 {
 	return k_;
 }

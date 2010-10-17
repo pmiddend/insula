@@ -122,7 +122,10 @@ try
 				sge::renderer::window_mode::windowed,
 				sge::renderer::vsync::on,
 				sge::renderer::no_multi_sampling))
-		(sge::systems::parameterless::input)
+		(sge::systems::input(
+			sge::systems::input_helper_field(
+				sge::systems::input_helper::keyboard_collector) 
+					| sge::systems::input_helper::mouse_collector))
 		(sge::systems::parameterless::font)
 		(
 			sge::systems::image_loader(

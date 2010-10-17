@@ -64,9 +64,10 @@
 #include <sge/image/colors.hpp>
 #include <sge/time/timer.hpp>
 #include <sge/time/second.hpp>
-#include <sge/input/system.hpp>
-#include <sge/input/action.hpp>
-#include <sge/input/key_code.hpp>
+#include <sge/input/keyboard/collector.hpp>
+#include <sge/input/keyboard/action.hpp>
+#include <sge/input/keyboard/key_event.hpp>
+#include <sge/input/keyboard/key_code.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/extension_set.hpp>
 #include <sge/model/loader_ptr.hpp>
@@ -207,7 +208,10 @@ try
 				sge::renderer::window_mode::windowed,
 				sge::renderer::vsync::on,
 				sge::renderer::no_multi_sampling))
-		(sge::systems::parameterless::input)
+		(sge::systems::input(
+			sge::systems::input_helper_field(
+				sge::systems::input_helper::keyboard_collector) 
+					| sge::systems::input_helper::mouse_collector))
 		(sge::systems::parameterless::font)
 		(
 			sge::systems::image_loader(
@@ -215,14 +219,14 @@ try
 				sge::all_extensions)));
 
 	console::object console(
-		sys.input_system(),
+		sys.keyboard_collector(),
 		sys.renderer(),
 		sys.font_system(),
 		sys.image_loader(),
 		console::redirect_mode::all);
 
 	input_delegator input_delegator_(
-		sys.input_system(),
+		sys,
 		console);
 
 	graphics::shader::object shader_(
@@ -250,9 +254,9 @@ try
 		true;
 
 	fcppt::signal::scoped_connection const cb(
-		sys.input_system()->register_callback(
-			sge::input::action(
-				sge::input::kc::key_escape,
+		sys.keyboard_collector()->key_callback(
+			sge::input::keyboard::action(
+				sge::input::keyboard::key_code::escape,
 				[&running]() { running = false; })));
 	
 	sge::time::timer frame_timer(
@@ -301,10 +305,10 @@ try
 		sge::time::activation_state::inactive);
 
 	fcppt::signal::scoped_connection start_cb(
-		sys.input_system()->register_callback(
-			[&anim_timer](sge::input::key_pair const &k)
+		sys.keyboard_collector()->key_callback(
+			[&anim_timer](sge::input::keyboard::key_event const &k)
 			{
-				if (k.key().code() == sge::input::kc::key_return && !anim_timer.active())
+				if (k.key().code() == sge::input::keyboard::key_code::return_ && !anim_timer.active())
 				{
 					fcppt::io::cout << "Activating animation\n";
 					anim_timer.activate();

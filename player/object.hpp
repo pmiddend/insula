@@ -9,7 +9,8 @@
 #include "../time_delta.hpp"
 #include "../graphics/camera/object_fwd.hpp"
 #include "../projectile/manager_fwd.hpp"
-#include <sge/input/key_pair_fwd.hpp>
+#include <sge/input/keyboard/key_event_fwd.hpp>
+#include <sge/input/mouse/button_event_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <map>
 
@@ -45,14 +46,18 @@ private:
 	graphics::camera::object &camera_;
 	physics::character_controller character_controller_;
 	physics::scalar walk_speed_;
-	fcppt::signal::scoped_connection input_connection_;
+	fcppt::signal::scoped_connection key_callback_,mouse_button_callback_;
 	// Tells me if the given action should be executed currently
 	action_map action_execute_;
 	projectile::manager &projectiles_;
 
 	void
-	input_callback(
-		sge::input::key_pair const &);
+	key_callback(
+		sge::input::keyboard::key_event const &);
+
+	void
+	mouse_button_callback(
+		sge::input::mouse::button_event const &);
 };
 }
 }

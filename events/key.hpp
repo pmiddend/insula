@@ -1,7 +1,7 @@
 #ifndef INSULA_EVENTS_KEY_HPP_INCLUDED
 #define INSULA_EVENTS_KEY_HPP_INCLUDED
 
-#include <sge/input/key_pair.hpp>
+#include <sge/input/keyboard/key_event.hpp>
 #include <boost/statechart/event.hpp>
 
 namespace insula
@@ -15,12 +15,12 @@ class key
 public:
 	explicit
 	key(
-		sge::input::key_pair const &);
+		sge::input::keyboard::key_event const &);
 
-	sge::input::key_pair const &
-	pair() const;
+	sge::input::keyboard::key_event const &
+	event() const;
 private:
-	sge::input::key_pair k_;
+	sge::input::keyboard::key_event k_;
 };
 }
 }

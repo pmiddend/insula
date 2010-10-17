@@ -3,7 +3,7 @@
 
 #include "redirect_mode.hpp"
 #include "streambuf.hpp"
-#include <sge/input/system_ptr.hpp>
+#include <sge/input/keyboard/device_ptr.hpp>
 #include <sge/console/object.hpp>
 #include <sge/console/gfx.hpp>
 #include <sge/renderer/device_ptr.hpp>
@@ -32,7 +32,7 @@ public:
 	
 	explicit
 	object(
-		sge::input::system_ptr,
+		sge::input::keyboard::device_ptr,
 		sge::renderer::device_ptr,
 		sge::font::system_ptr,
 		sge::image::multi_loader &,

@@ -1,65 +1,87 @@
 #include "input_delegator.hpp"
 #include "console/object.hpp"
-#include <sge/input/system.hpp>
-#include <sge/input/key_code.hpp>
-#include <sge/input/key_pair.hpp>
+#include <sge/systems/instance.hpp>
+#include <sge/input/keyboard/collector.hpp>
+#include <sge/input/mouse/collector.hpp>
+#include <sge/input/keyboard/key_event.hpp>
+#include <sge/input/keyboard/key.hpp>
 #include <fcppt/math/almost_zero.hpp>
 #include <functional>
 
 insula::input_delegator::input_delegator(
-	sge::input::system_ptr const is,
+	sge::systems::instance const &systems,
 	console::object &_con)
 :
 	con_(
 		_con),
 	c1(
-		is->register_callback(
+		systems.keyboard_collector()->key_callback(
 			std::bind(
-				&input_delegator::callback,
+				&input_delegator::key_callback_internal,
 				this,
 				std::placeholders::_1))),
 	c2(
-		is->register_repeat_callback(
+		systems.mouse_collector()->axis_callback(
 			std::bind(
-				&input_delegator::repeat_callback,
+				&input_delegator::mouse_axis_callback_internal,
+				this,
+				std::placeholders::_1))),
+	c3(
+		systems.mouse_collector()->button_callback(
+			std::bind(
+				&input_delegator::mouse_button_callback_internal,
 				this,
 				std::placeholders::_1)))
 {
 }
 
 fcppt::signal::auto_connection
-insula::input_delegator::register_callback(
-	sge::input::callback const &c)
+insula::input_delegator::key_callback(
+	sge::input::keyboard::key_callback const &c)
 {
-	return signal_.connect(c);
+	return key_signal_.connect(c);
 }
 
 fcppt::signal::auto_connection
-insula::input_delegator::register_repeat_callback(
-	sge::input::repeat_callback const &c)
+insula::input_delegator::mouse_axis_callback(
+	sge::input::mouse::axis_callback const &c)
 {
-	return repeat_signal_.connect(c);
+	return mouse_axis_signal_.connect(c);
+}
+
+fcppt::signal::auto_connection
+insula::input_delegator::mouse_button_callback(
+	sge::input::mouse::button_callback const &c)
+{
+	return mouse_button_signal_.connect(c);
 }
 
 void
-insula::input_delegator::callback(
-	sge::input::key_pair const &c)
+insula::input_delegator::key_callback_internal(
+	sge::input::keyboard::key_event const &c)
 {
 	if(
-		c.key().code() == sge::input::kc::key_f1 && 
-		!fcppt::math::almost_zero(c.value()))
+		c.key().code() == sge::input::keyboard::key_code::f1 && 
+		!c.pressed())
 		con_.view().active(
 			!con_.view().active());
 	if (!con_.view().active())
-		signal_(
+		key_signal_(
 			c);
 }
 
 void
-insula::input_delegator::repeat_callback(
-	sge::input::key_type const &c)
+insula::input_delegator::mouse_axis_callback_internal(
+	sge::input::mouse::axis_event const &e)
 {
-	if (!con_.view().active())
-		repeat_signal_(
-			c);
+	mouse_axis_signal_(
+		e);
+}
+
+void
+insula::input_delegator::mouse_button_callback_internal(
+	sge::input::mouse::button_event const &b)
+{
+	mouse_button_signal_(
+		b);
 }

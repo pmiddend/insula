@@ -97,7 +97,7 @@ boost::statechart::result
 insula::states::pregame::react(
 	events::key const &r)
 {
-	if (r.pair().key().code() == sge::input::kc::key_return)
+	if (r.event().key().code() == sge::input::keyboard::key_code::return_)
 	{
 		fcppt::io::cout << FCPPT_TEXT("Return pressed, now switching to running\n");
 		return 

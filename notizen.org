@@ -9,6 +9,12 @@
 - Weiterer CC: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=5712
 - Landschaftsgenerierung http://www.dungeonleague.com/page/2/
 - Neue AA-Methode: http://www.gamedev.net/community/forums/topic.asp?topic_id=580517
+* Konfigurationssystem
+- Alle Daten stehen in der json-Datei
+- Alle Subsysteme kriegen ein json-Objekt
+- Von der Kommandozeile kann man jede json-Option überschreiben
+- Problem: Arrays: --sun-direction=(1.0,1.0,1.0), wie einlesen? Im
+  json zu sun-direction springen und dann Visitor. Der findet ein Array und versucht und visited seine Kinder
 * Stabilisierung
 ** TODO Overlaypass
 Dazu gehören:

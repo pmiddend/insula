@@ -161,7 +161,7 @@ boost::statechart::result
 insula::states::freelook::react(
 	events::key const &r)
 {
-	if (r.pair().key().code() == sge::input::kc::key_return)
+	if (r.event().key().code() == sge::input::keyboard::key_code::return_)
 		return transit<camera_move>();
 
 	return discard_event();

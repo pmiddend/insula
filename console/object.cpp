@@ -9,7 +9,6 @@
 #include <sge/renderer/device.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/image/file.hpp>
-#include <sge/input/key_pair.hpp>
 #include <sge/texture/part_ptr.hpp>
 #include <sge/texture/part_raw.hpp>
 #include <sge/config/media_path.hpp>
@@ -27,7 +26,7 @@
 #include <functional>
 
 insula::console::object::object(
-	sge::input::system_ptr const is,
+	sge::input::keyboard::device_ptr const is,
 	sge::renderer::device_ptr const rend,
 	sge::font::system_ptr const fs,
 	sge::image::multi_loader &il,

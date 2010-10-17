@@ -2,11 +2,16 @@
 #define INSULA_INPUT_DELEGATOR_HPP_INCLUDED
 
 #include "console/object_fwd.hpp"
-#include <sge/input/system_ptr.hpp>
-#include <sge/input/callback.hpp>
-#include <sge/input/repeat_callback.hpp>
-#include <sge/input/key_pair_function.hpp>
-#include <sge/input/key_type_function.hpp>
+#include <sge/systems/instance_fwd.hpp>
+#include <sge/input/keyboard/key_function.hpp>
+#include <sge/input/mouse/axis_function.hpp>
+#include <sge/input/mouse/button_function.hpp>
+#include <sge/input/keyboard/key_callback.hpp>
+#include <sge/input/keyboard/key_event_fwd.hpp>
+#include <sge/input/mouse/axis_callback.hpp>
+#include <sge/input/mouse/button_callback.hpp>
+#include <sge/input/mouse/button_event_fwd.hpp>
+#include <sge/input/mouse/axis_event_fwd.hpp>
 #include <fcppt/signal/auto_connection.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <fcppt/signal/object.hpp>
@@ -26,30 +31,38 @@ public:
 
 	explicit 
 	input_delegator(
-		sge::input::system_ptr,
+		sge::systems::instance const &,
 		console::object &);
 
 	fcppt::signal::auto_connection
-	register_callback(
-		sge::input::callback const &);
+	key_callback(
+		sge::input::keyboard::key_callback const &);
 
 	fcppt::signal::auto_connection
-	register_repeat_callback(
-		sge::input::repeat_callback const &);
+	mouse_axis_callback(
+		sge::input::mouse::axis_callback const &);
+
+	fcppt::signal::auto_connection
+	mouse_button_callback(
+		sge::input::mouse::button_callback const &);
 private:
 	console::object &con_;
-	fcppt::signal::object<sge::input::key_pair_function> signal_;
-	fcppt::signal::object<sge::input::key_type_function> repeat_signal_;
-
-	fcppt::signal::scoped_connection c1,c2;
-
-	void
-	callback(
-		sge::input::key_pair const &);
+	fcppt::signal::object<sge::input::keyboard::key_function> key_signal_;
+	fcppt::signal::object<sge::input::mouse::axis_function> mouse_axis_signal_;
+	fcppt::signal::object<sge::input::mouse::button_function> mouse_button_signal_;
+	fcppt::signal::scoped_connection c1,c2,c3;
 
 	void
-	repeat_callback(
-		sge::input::key_type const &);
+	key_callback_internal(
+		sge::input::keyboard::key_event const &);
+
+	void
+	mouse_axis_callback_internal(
+		sge::input::mouse::axis_event const &);
+
+	void
+	mouse_button_callback_internal(
+		sge::input::mouse::button_event const &);
 };
 }
 

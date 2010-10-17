@@ -10,8 +10,9 @@
 #include <sge/parse/json/array.hpp>
 #include <sge/parse/json/find_member_exn.hpp>
 #include <sge/parse/json/float_type.hpp>
-#include <sge/input/key_pair.hpp>
-#include <sge/input/key_code.hpp>
+#include <sge/input/keyboard/key_event.hpp>
+#include <sge/input/mouse/button_event.hpp>
+#include <sge/input/mouse/button_code.hpp>
 #include <fcppt/text.hpp>
 #include <functional>
 
@@ -43,10 +44,16 @@ insula::player::object::object(
 			sge::parse::json::find_member_exn<sge::parse::json::float_type>(
 				params.config_file.members,
 				FCPPT_TEXT("walk-speed")))),
-	input_connection_(
-		params.input_delegator.register_callback(
+	key_callback_(
+		params.input_delegator.key_callback(
 			std::bind(
-				&object::input_callback,
+				&object::key_callback,
+				this,
+				std::placeholders::_1))),
+	mouse_button_callback_(
+		params.input_delegator.mouse_button_callback(
+			std::bind(
+				&object::mouse_button_callback,
 				this,
 				std::placeholders::_1))),
 	projectiles_(
@@ -87,25 +94,36 @@ insula::player::object::update(
 }
 
 void
-insula::player::object::input_callback(
-	sge::input::key_pair const &k)
+insula::player::object::key_callback(
+	sge::input::keyboard::key_event const &k)
 {
 	switch (k.key().code())
 	{
-		case sge::input::kc::key_w:
-			action_execute_[action::forward] = k.value();
+		case sge::input::keyboard::key_code::w:
+			action_execute_[action::forward] = k.pressed();
 			break;
-		case sge::input::kc::key_s:
-			action_execute_[action::backward] = k.value();
+		case sge::input::keyboard::key_code::s:
+			action_execute_[action::backward] = k.pressed();
 			break;
-		case sge::input::kc::key_a:
-			action_execute_[action::left] = k.value();
+		case sge::input::keyboard::key_code::a:
+			action_execute_[action::left] = k.pressed();
 			break;
-		case sge::input::kc::key_d:
-			action_execute_[action::right] = k.value();
+		case sge::input::keyboard::key_code::d:
+			action_execute_[action::right] = k.pressed();
 			break;
-		case sge::input::kc::mouse_l:
-			if (k.value())
+		default:
+			break;
+	}
+}
+
+void
+insula::player::object::mouse_button_callback(
+	sge::input::mouse::button_event const &k)
+{
+	switch (k.button_code())
+	{
+		case sge::input::mouse::button_code::left:
+			if (k.pressed())
 			{
 				projectiles_.spawn(
 					camera_.gizmo().position() - 

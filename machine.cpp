@@ -8,7 +8,8 @@
 #include "graphics/vec3.hpp"
 #include "events/tick.hpp"
 #include "events/key.hpp"
-#include "events/key_repeat.hpp"
+#include "events/mouse_axis.hpp"
+#include "events/mouse_button.hpp"
 #include "events/render.hpp"
 #include "states/game_outer.hpp"
 #include <sge/window/parameters.hpp>
@@ -32,12 +33,17 @@
 #include <sge/renderer/state/list.hpp>
 #include <sge/renderer/state/draw_mode.hpp>
 // For the exit callback begin
-#include <sge/input/system.hpp>
-#include <sge/input/action.hpp>
-#include <sge/input/key_code.hpp>
+#include <sge/input/keyboard/collector.hpp>
+#include <sge/input/mouse/collector.hpp>
+#include <sge/input/mouse/axis_event_fwd.hpp>
+#include <sge/input/mouse/button_event_fwd.hpp>
+#include <sge/input/keyboard/key_code.hpp>
+#include <sge/input/keyboard/action.hpp>
+#include <sge/input/keyboard/key_event_fwd.hpp>
 // For the exit callback end
 #include <sge/systems/parameterless.hpp>
 #include <sge/systems/image_loader.hpp>
+#include <sge/systems/input.hpp>
 #include <sge/systems/list.hpp>
 // Default state begin
 #include <sge/renderer/state/bool.hpp>
@@ -97,7 +103,10 @@ insula::machine::machine(
 				sge::renderer::window_mode::windowed,
 				sge::renderer::vsync::on,
 				sge::renderer::no_multi_sampling))
-		(sge::systems::parameterless::input)
+		(sge::systems::input(
+			sge::systems::input_helper_field(
+				sge::systems::input_helper::keyboard_collector) 
+					| sge::systems::input_helper::mouse_collector))
 		(sge::systems::parameterless::md3_loader)
 		(sge::systems::parameterless::font)
 		(
@@ -105,7 +114,7 @@ insula::machine::machine(
 				sge::image::capabilities_field::null(),
 				sge::all_extensions))),
 	console_(
-		systems_.input_system(),
+		systems_.keyboard_collector(),
 		systems_.renderer(),
 		systems_.font_system(),
 		systems_.image_loader(),
@@ -117,7 +126,7 @@ insula::machine::machine(
 			: 
 				console::redirect_mode::none),
 	input_delegator_(
-		systems_.input_system(),
+		systems_,
 		console_),
 	camera_(
 		graphics::camera::cli_factory(
@@ -127,9 +136,9 @@ insula::machine::machine(
 				systems_.renderer()->screen_size()),
 			graphics::vec3::null())),
 	exit_callback_(
-		systems_.input_system()->register_callback(
-			sge::input::action(
-				sge::input::kc::key_escape,
+		systems_.keyboard_collector()->key_callback(
+			sge::input::keyboard::action(
+				sge::input::keyboard::key_code::escape,
 				[&running_]() { running_ = false; }))),
 	wireframe_callback_(
 		console_.model().insert(
@@ -157,18 +166,30 @@ insula::machine::machine(
 							(sge::renderer::state::draw_mode::fill));
 			},
 			FCPPT_TEXT("Toggle wireframe mode"))),
-	input_callback_(
-		input_delegator_.register_callback(
-			std::bind(
-				&machine::input_callback,
-				this,
-				std::placeholders::_1))),
-	input_repeat_callback_(
-		input_delegator_.register_repeat_callback(
-			std::bind(
-				&machine::input_repeat_callback,
-				this,
-				std::placeholders::_1))),
+	key_callback_(
+		systems_.keyboard_collector()->key_callback(
+			[this](sge::input::keyboard::key_event const &e) 
+			{
+				this->process_event(
+					events::key(
+						e));
+			})),
+	mouse_axis_callback_(
+		systems_.mouse_collector()->axis_callback(
+			[this](sge::input::mouse::axis_event const &e) 
+			{
+				this->process_event(
+					events::mouse_axis(
+						e));
+			})),
+	mouse_button_callback_(
+		systems_.mouse_collector()->button_callback(
+			[this](sge::input::mouse::button_event const &e) 
+			{
+				this->process_event(
+					events::mouse_button(
+						e));
+			})),
 	stats_(
 		systems_.renderer(),
 		systems_.font_system()),
@@ -288,23 +309,3 @@ insula::machine::running() const
 }
 
 insula::machine::~machine() {}
-
-void
-insula::machine::input_callback(
-	sge::input::key_pair const &k)
-{
-	process_event(
-		events::key(
-			k));
-}
-
-void
-insula::machine::input_repeat_callback(
-	sge::input::key_type const &k)
-{
-	/* FIXME: this is kinda broken
-	process_event(
-		events::key_repeat(
-			k));
-	*/
-}

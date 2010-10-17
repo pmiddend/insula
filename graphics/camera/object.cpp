@@ -5,15 +5,13 @@
 #include "../mat3.hpp"
 #include "../../input_delegator.hpp"
 #include "parameters.hpp"
-#include <sge/input/key_pair.hpp>
-#include <sge/input/system.hpp>
+#include <sge/input/mouse/axis_event.hpp>
+#include <sge/input/mouse/axis.hpp>
+#include <sge/input/keyboard/key_event.hpp>
 #include <fcppt/math/matrix/perspective.hpp>
 #include <fcppt/math/matrix/translation.hpp>
 #include <fcppt/math/matrix/rotation_axis.hpp>
 #include <fcppt/math/matrix/transpose.hpp>
-#include <fcppt/math/almost_zero.hpp>
-#include <fcppt/math/compare.hpp>
-#include <fcppt/math/pi.hpp>
 #include <fcppt/io/cout.hpp>
 #include <fcppt/assert.hpp>
 
@@ -23,10 +21,16 @@
 insula::graphics::camera::object::object(
 	parameters const &params)
 :
-	input_connection_(
-		params.input_delegator.register_callback(
+	key_callback_(
+		params.input_delegator.key_callback(
 			std::bind(
-				&object::input_callback,
+				&object::key_callback,
+				this,
+				std::placeholders::_1))),
+	mouse_axis_callback_(
+		params.input_delegator.mouse_axis_callback(
+			std::bind(
+				&object::mouse_axis_callback,
 				this,
 				std::placeholders::_1))),
 	aspect_(
@@ -161,15 +165,46 @@ insula::graphics::camera::object::movement(
 }
 
 void
-insula::graphics::camera::object::input_callback(
-	sge::input::key_pair const &k)
+insula::graphics::camera::object::key_callback(
+	sge::input::keyboard::key_event const &k)
 {
-	scalar const angle = 
-		static_cast<scalar>(k.value())/rotation_speed_;
-
 	switch (k.key().code())
 	{
-		case sge::input::kc::mouse_x_axis:
+		case sge::input::keyboard::key_code::space:
+			dirs_[1] = !k.pressed() ? 0 : 1;
+			break;
+		case sge::input::keyboard::key_code::lctrl:
+			dirs_[1] = !k.pressed() ? 0 : -1;
+			break;
+		case sge::input::keyboard::key_code::up:
+			dirs_[2] = !k.pressed() ? 0 : -1;
+			break;
+		case sge::input::keyboard::key_code::down:
+			dirs_[2] = !k.pressed() ? 0 : 1;
+			break;
+		case sge::input::keyboard::key_code::left:
+			dirs_[0] = !k.pressed() ? 0 : -1;
+			break;
+		case sge::input::keyboard::key_code::right:
+			dirs_[0] = !k.pressed() ? 0 : 1;
+			break;
+		default:
+			break;
+	}
+}
+
+void
+insula::graphics::camera::object::mouse_axis_callback(
+	sge::input::mouse::axis_event const &k)
+{
+	scalar const angle = 
+		static_cast<scalar>(
+			k.axis_position())
+			/rotation_speed_;
+
+	switch (k.axis())
+	{
+		case sge::input::mouse::axis::x:
 		{
 		using fcppt::math::matrix::rotation_axis;
 		using fcppt::math::vector::narrow_cast;
@@ -203,7 +238,7 @@ insula::graphics::camera::object::input_callback(
 				.right(normalize(right));
 		}
 		break;
-		case sge::input::kc::mouse_y_axis:
+		case sge::input::mouse::axis::y:
 		{
 			using fcppt::math::matrix::rotation_axis;
 			using fcppt::math::vector::narrow_cast;
@@ -231,24 +266,7 @@ insula::graphics::camera::object::input_callback(
 					.right(normalize(right));
 		}
 		break;
-		case sge::input::kc::key_space:
-			dirs_[1] = !k.value() ? 0 : 1;
-			break;
-		case sge::input::kc::key_lctrl:
-			dirs_[1] = !k.value() ? 0 : -1;
-			break;
-		default:
-			if (k.key().code() == sge::input::kc::key_up)
-				dirs_[2] = !k.value() ? 0 : -1;
-
-			if (k.key().code() == sge::input::kc::key_down)
-				dirs_[2] = !k.value() ? 0 : 1;
-
-			if (k.key().code() == sge::input::kc::key_left)
-				dirs_[0] = !k.value() ? 0 : -1;
-
-			if (k.key().code() == sge::input::kc::key_right)
-				dirs_[0] = !k.value() ? 0 : 1;
-			break;
+		case sge::input::mouse::axis::wheel:
+		break;
 	}
 }

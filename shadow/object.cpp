@@ -9,6 +9,8 @@
 #include <sge/renderer/viewport.hpp>
 #include <sge/renderer/pixel_pos.hpp>
 #include <sge/renderer/filter/linear.hpp>
+#include <sge/renderer/filter/point.hpp>
+#include <sge/renderer/filter/trilinear.hpp>
 #include <sge/renderer/no_depth_stencil_texture.hpp>
 #include <sge/renderer/resource_flags_none.hpp>
 #include <sge/renderer/texture.hpp>
@@ -28,7 +30,7 @@ insula::shadow::object::object(
 			fcppt::math::dim::structure_cast<sge::renderer::dim_type>(
 				params.texture_size),
 			sge::image::color::format::rgb32f,
-			sge::renderer::filter::linear,
+			sge::renderer::filter::trilinear,
 			sge::renderer::resource_flags::none)),
 	target_(
 		params.systems.renderer()->create_target(
