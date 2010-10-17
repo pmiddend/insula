@@ -175,6 +175,7 @@ model/scoped.cpp
 model/create_shader.cpp)
 SET(json_files json/parse_config.cpp
 json/parse_font.cpp
+json/process_option.cpp
 json/string_to_value.cpp
 json/merge_trees.cpp)
 SET(base_files media_path.cpp input_delegator.cpp create_path.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp help_needed.cpp create_variables_map.cpp game_cli_options.cpp random_seed.cpp scoped_machine.cpp timed_output.cpp turn_timer.cpp milliseconds_to_string.cpp rigid_model.cpp arrow.cpp)

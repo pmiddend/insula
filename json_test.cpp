@@ -1,5 +1,6 @@
 #include "json/process_option.hpp"
 #include "json/merge_trees.hpp"
+#include "json/find_member.hpp"
 #include "json/convert.hpp"
 #include <sge/parse/json/output/to_stream.hpp>
 #include <sge/parse/json/object.hpp>
@@ -8,7 +9,7 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/string.hpp>
-#include <fcppt/math/vector/vector.hpp>
+#include <fcppt/math/dim/dim.hpp>
 #include <fcppt/exception.hpp>
 #include <fcppt/io/istringstream.hpp>
 #include <fcppt/text.hpp>
@@ -22,7 +23,6 @@ fcppt::string const
 int main(int argc,char *argv[])
 try
 {
-#if 0
 	fcppt::io::istringstream 
 		stream1(
 			global_json1),
@@ -67,34 +67,13 @@ try
 			o1,
 			o2));
 	fcppt::io::cout << "\n";
-#endif
-	sge::parse::json::array a;
-	sge::parse::json::array suba;
-	suba.elements.push_back(1);
-	suba.elements.push_back(2);
-	suba.elements.push_back(3);
-	sge::parse::json::array subb;
-	subb.elements.push_back(4);
-	subb.elements.push_back(5);
-	subb.elements.push_back(6);
-	a.elements.push_back(suba);
-	a.elements.push_back(subb);
-	/*
-	fcppt::io::cout << 
-		fcppt::type_traits::is_iterable<fcppt::math::vector::static_<int,3>::type>::value << "\n";
-	*/
-	/*
-	std::vector<std::vector<int>> vs = 
-		insula::json::convert<std::vector<std::vector<int>>>(
-			a);
 
-	for (int i = 0; i < vs.size(); ++i)
-	{
-		for (int j = 0; j < vs[i].size(); ++j)
-			fcppt::io::cout << vs[i][j] << " ";
-		fcppt::io::cout << "\n";
-	}
-	*/
+	fcppt::io::cout << "Resolution found with find_member: " << 
+		insula::json::find_member<fcppt::math::dim::static_<int,2>::type>(
+			insula::json::merge_trees(
+				o1,
+				o2),
+			FCPPT_TEXT("renderer/screen/size")) << "\n";
 }
 catch (fcppt::exception const &e)
 {

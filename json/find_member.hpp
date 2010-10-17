@@ -3,6 +3,7 @@
 
 #include "convert.hpp"
 #include "../stdlib/accumulate.hpp"
+#include "../exception.hpp"
 #include <sge/parse/json/object.hpp>
 #include <sge/parse/json/find_member_exn.hpp>
 #include <sge/parse/json/array.hpp>
@@ -13,12 +14,14 @@
 #include <vector>
 #include <algorithm>
 
+#include <boost/foreach.hpp>
+#include <fcppt/io/cout.hpp>
 namespace insula
 {
 namespace json
 {
 template<typename T>
-T const &
+T const 
 find_member(
 	sge::parse::json::object const &o,
 	fcppt::string const &path)
@@ -28,16 +31,22 @@ find_member(
 	string_vector;
 
 	string_vector parts;
-	
-	sge::parse::json::object *target = 
+
+	boost::algorithm::split(
+		parts,
+		path,
+		boost::algorithm::is_any_of(FCPPT_TEXT("/")));
+
+	fcppt::string const last_element = parts.back();
+
+	parts.pop_back();
+
+	sge::parse::json::object const *target = 
 		stdlib::accumulate(
-			boost::algorithm::split(
-				path,
-				parts,
-				boost::algorithm::is_any_of(FCPPT_TEXT("/"))),
+			parts,
 			&o,
 			[](
-				sge::parse::json::object *o,
+				sge::parse::json::object const *o,
 				fcppt::string const &s)
 			{
 				return 
@@ -46,20 +55,20 @@ find_member(
 						s);
 			});
 
-	sge::parse::json::member_vector::iterator it = 
+	sge::parse::json::member_vector::const_iterator it = 
 		std::find_if(
-			target->begin(),
-			target->end(),
+			target->members.begin(),
+			target->members.end(),
 			sge::parse::json::member_name_equal(
-				parts.back()));
+				last_element));
 
-	if (it == target->end())
+	if (it == target->members.end())
 		throw exception(
 			FCPPT_TEXT("Couldn't find member \"")+parts.back()+FCPPT_TEXT("\""));
 
 	return 
-		convert<T>(
-			*it);
+		insula::json::convert<T>(
+			it->value_);
 }
 }
 }
