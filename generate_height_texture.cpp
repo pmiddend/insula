@@ -16,8 +16,6 @@
 #include <sge/systems/instance.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/config/media_path.hpp>
-#include <sge/input/system.hpp>
-#include <sge/input/action.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/image/capabilities.hpp>
 #include <sge/image/loader.hpp>

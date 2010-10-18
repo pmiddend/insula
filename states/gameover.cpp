@@ -9,8 +9,6 @@
 #include <sge/font/align_h.hpp>
 #include <sge/font/align_v.hpp>
 #include <sge/font/flags_none.hpp>
-#include <sge/input/key_pair.hpp>
-#include <sge/input/key_code.hpp>
 #include <sge/renderer/device.hpp>
 #include <sge/font/pos.hpp>
 #include <fcppt/text.hpp>

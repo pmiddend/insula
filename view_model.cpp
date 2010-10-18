@@ -54,7 +54,6 @@
 #include <sge/input/keyboard/collector.hpp>
 #include <sge/input/keyboard/action.hpp>
 #include <sge/input/keyboard/key_code.hpp>
-#include <sge/input/action.hpp>
 #include <sge/image/multi_loader.hpp>
 #include <sge/extension_set.hpp>
 #include <sge/model/loader_ptr.hpp>

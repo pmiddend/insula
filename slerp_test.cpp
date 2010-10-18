@@ -16,8 +16,6 @@
 #include <sge/log/global.hpp>
 #include <sge/systems/instance.hpp>
 #include <sge/image/create_texture.hpp>
-#include <sge/input/key_code.hpp>
-#include <sge/input/key_pair.hpp>
 #include <sge/systems/list.hpp>
 #include <sge/renderer/aspect.hpp>
 #include <sge/renderer/vf/format.hpp>

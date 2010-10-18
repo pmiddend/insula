@@ -10,8 +10,6 @@
 #include "sound_controller.hpp"
 #include <sge/systems/instance.hpp>
 #include <sge/parse/json/object.hpp>
-#include <sge/input/key_pair_fwd.hpp>
-#include <sge/input/key_type_fwd.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <boost/statechart/state_machine.hpp>
 #include <boost/program_options/variables_map.hpp>
@@ -105,14 +103,6 @@ private:
 	fcppt::signal::scoped_connection stats_callback_;
 	music_controller music_;
 	sound_controller sounds_;
-
-	void
-	input_callback(
-		sge::input::key_pair const &);
-
-	void
-	input_repeat_callback(
-		sge::input::key_type const &);
 };
 }
 
