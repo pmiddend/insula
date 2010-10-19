@@ -1,7 +1,7 @@
 #include "game_inner.hpp"
-#include "../get_option.hpp"
 #include "../create_path.hpp"
 #include "../media_path.hpp"
+#include "../json/find_member.hpp"
 #include "../height_map/object.hpp"
 #include "../height_map/vec2.hpp"
 #include "../physics/box.hpp"
@@ -44,9 +44,9 @@ insula::states::game_inner::game_inner(
 	physics_world_(
 		fcppt::math::box::structure_cast<physics::box>(
 			context<game_outer>().height_map().extents()),
-		get_option<physics::vec3>(
-			context<machine>().cli_variables(),
-			"physics-gravity"),
+		json::find_member<physics::vec3>(
+			context<machine>().config_file(),
+			FCPPT_TEXT("physics/gravity")),
 		context<game_outer>().broadphase_manager()),
 	physics_height_map_(
 		physics_world_,
@@ -86,8 +86,8 @@ insula::states::game_inner::game_inner(
 			physics_world_)),
 	player_(
 		player::parameters(
-			sge::parse::json::find_member_exn<sge::parse::json::object>(
-				context<machine>().config_file().members,
+			json::find_member<sge::parse::json::object>(
+				context<machine>().config_file(),
 				FCPPT_TEXT("player")),
 			context<game_outer>().height_map(),
 			context<game_outer>().water_level(),

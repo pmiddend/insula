@@ -1,6 +1,8 @@
 #include "process_option.hpp"
 #include "string_to_value.hpp"
 #include "../stdlib/accumulate.hpp"
+#include "../stdlib/shortest_levenshtein.hpp"
+#include "../stdlib/map.hpp"
 #include "../exception.hpp"
 #include <sge/parse/json/object.hpp>
 #include <sge/parse/json/array.hpp>
@@ -77,7 +79,18 @@ insula::json::process_option(
 				element));
 
 	if (it == target->members.end())
-		throw exception(FCPPT_TEXT("Couldn't find member \"")+element+FCPPT_TEXT("\""));
+		throw exception(
+			FCPPT_TEXT("Couldn't find member \"")+
+			element+
+			FCPPT_TEXT("\", did you mean: ")+
+			stdlib::shortest_levenshtein(
+				stdlib::map<std::vector<fcppt::string>>(
+					target->members,
+					[](sge::parse::json::member const &m) 
+					{ 
+						return m.name; 
+					}),
+				element));
 
 	it->value_ = 
 			string_to_value(

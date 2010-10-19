@@ -1,9 +1,9 @@
 #include "camera_move.hpp"
 #include "pregame.hpp"
-#include "../get_option.hpp"
 #include "../sound_controller.hpp"
 #include "../events/tick.hpp"
 #include "../graphics/scalar.hpp"
+#include "../json/find_member.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../gizmo/orthogonalize_simple.hpp"
 #include "../gizmo/orthogonalize_keep_axis.hpp"
@@ -20,12 +20,12 @@ insula::states::camera_move::camera_move(
 	pan_(
 		context<machine>().camera().gizmo(),
 		context<game_inner>().player().gizmo(),
-		get_option<graphics::scalar>(
-			context<machine>().cli_variables(),
-			"camera-move-inverse-speed"),
-		get_option<graphics::scalar>(
-			context<machine>().cli_variables(),
-			"camera-move-threshold"))
+		json::find_member<graphics::scalar>(
+			context<machine>().config_file(),
+			FCPPT_TEXT("camera-move/inverse-speed")),
+		json::find_member<graphics::scalar>(
+			context<machine>().config_file(),
+			FCPPT_TEXT("camera-move/threshold")))
 {
 	context<machine>().camera().movement(
 		false);
@@ -68,14 +68,4 @@ insula::states::camera_move::react(
 		r);
 
 	return discard_event();
-}
-
-boost::program_options::options_description const
-insula::states::camera_move::cli_options()
-{
-	boost::program_options::options_description opts("Camera move state options");
-	opts.add_options()
-		("camera-move-inverse-speed",boost::program_options::value<graphics::scalar>(),"This is the _inverse_ speed of the camera. The lower the value, the faster it is (\"average\")")
-		("camera-move-threshold",boost::program_options::value<graphics::scalar>(),"If the distance from the camera to the vehicle is this small, the state is changed to pregame");
-	return opts;
 }

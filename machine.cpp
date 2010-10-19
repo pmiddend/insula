@@ -1,11 +1,11 @@
 #include "machine.hpp"
 #include "application_title.hpp"
-#include "get_option.hpp"
-#include "graphics/camera/cli_factory.hpp"
+#include "graphics/camera/parameters.hpp"
 // Camera has to be updated in tick
 #include "graphics/camera/object.hpp"
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
+#include "json/find_member.hpp"
 #include "events/tick.hpp"
 #include "events/key.hpp"
 #include "events/mouse_axis.hpp"
@@ -69,15 +69,12 @@
 #include <functional>
 
 insula::machine::machine(
-	sge::parse::json::object const &_config_file,
-	boost::program_options::variables_map const &_vm)
+	sge::parse::json::object const &_config_file)
 :
 	// Has to be initialized early because the exit callback needs it
 	running_(true),
 	config_file_(
 		_config_file),
-	vm_(
-		_vm),
 	systems_(
 		sge::systems::list
 		(
@@ -91,13 +88,13 @@ insula::machine::machine(
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
-					get_option<sge::renderer::screen_size>(
-						vm_,
-						"graphics-screen-size"),
+					// hier get_option durch json::find_member ersetzen, danach
+					// weitermachen, boost::po zu entfernen
+					json::find_member<sge::renderer::screen_size>(
+						config_file_,
+						FCPPT_TEXT("graphics/screen-size")),
 					sge::renderer::bit_depth::depth32,
-					sge::renderer::refresh_rate_dont_care
-				),
-
+					sge::renderer::refresh_rate_dont_care),
 				sge::renderer::depth_buffer::d24,
 				sge::renderer::stencil_buffer::off,
 				sge::renderer::window_mode::windowed,
@@ -118,9 +115,9 @@ insula::machine::machine(
 		systems_.renderer(),
 		systems_.font_system(),
 		systems_.image_loader(),
-		get_option<bool>(
-			vm_,
-			"console-redirect") 
+		json::find_member<bool>(
+			config_file_,
+			"console/redirect") 
 			? 
 				console::redirect_mode::all
 			: 
@@ -129,11 +126,25 @@ insula::machine::machine(
 		systems_,
 		console_),
 	camera_(
-		graphics::camera::cli_factory(
-			vm_,
+		graphics::camera::parameters(
 			input_delegator_,
 			sge::renderer::aspect<graphics::scalar>(
 				systems_.renderer()->screen_size()),
+			json::find_member<graphics::scalar>(
+				config_file_,
+				FCPPT_TEXT("camera/fov")),
+			json::find_member<graphics::scalar>(
+				config_file_,
+				FCPPT_TEXT("camera/near")),
+			json::find_member<graphics::scalar>(
+				config_file_,
+				FCPPT_TEXT("camera/far")),
+			json::find_member<graphics::scalar>(
+				config_file_,
+				FCPPT_TEXT("camera/movement-speed")),
+			json::find_member<graphics::scalar>(
+				config_file_,
+				FCPPT_TEXT("camera/rotation-speed")),
 			graphics::vec3::null())),
 	exit_callback_(
 		systems_.keyboard_collector()->key_callback(
@@ -252,12 +263,6 @@ insula::machine::tick(
 
 	console_.render();
 	*/
-}
-
-boost::program_options::variables_map const &
-insula::machine::cli_variables() const
-{
-	return vm_;
 }
 
 insula::graphics::camera::object &

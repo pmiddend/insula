@@ -5,7 +5,7 @@
 #include "vf/packed_position.hpp"
 #include "vf/format.hpp"
 #include "vf/vertex_view.hpp"
-#include "../json/parse_vector.hpp"
+#include "../json/find_member.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../graphics/shader/scoped.hpp"
@@ -42,11 +42,6 @@
 #include <sge/renderer/scoped_vertex_buffer.hpp>
 #include <sge/renderer/scoped_index_lock.hpp>
 #include <sge/renderer/lock_mode.hpp>
-#include <sge/parse/json/object.hpp>
-#include <sge/parse/json/array.hpp>
-#include <sge/parse/json/find_member_exn.hpp>
-#include <sge/parse/json/float_type.hpp>
-#include <sge/parse/json/int_type.hpp>
 #include <sge/image/color/init.hpp>
 #include <sge/image/color/rgba32f.hpp>
 #include <sge/systems/instance.hpp>
@@ -100,17 +95,15 @@ insula::skydome::object::object(
 			graphics::shader::variable(
 				"color0",
 				graphics::shader::variable_type::const_,
-				json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
-					sge::parse::json::find_member_exn<sge::parse::json::array>(
-						params.config_file.members,
-						FCPPT_TEXT("color0")))),
+				json::find_member<graphics::vec3>(
+					params.config_file,
+					FCPPT_TEXT("skydome/color0"))),
 			graphics::shader::variable(
 				"color1",
 				graphics::shader::variable_type::const_,
-				json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
-					sge::parse::json::find_member_exn<sge::parse::json::array>(
-						params.config_file.members,
-						FCPPT_TEXT("color1"))))
+				json::find_member<graphics::vec3>(
+					params.config_file,
+					FCPPT_TEXT("skydome/color1")))
 		},
 		graphics::shader::sampler_sequence()),
 	perspective_(
@@ -121,10 +114,9 @@ insula::skydome::object::object(
 			3.0f))
 {
 	graphics::vec3 const color0 = 	
-		json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
-			sge::parse::json::find_member_exn<sge::parse::json::array>(
-				params.config_file.members,
-				FCPPT_TEXT("color0")));
+		json::find_member<graphics::vec3>(
+			params.config_file,
+			FCPPT_TEXT("skydome/color0"));
 
 	// _Permanently_ change the renderer's clear color (this could be a
 	// scoped_state, too)
@@ -145,14 +137,13 @@ insula::skydome::object::object(
 
 	size_type const 
 		lats = 
-			sge::parse::json::find_member_exn<sge::parse::json::int_type>(
-				params.config_file.members,
-				FCPPT_TEXT("lats")),
+			json::find_member<size_type>(
+				params.config_file,
+				FCPPT_TEXT("skydome/lats")),
 		lons = 
-			sge::parse::json::find_member_exn<sge::parse::json::int_type>(
-				params.config_file.members,
-				FCPPT_TEXT("lons"));
-
+			json::find_member<size_type>(
+				params.config_file,
+				FCPPT_TEXT("skydome/lons"));
 
 	// We have to activate the shader here because we want to fill the
 	// vertex buffer with "custom" attributes.

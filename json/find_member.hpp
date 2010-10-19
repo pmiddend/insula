@@ -64,11 +64,22 @@ find_member(
 
 	if (it == target->members.end())
 		throw exception(
-			FCPPT_TEXT("Couldn't find member \"")+parts.back()+FCPPT_TEXT("\""));
+			FCPPT_TEXT("Couldn't find member \"")+last_element+FCPPT_TEXT("\""));
 
-	return 
-		insula::json::convert<T>(
-			it->value_);
+	try
+	{
+		return 
+			insula::json::convert<T>(
+				it->value_);
+	}
+	catch (sge::parse::json::invalid_get const &e)
+	{
+		throw exception(
+			FCPPT_TEXT("Unable to parse \"")+
+			it->name+
+			FCPPT_TEXT("\": ")+
+			e.string());
+	}
 }
 }
 }

@@ -6,6 +6,7 @@
 #include "../exception.hpp"
 #include "../json/parse_vector.hpp"
 #include "../json/member_has_type.hpp"
+#include "../json/find_member.hpp"
 #include "../random_engine.hpp"
 #include "../stdlib/for_each.hpp"
 #include "../random_seed.hpp"
@@ -57,16 +58,16 @@ insula::prop::manager::manager(
 		params.broadphase_manager)
 {
 	stdlib::for_each(
-		sge::parse::json::find_member_exn<sge::parse::json::array>(
-			params.json_object.members,
+		json::find_member<sge::parse::json::array>(
+			params.json_object,
 			FCPPT_TEXT("props")).elements,
 		[&params,this](sge::parse::json::value const &v)
 		{
-				return 
-					this->parse_single_prop(
-						params,
-						sge::parse::json::get<sge::parse::json::object>(
-							v));
+			return 
+				parse_single_prop(
+					params,
+					sge::parse::json::get<sge::parse::json::object>(
+						v));
 		});
 }
 
@@ -121,40 +122,34 @@ insula::prop::manager::parse_single_prop(
 	// the loop that follows.
 
 	height_map::flatness_range const flatness =	
-		json::parse_vector<height_map::scalar,2,sge::parse::json::float_type>(
-			sge::parse::json::find_member_exn<sge::parse::json::array>(
-				p.members,
-				FCPPT_TEXT("flatness_range")));
+		json::find_member<height_map::vec2>(
+			p,
+			FCPPT_TEXT("flatness-range"));
 
-	physics::scalar const penetration_depth = 
-		static_cast<physics::scalar>(
-			sge::parse::json::find_member_exn<sge::parse::json::float_type>(
-				p.members,
-				FCPPT_TEXT("penetration_depth")));
+	height_map::scalar const penetration_depth =	
+		json::find_member<height_map::scalar>(
+			p,
+			FCPPT_TEXT("penetration-depth"));
 
-	physics::vec2 const scale_range = 
-		json::parse_vector<physics::scalar,2,sge::parse::json::float_type>(
-			sge::parse::json::find_member_exn<sge::parse::json::array>(
-				p.members,
-				FCPPT_TEXT("scale_range")));
+	physics::vec2 const scale_range =	
+		json::find_member<physics::vec2>(
+			p,
+			FCPPT_TEXT("scale-range"));
 
-	physics::vec3 const rotation_axis = 
-		json::parse_vector<physics::scalar,3,sge::parse::json::float_type>(
-			sge::parse::json::find_member_exn<sge::parse::json::array>(
-				p.members,
-				FCPPT_TEXT("rotation_axis")));
+	physics::vec3 const rotation_axis =	
+		json::find_member<physics::vec3>(
+			p,
+			FCPPT_TEXT("rotation-axis"));
 
 	physics::vec3 const physics_offset = 
-		json::parse_vector<physics::scalar,3,sge::parse::json::float_type>(
-			sge::parse::json::find_member_exn<sge::parse::json::array>(
-				p.members,
-				FCPPT_TEXT("physics_offset")));
+		json::find_member<physics::vec3>(
+			p,
+			FCPPT_TEXT("physics-offset"));
 
 	std::size_t const count = 
-		static_cast<std::size_t>(
-			sge::parse::json::find_member_exn<sge::parse::json::int_type>(
-				p.members,
-				FCPPT_TEXT("count")));
+		json::find_member<std::size_t>(
+			p,
+			FCPPT_TEXT("count"));
 
 	// Beginning of the actual algorithm
 
@@ -197,8 +192,8 @@ insula::prop::manager::parse_single_prop(
 				:
 					physics::shape_from_approximation(
 						parse_approximation(
-							sge::parse::json::find_member_exn<sge::parse::json::object>(
-								p.members,
+							json::find_member<sge::parse::json::object>(
+								p,
 								FCPPT_TEXT("approximation")),
 							scaling)),
 				rotation_axis,
@@ -240,43 +235,38 @@ insula::prop::manager::parse_approximation(
 	physics::scalar const scaling)
 {
 	fcppt::string const type = 
-		sge::parse::json::find_member_exn<sge::parse::json::string>(
-			o.members,
+		json::find_member<fcppt::string>(
+			o,
 			FCPPT_TEXT("type"));
 
 	if (type == FCPPT_TEXT("box"))
 		return physics::approximation::box(
 			scaling * 
-			fcppt::math::vector::structure_cast<physics::dim3>(
-				json::parse_vector<physics::scalar,3,sge::parse::json::float_type>(
-					sge::parse::json::find_member_exn<sge::parse::json::array>(
-						o.members,
-						FCPPT_TEXT("size")))));
+			json::find_member<physics::dim3>(
+				o,
+				FCPPT_TEXT("size")));
 
 	if (type == FCPPT_TEXT("sphere"))
 		return physics::approximation::sphere(
 			scaling * 
-			static_cast<physics::scalar>(
-				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
-					o.members,
-					FCPPT_TEXT("radius"))));
+			json::find_member<physics::scalar>(
+				o,
+				FCPPT_TEXT("radius")));
 
 	if (type == FCPPT_TEXT("cylinder"))
 		return physics::approximation::cylinder(
 			physics::approximation::string_to_cylinder_orientation(
-				sge::parse::json::find_member_exn<sge::parse::json::string>(
-					o.members,
+				json::find_member<fcppt::string>(
+					o,
 					FCPPT_TEXT("orientation"))),
 			scaling * 
-			static_cast<physics::scalar>(
-				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
-					o.members,
-					FCPPT_TEXT("height"))),
+			json::find_member<physics::scalar>(
+				o,
+				FCPPT_TEXT("height")),
 			scaling * 
-			static_cast<physics::scalar>(
-				sge::parse::json::find_member_exn<sge::parse::json::float_type>(
-					o.members,
-					FCPPT_TEXT("radius"))));
+			json::find_member<physics::scalar>(
+				o,
+				FCPPT_TEXT("radius")));
 
 	std::vector<fcppt::string> const allowed_types
 	{

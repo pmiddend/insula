@@ -4,16 +4,15 @@
 #include <boost/statechart/state.hpp>
 // fwd isn't enough here
 #include "../machine.hpp"
-#include "../height_map/object_ptr.hpp"
-#include "../height_map/object_fwd.hpp"
+#include "../height_map/object.hpp"
 #include "../skydome/object.hpp"
 #include "../shadow/object.hpp"
-#include "../water/object_ptr.hpp"
 #include "../scene/manager.hpp"
 #include "../graphics/shader/shared_object_ptr.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../physics/broadphase/manager.hpp"
 #include "../overlay/object.hpp"
+#include "../water/object.hpp"
 // If this is omitted, insula.cpp complains about incomplete tick
 // events (!?)
 #include "../events/tick.hpp"
@@ -126,10 +125,6 @@ public:
 
 	// Holds height_map, skydome and the water
 	~game_outer();
-
-	static
-	boost::program_options::options_description const
-	cli_options();
 private:
 	// This is used for command line input
 	typedef
@@ -140,9 +135,9 @@ private:
 	graphics::shader::shared_object_ptr model_shadow_shader_;
 	scene::manager scene_manager_;
 	shadow::object shadow_;
-	insula::height_map::object_ptr height_map_;
+	insula::height_map::object height_map_;
 	skydome::object skydome_;
-	insula::water::object_ptr water_;
+	water::object water_;
 	// This could also be in the machine, it's arbitrarily placed here
 	sge::font::metrics_ptr large_font_;
 	sge::font::drawer_ptr font_drawer_;

@@ -2,21 +2,21 @@
 #include "../random_seed.hpp"
 #include "../model/create_shader.hpp"
 #include "../model/create_shadow_shader.hpp"
-#include "../get_option.hpp"
 #include "../ghost/manager_parameters.hpp"
-#include "../height_map/cli_factory.hpp"
 #include "../stdlib/map.hpp"
 #include "../overlay/parameters.hpp"
+#include "../water/parameters.hpp"
 
 #include "../height_map/object.hpp"
+#include "../height_map/parameters.hpp"
+#include "../height_map/image_to_array.hpp"
 #include "../skydome/object.hpp"
 #include "../skydome/parameters.hpp"
 #include "../nugget/parameters.hpp"
 #include "../prop/parameters.hpp"
-#include "../water/cli_factory.hpp"
 #include "../water/object.hpp"
 #include "../json/parse_font.hpp"
-#include "../json/parse_vector.hpp"
+#include "../json/find_member.hpp"
 #include "../exception.hpp"
 #include "../scene/render_pass/object.hpp"
 #include "../shadow/parameters.hpp"
@@ -25,8 +25,6 @@
 #include <fcppt/make_shared_ptr.hpp>
 #include <fcppt/text.hpp>
 #include <sge/font/drawer_3d.hpp>
-#include <sge/parse/json/find_member_exn.hpp>
-#include <sge/parse/json/array.hpp>
 #include <sge/parse/json/string.hpp>
 #include <sge/image/colors.hpp>
 #include <sge/image/color/rgb8.hpp>
@@ -51,10 +49,9 @@ insula::states::game_outer::game_outer(
 	model_shader_(
 		model::create_shader(
 			context<machine>().systems().renderer(),
-			json::parse_vector<graphics::scalar,3,sge::parse::json::float_type>(
-				sge::parse::json::find_member_exn<sge::parse::json::array>(
-					context<machine>().config_file().members,
-					FCPPT_TEXT("light-source"))))),
+			json::find_member<graphics::vec3>(
+				context<machine>().config_file(),
+				"sun-position"))),
 	model_shadow_shader_(
 		model::create_shadow_shader(
 			context<machine>().systems().renderer())),
@@ -78,21 +75,13 @@ insula::states::game_outer::game_outer(
 					.up(
 						graphics::vec3(
 							0.71685f,0.402825f,0.569086f))),
-			fcppt::math::vector::structure_cast<sge::renderer::dim_type>(
-				json::parse_vector
-				<
-					sge::renderer::dim_type::value_type,
-					2,
-					sge::parse::json::int_type
-				>
-				(
-					sge::parse::json::find_member_exn<sge::parse::json::array>(
-						context<machine>().config_file().members,
-						FCPPT_TEXT("shadow-map-size")))),
+				json::find_member<sge::renderer::dim_type>(
+					context<machine>().config_file(),
+					FCPPT_TEXT("shadow-map-size")),
 			scene_manager_)),
 	height_map_(
-		insula::height_map::cli_factory(
-			context<machine>().cli_variables(),
+		insula::height_map::parameters(
+			context<machine>().config_file(),
 			context<machine>().camera(),
 			context<machine>().systems().renderer(),
 			context<machine>().systems().image_loader(),
@@ -102,25 +91,22 @@ insula::states::game_outer::game_outer(
 				context<machine>().camera().perspective()))),
 	skydome_(
 		skydome::parameters(
-			sge::parse::json::find_member_exn<sge::parse::json::object>(
-				context<machine>().config_file().members,
-				FCPPT_TEXT("skydome")),
+			context<machine>().config_file(),
 			context<machine>().camera(),
 			context<machine>().systems(),
 			scene_manager_)),
 	water_(
-		insula::water::cli_factory(
-			context<machine>().cli_variables(),
-			context<machine>().systems().renderer(),
+		water::parameters(
+			context<machine>().config_file(),
+			context<machine>().systems(),
 			context<machine>().camera(),
 			fcppt::math::box::structure_cast<graphics::box>(
-				height_map_->extents()),
-			context<machine>().systems().image_loader(),
+				height_map_.extents()),
 			scene_manager_)),
 	large_font_(
 		json::parse_font(
-			sge::parse::json::find_member_exn<sge::parse::json::object>(
-				context<machine>().config_file().members,
+			json::find_member<sge::parse::json::object>(
+				context<machine>().config_file(),
 				FCPPT_TEXT("large_font")),
 			context<machine>().systems().font_system())),
 	font_drawer_(
@@ -132,11 +118,11 @@ insula::states::game_outer::game_outer(
 				(mizuiro::color::init::blue %= 1.0)))),
 	player_times_(
 		stdlib::map<player_time_map>(
-			get_option<player_sequence>(
-				context<machine>().cli_variables(),
-				"player"),
+			json::find_member<player_sequence>(
+				context<machine>().config_file(),
+				"players"),
 			[](fcppt::string const &p)
-		{
+			{
 				return 
 					player_time_map::value_type(
 						p,
@@ -151,24 +137,24 @@ insula::states::game_outer::game_outer(
 			context<machine>().camera(),
 			*model_shader_,
 			*model_shadow_shader_,
-			*height_map_,
-			water_->water_level(),
+			height_map_,
+			water_.water_level(),
 			scene_manager_,
 			broadphase_manager_)),
 	ghost_manager_(
 		ghost::manager_parameters(
 			scene_manager_,
 			broadphase_manager_,
-			sge::parse::json::find_member_exn<sge::parse::json::array>(
-				context<machine>().config_file().members,
+			json::find_member<sge::parse::json::array>(
+				context<machine>().config_file(),
 				FCPPT_TEXT("ghosts")),
 			context<machine>().systems(),
 			context<machine>().camera(),
 			*model_shader_,
 			*model_shadow_shader_,
-			*height_map_,
+			height_map_,
 			static_cast<height_map::scalar>(
-				water_->water_level()))),
+				water_.water_level()))),
 	player_position_rng_(
 		random_seed()),
 	overlay_(
@@ -179,59 +165,24 @@ insula::states::game_outer::game_outer(
 {
 	if (player_times_.empty())
 		throw exception(FCPPT_TEXT("You have to specify at least one player"));
-
-	/*
-	scene_manager_.add(
-		scene::render_pass::object(
-			FCPPT_TEXT("overlay"),
-			[this]() 
-			{ 
-				return this->context<machine>().camera().gizmo(); 
-			},
-			[this]() 
-			{ 
-				return 
-					sge::renderer::viewport(
-						sge::renderer::pixel_pos::null(),
-						this->context<machine>().systems().renderer()->screen_size()); 
-			},
-			[]() 
-			{ 
-				return sge::renderer::default_target(); 
-			},
-			sge::renderer::state::list
-				(sge::renderer::state::bool_::clear_backbuffer = false)),
-			{"normal"});*/
 }
 
 insula::height_map::object &
 insula::states::game_outer::height_map()
 {
-	return *height_map_;
+	return height_map_;
 }
 
 insula::height_map::object const &
 insula::states::game_outer::height_map() const
 {
-	return *height_map_;
+	return height_map_;
 }
 
 void
 insula::states::game_outer::react(
 	events::tick const &)
 {
-	/*
-	timed_output() 
-		<< "p: " <<
-			context<machine>().camera().gizmo().position() 
-		<< ", f: " <<
-			context<machine>().camera().gizmo().forward() 
-		<< ", r: " <<
-			context<machine>().camera().gizmo().right() 
-		<< ", u: " <<
-			context<machine>().camera().gizmo().up() << "\n";
-	*/
-
 	broadphase_manager_.update();
 }
 
@@ -316,14 +267,6 @@ insula::states::game_outer::scene_manager()
 	return scene_manager_;
 }
 
-/*
-insula::nugget::manager &
-insula::states::game_outer::nugget_manager()
-{
-	return nugget_manager_;
-}
-*/
-
 insula::prop::manager &
 insula::states::game_outer::prop_manager()
 {
@@ -345,18 +288,9 @@ insula::states::game_outer::player_position_rng()
 insula::graphics::scalar
 insula::states::game_outer::water_level() const
 {
-	return water_->water_level();
+	return water_.water_level();
 }
 
 insula::states::game_outer::~game_outer()
 {
-}
-
-boost::program_options::options_description const
-insula::states::game_outer::cli_options()
-{
-	boost::program_options::options_description opts("Outer game options");
-	opts.add_options()
-		("player",boost::program_options::value<player_sequence>()->multitoken(),"The players (multiple occurences needed)");
-	return opts;
 }

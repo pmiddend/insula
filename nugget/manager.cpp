@@ -92,14 +92,14 @@ insula::nugget::manager::manager(
 		static_cast<physics::scalar>(
 			sge::parse::json::find_member_exn<sge::parse::json::float_type>(
 				params.json.members,
-				FCPPT_TEXT("floating_height")))),
+				FCPPT_TEXT("floating-height")))),
 	water_level_(
 		params.water_level),
 	flatness_range_(
 		json::parse_vector<height_map::scalar,2,sge::parse::json::float_type>(
 			sge::parse::json::find_member_exn<sge::parse::json::array>(
 				params.json.members,
-				FCPPT_TEXT("flatness_range")))),
+				FCPPT_TEXT("flatness-range")))),
 	callback_connection_(
 		world_.register_callback<physics::rigid::object,physics::rigid::object>(
 			physics::object_type::nugget,

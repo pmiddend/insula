@@ -80,8 +80,6 @@ SET(media_path ${CMAKE_SOURCE_DIR}/media)
 
 SET(height_map_files height_map/random_point.cpp
 height_map/image_to_array.cpp
-height_map/cli_options.cpp
-height_map/cli_factory.cpp
 height_map/object.cpp
 height_map/array_to_image.cpp
 height_map/height_for_point.cpp)
@@ -90,10 +88,7 @@ graphics/shader/object.cpp
 graphics/shader/scoped.cpp
 graphics/shader/variable.cpp
 graphics/stats.cpp
-graphics/cli_options.cpp
 graphics/camera/pan.cpp
-graphics/camera/cli_options.cpp
-graphics/camera/cli_factory.cpp
 graphics/camera/object.cpp
 graphics/camera/scoped.cpp)
 SET(texture_files textures/interpolators/bernstein_polynomial.cpp
@@ -106,8 +101,7 @@ console/object.cpp)
 SET(skydome_files
 skydome/object.cpp
 skydome/sphere_point.cpp)
-SET(water_files water/cli_options.cpp
-water/cli_factory.cpp
+SET(water_files
 water/object.cpp)
 SET(scene_files scene/transparent_instance.cpp
 scene/instance.cpp
@@ -153,7 +147,6 @@ physics/shape_from_model.cpp
 physics/ghost.cpp
 physics/filter_callback.cpp
 physics/debug_drawer.cpp
-physics/cli_options.cpp
 physics/object.cpp
 physics/triangle_mesh/shape.cpp
 physics/triangle_mesh/shape_from_model.cpp
@@ -178,7 +171,7 @@ json/parse_font.cpp
 json/process_option.cpp
 json/string_to_value.cpp
 json/merge_trees.cpp)
-SET(base_files media_path.cpp input_delegator.cpp create_path.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp help_needed.cpp create_variables_map.cpp game_cli_options.cpp random_seed.cpp scoped_machine.cpp timed_output.cpp turn_timer.cpp milliseconds_to_string.cpp rigid_model.cpp arrow.cpp)
+SET(base_files media_path.cpp input_delegator.cpp create_path.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp random_seed.cpp scoped_machine.cpp timed_output.cpp turn_timer.cpp milliseconds_to_string.cpp rigid_model.cpp arrow.cpp)
 
 SET_SOURCE_FILES_PROPERTIES(
 	media_path.cpp
@@ -200,17 +193,17 @@ FUNCTION(CREATE_INSULA_EXE name)
 	)
 ENDFUNCTION(CREATE_INSULA_EXE)
 
-CREATE_INSULA_EXE(load_image_to_array)
-CREATE_INSULA_EXE(view_model)
-CREATE_INSULA_EXE(point_sprite_test)
-CREATE_INSULA_EXE(generate_height_texture)
-CREATE_INSULA_EXE(music_test)
-CREATE_INSULA_EXE(sound_test)
+#CREATE_INSULA_EXE(load_image_to_array)
+#CREATE_INSULA_EXE(view_model)
+#CREATE_INSULA_EXE(point_sprite_test)
+#CREATE_INSULA_EXE(generate_height_texture)
+#CREATE_INSULA_EXE(music_test)
+#CREATE_INSULA_EXE(sound_test)
 CREATE_INSULA_EXE(insula)
-CREATE_INSULA_EXE(timer_test)
-CREATE_INSULA_EXE(slerp_test)
-CREATE_INSULA_EXE(vertex_format_test)
-CREATE_INSULA_EXE(json_test)
+#CREATE_INSULA_EXE(timer_test)
+#CREATE_INSULA_EXE(slerp_test)
+#CREATE_INSULA_EXE(vertex_format_test)
+#CREATE_INSULA_EXE(json_test)
 
 ENABLE_TESTING()
 

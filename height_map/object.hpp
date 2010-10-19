@@ -106,6 +106,7 @@ public:
 private:
 	graphics::camera::object const &camera_;
 	sge::renderer::device_ptr const renderer_;
+	array const heights_,gradient_;
 	graphics::scalar const cell_size_;
 	graphics::scalar const height_scaling_;
 	sge::renderer::vertex_buffer_ptr const vb_;
@@ -113,7 +114,6 @@ private:
 	graphics::shader::object shader_;
 	graphics::shader::object shadow_shader_;
 	graphics::box const extents_;
-	array const heights_,gradient_;
 	vec3_array points_,normals_;
 
 	void

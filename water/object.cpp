@@ -1,17 +1,25 @@
-#include "../graphics/camera/object.hpp"
-#include "../graphics/vec3.hpp"
-#include "../graphics/camera/scoped.hpp"
-#include "../graphics/shader/vf_to_string.hpp"
-#include "../graphics/shader/scoped.hpp"
-#include "../gizmo/mirror_at_plane.hpp"
-#include "../scene/render_pass/object.hpp"
-#include "../scene/manager.hpp"
+#include "object.hpp"
+#include "parameters.hpp"
 #include "vf/vertex_view.hpp"
 #include "vf/position.hpp"
 #include "vf/texture_coordinate.hpp"
 #include "vf/packed_position.hpp"
 #include "vf/packed_texture_coordinate.hpp"
 #include "vf/format.hpp"
+#include "../graphics/camera/object.hpp"
+#include "../graphics/vec3.hpp"
+#include "../graphics/vec2.hpp"
+#include "../graphics/dim2.hpp"
+#include "../graphics/rect.hpp"
+#include "../graphics/camera/scoped.hpp"
+#include "../graphics/shader/vf_to_string.hpp"
+#include "../graphics/shader/scoped.hpp"
+#include "../gizmo/mirror_at_plane.hpp"
+#include "../scene/render_pass/object.hpp"
+#include "../scene/manager.hpp"
+#include "../json/find_member.hpp"
+#include "../media_path.hpp"
+#include "../create_path.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/vertex_buffer.hpp>
@@ -44,48 +52,41 @@
 #include <sge/renderer/vf/iterator.hpp>
 #include <sge/renderer/lock_mode.hpp>
 #include <sge/renderer/dim_type.hpp>
+#include <sge/image/create_texture.hpp>
 #include <sge/image/file.hpp>
 #include <sge/time/second.hpp>
+#include <sge/systems/instance.hpp>
 #include <fcppt/container/bitfield/bitfield.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
+#include <fcppt/math/box/stretch.hpp>
 #include <initializer_list>
-#include "../media_path.hpp"
-#include "object.hpp"
 
 insula::water::object::object(
-	sge::renderer::device_ptr const _renderer,
-	graphics::camera::object &_camera,
-	graphics::scalar const _water_level,
-	graphics::rect const &extents,
-	sge::renderer::dim_type const &reflection_texture_size,
-	sge::image::file_ptr const _bump_texture,
-	graphics::scalar const texture_scaling,
-	graphics::scalar const wave_height,
-	graphics::scalar const wind_speed,
-	scene::manager &scene_manager
-)
+	parameters const &params)
 :
 	scene::backend(
-		scene_manager,
+		params.scene_manager,
 		{"normal"}),
 	renderer_(
-		_renderer),
+		params.systems.renderer()),
 	target_texture_(
 		renderer_->create_texture(
-			reflection_texture_size,
+			json::find_member<sge::renderer::dim_type>(
+				params.config_file,
+				FCPPT_TEXT("water/reflection-size")),
 			sge::image::color::format::rgb8,
 			sge::renderer::filter::linear,
 			sge::renderer::resource_flags::readable)),
-	bump_texture_(
-		),
 	target_(
 		renderer_->create_target(
 			target_texture_,
 			sge::renderer::no_depth_stencil_texture())),
 	camera_(
-		_camera),
+		params.camera),
 	water_level_(
-		_water_level),
+		json::find_member<graphics::scalar>(
+				params.config_file,
+				FCPPT_TEXT("water/level"))),
 	shader_(
 		renderer_,
 		media_path()/FCPPT_TEXT("water_vertex.glsl"),
@@ -95,11 +96,15 @@ insula::water::object::object(
 			graphics::shader::variable(
 				"wave_height",
 				graphics::shader::variable_type::const_,
-				wave_height),
+				json::find_member<graphics::scalar>(
+					params.config_file,
+					FCPPT_TEXT("water/wave-height"))),
 			graphics::shader::variable(
 				"wind_speed",
 				graphics::shader::variable_type::const_,
-				wind_speed),
+				json::find_member<graphics::scalar>(
+					params.config_file,
+					FCPPT_TEXT("water/wind-speed"))),
 			graphics::shader::variable(
 				"mvp",
 				graphics::shader::variable_type::uniform,
@@ -116,8 +121,14 @@ insula::water::object::object(
 		{
 			graphics::shader::sampler(
 				"bump_texture",
-				renderer_->create_texture(
-					_bump_texture->view(),
+				sge::image::create_texture(
+					create_path(
+						json::find_member<fcppt::string>(
+							params.config_file,
+							FCPPT_TEXT("water/bump-texture")),
+						FCPPT_TEXT("textures")),
+					renderer_,
+					params.systems.image_loader(),
 					sge::renderer::filter::linear,
 					sge::renderer::resource_flags::none)),
 			graphics::shader::sampler(
@@ -135,6 +146,26 @@ insula::water::object::object(
 	current_time_(
 		static_cast<graphics::scalar>(0))
 {
+	graphics::box const stretched = 
+		fcppt::math::box::stretch(
+			params.extents,
+			json::find_member<graphics::scalar>(
+				params.config_file,
+				FCPPT_TEXT("water/stretch-factor")));
+
+	graphics::rect const extents(
+		graphics::vec2(
+			stretched.pos()[0],
+			stretched.pos()[2]),
+		graphics::dim2(
+			stretched.dimension()[0],
+			stretched.dimension()[2]));
+
+	graphics::scalar const texture_scaling = 
+		json::find_member<graphics::scalar>(
+			params.config_file,
+			FCPPT_TEXT("water/texture-scaling"));
+	
 	// We have to activate the shader here because we want to fill the
 	// vertex buffer with "custom" attributes.
 	sge::renderer::glsl::scoped_program scoped_shader_(
@@ -167,7 +198,8 @@ insula::water::object::object(
 			extents.pos().y()));
 	(vb_it++)->set<vf::texture_coordinate>(
 		vf::packed_texture_coordinate(
-			texture_scaling,0)); 
+			texture_scaling,
+			0)); 
 
 	(vb_it)->set<vf::position>(
 		vf::packed_position(
@@ -176,7 +208,8 @@ insula::water::object::object(
 			extents.pos().y() + extents.dimension().h()));
 	(vb_it++)->set<vf::texture_coordinate>(
 		vf::packed_texture_coordinate(
-			texture_scaling,texture_scaling)); 
+			texture_scaling,
+			texture_scaling)); 
 
 	(vb_it)->set<vf::position>(
 		vf::packed_position(
@@ -205,7 +238,7 @@ insula::water::object::object(
 		vf::packed_texture_coordinate(
 			0,0)); 
 
-	scene_manager.add(
+	params.scene_manager.add(
 		scene::render_pass::object(
 			FCPPT_TEXT("water"),
 			[&camera_,&water_level_]()

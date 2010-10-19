@@ -10,7 +10,6 @@
 #include "textures/image_sequence.hpp"
 #include "textures/rgb_view.hpp"
 #include "textures/rgb_view_sequence.hpp"
-#include "get_option.hpp"
 #include "stdlib/grid/sobel_operator.hpp"
 #include "stdlib/grid/average_convolve.hpp"
 #include <sge/systems/instance.hpp>

@@ -12,7 +12,6 @@
 #include <sge/parse/json/object.hpp>
 #include <fcppt/signal/scoped_connection.hpp>
 #include <boost/statechart/state_machine.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 namespace insula
 {
@@ -45,16 +44,12 @@ class machine
 public:
 	explicit
 	machine(
-		sge::parse::json::object const &config_file,
-		boost::program_options::variables_map const &);
+		sge::parse::json::object const &config_file);
 
 	// Sends events::tick, events::input and then events::render
 	void
 	tick(
 		sge::time::timer::frames_type);
-
-	boost::program_options::variables_map const &
-	cli_variables() const;
 
 	graphics::camera::object &
 	camera();
@@ -86,7 +81,6 @@ public:
 private:
 	bool running_;
 	sge::parse::json::object config_file_;
-	boost::program_options::variables_map vm_;
 	sge::systems::instance systems_;
 	insula::console::object console_;
 	insula::input_delegator input_delegator_;

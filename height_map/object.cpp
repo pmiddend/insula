@@ -1,23 +1,20 @@
 #include "object.hpp"
 #include "index_visitor.hpp"
+#include "image_to_array.hpp"
+#include "../create_path.hpp"
+#include "../json/find_member.hpp"
 #include "../graphics/scalar.hpp"
 #include "../graphics/camera/object.hpp"
 #include "../graphics/shader/vf_to_string.hpp"
 #include "../graphics/shader/scoped.hpp"
 #include "../graphics/dim3.hpp"
-#include "../graphics/rect.hpp"
 #include "../media_path.hpp"
-#include "../graphics/vec4.hpp"
 #include "../stdlib/normalize.hpp"
 #include "../stdlib/grid/sobel_operator.hpp"
 #include "../stdlib/grid/average_convolve.hpp"
 #include "../math/triangle/to_plane.hpp"
 #include "../scene/render_pass/object.hpp"
-#include "vf/packed_normal.hpp"
-#include "vf/packed_position.hpp"
 #include "vf/format.hpp"
-#include "vf/height_and_gradient.hpp"
-#include "vf/packed_height_and_gradient.hpp"
 #include "vf/normal.hpp"
 #include "vf/vertex_view.hpp"
 #include "scalar.hpp"
@@ -58,6 +55,8 @@
 #include <sge/renderer/scoped_index_lock.hpp>
 #include <sge/renderer/scoped_texture.hpp>
 #include <sge/renderer/lock_mode.hpp>
+#include <sge/image/multi_loader.hpp>
+#include <sge/image/create_texture.hpp>
 #include <sge/image/file.hpp>
 #include <fcppt/math/box/contains_point.hpp>
 #include <fcppt/math/almost_zero.hpp>
@@ -82,15 +81,34 @@ insula::height_map::object::object(
 		params.camera),
 	renderer_(
 		params.renderer),
+	heights_(
+		stdlib::grid::average_convolve(
+			stdlib::grid::average_convolve(
+				stdlib::grid::average_convolve(
+					height_map::image_to_array(
+						params.image_loader.load(
+							create_path(
+								json::find_member<fcppt::string>(
+									params.config_file,
+									FCPPT_TEXT("terrain/height-map")),
+								FCPPT_TEXT("heightfields")))))))),
+	gradient_(
+		stdlib::normalize(
+			stdlib::grid::sobel_operator(
+				heights_))),
 	cell_size_(
-		params.cell_size),
+		json::find_member<scalar>(
+			params.config_file,
+			FCPPT_TEXT("terrain/cell-size"))),
 	height_scaling_(
-		params.height_scaling),
+		json::find_member<scalar>(
+			params.config_file,
+			FCPPT_TEXT("terrain/height-scaling"))),
 	vb_(
 		renderer_->create_vertex_buffer(
 			sge::renderer::vf::dynamic::make_format<vf::format>(),
 			static_cast<sge::renderer::size_type>(
-				params.array.size()),
+				heights_.size()),
 			sge::renderer::resource_flags::none)),
 	ib_(
 		renderer_->create_index_buffer(
@@ -99,7 +117,7 @@ insula::height_map::object::object(
 			// 2*q Tris
 			// 3*2*q Indices
 			static_cast<sge::renderer::size_type>(
-				3*2*((params.array.dimension()[0]-1)*(params.array.dimension()[1]-1))),
+				3*2*((heights_.dimension()[0]-1)*(heights_.dimension()[1]-1))),
 			sge::renderer::resource_flags::none)),
 	shader_(
 		renderer_,
@@ -110,22 +128,28 @@ insula::height_map::object::object(
 			graphics::shader::variable(
 				"sun_direction",
 				graphics::shader::variable_type::const_,
-				normalize(
-					params.sun_direction)),
+				-fcppt::math::vector::normalize(
+					json::find_member<vec3>(
+						params.config_file,
+						FCPPT_TEXT("sun-position")))),
 			graphics::shader::variable(
 				"ambient_light",
 				graphics::shader::variable_type::const_,
-				params.ambient_light),
+				json::find_member<scalar>(
+					params.config_file,
+					FCPPT_TEXT("terrain/ambient-light"))),
 			graphics::shader::variable(
 				"texture_scaling",
 				graphics::shader::variable_type::const_,
-				params.texture_scaling),
+				json::find_member<scalar>(
+					params.config_file,
+					FCPPT_TEXT("terrain/texture-scaling"))),
 			graphics::shader::variable(
 				"grid_size",
 				graphics::shader::variable_type::const_,
-				params.cell_size * 
+				cell_size_ * 
 				fcppt::math::dim::structure_cast<graphics::vec2>(
-					params.array.dimension())),
+					heights_.dimension())),
 			graphics::shader::variable(
 				"do_clip",
 				graphics::shader::variable_type::uniform,
@@ -133,7 +157,9 @@ insula::height_map::object::object(
 			graphics::shader::variable(
 				"water_level",
 				graphics::shader::variable_type::uniform,
-				params.water_height),
+				json::find_member<scalar>(
+					params.config_file,
+					FCPPT_TEXT("water/level"))),
 			graphics::shader::variable(
 				"mvp",
 				graphics::shader::variable_type::uniform,
@@ -147,8 +173,14 @@ insula::height_map::object::object(
 		{
 			graphics::shader::sampler(
 				"rock",
-				renderer_->create_texture(
-					params.gradient_texture_image->view(),
+				sge::image::create_texture(
+					create_path(
+						json::find_member<fcppt::string>(
+							params.config_file,
+							FCPPT_TEXT("terrain/rock-texture")),
+						FCPPT_TEXT("textures")),
+					params.renderer,
+					params.image_loader,
 					sge::renderer::filter::trilinear,
 					sge::renderer::resource_flags::none)),
 			graphics::shader::sampler(
@@ -156,14 +188,26 @@ insula::height_map::object::object(
 				params.shadow_map),
 			graphics::shader::sampler(
 				"grass",
-				renderer_->create_texture(
-					params.upper_texture_image->view(),
+				sge::image::create_texture(
+					create_path(
+						json::find_member<fcppt::string>(
+							params.config_file,
+							FCPPT_TEXT("terrain/grass-texture")),
+						FCPPT_TEXT("textures")),
+					params.renderer,
+					params.image_loader,
 					sge::renderer::filter::trilinear,
 					sge::renderer::resource_flags::none)),
 			graphics::shader::sampler(
 				"sand",
-				renderer_->create_texture(
-					params.lower_texture_image->view(),
+				sge::image::create_texture(
+					create_path(
+						json::find_member<fcppt::string>(
+							params.config_file,
+							FCPPT_TEXT("terrain/sand-texture")),
+						FCPPT_TEXT("textures")),
+					params.renderer,
+					params.image_loader,
 					sge::renderer::filter::trilinear,
 					sge::renderer::resource_flags::none))
 		}),
@@ -185,30 +229,21 @@ insula::height_map::object::object(
 		graphics::dim3(
 			cell_size_ * 
 			static_cast<graphics::scalar>(
-				params.array.dimension().w()),
+				heights_.dimension().w()),
 			height_scaling_,
 			cell_size_ * 
 			static_cast<graphics::scalar>(
-				params.array.dimension().h()))),
-	heights_(
-		stdlib::grid::average_convolve(
-			stdlib::grid::average_convolve(
-				stdlib::grid::average_convolve(
-					params.array)))),
-	gradient_(
-		stdlib::normalize(
-			stdlib::grid::sobel_operator(
-				heights_))),
+				heights_.dimension().h()))),
 	points_(
-		params.array.dimension()),
+		heights_.dimension()),
 	normals_(
-		params.array.dimension())
+		heights_.dimension())
 {
 	// We need the stretched values for the texture layers (_before_ the
 	// convolution!)
 	array const stretched = 
 		stdlib::normalize(
-			params.array);
+			heights_);
 
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
@@ -243,9 +278,15 @@ insula::height_map::object::object(
 		vec3::null());
 
 	// Calculate the averaged normals
-	for (array::size_type y = 1; y < static_cast<array::size_type>(heights_.dimension().h()-1); ++y)
+	for(
+		array::size_type y = 1; 
+		y < static_cast<array::size_type>(heights_.dimension().h()-1); 
+		++y)
 	{
-		for (array::size_type x = 1; x < static_cast<array::size_type>(heights_.dimension().w()-1); ++x)
+		for(
+			array::size_type x = 1; 
+			x < static_cast<array::size_type>(heights_.dimension().w()-1); 
+			++x)
 		{
 			vec3 const point = 
 				points_[vec3_array::dim(x,y)];
@@ -280,7 +321,7 @@ insula::height_map::object::object(
 				normals_[vec3_array::dim(x,y)]);
 
 			(*vb_it).set<vf::height_and_gradient>(
-				vf::packed_height_and_gradient(
+				graphics::vec2(
 					stretched[array::dim(x,y)],
 					gradient_[array::dim(x,y)]));
 			

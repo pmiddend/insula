@@ -7,6 +7,7 @@
 #include "../graphics/rect.hpp"
 #include "../scene/backend.hpp"
 #include "../scene/manager_fwd.hpp"
+#include "parameters_fwd.hpp"
 #include <sge/renderer/device_ptr.hpp>
 #include <sge/renderer/target_ptr.hpp>
 #include <sge/renderer/texture_ptr.hpp>
@@ -30,16 +31,7 @@ public:
 
 	explicit 
 	object(
-		sge::renderer::device_ptr,
-		graphics::camera::object &,
-		graphics::scalar water_level,
-		graphics::rect const &,
-		sge::renderer::dim_type const &reflection_texture_size,
-		sge::image::file_ptr bump_texture,
-		graphics::scalar texture_scaling,
-		graphics::scalar wave_height,
-		graphics::scalar wind_speed,
-		scene::manager &);
+		parameters const &);
 
 	void 
 	begin(

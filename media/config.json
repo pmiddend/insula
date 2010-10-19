@@ -1,61 +1,62 @@
 {
-	"cli" :
-	{
-		"console" : 
-		{ 
-			"redirect" : true 
-		},
-
-		"camera" : 
-		{
-			"fov" : 90,
-			"near" : 1,
-			"far" : 10000,
-			"movement-speed" : 200,
-			"rotation-speed" : 500
-		},
-
-		"terrain" :
-		{
-			"cell-size" : 5,
-			"height-scaling" : 500,
-			"height-map" : "test_256.png",
-			"gradient-texture" : "rock_512.png",
-			"height-texture-1" : "sand_512.png",
-			"height-texture-2" : "grass_512.png",
-			"ambient-light" : 0.4,
-			"sun-direction" : [100,100,100],
-			"texture-scaling" : 50
-		},
-
-		"water" :
-		{
-			"level" : 0.125,
-			"reflection-size" : [512,512],
-			"bump-map" : "bumps.png",
-			"bump-scaling" : 20,
-			"wave-height" : 0.5,
-			"wind-speed" : 0.125,
-			"stretching" : 2
-		},
-
-		"graphics" : 
-		{
-			"screen-size" : [1024,768]
-		},
-
-		"physics" : 
-		{
-			"gravity" : [0,-10,0]
-		},
-
-		
-		"camera-move" : 
-		{
-			"inverse-speed" : 0.4,
-			"threshold" : 0.1
-		}
+	"console" : 
+	{ 
+		"redirect" : true 
 	},
+
+	"camera" : 
+	{
+		"fov" : 90.0,
+		"near" : 1.0,
+		"far" : 10000.0,
+		"movement-speed" : 200.0,
+		"rotation-speed" : 500.0
+	},
+
+	"terrain" :
+	{
+		"cell-size" : 5.0,
+		"height-scaling" : 500.0,
+		"height-map" : "test_256.png",
+		"rock-texture" : "rock_512.png",
+		"sand-texture" : "sand_512.png",
+		"grass-texture" : "grass_512.png",
+		"ambient-light" : 0.4,
+		"texture-scaling" : 50.0
+	},
+
+	"water" :
+	{
+		"level" : 0.125,
+		"reflection-size" : [512,512],
+		"bump-texture" : "bumps.png",
+		"texture-scaling" : 20.0,
+		"wave-height" : 0.5,
+		"wind-speed" : 0.125,
+		"stretch-factor" : 2.0
+	},
+
+	"graphics" : 
+	{
+		"screen-size" : [1024,768]
+	},
+
+	"physics" : 
+	{
+		"gravity" : [0.0,-10.0,0.0]
+	},
+
+
+	"camera-move" : 
+	{
+		"inverse-speed" : 0.4,
+		"threshold" : 0.1
+	},
+
+	"players" : 
+	[
+		"foobar"
+	],
 
 	"player" :
 	{
@@ -69,12 +70,12 @@
 	{
 		"model" : "beacon.md3",
 		"texture" : "beacon.png",
-		"flatness_range" : [0.0,0.2],
-		"floating_height" : 1.0
+		"flatness-range" : [0.0,0.2],
+		"floating-height" : 1.0
  },
 
 	"remaining-time" : 20000,
-	"light-source" : [100.0,100.0,100.0],
+	"sun-position" : [100.0,100.0,100.0],
 	"shadow-map-size" : [2048,2048],
 
 	"props" :
@@ -82,11 +83,11 @@
 		{
 			"model" : "rock1.md3",
 			"texture" : "rocks.png",
-			"flatness_range" : [0.0,1.0],
-			"penetration_depth" : 1.0,
-			"scale_range" : [2.0,10.0],
-			"rotation_axis" : [0.0,1.0,0.0],
-			"physics_offset" : [0.0,0.0,0.0],
+			"flatness-range" : [0.0,1.0],
+			"penetration-depth" : 1.0,
+			"scale-range" : [2.0,10.0],
+			"rotation-axis" : [0.0,1.0,0.0],
+			"physics-offset" : [0.0,0.0,0.0],
 			"approximation" : 
 			{
 				"type" : "sphere",
@@ -97,24 +98,24 @@
 		{
 			"model" : "palmtree.md3",
 			"texture" : "palmtree.png",
-			"flatness_range" : [0.0,0.2],
-			"penetration_depth" : 1.0,
-			"scale_range" : [2.0,4.0],
-			"rotation_axis" : [0.0,1.0,0.0],
-			"physics_offset_old" : [-3.73,-3.48,-0.36],
-			"physics_offset" : [0.0,0.0,0.0],
+			"flatness-range" : [0.0,0.2],
+			"penetration-depth" : 1.0,
+			"scale-range" : [2.0,4.0],
+			"rotation-axis" : [0.0,1.0,0.0],
+			"physics-offset-old" : [-3.73,-3.48,-0.36],
+			"physics-offset" : [0.0,0.0,0.0],
 			"approximation" : "exact",
 			"count" : 10
 		},
 		{
 			"model" : "statue.md3",
 			"texture" : "statue.png",
-			"flatness_range" : [0.0,0.02],
-			"penetration_depth" : 2.0,
-			"scale_range" : [4.0,4.0],
-			"rotation_axis" : [0.0,1.0,0.0],
-			"physics_offset_old" : [-3.73,-3.48,-0.36],
-			"physics_offset" : [0.0,0.0,0.0],
+			"flatness-range" : [0.0,0.02],
+			"penetration-depth" : 2.0,
+			"scale-range" : [4.0,4.0],
+			"rotation-axis" : [0.0,1.0,0.0],
+			"physics-offset-old" : [-3.73,-3.48,-0.36],
+			"physics-offset" : [0.0,0.0,0.0],
 			"approximation" : "exact",
 			"count" : 0
 		}

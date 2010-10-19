@@ -22,6 +22,8 @@ public:
 	sge::renderer::texture_ptr const
 	texture();
 
+	// This gets a perspective matrix so that shadow::object doesn't
+	// need to know the camera
 	graphics::mat4 const
 	mvp(
 		graphics::mat4 const &projection) const;

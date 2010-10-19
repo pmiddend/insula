@@ -1,9 +1,9 @@
-#include "create_variables_map.hpp"
 #include "scoped_machine.hpp"
 #include "machine.hpp"
 // The first state to be used has to be included here
 #include "states/freelook.hpp"
-#include "help_needed.hpp"
+#include "json/process_option.hpp"
+#include "json/merge_trees.hpp"
 #include "media_path.hpp"
 #include <sge/time/timer.hpp>
 #include <sge/time/second.hpp>
@@ -12,123 +12,51 @@
 #include <fcppt/io/cout.hpp>
 #include <fcppt/io/cerr.hpp>
 #include <fcppt/text.hpp>
+#include <fcppt/from_std_string.hpp>
 #include <iostream>
 #include <cstddef>
-
-
-#include <string>
-#include <vector>
-namespace
-{
-template<typename T>
-typename 
-std::basic_string<T>::difference_type 
-distance(
-	std::basic_string<T> const &source, 
-	std::basic_string<T> const &target) 
-{
-	typedef typename
-	std::basic_string<T>::difference_type 
-	result_type;
-
-	result_type const 
-		n = static_cast<result_type>(source.length()),
-		m = static_cast<result_type>(target.length());
-
-	if (source.empty())
-		return m;
-	if (target.empty())
-		return n;
-
-	typedef
-	fcppt::container::grid::object
-	<
-		result_type,
-		2
-	>
-	grid;
-
-	typedef typename
-	grid::vector
-	vector;
-
-	grid matrix(
-		vector(
-			static_cast<result_type>(
-				n+1),
-			static_cast<result_type>(
-				m+1)));
-
-  // Step 2
-
-  for (result_type i = 0; i <= n; i++)
-    matrix[vector(i,0)] = i;
-
-  for (result_type j = 0; j <= m; j++)
-    matrix[vector(0,j)] = j;
-
-  for (result_type i = 1; i <= n; i++) 
-	{
-    T const s_i = 
-			source[i-1];
-
-    for (result_type j = 1; j <= m; j++) 
-		{
-      T const t_j = target[j-1];
-
-      result_type cost;
-      if (s_i == t_j) 
-			{
-        cost = 0;
-      }
-      else 
-			{
-        cost = 1;
-      }
-
-      // Step 6
-
-      result_type const 
-				above = matrix[vector(i-1,j)],
-				left = matrix[vector(i,j-1)],
-				diag = matrix[vector(i-1,j-1)],
-				cell = std::min(above + 1,std::min(left + 1, diag + cost));
-
-      // Step 6A: Cover transposition, in addition to deletion,
-      // insertion and substitution. This step is taken from:
-      // Berghel, Hal ; Roach, David : "An Extension of Ukkonen's 
-      // Enhanced Dynamic Programming ASM Algorithm"
-      // (http://www.acm.org/~hlb/publications/asm/asm.html)
-      if (i>static_cast<result_type>(2) && j>static_cast<result_type>(2)) 
-			{
-        result_type trans = matrix[vector(i-2,j-2)]+1;
-        if (source[i-2]!=t_j) trans++;
-        if (s_i!=target[j-2]) trans++;
-        if (cell>trans) cell = trans;
-      }
-
-      matrix[vector(i,j)] = cell;
-    }
-  }
-
-  return matrix[n][m];
-}
-
-}
+#include <cstdlib>
 
 int main(int argc,char *argv[])
 try
 {
-	sge::parse::json::object const config_file =
-		sge::parse::json::parse_file_exn(
-			insula::media_path()/FCPPT_TEXT("config.json"));
+	sge::parse::json::object config_file =
+		insula::json::merge_trees(
+			sge::parse::json::parse_file_exn(
+				insula::media_path()/FCPPT_TEXT("config.json")),
+			sge::parse::json::parse_file_exn(
+				insula::media_path()/FCPPT_TEXT("user_config.json")));
+
+	if (argc >= 2 && std::string(argv[1]) == "--help")
+	{
+		std::cout << 
+			"Command line options are of the form:\n\n"
+			"foo/bar/baz=qux\n\n"
+			"where foo/bar/baz is a sequence of objects in the config.json file.\n"
+			"qux can be any json type (strings, arrays, etc.)\n"
+			"For example, if config.json looks like this:\n\n"
+			"{ \"renderer\" : { \"screen_size\" : [640,480] } }\n\n"
+			"You could change the resolution via:\n\n"
+			"renderer/screen_size=[1024,768]\n\n"
+			"Be aware of two things, though:\n"
+			"1. You can use _any_ json type, so it's possible to write\n\n"
+			"renderer/screen_size=1.0\n\n"
+			"which, of course, makes no sense. Try to use the correct type.\n"
+			"2. Be aware of your shell' special characters. For example, in bash\n"
+			"to set a json string, you have to write:\n\n"
+			"player/name='\"foobar\"'\n\n"
+			"It's a good idea to always put the argument in apostrophes.\n";
+		return EXIT_SUCCESS;
+	}
+
+	for (int i = 1; i < argc; ++i)
+		insula::json::process_option(
+			config_file,
+			fcppt::from_std_string(
+				argv[i]));
 
 	insula::machine m(
-		config_file,
-		insula::create_variables_map(
-			argc,
-			argv,
-			config_file));
+		config_file);
 
 	insula::scoped_machine scope(
 		m);
@@ -138,11 +66,6 @@ try
 	while (m.running())
 		m.tick(
 			frame_timer.reset());
-}
-catch (insula::help_needed const &h)
-{
-	fcppt::io::cout << h.string() << FCPPT_TEXT("\n");
-	return EXIT_SUCCESS;
 }
 catch (fcppt::exception const &e)
 {
