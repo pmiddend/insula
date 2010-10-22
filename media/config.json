@@ -76,6 +76,7 @@
 
 	"remaining-time" : 20000,
 	"sun-position" : [100.0,100.0,100.0],
+	"sun-distance" : 800.0,
 	"shadow-map-size" : [2048,2048],
 
 	"props" :

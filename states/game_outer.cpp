@@ -21,7 +21,9 @@
 #include "../scene/render_pass/object.hpp"
 #include "../shadow/parameters.hpp"
 #include "../timed_output.hpp"
+#include "../events/tick.hpp"
 #include <fcppt/math/box/structure_cast.hpp>
+#include <fcppt/math/box/center.hpp>
 #include <fcppt/make_shared_ptr.hpp>
 #include <fcppt/text.hpp>
 #include <sge/font/drawer_3d.hpp>
@@ -60,24 +62,8 @@ insula::states::game_outer::game_outer(
 		context<machine>().camera()),
 	shadow_(
 		shadow::parameters(
+			context<machine>().config_file(),
 			context<machine>().systems(),
-			graphics::gizmo(
-				graphics::gizmo::init()
-					.position(
-						graphics::vec3(
-							303.661f,592.32f,376.59f))
-					.forward(
-						graphics::vec3(
-							-0.315495f,0.915277f,-0.250462f))
-					.right(
-						graphics::vec3(
-							-0.621763f,0.0f,0.783205f))
-					.up(
-						graphics::vec3(
-							0.71685f,0.402825f,0.569086f))),
-				json::find_member<sge::renderer::dim_type>(
-					context<machine>().config_file(),
-					FCPPT_TEXT("shadow-map-size")),
 			scene_manager_)),
 	height_map_(
 		insula::height_map::parameters(
@@ -86,9 +72,7 @@ insula::states::game_outer::game_outer(
 			context<machine>().systems().renderer(),
 			context<machine>().systems().image_loader(),
 			scene_manager_,
-			shadow_.texture(),
-			shadow_.mvp(
-				context<machine>().camera().perspective()))),
+			shadow_)),
 	skydome_(
 		skydome::parameters(
 			context<machine>().config_file(),
@@ -163,6 +147,16 @@ insula::states::game_outer::game_outer(
 			scene_manager_,
 			context<machine>().camera()))
 {
+	graphics::vec3 const terrain_center = 
+		fcppt::math::vector::structure_cast<height_map::vec3>(
+			fcppt::math::box::center(
+				height_map_.extents()));
+	shadow_.base_position(
+		graphics::vec3(
+			terrain_center.x(),
+			0,
+			terrain_center.z()));
+
 	if (player_times_.empty())
 		throw exception(FCPPT_TEXT("You have to specify at least one player"));
 }
@@ -181,9 +175,11 @@ insula::states::game_outer::height_map() const
 
 void
 insula::states::game_outer::react(
-	events::tick const &)
+	events::tick const &t)
 {
 	broadphase_manager_.update();
+	shadow_.update(
+		t.delta());
 }
 
 void

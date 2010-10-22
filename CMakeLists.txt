@@ -99,8 +99,7 @@ overlay/function_backend.cpp)
 SET(console_files console/streambuf.cpp
 console/object.cpp)
 SET(skydome_files
-skydome/object.cpp
-skydome/sphere_point.cpp)
+skydome/object.cpp)
 SET(water_files
 water/object.cpp)
 SET(scene_files scene/transparent_instance.cpp
@@ -170,6 +169,7 @@ SET(json_files json/parse_config.cpp
 json/parse_font.cpp
 json/process_option.cpp
 json/string_to_value.cpp
+json/config_wrapper.cpp
 json/merge_trees.cpp)
 SET(base_files media_path.cpp input_delegator.cpp create_path.cpp music_controller.cpp machine.cpp application_title.cpp sound_controller.cpp exception.cpp random_seed.cpp scoped_machine.cpp timed_output.cpp turn_timer.cpp milliseconds_to_string.cpp rigid_model.cpp arrow.cpp)
 
@@ -193,17 +193,13 @@ FUNCTION(CREATE_INSULA_EXE name)
 	)
 ENDFUNCTION(CREATE_INSULA_EXE)
 
-#CREATE_INSULA_EXE(load_image_to_array)
-#CREATE_INSULA_EXE(view_model)
-#CREATE_INSULA_EXE(point_sprite_test)
-#CREATE_INSULA_EXE(generate_height_texture)
-#CREATE_INSULA_EXE(music_test)
-#CREATE_INSULA_EXE(sound_test)
+CREATE_INSULA_EXE(view_model)
+CREATE_INSULA_EXE(point_sprite_test)
+CREATE_INSULA_EXE(music_test)
+CREATE_INSULA_EXE(sound_test)
 CREATE_INSULA_EXE(insula)
-#CREATE_INSULA_EXE(timer_test)
-#CREATE_INSULA_EXE(slerp_test)
-#CREATE_INSULA_EXE(vertex_format_test)
-#CREATE_INSULA_EXE(json_test)
+CREATE_INSULA_EXE(vertex_format_test)
+CREATE_INSULA_EXE(json_test)
 
 ENABLE_TESTING()
 

@@ -14,6 +14,7 @@
 #include "../stdlib/grid/average_convolve.hpp"
 #include "../math/triangle/to_plane.hpp"
 #include "../scene/render_pass/object.hpp"
+#include "../shadow/object.hpp"
 #include "vf/format.hpp"
 #include "vf/normal.hpp"
 #include "vf/vertex_view.hpp"
@@ -164,11 +165,10 @@ insula::height_map::object::object(
 				"mvp",
 				graphics::shader::variable_type::uniform,
 				graphics::mat4()),
-			// This could be const!
 			graphics::shader::variable(
 				"shadow_mvp",
 				graphics::shader::variable_type::uniform,
-				params.shadow_mvp)
+				graphics::mat4())
 		},
 		{
 			graphics::shader::sampler(
@@ -185,7 +185,7 @@ insula::height_map::object::object(
 					sge::renderer::resource_flags::none)),
 			graphics::shader::sampler(
 				"shadow_map",
-				params.shadow_map),
+				params.shadow.texture()),
 			graphics::shader::sampler(
 				"grass",
 				sge::image::create_texture(
@@ -237,7 +237,9 @@ insula::height_map::object::object(
 	points_(
 		heights_.dimension()),
 	normals_(
-		heights_.dimension())
+		heights_.dimension()),
+	shadow_(
+		params.shadow)
 {
 	// We need the stretched values for the texture layers (_before_ the
 	// convolution!)
@@ -342,12 +344,15 @@ insula::height_map::object::begin(
 	scene::render_pass::object const &rp)
 {
 	if (rp.name == FCPPT_TEXT("shadow"))
-	{
 		return begin_shadow();
-	}
 
 	graphics::shader::scoped scoped_shader_(
 		shader_);
+
+	shader_.set_uniform(
+		"shadow_mvp",
+		shadow_.mvp(
+			camera_.perspective()));
 
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,
@@ -564,7 +569,8 @@ insula::height_map::object::begin_shadow()
 		renderer_,
 		sge::renderer::state::list
 			// sic!
-		 	(sge::renderer::state::cull_mode::front)
+		 //	(sge::renderer::state::cull_mode::front)
+		 	(sge::renderer::state::cull_mode::back)
 		 	(sge::renderer::state::depth_func::less));
 
 	renderer_->render(

@@ -44,9 +44,9 @@ insula::json::process_option(
 			input+
 			FCPPT_TEXT("\""));
 
-	fcppt::io::cout << "Parts were:\n";
-	BOOST_FOREACH(string_vector::const_reference r,boost::fusion::at_c<0>(result))
-		fcppt::io::cout << r << "\n";
+	//fcppt::io::cout << "Parts were:\n";
+	//BOOST_FOREACH(string_vector::const_reference r,boost::fusion::at_c<0>(result))
+	//	fcppt::io::cout << r << "\n";
 
 	FCPPT_ASSERT(
 		!boost::fusion::at_c<0>(result).empty());

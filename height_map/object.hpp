@@ -10,6 +10,7 @@
 #include "../scene/backend.hpp"
 #include "parameters_fwd.hpp"
 #include "triangle.hpp"
+#include "../shadow/object_fwd.hpp"
 #include "vec3_array.hpp"
 #include "vec2.hpp"
 #include "render_mode.hpp"
@@ -115,6 +116,7 @@ private:
 	graphics::shader::object shadow_shader_;
 	graphics::box const extents_;
 	vec3_array points_,normals_;
+	shadow::object &shadow_;
 
 	void
 	begin_shadow();

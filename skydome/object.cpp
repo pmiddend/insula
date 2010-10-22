@@ -1,4 +1,3 @@
-#include "sphere_point.hpp"
 #include "object.hpp"
 #include "parameters.hpp"
 #include "index_visitor.hpp"
@@ -12,6 +11,7 @@
 #include "../graphics/shader/vf_to_string.hpp"
 #include "../media_path.hpp"
 #include "../timed_output.hpp"
+#include "../math/sphere_point.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/vertex_buffer.hpp>
@@ -86,7 +86,7 @@ insula::skydome::object::object(
 			graphics::shader::variable(
 				"sun_position",
 				graphics::shader::variable_type::const_,
-				sphere_point(
+				math::sphere_point(
 					static_cast<graphics::scalar>(1),
 					fcppt::math::deg_to_rad(
 						static_cast<graphics::scalar>(20)),
@@ -197,10 +197,10 @@ insula::skydome::object::object(
 
 	// The top
 	vb_it->set<vf::position>(
-		sphere_point(
+		math::sphere_point(
 			radius,
-			0,
-			0));
+			static_cast<scalar>(0),
+			static_cast<scalar>(0)));
 	
 	vb_it++;
 
@@ -228,7 +228,7 @@ insula::skydome::object::object(
 	//		fcppt::io::cout << sphere_point(radius,lat,lon).y() << "\n";
 
 			vb_it->set<vf::position>(
-				sphere_point(
+				math::sphere_point(
 					radius,
 					lat,
 					lon));

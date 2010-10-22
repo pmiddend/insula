@@ -1,18 +1,17 @@
 #include "graphics/scalar.hpp"
 #include "graphics/vec3.hpp"
+#include "graphics/camera/parameters.hpp"
 #include "graphics/camera/object.hpp"
-#include "graphics/camera/cli_options.hpp"
-#include "graphics/camera/cli_factory.hpp"
 #include "graphics/shader/object.hpp"
 #include "graphics/shader/vf_to_string.hpp"
 #include "graphics/shader/scoped.hpp"
-#include "graphics/cli_options.hpp"
 #include "console/object.hpp"
 #include "model/object.hpp"
 #include "model/scoped.hpp"
 #include "model/vf/format.hpp"
 #include "create_path.hpp"
-#include "get_option.hpp"
+#include "json/config_wrapper.hpp"
+#include "json/find_member.hpp"
 #include "media_path.hpp"
 #include "stdlib/copy.hpp"
 #include "input_delegator.hpp"
@@ -87,42 +86,16 @@ try
 {
 	using namespace insula;
 
+	sge::parse::json::object const config_file =
+		insula::json::config_wrapper(
+			{"view_model.json"},
+			argc,
+			argv);
+
 	fcppt::log::activate_levels(
 		sge::log::global(),
 		fcppt::log::level::debug
 	);
-
-	boost::program_options::options_description desc("Allowed options");
-
-	desc.add(
-		graphics::camera::cli_options());
-
-	desc.add(
-		graphics::cli_options());
-
-	desc.add_options()
-		("help","produce help message")
-		("model",boost::program_options::value<fcppt::string>()->required(),"The model file to load")
-		("texture",boost::program_options::value<fcppt::string>(),"The texture")
-		("list-parts",boost::program_options::value<bool>()->zero_tokens()->default_value(false),"List all the available parts")
-		("part",boost::program_options::value<fcppt::string>(),"Which part of the model we shall load");
-	
-	boost::program_options::variables_map vm;
-	boost::program_options::store(
-		boost::program_options::parse_command_line(
-			argc, 
-			argv, 
-			desc), 
-			vm);
-
-	boost::program_options::notify(
-		vm);    
-
-	if (vm.count("help")) 
-	{
-		fcppt::io::cout << desc << FCPPT_TEXT("\n");
-		return EXIT_SUCCESS;
-	}
 
 	sge::systems::instance sys(
 		sge::systems::list() 
@@ -132,7 +105,9 @@ try
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
-					get_option<sge::renderer::screen_size>(vm,"graphics-screen-size"),
+					json::find_member<sge::renderer::screen_size>(
+						config_file,
+						FCPPT_TEXT("graphics/screen-size")),
 					sge::renderer::bit_depth::depth32,
 					sge::renderer::refresh_rate_dont_care
 				),
@@ -164,21 +139,37 @@ try
 		console);
 	
 	graphics::camera::object cam(
-		graphics::camera::cli_factory(
-			vm,
+		graphics::camera::parameters(
 			input_delegator_,
 			sge::renderer::aspect<graphics::scalar>(
 				sys.renderer()->screen_size()),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/fov")),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/near")),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/far")),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/movement-speed")),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/rotation-speed")),
 			graphics::vec3::null()));
 
 	sge::model::object_ptr const model_object = 
 		sys.md3_loader()->load(
 			create_path(
-				get_option<fcppt::string>(vm,"model"),
+				json::find_member<fcppt::string>(
+					config_file,
+					FCPPT_TEXT("model")),
 				FCPPT_TEXT("models")),
 			sge::model::load_flags::switch_yz);
 
-	if (get_option<bool>(vm,"list-parts"))
+	if (json::find_member<bool>(config_file,FCPPT_TEXT("list-parts")))
 	{
 		fcppt::io::cout << FCPPT_TEXT("Available model parts are: \n\n");
 		stdlib::copy(
@@ -187,12 +178,6 @@ try
 				fcppt::io::cout,
 				FCPPT_TEXT("\n")));
 		return EXIT_SUCCESS;
-	}
-
-	if (!vm.count("texture"))
-	{
-		fcppt::io::cerr << FCPPT_TEXT("You have to specify a texture!\n");
-		return EXIT_FAILURE;
 	}
 
 	graphics::shader::object model_shader(
@@ -211,7 +196,9 @@ try
 				"texture",
 				sge::image::create_texture(
 				create_path(
-					get_option<fcppt::string>(vm,"texture"),
+					json::find_member<fcppt::string>(
+						config_file,
+						FCPPT_TEXT("texture")),
 					FCPPT_TEXT("textures")),
 				sys.renderer(),
 				sys.image_loader(),
@@ -222,12 +209,16 @@ try
 	model::object model(
 		model_object,
 		sys.renderer(),
-		!vm.count("part")
+		json::find_member<fcppt::string>(
+			config_file,
+			FCPPT_TEXT("part")).empty()
 		?
 			fcppt::optional<fcppt::string>()
 		:
 			fcppt::optional<fcppt::string>(
-				get_option<fcppt::string>(vm,"part")));
+				json::find_member<fcppt::string>(
+					config_file,
+					FCPPT_TEXT("part"))));
 
 	bool running = 
 		true;
@@ -261,13 +252,6 @@ try
 							(sge::renderer::state::draw_mode::fill));
 			},
 			FCPPT_TEXT("Toggle wireframe mode")));
-
-	if (vm.count("wireframe"))
-	{
-		sys.renderer()->state(
-			sge::renderer::state::list
-				(sge::renderer::state::draw_mode::line));
-	}
 
 	sge::time::timer frame_timer(
 		sge::time::second(

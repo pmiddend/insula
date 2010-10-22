@@ -9,6 +9,7 @@
 - Weiterer CC: http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=5712
 - Landschaftsgenerierung http://www.dungeonleague.com/page/2/
 - Neue AA-Methode: http://www.gamedev.net/community/forums/topic.asp?topic_id=580517
+- VSM, bestes Paper: http://http.developer.nvidia.com/GPUGems3/gpugems3_ch08.html
 * Konfigurationssystem
 - Alle Daten stehen in der json-Datei
 - Alle Subsysteme kriegen ein json-Objekt

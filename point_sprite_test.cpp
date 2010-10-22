@@ -3,16 +3,15 @@
 #include "random_seed.hpp"
 #include "graphics/vec3.hpp"
 #include "graphics/camera/object.hpp"
-#include "graphics/camera/cli_options.hpp"
-#include "graphics/camera/cli_factory.hpp"
+#include "graphics/camera/parameters.hpp"
 #include "graphics/shader/object.hpp"
 #include "graphics/shader/scoped.hpp"
 #include "graphics/shader/vf_to_string.hpp"
-#include "graphics/cli_options.hpp"
 #include "console/object.hpp"
 #include "model/object.hpp"
 #include "create_path.hpp"
-#include "get_option.hpp"
+#include "json/config_wrapper.hpp"
+#include "json/find_member.hpp"
 #include "media_path.hpp"
 #include "stdlib/copy.hpp"
 #include "input_delegator.hpp"
@@ -46,6 +45,7 @@
 #include <sge/renderer/state/bool.hpp>
 #include <sge/renderer/state/color.hpp>
 #include <sge/renderer/state/float.hpp>
+#include <sge/parse/json/parse_file_exn.hpp>
 #include <sge/mainloop/dispatch.hpp>
 #include <sge/renderer/scoped_block.hpp>
 #include <sge/exception.hpp>
@@ -154,35 +154,11 @@ try
 		fcppt::log::level::debug
 	);
 
-	boost::program_options::options_description desc("Allowed options");
-
-	desc.add(
-		graphics::camera::cli_options());
-
-	desc.add(
-		graphics::cli_options());
-
-	desc.add_options()
-		("help","produce help message")
-		("texture",boost::program_options::value<fcppt::string>(),"the point sprite's texture")
-		("point-count",boost::program_options::value<sge::renderer::size_type>()->default_value(100),"how many points to generate");
-	
-	boost::program_options::variables_map vm;
-	boost::program_options::store(
-		boost::program_options::parse_command_line(
-			argc, 
-			argv, 
-			desc), 
-			vm);
-
-	boost::program_options::notify(
-		vm);    
-
-	if (vm.count("help")) 
-	{
-		fcppt::io::cout << desc << FCPPT_TEXT("\n");
-		return EXIT_SUCCESS;
-	}
+	sge::parse::json::object const config_file =
+		insula::json::config_wrapper(
+			{"point_sprite.json"},
+			argc,
+			argv);
 
 	sge::systems::instance sys(
 		sge::systems::list() 
@@ -192,7 +168,9 @@ try
 		(
 			sge::renderer::parameters(
 				sge::renderer::display_mode(
-					get_option<sge::renderer::screen_size>(vm,"graphics-screen-size"),
+					json::find_member<sge::renderer::screen_size>(
+						config_file,
+						FCPPT_TEXT("graphics/screen-size")),
 					sge::renderer::bit_depth::depth32,
 					sge::renderer::refresh_rate_dont_care
 				),
@@ -224,18 +202,26 @@ try
 		console);
 	
 	graphics::camera::object cam(
-		graphics::camera::cli_factory(
-			vm,
+		graphics::camera::parameters(
 			input_delegator_,
 			sge::renderer::aspect<graphics::scalar>(
 				sys.renderer()->screen_size()),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/fov")),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/near")),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/far")),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/movement-speed")),
+			json::find_member<graphics::scalar>(
+				config_file,
+				FCPPT_TEXT("camera/rotation-speed")),
 			graphics::vec3::null()));
-
-	if (!vm.count("texture"))
-	{
-		fcppt::io::cerr << FCPPT_TEXT("You have to specify a texture!\n");
-		return EXIT_FAILURE;
-	}
 
 	graphics::shader::object point_shader(
 		sys.renderer(),
@@ -253,7 +239,9 @@ try
 				"texture",
 				sge::image::create_texture(
 					create_path(
-						get_option<fcppt::string>(vm,"texture"),
+						json::find_member<fcppt::string>(
+							config_file,
+							FCPPT_TEXT("texture")),
 						FCPPT_TEXT("textures")),
 					sys.renderer(),
 					sys.image_loader(),
@@ -265,9 +253,9 @@ try
 		true;
 
 	sge::renderer::size_type const point_count = 
-		get_option<sge::renderer::size_type>(
-			vm,
-			"point-count");
+		json::find_member<sge::renderer::size_type>(
+			config_file,
+			FCPPT_TEXT("point-count"));
 
 	sge::renderer::vertex_buffer_ptr const vb_ = 
 		sys.renderer()->create_vertex_buffer(
@@ -340,13 +328,6 @@ try
 							(sge::renderer::state::draw_mode::fill));
 			},
 			FCPPT_TEXT("Toggle wireframe mode")));
-
-	if (vm.count("wireframe"))
-	{
-		sys.renderer()->state(
-			sge::renderer::state::list
-				(sge::renderer::state::draw_mode::line));
-	}
 
 	sge::time::timer frame_timer(
 		sge::time::second(

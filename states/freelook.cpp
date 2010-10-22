@@ -74,47 +74,6 @@ insula::states::freelook::freelook(
 
 	context<machine>().camera().gizmo() = 
 		context<game_outer>().shadow_object().gizmo();
-		/*
-		insula::gizmo::lock_to(
-			insula::gizmo::orthogonalize_keep_axis(
-				graphics::gizmo(
-					graphics::gizmo::init()
-						.position(
-							graphics::vec3(
-								hm_size.w() / 
-								static_cast<graphics::scalar>(2),
-								static_cast<graphics::scalar>(0),
-								hm_size.d() / 
-								static_cast<graphics::scalar>(2)))
-						.forward(
-							graphics::vec3(
-								std::cos(
-									fcppt::math::pi<graphics::scalar>()*
-									static_cast<graphics::scalar>(1.0/4.0)),
-								static_cast<graphics::scalar>(0),
-								std::sin(
-									fcppt::math::pi<graphics::scalar>()*
-									static_cast<graphics::scalar>(1.0/4.0))))
-						.right(
-							graphics::vec3(
-								std::cos(
-									fcppt::math::pi<graphics::scalar>()*
-									static_cast<graphics::scalar>(-1.0/4.0)),
-								static_cast<graphics::scalar>(0),
-								std::sin(
-									fcppt::math::pi<graphics::scalar>()*
-									static_cast<graphics::scalar>(-1.0/4.0))))
-						.up(
-							graphics::vec3(
-								static_cast<graphics::scalar>(0),
-								static_cast<graphics::scalar>(1),
-								static_cast<graphics::scalar>(0)))),
-					0),
-				hm_size.w()/
-				static_cast<graphics::scalar>(
-					2),
-				fcppt::math::pi<graphics::scalar>()/
-				static_cast<graphics::scalar>(4))*/;
 }
 
 boost::statechart::result
@@ -125,6 +84,11 @@ insula::states::freelook::react(
 		t); 
 	context<game_inner>().react(
 		t);
+
+	/*
+	context<machine>().camera().gizmo() = 
+		context<game_outer>().shadow_object().gizmo();
+	*/
 
 	return discard_event();
 }

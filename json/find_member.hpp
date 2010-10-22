@@ -2,11 +2,13 @@
 #define INSULA_JSON_FIND_MEMBER_HPP_INCLUDED
 
 #include "convert.hpp"
+#include "member_has_type.hpp"
 #include "../stdlib/accumulate.hpp"
 #include "../exception.hpp"
 #include <sge/parse/json/object.hpp>
 #include <sge/parse/json/find_member_exn.hpp>
 #include <sge/parse/json/array.hpp>
+#include <sge/parse/json/get.hpp>
 #include <sge/parse/json/member_name_equal.hpp>
 #include <fcppt/string.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -68,18 +70,28 @@ find_member(
 
 	try
 	{
-		return 
-			insula::json::convert<T>(
-				it->value_);
+		sge::parse::json::get<sge::parse::json::null>(
+			it->value_);
+		throw exception(FCPPT_TEXT("The member \"")+path+FCPPT_TEXT("\" is null"));
 	}
-	catch (sge::parse::json::invalid_get const &e)
+	catch (sge::parse::json::invalid_get const &)
 	{
-		throw exception(
-			FCPPT_TEXT("Unable to parse \"")+
-			it->name+
-			FCPPT_TEXT("\": ")+
-			e.string());
+		try
+		{
+			return 
+				insula::json::convert<T>(
+					it->value_);
+		}
+		catch (sge::parse::json::invalid_get const &e)
+		{
+			throw exception(
+				FCPPT_TEXT("Unable to parse \"")+
+				it->name+
+				FCPPT_TEXT("\": ")+
+				e.string());
+		}
 	}
+
 }
 }
 }

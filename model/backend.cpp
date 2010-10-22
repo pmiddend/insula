@@ -85,7 +85,8 @@ insula::model::backend::begin(
 		nontransparent_list = 
 			sge::renderer::state::list
 				// for now, cull both
-				(rp.name == FCPPT_TEXT("shadow") ? sge::renderer::state::cull_mode::back : sge::renderer::state::cull_mode::front)
+				//(rp.name == FCPPT_TEXT("shadow") ? sge::renderer::state::cull_mode::back : sge::renderer::state::cull_mode::front)
+				(sge::renderer::state::cull_mode::front)
 				(sge::renderer::state::bool_::enable_alpha_blending = false)
 				(sge::renderer::state::depth_func::less),
 		transparent_list = 

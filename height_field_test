@@ -1,4 +1,0 @@
-#!/bin/bash
-
-build/generate_height_texture media/smooth* media/textures/rock_512.png media/textures/sand_512.png media/textures/grass_512.png
-display media/result.png
