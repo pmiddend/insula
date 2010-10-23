@@ -92,19 +92,6 @@ insula::shadow::object::update(
 		gizmo());
 }
 
-/*
-insula::graphics::mat4 const
-insula::shadow::object::mvp(
-	graphics::mat4 const &projection) const
-{
-	return 
-		projection 
-			gizmo::to_mat4(gizmo())
-			* gizmo::rotation_to_mat4(gizmo()) 
-			* fcppt::math::matrix::translation(-gizmo().position());
-}
-*/
-
 insula::graphics::gizmo const
 insula::shadow::object::gizmo() const
 {
@@ -115,7 +102,7 @@ insula::shadow::object::gizmo() const
 				sun_angle_,
 				static_cast<graphics::scalar>(0)),
 		forward = 
-			-fcppt::math::vector::normalize(
+			fcppt::math::vector::normalize(
 				position),
 		right = 
 			graphics::vec3(0,0,-1),
@@ -128,7 +115,7 @@ insula::shadow::object::gizmo() const
 	return 
 		graphics::gizmo(
 			graphics::gizmo::init()
-				.position(base_position_ - position)
+				.position(base_position_ + position)
 				.forward(forward)
 				.up(up)
 				.right(right));
@@ -139,6 +126,7 @@ insula::shadow::object::base_position(
 	graphics::vec3 const &v)
 {
 	base_position_ = v;
+	fcppt::io::cout << "new base position: " << v << "\n";
 }
 
 fcppt::signal::auto_connection
