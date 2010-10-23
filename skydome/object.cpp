@@ -307,8 +307,8 @@ insula::skydome::object::render(
 
 void
 insula::skydome::object::shadow_update(
-	graphics::scalar,
-	graphics::gizmo const &sun_gizmo)
+	graphics::scalar const angle,
+	graphics::gizmo const &)
 {
 	sge::renderer::glsl::scoped_program scoped_shader_(
 		renderer_,
@@ -316,6 +316,8 @@ insula::skydome::object::shadow_update(
 
 	shader_.set_uniform(
 		"sun_position",
-		fcppt::math::vector::normalize(
-			sun_gizmo.position()));
+		math::sphere_point(
+			static_cast<graphics::scalar>(1),
+			angle,
+			static_cast<graphics::scalar>(0)));
 }

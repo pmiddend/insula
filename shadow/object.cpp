@@ -85,8 +85,8 @@ insula::shadow::object::update(
 	time_delta const delta)
 {
 	sun_angle_ += delta / 2;
-	if (sun_angle_ >= fcppt::math::pi<graphics::scalar>())
-		sun_angle_ = -fcppt::math::pi<graphics::scalar>();
+	if (sun_angle_ >= fcppt::math::pi<graphics::scalar>()/2)
+		sun_angle_ = -fcppt::math::pi<graphics::scalar>()/2;
 	update_signal_(
 		sun_angle_,
 		gizmo());
@@ -128,7 +128,7 @@ insula::shadow::object::gizmo() const
 	return 
 		graphics::gizmo(
 			graphics::gizmo::init()
-				.position(base_position_ + position)
+				.position(base_position_ - position)
 				.forward(forward)
 				.up(up)
 				.right(right));

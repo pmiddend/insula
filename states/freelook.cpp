@@ -85,10 +85,10 @@ insula::states::freelook::react(
 	context<game_inner>().react(
 		t);
 
-	/*
+/*
 	context<machine>().camera().gizmo() = 
 		context<game_outer>().shadow_object().gizmo();
-	*/
+*/
 
 	return discard_event();
 }
