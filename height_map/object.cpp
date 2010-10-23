@@ -15,6 +15,7 @@
 #include "../math/triangle/to_plane.hpp"
 #include "../scene/render_pass/object.hpp"
 #include "../shadow/object.hpp"
+#include "../gizmo/to_mat4.hpp"
 #include "vf/format.hpp"
 #include "vf/normal.hpp"
 #include "vf/vertex_view.hpp"
@@ -351,8 +352,9 @@ insula::height_map::object::begin(
 
 	shader_.set_uniform(
 		"shadow_mvp",
-		shadow_.mvp(
-			camera_.perspective()));
+		camera_.perspective() * 
+		gizmo::to_mat4(
+			shadow_.gizmo()));
 
 	sge::renderer::scoped_vertex_buffer const scoped_vb_(
 		renderer_,

@@ -94,8 +94,7 @@ graphics/camera/scoped.cpp)
 SET(texture_files textures/interpolators/bernstein_polynomial.cpp
 textures/weights.cpp
 textures/blend.cpp) 
-SET(overlay_files overlay/object.cpp
-overlay/function_backend.cpp) 
+SET(overlay_files overlay/object.cpp) 
 SET(console_files console/streambuf.cpp
 console/object.cpp)
 SET(skydome_files
@@ -107,6 +106,7 @@ scene/instance.cpp
 scene/backend.cpp
 scene/manager.cpp
 scene/scoped_backend.cpp
+scene/function_backend.cpp
 scene/render_pass/scoped.cpp
 )
 SET(prop_files prop/instance.cpp

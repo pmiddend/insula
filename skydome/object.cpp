@@ -12,6 +12,7 @@
 #include "../media_path.hpp"
 #include "../timed_output.hpp"
 #include "../math/sphere_point.hpp"
+#include "../shadow/object.hpp"
 #include <sge/renderer/device.hpp>
 #include <sge/renderer/texture.hpp>
 #include <sge/renderer/vertex_buffer.hpp>
@@ -51,24 +52,20 @@
 #include <fcppt/math/rad_to_deg.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/variant/apply_unary.hpp>
-#include <boost/foreach.hpp>
-#include <type_traits>
-#include <cmath>
-#include <algorithm>
 #include <fcppt/text.hpp>
 #include <fcppt/assert.hpp>
 #include <fcppt/assert_message.hpp>
 #include <fcppt/math/deg_to_rad.hpp>
-
 #include <fcppt/math/matrix/perspective.hpp>
+#include <boost/foreach.hpp>
+#include <functional>
+#include <type_traits>
+#include <cmath>
+#include <algorithm>
 
 insula::skydome::object::object(
 	parameters const &params)
 :
-	scene::backend(
-		params.scene_manager,
-		{"water","normal"},
-		scene::backend_priority::high),
 	camera_(
 		params.camera),
 	renderer_(
@@ -85,7 +82,7 @@ insula::skydome::object::object(
 				graphics::mat4()),
 			graphics::shader::variable(
 				"sun_position",
-				graphics::shader::variable_type::const_,
+				graphics::shader::variable_type::uniform,
 				math::sphere_point(
 					static_cast<graphics::scalar>(1),
 					fcppt::math::deg_to_rad(
@@ -111,7 +108,24 @@ insula::skydome::object::object(
 			camera_.aspect(),
 			camera_.fov(),
 			0.1f,
-			3.0f))
+			3.0f)),
+	backend_(
+		params.scene_manager,
+		{"water","normal"},
+		scene::backend_priority::high),
+	render_connection_(
+		backend_.register_callback(
+			std::bind(
+				&object::render,
+				this,
+				std::placeholders::_1))),
+	shadow_update_connection_(
+		params.shadow.register_callback(
+			std::bind(
+				&object::shadow_update,
+				this,
+				std::placeholders::_1,
+				std::placeholders::_2)))
 {
 	graphics::vec3 const color0 = 	
 		json::find_member<graphics::vec3>(
@@ -252,8 +266,10 @@ insula::skydome::object::object(
 			sge::renderer::lock_mode::writeonly).value().any());
 }
 
+insula::skydome::object::~object() {}
+
 void
-insula::skydome::object::begin(
+insula::skydome::object::render(
 	scene::render_pass::object const &)
 {
 	// FIRST the shader, THEN the vertex buffer
@@ -290,9 +306,16 @@ insula::skydome::object::begin(
 }
 
 void
-insula::skydome::object::end(
-	scene::render_pass::object const &)
+insula::skydome::object::shadow_update(
+	graphics::scalar,
+	graphics::gizmo const &sun_gizmo)
 {
-}
+	sge::renderer::glsl::scoped_program scoped_shader_(
+		renderer_,
+		shader_.program());
 
-insula::skydome::object::~object() {}
+	shader_.set_uniform(
+		"sun_position",
+		fcppt::math::vector::normalize(
+			sun_gizmo.position()));
+}

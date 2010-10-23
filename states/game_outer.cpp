@@ -78,7 +78,8 @@ insula::states::game_outer::game_outer(
 			context<machine>().config_file(),
 			context<machine>().camera(),
 			context<machine>().systems(),
-			scene_manager_)),
+			scene_manager_,
+			shadow_)),
 	water_(
 		water::parameters(
 			context<machine>().config_file(),

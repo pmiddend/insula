@@ -48,7 +48,9 @@ insula::shadow::object::object(
 			FCPPT_TEXT("sun-distance"))),
 	// Angle 0 would mean the sun is at the zenith. I want it to start at y=0
 	sun_angle_(
-		-fcppt::math::pi<graphics::scalar>()/2)
+		-fcppt::math::pi<graphics::scalar>()/2),
+	base_position_(
+		graphics::vec3::null())
 {
 	params.scene_manager.add(
 		scene::render_pass::object(
@@ -82,24 +84,27 @@ void
 insula::shadow::object::update(
 	time_delta const delta)
 {
-	//sun_angle_ = graphics::scalar(-2.28399);
-	sun_angle_ -= delta / 10;
-	//fcppt::io::cout << "Angle: " << sun_angle_ << "\n";
+	sun_angle_ += delta / 2;
 	if (sun_angle_ >= fcppt::math::pi<graphics::scalar>())
 		sun_angle_ = -fcppt::math::pi<graphics::scalar>();
+	update_signal_(
+		sun_angle_,
+		gizmo());
 }
 
+/*
 insula::graphics::mat4 const
 insula::shadow::object::mvp(
 	graphics::mat4 const &projection) const
 {
 	return 
 		projection 
+			gizmo::to_mat4(gizmo())
 			* gizmo::rotation_to_mat4(gizmo()) 
-			* fcppt::math::matrix::translation(gizmo().position() * -1.0f);
+			* fcppt::math::matrix::translation(-gizmo().position());
 }
+*/
 
-// This is just to test the camera in freelook
 insula::graphics::gizmo const
 insula::shadow::object::gizmo() const
 {
@@ -120,18 +125,10 @@ insula::shadow::object::gizmo() const
 				graphics::vec3(
 					0,0,-1));
 
-	/*
-	fcppt::io::cout << "angle is " << sun_angle_ << "\n";
-	fcppt::io::cout << "position is " << position << "\n";
-	fcppt::io::cout << "forward is " << forward << "\n";
-	fcppt::io::cout << "right is " << right << "\n";
-	fcppt::io::cout << "up is " << up << "\n";
-	*/
-
 	return 
 		graphics::gizmo(
 			graphics::gizmo::init()
-				.position(base_position_ - position)
+				.position(base_position_ + position)
 				.forward(forward)
 				.up(up)
 				.right(right));
@@ -142,4 +139,13 @@ insula::shadow::object::base_position(
 	graphics::vec3 const &v)
 {
 	base_position_ = v;
+}
+
+fcppt::signal::auto_connection
+insula::shadow::object::register_callback(
+	update_callback const &c)
+{
+	return 
+		update_signal_.connect(
+			c);
 }

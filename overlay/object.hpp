@@ -1,7 +1,7 @@
 #ifndef INSULA_OVERLAY_OBJECT_HPP_INCLUDED
 #define INSULA_OVERLAY_OBJECT_HPP_INCLUDED
 
-#include "function_backend.hpp"
+#include "../scene/function_backend.hpp"
 #include "parameters_fwd.hpp"
 #include "../graphics/shader/object.hpp"
 #include "../graphics/camera/object_fwd.hpp"
@@ -38,14 +38,14 @@ public:
 	// texture is drawn
 	fcppt::signal::auto_connection
 	register_callback(
-		function_backend::callback const &);
+		scene::function_backend::callback const &);
 private:
 	sge::renderer::device_ptr renderer_;
 	graphics::camera::object &camera_;
 	// This backend draws the quad with the overlay texture
-	function_backend texture_backend_;
+	scene::function_backend texture_backend_;
 	// And this one is activated after that, to draw...overlay stuff
-	function_backend user_backend_;
+	scene::function_backend user_backend_;
 	sge::renderer::texture_ptr overlay_texture_;
 	sge::renderer::target_ptr target_;
 	sge::renderer::vertex_buffer_ptr vb_;
@@ -53,7 +53,8 @@ private:
 	fcppt::signal::scoped_connection internal_connection_;
 
 	void
-	render();
+	render(
+		scene::render_pass::object const &);
 };
 }
 }

@@ -39,6 +39,7 @@
 #include <sge/renderer/vertex_count.hpp>
 #include <sge/renderer/nonindexed_primitive_type.hpp>
 #include <fcppt/math/dim/structure_cast.hpp>
+#include <fcppt/math/matrix/orthogonal_xy.hpp>
 #include <fcppt/text.hpp>
 #include <fcppt/io/cout.hpp>
 #include <functional>
@@ -102,7 +103,8 @@ insula::overlay::object::object(
 		texture_backend_.register_callback(
 			std::bind(
 				&object::render,
-				this)))
+				this,
+				std::placeholders::_1)))
 {
 	params.scene_manager.add(
 		scene::render_pass::object(
@@ -150,36 +152,6 @@ insula::overlay::object::object(
 			}),
 		{"normal"});
 
-	// Currently, I don't have the capabilities to modify the camera
-	// perspective matrix, only the modelview matrix. So I cannot set an
-	// orthogonal projection. So, as a hack, we set the camera to the
-	// origin and place a quad in the middle of the near/far plane and
-	// make it large, so we can be sure it covers the whole screen.
-	//
-	// Then, in the shader, we use gl_FragCoord to get the texture
-	// coordinate.
-	graphics::scalar const
-		z_value =
-			-(params.camera.near() + params.camera.far())/static_cast<graphics::scalar>(2),
-		// The formula is z * tan(fovy/2), but we want a square block, so
-		// we multiply by aspect
-		//      /|-
-		//     / |
-		//    /  | 
-		//   /   | z * tan(fovy/2)
-		//  /|   |
-		// . |   |-
-		//  \|   |
-		//   \   |
-		//    \  |
-		//     \ |
-		//      \|
-		edge_length =
-			-z_value
-				* params.camera.aspect()
-				* static_cast<graphics::scalar>(2.0)
-				* std::tan(params.camera.fov() / static_cast<graphics::scalar>(2));
-
 	// We have to activate the shader here because we want to fill the
 	// vertex buffer with "custom" attributes.
 	sge::renderer::glsl::scoped_program scoped_shader_(
@@ -197,7 +169,8 @@ insula::overlay::object::object(
 					.right(graphics::vec3(1,0,0))));
 		quad_shader_.set_uniform(
 			FCPPT_TEXT("mvp"),
-			params.camera.mvp());
+			fcppt::math::matrix::orthogonal_xy<graphics::scalar>() 
+				* params.camera.world());
 	}
 
 
@@ -214,53 +187,35 @@ insula::overlay::object::object(
 	// Left top
 	(vb_it++)->set<vf::position>(
 		vf::position::packed_type(
-			-edge_length,
-			edge_length,
-			z_value));
+			-1,
+			1,
+			0));
 
 	// Left bottom
 	(vb_it++)->set<vf::position>(
 		vf::position::packed_type(
-			-edge_length,
-			-edge_length,
-			z_value));
+			-1,-1,0));
 
 	// Right top
 	(vb_it++)->set<vf::position>(
 		vf::position::packed_type(
-			edge_length,
-			edge_length,
-			z_value));
+			1,1,0));
 
 	// Right top
 	(vb_it++)->set<vf::position>(
 		vf::position::packed_type(
-			edge_length,
-			edge_length,
-			z_value));
+			1,1,0));
 
 	// Left bottom
 	(vb_it++)->set<vf::position>(
 		vf::position::packed_type(
-			-edge_length,
-			-edge_length,
-			z_value));
+			-1,-1,0));
 
 	// Right bottom
 	(vb_it++)->set<vf::position>(
 		vf::position::packed_type(
-			edge_length,
-			-edge_length,
-			z_value));
+			1,-1,0));
 }
-
-/*
-sge::renderer::texture_ptr const
-insula::overlay::object::texture()
-{
-	return overlay_texture_;
-}
-*/
 
 sge::renderer::target_ptr const
 insula::overlay::object::target()
@@ -270,13 +225,14 @@ insula::overlay::object::target()
 
 fcppt::signal::auto_connection
 insula::overlay::object::register_callback(
-	function_backend::callback const &c)
+	scene::function_backend::callback const &c)
 {
 	return user_backend_.register_callback(c);
 }
 
 void
-insula::overlay::object::render()
+insula::overlay::object::render(
+	scene::render_pass::object const &)
 {
 	sge::renderer::state::scoped scoped_state(
 		renderer_,

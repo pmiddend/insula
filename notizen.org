@@ -10,6 +10,7 @@
 - Landschaftsgenerierung http://www.dungeonleague.com/page/2/
 - Neue AA-Methode: http://www.gamedev.net/community/forums/topic.asp?topic_id=580517
 - VSM, bestes Paper: http://http.developer.nvidia.com/GPUGems3/gpugems3_ch08.html
+- Szenegraphen: http://www.realityprime.com/articles/scenegraphs-past-present-and-future
 * Konfigurationssystem
 - Alle Daten stehen in der json-Datei
 - Alle Subsysteme kriegen ein json-Objekt

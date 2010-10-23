@@ -61,6 +61,7 @@
 #include "media_path.hpp"
 // Config file end
 #include <fcppt/text.hpp>
+#include <fcppt/math/deg_to_rad.hpp>
 // Viewport hack begin
 #include <sge/renderer/viewport.hpp>
 #include <sge/renderer/pixel_pos.hpp>
@@ -130,9 +131,10 @@ insula::machine::machine(
 			input_delegator_,
 			sge::renderer::aspect<graphics::scalar>(
 				systems_.renderer()->screen_size()),
-			json::find_member<graphics::scalar>(
-				config_file_,
-				FCPPT_TEXT("camera/fov")),
+			fcppt::math::deg_to_rad(
+				json::find_member<graphics::scalar>(
+					config_file_,
+					FCPPT_TEXT("camera/fov"))),
 			json::find_member<graphics::scalar>(
 				config_file_,
 				FCPPT_TEXT("camera/near")),
